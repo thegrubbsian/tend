@@ -1,13 +1,14 @@
 id: F-aotv97
 key: habit-engine/habit-activity-lifecycle
 title: Habit Activity Lifecycle
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-vrsbxv
+branch: tiller/habit-engine/habit-activity-lifecycle
 accepted_against:
     spec:
         kind: git_blob
