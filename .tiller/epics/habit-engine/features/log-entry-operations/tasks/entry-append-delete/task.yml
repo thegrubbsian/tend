@@ -1,7 +1,7 @@
 id: T-jg4df3
 key: habit-engine/log-entry-operations/entry-append-delete
 title: Append and delete editable log entries
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,6 +15,7 @@ accepted_against:
         kind: git_commit
         value: git:48e2ba2
         observed_at: 2026-08-01T17:46:00.784098Z
+pr: 10
 gates:
     build:
         required: true
