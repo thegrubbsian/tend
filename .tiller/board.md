@@ -7,7 +7,9 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- (none)
+- epic habit-engine (E-tslnrm): ready
+- epic app-experience (E-ul4fy3): ready
+- epic device-readiness (E-z3y156): ready
 
 ### Blocked
 
@@ -19,5 +21,4 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Open questions
 
-- Q-lfe6in: "How should weekly quantity habits scope logging and set-total behavior when their bucket is a week but the log sheet specifies Today and Yesterday?"
 - Q-zyqw93: "What weekly Habit Detail history layout, navigation, and state treatment should replace the day-cell garden bed specified for daily habits?"

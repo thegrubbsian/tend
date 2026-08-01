@@ -1,7 +1,7 @@
 id: E-z3y156
 key: device-readiness
 title: Device Readiness
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: design/01-overview.md
