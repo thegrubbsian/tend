@@ -1,7 +1,7 @@
 id: T-lq5y49
 key: habit-engine/log-entry-operations/bucket-total-adjustment
 title: Set bucket totals by appending deltas
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,34 +18,29 @@ accepted_against:
         value: git:48e2ba2
         observed_at: 2026-08-01T17:46:00.800851Z
 gates:
-    evals:
+    build:
         required: true
         kind: command
         status: pass
         run_by: jc
-        run_at: 2026-08-01T19:30:26.184184Z
+        run_at: 2026-08-01T19:36:42.212581Z
         against:
-            kind: sha256
-            value: sha256:5686832f23b2d8108673e837a2f230f4c100f82744fba47071e8407b577717eb
-            observed_at: 2026-08-01T19:30:22.0261Z
-        criteria:
-            C1:
-                status: pass
-                evidence:
-                    - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C1-sha256-5686832f23b2-out-402e3dc9d1a3169fb46d4d8a0b94fe253848a5097686de6ebc4d80f0d3467108.txt
-            C2:
-                status: pass
-                evidence:
-                    - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C2-sha256-5686832f23b2-out-a34ecb0f3250805f5dbc73f9ba1bee439391064a046787a49c9499907b60fe18.txt
-            C3:
-                status: pass
-                evidence:
-                    - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C3-sha256-5686832f23b2-out-838553a89fcce187472f194431bda97cbfd03e8b1136358f6c55932b255ff061.txt
-            C4:
-                status: pass
-                evidence:
-                    - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C4-sha256-5686832f23b2-out-36555076c562eeffdd5b9e947039beb5d65ff8cff4dd22e6d21edfd4ae3749c2.txt
+            kind: git_commit
+            value: git:e73555c
+            observed_at: 2026-08-01T19:36:42.212575Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-e73555c-out-ed83882d0d9b01989afef95b5b4018c46d4ac4b877db293a0043301741ca9194.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T19:36:42.212581Z
+        against:
+            kind: git_commit
+            value: git:e73555c
+            observed_at: 2026-08-01T19:36:42.212575Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-e73555c-out-7d945aa5129b3b8f6903697851069ae13e726e8cc8152ece33a947917eb35fa8.txt
