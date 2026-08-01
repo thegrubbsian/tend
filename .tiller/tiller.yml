@@ -39,7 +39,7 @@ gates:
   required:
     evals: { kind: command, run: "tiller eval ${node.noun} ${node.id}", on: [feature] }
     build: { kind: command, run: "swift build", on: [feature, task] }
-    tests: { kind: command, run: "swift test",  on: [feature, task] }
+    tests: { kind: command, run: "Scripts/tiller-swift-test", on: [feature, task] }
   optional:
     code_review:          { kind: attestation, on: pr }
     security_review:      { kind: attestation, on: pr }

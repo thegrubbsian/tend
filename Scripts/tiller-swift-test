@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -eq 0 ]; then
+  exec swift test
+fi
+
+if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
+  echo "usage: $0 [Tests/.../SuiteName.swift]" >&2
+  exit 2
+fi
+
+test_suite=$(basename "$1" .swift)
+test_list=$(swift test list)
+
+case "$test_list" in
+  *".$test_suite/"*) ;;
+  *)
+    echo "no discovered Swift test suite matches $1" >&2
+    exit 2
+    ;;
+esac
+
+exec swift test --filter "$test_suite"

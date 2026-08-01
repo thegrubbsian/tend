@@ -1,0 +1,13 @@
+id: EV-t9yuyr
+type: eval.feature
+at: 2026-08-01T15:13:45.103708Z
+owner: jc
+command: eval feature F-n7oy52
+targets:
+    - F-n7oy52
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml

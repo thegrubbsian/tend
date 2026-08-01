@@ -22,3 +22,50 @@ accepted_against:
         kind: git_commit
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.201406Z
+gates:
+    evals:
+        required: true
+        kind: command
+        status: fail
+        run_by: jc
+        run_at: 2026-08-01T15:14:09.713094Z
+        against:
+            kind: sha256
+            value: sha256:7801db6b26f4ced8bd0b78a4bc8feccf37de1a5ea767c473fa1187230fb3f329
+            observed_at: 2026-08-01T15:14:08.078965Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-7801db6b26f4-out-e2d3c2ed5888ad1af75953a6e83aad72b85562ecdcc60f7db09d23c3d4325adc.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-sha256-7801db6b26f4-out-5264fb3e779a9d29e04edc2f2355b93a1d628bc8fb22f3378f691dfb4624ea74.txt
+            C3:
+                status: fail
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-7801db6b26f4-out-ef270a83c003e9bffeb308111fa26280917ea3fc276816615f7e77e59252b7d3.txt
+            C4:
+                status: fail
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-sha256-7801db6b26f4-out-151d4db9152af61adc669cf19005b564287fe6f4b8ea89560462d89aa96f8500.txt
+            C5:
+                status: fail
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C5-sha256-7801db6b26f4-out-5db0d7ba7bdd1c9bba38e48e98e140cd705651987ad19cfb30051dcf61af5c95.txt
+            C6:
+                status: fail
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C6-sha256-7801db6b26f4-out-3b66d513fc0e9df14e8518734497bdafe5dd217329c4ab6aba7093289be53ce9.txt
+            C7:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C7-sha256-7801db6b26f4-out-a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74.txt
