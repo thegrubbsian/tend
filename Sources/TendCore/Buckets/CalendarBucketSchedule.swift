@@ -13,6 +13,7 @@ public enum CalendarBucketScheduleError: Error, Equatable, Sendable {
   case malformedKey(String)
   case invalidDate(String)
   case invalidWeeklyStart(String)
+  case unrepresentableDate
   case calendarCalculationFailed
 }
 
@@ -67,6 +68,7 @@ public struct CalendarBucketSchedule: Sendable {
     let calendar = calendar
     var components = DateComponents()
     components.timeZone = timeZone
+    components.era = 1
     components.year = parsed.year
     components.month = parsed.month
     components.day = parsed.day
@@ -76,8 +78,9 @@ public struct CalendarBucketSchedule: Sendable {
     }
 
     let start = calendar.startOfDay(for: date)
-    let resolved = calendar.dateComponents([.year, .month, .day], from: start)
+    let resolved = calendar.dateComponents([.era, .year, .month, .day], from: start)
     guard
+      resolved.era == 1,
       resolved.year == parsed.year,
       resolved.month == parsed.month,
       resolved.day == parsed.day
@@ -115,19 +118,32 @@ public struct CalendarBucketSchedule: Sendable {
   ) throws -> CalendarBucketPeriod {
     let lengthInDays = cadence == .daily ? 1 : 7
     guard
-      let end = calendar.date(byAdding: .day, value: lengthInDays, to: start),
-      let graceEnd = calendar.date(byAdding: .day, value: 1, to: end)
+      let endCandidate = calendar.date(
+        byAdding: .day,
+        value: lengthInDays,
+        to: start
+      )
     else {
       throw CalendarBucketScheduleError.calendarCalculationFailed
     }
+    let end = calendar.startOfDay(for: endCandidate)
+    guard let graceEndCandidate = calendar.date(byAdding: .day, value: 1, to: end)
+    else {
+      throw CalendarBucketScheduleError.calendarCalculationFailed
+    }
+    let graceEnd = calendar.startOfDay(for: graceEndCandidate)
 
-    let components = calendar.dateComponents([.year, .month, .day], from: start)
+    let components = calendar.dateComponents([.era, .year, .month, .day], from: start)
     guard
+      let era = components.era,
       let year = components.year,
       let month = components.month,
       let day = components.day
     else {
       throw CalendarBucketScheduleError.calendarCalculationFailed
+    }
+    guard era == 1, (1...9_999).contains(year) else {
+      throw CalendarBucketScheduleError.unrepresentableDate
     }
 
     let prefix = cadence == .daily ? "day" : "week"
