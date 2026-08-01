@@ -1,0 +1,13 @@
+id: EV-0p0dnb
+type: start.task
+at: 2026-08-01T18:42:37.192146Z
+owner: jc
+command: start task T-jg4df3
+targets:
+    - T-jg4df3
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/entry-append-delete/task.yml
