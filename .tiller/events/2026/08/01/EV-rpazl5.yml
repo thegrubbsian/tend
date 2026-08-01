@@ -1,0 +1,13 @@
+id: EV-rpazl5
+type: start.task
+at: 2026-08-01T19:23:26.653692Z
+owner: jc
+command: start task T-lq5y49
+targets:
+    - T-lq5y49
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml
