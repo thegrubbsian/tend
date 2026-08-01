@@ -1,0 +1,13 @@
+id: EV-yw110e
+type: check.task
+at: 2026-08-01T19:01:02.468511Z
+owner: jc
+command: check task T-jg4df3
+targets:
+    - T-jg4df3
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/entry-append-delete/task.yml
