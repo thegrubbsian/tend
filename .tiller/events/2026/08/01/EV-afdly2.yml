@@ -1,0 +1,13 @@
+id: EV-afdly2
+type: check.task
+at: 2026-08-01T21:09:48.768538Z
+owner: jc
+command: check task T-otqpk2
+targets:
+    - T-otqpk2
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.yml
