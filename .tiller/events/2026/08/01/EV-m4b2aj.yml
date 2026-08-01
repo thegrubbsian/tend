@@ -1,0 +1,14 @@
+id: EV-m4b2aj
+type: sync.task
+at: 2026-08-01T16:44:08.850363Z
+owner: jc
+command: sync task T-96c5xx
+targets:
+    - T-96c5xx
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml

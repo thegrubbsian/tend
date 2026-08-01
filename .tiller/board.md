@@ -19,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/bucket-evaluation/bucket-state-evaluation (T-96c5xx): build pass, tests pass
+- (none)
 
 ### Open questions
 
