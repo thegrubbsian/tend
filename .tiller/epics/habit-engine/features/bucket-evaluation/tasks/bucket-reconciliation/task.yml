@@ -1,7 +1,7 @@
 id: T-evhkq6
 key: habit-engine/bucket-evaluation/bucket-reconciliation
 title: Reconcile persisted buckets deterministically
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:a7145a5
         observed_at: 2026-08-01T15:32:54.823327Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T17:03:23.25344Z
+        against:
+            kind: sha256
+            value: sha256:6e505ad803b8b8305fe4fa02dbad2d2794c55f03537801cdfa1c74a6896249d3
+            observed_at: 2026-08-01T17:03:23.253437Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-6e505ad803b8-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T17:03:23.25344Z
+        against:
+            kind: sha256
+            value: sha256:6e505ad803b8b8305fe4fa02dbad2d2794c55f03537801cdfa1c74a6896249d3
+            observed_at: 2026-08-01T17:03:23.253437Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-6e505ad803b8-out-61af23f84e222c3aea726f511491e1d42d766236dcbedd6f2367485a4faf03ae.txt
