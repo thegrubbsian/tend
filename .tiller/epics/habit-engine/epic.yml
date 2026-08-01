@@ -1,7 +1,19 @@
 id: E-tslnrm
 key: habit-engine
 title: Habit Engine
-status: ready
+status: done
 blocked: false
 owner: jc
 source: design/02-domain-model.md
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:c995dbaa7c044b3d0dea791cc84788c36dcc28e7
+        path: .tiller/epics/habit-engine/epic.md
+        observed_at: 2026-08-01T22:35:39.654243Z
+    commit:
+        kind: git_commit
+        value: git:646dbee
+        observed_at: 2026-08-01T22:35:39.26896Z
+    surfaces: []
+done_basis: rollup

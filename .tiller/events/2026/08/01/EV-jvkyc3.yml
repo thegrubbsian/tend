@@ -1,0 +1,14 @@
+id: EV-jvkyc3
+type: sync.feature
+at: 2026-08-01T22:35:39.487809Z
+owner: jc
+command: sync feature F-vbsg1a
+targets:
+    - F-vbsg1a
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/feature.yml

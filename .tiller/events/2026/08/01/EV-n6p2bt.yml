@@ -1,0 +1,14 @@
+id: EV-n6p2bt
+type: sync.epic
+at: 2026-08-01T22:35:39.662384Z
+owner: jc
+command: sync epic E-tslnrm
+targets:
+    - E-tslnrm
+before:
+    status: ready
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/epic.yml
