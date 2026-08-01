@@ -153,6 +153,38 @@ struct BucketReconcilerTests {
     #expect(try buckets(for: multiple, in: multipleContext).isEmpty)
   }
 
+  @Test("instants before activation are rejected across calendar boundaries")
+  func instantsBeforeActivationAreRejectedAcrossCalendarBoundaries() throws {
+    for evaluationInstant in [
+      "2024-01-02T11:00:00Z",
+      "2024-01-01T23:00:00Z",
+    ] {
+      let context = try makeContext()
+      let habit = try insertHabit(
+        in: context,
+        cadence: .daily,
+        target: 1,
+        unit: "times",
+        activityStart: "2024-01-02T12:00:00Z"
+      )
+      var saveCount = 0
+
+      try expectError(.instantBeforeActivityStart) {
+        try BucketReconciler(context: context) {
+          saveCount += 1
+          try context.save()
+        }.reconcile(
+          habit: habit,
+          at: instant(evaluationInstant),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(saveCount == 0)
+      #expect(try buckets(for: habit, in: context).isEmpty)
+    }
+  }
+
   @Test("reconciliation is idempotent and skips the second save")
   func reconciliationIsIdempotentAndSkipsSecondSave() throws {
     let context = try makeContext()
@@ -259,6 +291,58 @@ struct BucketReconcilerTests {
     #expect(buckets[1].startAt == (try instant("2024-01-01T15:00:00Z")))
   }
 
+  @Test("habit UUID collisions do not cross SwiftData aggregate boundaries")
+  func habitUUIDCollisionsDoNotCrossSwiftDataAggregateBoundaries() throws {
+    let context = try makeContext()
+    let sharedID = UUID()
+    let firstHabit = Habit(
+      id: sharedID,
+      name: "First",
+      cadence: .daily,
+      target: 1
+    )
+    let secondHabit = Habit(
+      id: sharedID,
+      name: "Second",
+      cadence: .daily,
+      target: 9
+    )
+    firstHabit.activityPeriods = [
+      HabitActivityPeriod(startedAt: try instant("2024-01-01T00:00:00Z"))
+    ]
+    secondHabit.activityPeriods = [
+      HabitActivityPeriod(startedAt: try instant("2024-01-01T00:00:00Z"))
+    ]
+    let firstBucket = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: Date(timeIntervalSince1970: 10),
+      endAt: Date(timeIntervalSince1970: 20),
+      cadence: .daily
+    )
+    let secondBucket = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: Date(timeIntervalSince1970: 30),
+      endAt: Date(timeIntervalSince1970: 40),
+      cadence: .daily
+    )
+    firstHabit.buckets = [firstBucket]
+    secondHabit.buckets = [secondBucket]
+    context.insert(firstHabit)
+    context.insert(secondHabit)
+    try context.save()
+    let secondBefore = BucketSnapshot(secondBucket)
+
+    try BucketReconciler(context: context).reconcile(
+      habit: firstHabit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+
+    #expect(firstBucket.startAt == (try instant("2024-01-01T00:00:00Z")))
+    #expect(firstBucket.endAt == (try instant("2024-01-02T00:00:00Z")))
+    #expect(BucketSnapshot(secondBucket) == secondBefore)
+  }
+
   @Test("duplicate keys are rejected before any mutation")
   func duplicateKeysAreRejectedBeforeAnyMutation() throws {
     let context = try makeContext()
@@ -344,6 +428,112 @@ struct BucketReconcilerTests {
     #expect(try buckets(for: habit, in: context).count == 2)
   }
 
+  @Test("settled buckets still require canonical cadence and period identity")
+  func settledBucketsStillRequireCanonicalCadenceAndPeriodIdentity() throws {
+    let cases: [(String, String, BucketEvaluationError)] = [
+      (
+        "day:2024-1-01",
+        HabitCadence.daily.rawValue,
+        .calendar(.malformedKey("day:2024-1-01"))
+      ),
+      (
+        "day:2023-12-31",
+        "monthly",
+        .unsupportedCadence("monthly")
+      ),
+    ]
+
+    for (periodKey, cadenceRawValue, expectedError) in cases {
+      let context = try makeContext()
+      let habit = Habit(name: "Read", cadence: .daily, target: 1)
+      habit.activityPeriods = [
+        HabitActivityPeriod(startedAt: try instant("2024-01-01T00:00:00Z"))
+      ]
+      let settled = HabitBucket(
+        periodKey: periodKey,
+        startAt: Date(timeIntervalSince1970: 10),
+        endAt: Date(timeIntervalSince1970: 20),
+        cadence: .daily,
+        finalizedAt: try instant("2024-01-01T00:00:00Z"),
+        verdict: .met,
+        targetSnapshot: 1,
+        unitSnapshot: "times"
+      )
+      settled.cadenceRawValue = cadenceRawValue
+      habit.buckets = [settled]
+      context.insert(habit)
+      try context.save()
+      let before = BucketSnapshot(settled)
+      var saveCount = 0
+
+      do {
+        try BucketReconciler(context: context) {
+          saveCount += 1
+          try context.save()
+        }.reconcile(
+          habit: habit,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+        Issue.record("Expected settled identity validation failure")
+      } catch let error as BucketEvaluationError {
+        #expect(error == expectedError)
+      }
+
+      #expect(saveCount == 0)
+      #expect(BucketSnapshot(settled) == before)
+      #expect(try buckets(for: habit, in: context).count == 1)
+      #expect(!context.hasChanges)
+    }
+  }
+
+  @Test("persisted validation error order ignores SwiftData fetch order")
+  func persistedValidationErrorOrderIgnoresSwiftDataFetchOrder() throws {
+    let context = try makeContext()
+    let habit = Habit(name: "Read", cadence: .daily, target: 1)
+    habit.activityPeriods = [
+      HabitActivityPeriod(startedAt: try instant("2024-01-01T00:00:00Z"))
+    ]
+    habit.buckets = [
+      HabitBucket(
+        periodKey: "day:2024-01-01",
+        startAt: Date(timeIntervalSince1970: 10),
+        endAt: Date(timeIntervalSince1970: 20),
+        cadence: .daily
+      ),
+      HabitBucket(
+        periodKey: "day:2024-01-02",
+        startAt: Date(timeIntervalSince1970: 30),
+        endAt: Date(timeIntervalSince1970: 40),
+        cadence: .daily
+      ),
+    ]
+    context.insert(habit)
+    try context.save()
+
+    let habitIdentifier = habit.persistentModelID
+    let fetchOrder = try context.fetch(FetchDescriptor<HabitBucket>())
+      .filter { $0.habit?.persistentModelID == habitIdentifier }
+    let firstFetched = try #require(fetchOrder.first)
+    let secondFetched = try #require(fetchOrder.dropFirst().first)
+    firstFetched.periodKey = "day:2024-01-02"
+    firstFetched.cadenceRawValue = "yearly"
+    secondFetched.periodKey = "day:2024-01-01"
+    secondFetched.cadenceRawValue = "monthly"
+    try context.save()
+
+    do {
+      try BucketReconciler(context: context).reconcile(
+        habit: habit,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected deterministic validation failure")
+    } catch let error as BucketEvaluationError {
+      #expect(error == .unsupportedCadence("monthly"))
+    }
+  }
+
   @Test("save failure rolls back creations and existing updates")
   func saveFailureRollsBackCreationsAndExistingUpdates() throws {
     let context = try makeContext()
@@ -411,9 +601,9 @@ struct BucketReconcilerTests {
   private func buckets(for habit: Habit, in context: ModelContext) throws
     -> [HabitBucket]
   {
-    let habitID = habit.id
+    let habitIdentifier = habit.persistentModelID
     return try context.fetch(FetchDescriptor<HabitBucket>())
-      .filter { $0.habit?.id == habitID }
+      .filter { $0.habit?.persistentModelID == habitIdentifier }
       .sorted { $0.periodKey < $1.periodKey }
   }
 

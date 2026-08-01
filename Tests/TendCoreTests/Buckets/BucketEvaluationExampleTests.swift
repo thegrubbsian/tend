@@ -247,10 +247,10 @@ struct BucketEvaluationExampleTests {
     for habit: Habit,
     in context: ModelContext
   ) throws -> HabitBucket {
-    let habitID = habit.id
+    let habitIdentifier = habit.persistentModelID
     return try #require(
       context.fetch(FetchDescriptor<HabitBucket>()).first {
-        $0.habit?.id == habitID && $0.periodKey == key
+        $0.habit?.persistentModelID == habitIdentifier && $0.periodKey == key
       })
   }
 

@@ -4,6 +4,7 @@ import SwiftData
 public enum BucketReconciliationError: Error, Equatable, Sendable {
   case missingOpenActivityPeriod
   case multipleOpenActivityPeriods
+  case instantBeforeActivityStart
   case duplicatePeriodKey(String)
   case missingFinalizationCandidate(String)
   case nonAdvancingCalendarPeriod(String)
@@ -37,6 +38,9 @@ public final class BucketReconciler {
     }
 
     let activityPeriod = try openActivityPeriod(for: habit)
+    guard activityPeriod.startedAt <= instant else {
+      throw BucketReconciliationError.instantBeforeActivityStart
+    }
     guard let cadence = HabitCadence(rawValue: habit.cadenceRawValue) else {
       throw BucketEvaluationError.unsupportedCadence(habit.cadenceRawValue)
     }
@@ -51,6 +55,11 @@ public final class BucketReconciler {
     mutations.reserveCapacity(existingBuckets.count)
 
     for bucket in existingBuckets {
+      try validateIdentity(
+        of: bucket,
+        habitCadence: cadence,
+        schedule: schedule
+      )
       if let mutation = try plannedMutation(
         for: bucket,
         habit: habit,
@@ -134,11 +143,13 @@ public final class BucketReconciler {
   }
 
   private func fetchBuckets(for habit: Habit) throws -> [HabitBucket] {
-    let habitID = habit.id
+    let habitIdentifier = habit.persistentModelID
     let descriptor = FetchDescriptor<HabitBucket>(
       predicate: #Predicate<HabitBucket> { bucket in
-        bucket.habit?.id == habitID
-      })
+        bucket.habit?.persistentModelID == habitIdentifier
+      },
+      sortBy: [SortDescriptor(\HabitBucket.periodKey)]
+    )
     return try context.fetch(descriptor)
   }
 
@@ -157,6 +168,36 @@ public final class BucketReconciler {
       throw BucketReconciliationError.duplicatePeriodKey(duplicateKey)
     }
     return bucketsByKey
+  }
+
+  private func validateIdentity(
+    of bucket: HabitBucket,
+    habitCadence: HabitCadence,
+    schedule: CalendarBucketSchedule
+  ) throws {
+    guard let bucketCadence = HabitCadence(rawValue: bucket.cadenceRawValue)
+    else {
+      throw BucketEvaluationError.unsupportedCadence(bucket.cadenceRawValue)
+    }
+    guard habitCadence == bucketCadence else {
+      throw BucketEvaluationError.cadenceMismatch(
+        habit: habitCadence,
+        bucket: bucketCadence
+      )
+    }
+
+    let period: CalendarBucketPeriod
+    do {
+      period = try schedule.period(forKey: bucket.periodKey)
+    } catch let error as CalendarBucketScheduleError {
+      throw BucketEvaluationError.calendar(error)
+    }
+    guard period.cadence == bucketCadence else {
+      throw BucketEvaluationError.periodCadenceMismatch(
+        key: bucket.periodKey,
+        cadence: bucketCadence
+      )
+    }
   }
 
   private func plannedMutation(

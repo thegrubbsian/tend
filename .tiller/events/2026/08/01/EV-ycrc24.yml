@@ -1,0 +1,13 @@
+id: EV-ycrc24
+type: check.task
+at: 2026-08-01T17:23:27.577105Z
+owner: jc
+command: check task T-evhkq6
+targets:
+    - T-evhkq6
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.yml
