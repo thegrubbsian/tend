@@ -1,0 +1,14 @@
+id: EV-eai7mp
+type: submit.task
+at: 2026-08-01T16:09:38.085735Z
+owner: jc
+command: submit task T-24btkb
+targets:
+    - T-24btkb
+before:
+    status: check
+after:
+    pr: 7
+    status: in_review
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.yml

@@ -1,9 +1,19 @@
 id: T-96c5xx
 key: habit-engine/bucket-evaluation/bucket-state-evaluation
 title: Evaluate bucket state and finality
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-24btkb
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:31ec0af98a17555c392eb3bcc108c3c32b36abb3
+        path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.md
+        observed_at: 2026-08-01T15:32:54.797408Z
+    commit:
+        kind: git_commit
+        value: git:a7145a5
+        observed_at: 2026-08-01T15:32:54.810691Z

@@ -1,0 +1,13 @@
+id: EV-9586pg
+type: approve.task
+at: 2026-08-01T15:32:54.810731Z
+owner: jc
+command: approve task T-96c5xx
+targets:
+    - T-96c5xx
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml

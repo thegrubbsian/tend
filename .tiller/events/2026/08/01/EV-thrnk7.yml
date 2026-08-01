@@ -1,0 +1,13 @@
+id: EV-thrnk7
+type: approve.feature
+at: 2026-08-01T15:32:54.783245Z
+owner: jc
+command: approve feature F-6a3jmx
+targets:
+    - F-6a3jmx
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

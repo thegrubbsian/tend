@@ -1,9 +1,19 @@
 id: T-evhkq6
 key: habit-engine/bucket-evaluation/bucket-reconciliation
 title: Reconcile persisted buckets deterministically
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-96c5xx
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:7c008ca84ae28e1e02e84bb65aede64bd753df75
+        path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.md
+        observed_at: 2026-08-01T15:32:54.810783Z
+    commit:
+        kind: git_commit
+        value: git:a7145a5
+        observed_at: 2026-08-01T15:32:54.823327Z
