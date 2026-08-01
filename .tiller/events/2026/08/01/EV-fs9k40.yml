@@ -1,0 +1,14 @@
+id: EV-fs9k40
+type: sync.task
+at: 2026-08-01T19:42:38.769567Z
+owner: jc
+command: sync task T-lq5y49
+targets:
+    - T-lq5y49
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml

@@ -1,7 +1,7 @@
 id: T-lq5y49
 key: habit-engine/log-entry-operations/bucket-total-adjustment
 title: Set bucket totals by appending deltas
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:48e2ba2
         observed_at: 2026-08-01T17:46:00.800851Z
 pr: 11
+done_basis: ancestry
 gates:
     build:
         required: true

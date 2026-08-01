@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/log-entry-operations/bucket-total-adjustment (T-lq5y49): build pass, tests pass
+- (none)
 
 ### Open questions
 
