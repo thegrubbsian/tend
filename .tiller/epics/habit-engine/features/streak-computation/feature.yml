@@ -1,13 +1,14 @@
 id: F-vbsg1a
 key: habit-engine/streak-computation
 title: Streak Computation
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-aotv97
+branch: tiller/habit-engine/streak-computation
 accepted_against:
     spec:
         kind: git_blob

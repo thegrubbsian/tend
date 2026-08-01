@@ -1,7 +1,7 @@
 id: T-dqajj8
 key: habit-engine/streak-computation/streak-chain-calculation
 title: Calculate current and finalized streak chains
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,31 @@ accepted_against:
         kind: git_commit
         value: git:cec673c
         observed_at: 2026-08-01T21:45:05.05897Z
+pr: 14
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:56:42.855923Z
+        against:
+            kind: git_commit
+            value: git:1f4417e
+            observed_at: 2026-08-01T21:56:42.855913Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-1f4417e-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:56:42.855923Z
+        against:
+            kind: git_commit
+            value: git:1f4417e
+            observed_at: 2026-08-01T21:56:42.855913Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-1f4417e-out-f41e83942eb361cccff755908f2cea5e2ac102e11d6d90ac52c68573db67c6fd.txt
