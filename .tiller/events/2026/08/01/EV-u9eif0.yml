@@ -1,0 +1,14 @@
+id: EV-u9eif0
+type: sync.feature
+at: 2026-08-01T21:26:42.382694Z
+owner: jc
+command: sync feature F-aotv97
+targets:
+    - F-aotv97
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml

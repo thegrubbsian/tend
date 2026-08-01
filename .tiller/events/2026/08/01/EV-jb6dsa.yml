@@ -1,0 +1,14 @@
+id: EV-jb6dsa
+type: sync.task
+at: 2026-08-01T21:26:42.275205Z
+owner: jc
+command: sync task T-otqpk2
+targets:
+    - T-otqpk2
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.yml

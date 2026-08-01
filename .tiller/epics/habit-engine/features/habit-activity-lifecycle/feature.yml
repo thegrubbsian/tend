@@ -1,7 +1,7 @@
 id: F-aotv97
 key: habit-engine/habit-activity-lifecycle
 title: Habit Activity Lifecycle
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/02-domain-model.md
@@ -24,6 +24,23 @@ accepted_against:
         kind: git_commit
         value: git:e3973ae
         observed_at: 2026-08-01T20:22:52.811604Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:62b280d7db4e23e290626d752a8c692738e9b234
+        path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.md
+        observed_at: 2026-08-01T21:26:42.361931Z
+    eval:
+        kind: git_blob
+        value: git:95e5d5dbc0c96bd6d6684c7f7aff954a5bc01660
+        path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.eval.md
+        observed_at: 2026-08-01T21:26:42.361931Z
+    commit:
+        kind: git_commit
+        value: git:2b8af28
+        observed_at: 2026-08-01T21:26:42.244801Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true
