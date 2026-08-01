@@ -1,0 +1,14 @@
+id: EV-ut9qd1
+type: add.task
+at: 2026-08-01T17:38:10.559938Z
+owner: jc
+command: add task habit-engine/log-entry-operations/bucket-total-adjustment
+targets:
+    - T-lq5y49
+after:
+    feature: F-vrsbxv
+    key: habit-engine/log-entry-operations/bucket-total-adjustment
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.md
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml

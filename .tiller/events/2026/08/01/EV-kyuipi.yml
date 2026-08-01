@@ -1,0 +1,13 @@
+id: EV-kyuipi
+type: approve.feature
+at: 2026-08-01T17:46:00.765832Z
+owner: jc
+command: approve feature F-vrsbxv
+targets:
+    - F-vrsbxv
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml

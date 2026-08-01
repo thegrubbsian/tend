@@ -1,0 +1,17 @@
+id: T-jg4df3
+key: habit-engine/log-entry-operations/entry-append-delete
+title: Append and delete editable log entries
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:5d06746ae730488440ac8f4b0365478dd410dc8b
+        path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/entry-append-delete/task.md
+        observed_at: 2026-08-01T17:46:00.76591Z
+    commit:
+        kind: git_commit
+        value: git:48e2ba2
+        observed_at: 2026-08-01T17:46:00.784098Z

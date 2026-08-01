@@ -1,10 +1,25 @@
 id: F-vrsbxv
 key: habit-engine/log-entry-operations
 title: Log Entry Operations
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-6a3jmx
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:2ef3f10096d5ba4f7105957b0b813550269792db
+        path: .tiller/epics/habit-engine/features/log-entry-operations/feature.md
+        observed_at: 2026-08-01T17:46:00.736565Z
+    eval:
+        kind: git_blob
+        value: git:a5ab70227afc40ca1e8fbc87a797e641f6936be6
+        path: .tiller/epics/habit-engine/features/log-entry-operations/feature.eval.md
+        observed_at: 2026-08-01T17:46:00.736565Z
+    commit:
+        kind: git_commit
+        value: git:48e2ba2
+        observed_at: 2026-08-01T17:46:00.765756Z
