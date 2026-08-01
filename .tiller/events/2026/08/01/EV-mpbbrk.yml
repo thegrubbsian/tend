@@ -1,0 +1,13 @@
+id: EV-mpbbrk
+type: check.task
+at: 2026-08-01T14:28:24.328473Z
+owner: jc
+command: check task T-bt5coz
+targets:
+    - T-bt5coz
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml

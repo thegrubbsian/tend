@@ -1,7 +1,7 @@
 id: T-bt5coz
 key: habit-engine/swiftdata-model/bucket-entry-schema
 title: Model buckets and log entries
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.243765Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T14:28:23.361437Z
+        against:
+            kind: git_commit
+            value: git:f3fa1e0
+            observed_at: 2026-08-01T14:28:23.361432Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-f3fa1e0-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T14:28:23.361437Z
+        against:
+            kind: git_commit
+            value: git:f3fa1e0
+            observed_at: 2026-08-01T14:28:23.361432Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-f3fa1e0-out-2e6ce3d1abe1de3fcfbdc8ddd96ac79cf9015115babb6aba63798a99c6a42e71.txt
