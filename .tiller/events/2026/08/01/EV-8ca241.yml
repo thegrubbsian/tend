@@ -1,0 +1,13 @@
+id: EV-8ca241
+type: check.task
+at: 2026-08-01T16:25:50.690439Z
+owner: jc
+command: check task T-96c5xx
+targets:
+    - T-96c5xx
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml

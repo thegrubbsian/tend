@@ -1,7 +1,7 @@
 id: T-96c5xx
 key: habit-engine/bucket-evaluation/bucket-state-evaluation
 title: Evaluate bucket state and finality
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:a7145a5
         observed_at: 2026-08-01T15:32:54.810691Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T16:25:49.79329Z
+        against:
+            kind: git_commit
+            value: git:ad422f3
+            observed_at: 2026-08-01T16:25:49.793282Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-ad422f3-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T16:25:49.79329Z
+        against:
+            kind: git_commit
+            value: git:ad422f3
+            observed_at: 2026-08-01T16:25:49.793282Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-ad422f3-out-9f379f969510d02b418e3f67a80330d248d94a6071586357fcac54ebf12ba005.txt
