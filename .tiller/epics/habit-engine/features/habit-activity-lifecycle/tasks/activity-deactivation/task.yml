@@ -1,7 +1,17 @@
 id: T-obhbxb
 key: habit-engine/habit-activity-lifecycle/activity-deactivation
 title: Deactivate habits and exempt editable buckets
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:7e6912b6fc3626b9002b1b939a6e16e8e13e4c6c
+        path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.md
+        observed_at: 2026-08-01T20:22:52.811827Z
+    commit:
+        kind: git_commit
+        value: git:e3973ae
+        observed_at: 2026-08-01T20:22:52.834741Z

@@ -1,0 +1,13 @@
+id: EV-54erqv
+type: approve.feature
+at: 2026-08-01T20:22:52.811722Z
+owner: jc
+command: approve feature F-aotv97
+targets:
+    - F-aotv97
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml

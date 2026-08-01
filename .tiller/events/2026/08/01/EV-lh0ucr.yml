@@ -1,0 +1,13 @@
+id: EV-lh0ucr
+type: approve.task
+at: 2026-08-01T20:22:52.834822Z
+owner: jc
+command: approve task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml

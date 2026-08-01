@@ -1,0 +1,13 @@
+id: EV-kfurg6
+type: approve.task
+at: 2026-08-01T20:22:52.85493Z
+owner: jc
+command: approve task T-otqpk2
+targets:
+    - T-otqpk2
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.yml
