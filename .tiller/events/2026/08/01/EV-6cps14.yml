@@ -1,0 +1,14 @@
+id: EV-6cps14
+type: add.task
+at: 2026-08-01T21:36:29.201468Z
+owner: jc
+command: add task habit-engine/streak-computation/streak-chain-calculation
+targets:
+    - T-dqajj8
+after:
+    feature: F-vbsg1a
+    key: habit-engine/streak-computation/streak-chain-calculation
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.md
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.yml

@@ -1,0 +1,14 @@
+id: EV-v02ehb
+type: add.task
+at: 2026-08-01T21:36:29.284236Z
+owner: jc
+command: add task habit-engine/streak-computation/streak-persistence-integration
+targets:
+    - T-ipovyn
+after:
+    feature: F-vbsg1a
+    key: habit-engine/streak-computation/streak-persistence-integration
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.md
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.yml
