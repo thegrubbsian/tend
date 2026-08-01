@@ -1,0 +1,13 @@
+id: EV-4qhuv0
+type: start.task
+at: 2026-08-01T14:19:15.929824Z
+owner: jc
+command: start task T-bt5coz
+targets:
+    - T-bt5coz
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
