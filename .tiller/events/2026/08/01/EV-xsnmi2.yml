@@ -1,0 +1,13 @@
+id: EV-xsnmi2
+type: start.task
+at: 2026-08-01T14:44:18.431227Z
+owner: jc
+command: start task T-yjy3cq
+targets:
+    - T-yjy3cq
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.yml

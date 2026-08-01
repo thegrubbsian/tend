@@ -11,7 +11,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/swiftdata-model (F-n7oy52): active
-- task habit-engine/swiftdata-model/durable-container (T-yjy3cq): ready
 
 ### Blocked
 
@@ -19,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task habit-engine/swiftdata-model/durable-container (T-yjy3cq): build pass, tests pass
 
 ### Open questions
 

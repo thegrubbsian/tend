@@ -1,0 +1,13 @@
+id: EV-08dt2l
+type: check.task
+at: 2026-08-01T14:55:56.873006Z
+owner: jc
+command: check task T-yjy3cq
+targets:
+    - T-yjy3cq
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.yml
