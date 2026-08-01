@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/swiftdata-model/durable-container (T-yjy3cq): build pass, tests pass
+- (none)
 
 ### Open questions
 

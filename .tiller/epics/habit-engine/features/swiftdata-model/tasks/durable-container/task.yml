@@ -1,7 +1,7 @@
 id: T-yjy3cq
 key: habit-engine/swiftdata-model/durable-container
 title: Build the durable local model container
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.255657Z
 pr: 6
+done_basis: ancestry
 gates:
     build:
         required: true

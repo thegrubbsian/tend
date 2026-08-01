@@ -1,0 +1,14 @@
+id: EV-bqkgt0
+type: sync.task
+at: 2026-08-01T15:13:14.219662Z
+owner: jc
+command: sync task T-yjy3cq
+targets:
+    - T-yjy3cq
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.yml
