@@ -1,0 +1,13 @@
+id: EV-wujb9j
+type: eval.feature
+at: 2026-08-01T21:10:08.816305Z
+owner: jc
+command: eval feature F-aotv97
+targets:
+    - F-aotv97
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml
