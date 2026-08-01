@@ -1,7 +1,7 @@
 id: T-28yrbr
 key: habit-engine/swiftdata-model/habit-activity-schema
 title: Model habits and activity periods
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.230464Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T14:06:12.381539Z
+        against:
+            kind: git_commit
+            value: git:88450ef
+            observed_at: 2026-08-01T14:06:12.381536Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-88450ef-out-e32a63f36a52f9984805ee07dff2d0f13b4ebf540e561dafbe5b8bbeee5e67e8.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T14:06:12.381539Z
+        against:
+            kind: git_commit
+            value: git:88450ef
+            observed_at: 2026-08-01T14:06:12.381536Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-88450ef-out-7af8420706373cb25c24cb0f33ca72e4eddbb357fd445b34aeaeda9920714bd0.txt

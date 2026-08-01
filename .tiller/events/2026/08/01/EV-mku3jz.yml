@@ -1,0 +1,13 @@
+id: EV-mku3jz
+type: check.task
+at: 2026-08-01T14:06:13.212111Z
+owner: jc
+command: check task T-28yrbr
+targets:
+    - T-28yrbr
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/habit-activity-schema/task.yml
