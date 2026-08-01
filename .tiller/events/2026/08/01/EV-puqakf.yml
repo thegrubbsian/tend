@@ -1,0 +1,13 @@
+id: EV-puqakf
+type: approve.task
+at: 2026-08-01T17:46:00.800911Z
+owner: jc
+command: approve task T-lq5y49
+targets:
+    - T-lq5y49
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml
