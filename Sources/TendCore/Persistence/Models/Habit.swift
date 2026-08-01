@@ -17,6 +17,12 @@ public final class Habit {
   @Relationship(deleteRule: .cascade, inverse: \HabitActivityPeriod.habit)
   public var activityPeriods: [HabitActivityPeriod]? = []
 
+  @Relationship(deleteRule: .cascade, inverse: \HabitBucket.habit)
+  public var buckets: [HabitBucket]? = []
+
+  @Relationship(deleteRule: .cascade, inverse: \LogEntry.habit)
+  public var entries: [LogEntry]? = []
+
   public init(
     id: UUID = UUID(),
     name: String,
