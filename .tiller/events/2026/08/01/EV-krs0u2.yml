@@ -1,0 +1,13 @@
+id: EV-krs0u2
+type: check.task
+at: 2026-08-01T16:07:31.843505Z
+owner: jc
+command: check task T-24btkb
+targets:
+    - T-24btkb
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.yml
