@@ -1,7 +1,7 @@
 id: F-vrsbxv
 key: habit-engine/log-entry-operations
 title: Log Entry Operations
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/02-domain-model.md
@@ -24,35 +24,78 @@ accepted_against:
         kind: git_commit
         value: git:48e2ba2
         observed_at: 2026-08-01T17:46:00.765756Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:2ef3f10096d5ba4f7105957b0b813550269792db
+        path: .tiller/epics/habit-engine/features/log-entry-operations/feature.md
+        observed_at: 2026-08-01T19:48:44.048286Z
+    eval:
+        kind: git_blob
+        value: git:a5ab70227afc40ca1e8fbc87a797e641f6936be6
+        path: .tiller/epics/habit-engine/features/log-entry-operations/feature.eval.md
+        observed_at: 2026-08-01T19:48:44.048286Z
+    commit:
+        kind: git_commit
+        value: git:beac23e
+        observed_at: 2026-08-01T19:48:43.851947Z
+    surfaces: []
+done_basis: rollup
 gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T19:46:30.075174Z
+        against:
+            kind: git_commit
+            value: git:beac23e
+            observed_at: 2026-08-01T19:46:30.075022Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-beac23e-out-9b7d26171b42cb337faa5e83ea5a3b02232a51a8cac0c80e8dd099412db2b856.txt
     evals:
         required: true
         kind: command
         status: pass
         run_by: jc
-        run_at: 2026-08-01T19:30:30.564164Z
+        run_at: 2026-08-01T19:46:30.075174Z
         against:
-            kind: sha256
-            value: sha256:bf9ff86bf0d8c0910e233bb93f3983aaa89f7fd578457836440544bc331765d4
-            observed_at: 2026-08-01T19:30:26.383504Z
+            kind: git_commit
+            value: git:beac23e
+            observed_at: 2026-08-01T19:46:30.075022Z
         criteria:
             C1:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C1-sha256-bf9ff86bf0d8-out-dac544663e29657c5c3b3756902c489c61d8700720bd9eef0609aea100fe0997.txt
+                      ref: artifacts/tiller/gates/eval-C1-beac23e-out-c2c070bb6906c21fb0b83748e5660c93f2094ce2f602b29f7f1048edbaad19b9.txt
             C2:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C2-sha256-bf9ff86bf0d8-out-ac1c055179193e70b35d01815763efac278f2912b58c5fa2a9fba195665fee6f.txt
+                      ref: artifacts/tiller/gates/eval-C2-beac23e-out-6cf559f9b1423e133391980f7f29a4176b51ac9d8648cf52438df88447ba1203.txt
             C3:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C3-sha256-bf9ff86bf0d8-out-f3442d36ca17351179b065d2e7da0b123f96295476ef6c40acebbcdcb502bfaf.txt
+                      ref: artifacts/tiller/gates/eval-C3-beac23e-out-70b20058c8790924a7fc64886d8a24eccf7cc484e33c8fafe1ee970af51ffc53.txt
             C4:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C4-sha256-bf9ff86bf0d8-out-ed642863ac858ff981348823ed3edb08906766a23918dee7b7e6037bc003e67a.txt
+                      ref: artifacts/tiller/gates/eval-C4-beac23e-out-731a88b1c73160206b93b8184cd9c8503ce8bcec14ec09e13b10119dfefd942e.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T19:46:30.075174Z
+        against:
+            kind: git_commit
+            value: git:beac23e
+            observed_at: 2026-08-01T19:46:30.075022Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-beac23e-out-df501580a15ae61a3f5bddbaaff740cddac86f1a9637696c4fe53ce833cdc9fe.txt

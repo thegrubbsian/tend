@@ -1,0 +1,13 @@
+id: EV-o4clal
+type: check.feature
+at: 2026-08-01T19:46:38.946062Z
+owner: jc
+command: check feature F-vrsbxv
+targets:
+    - F-vrsbxv
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml
