@@ -1,7 +1,7 @@
 id: T-bt5coz
 key: habit-engine/swiftdata-model/bucket-entry-schema
 title: Model buckets and log entries
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.243765Z
 pr: 5
+done_basis: ancestry
 gates:
     build:
         required: true

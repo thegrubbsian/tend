@@ -19,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/swiftdata-model/bucket-entry-schema (T-bt5coz): build pass, tests pass
+- (none)
 
 ### Open questions
 

@@ -1,0 +1,14 @@
+id: EV-ziidj2
+type: sync.task
+at: 2026-08-01T14:38:31.046362Z
+owner: jc
+command: sync task T-bt5coz
+targets:
+    - T-bt5coz
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
