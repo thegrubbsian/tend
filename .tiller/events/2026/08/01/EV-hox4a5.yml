@@ -1,0 +1,14 @@
+id: EV-hox4a5
+type: add.task
+at: 2026-08-01T20:05:37.948492Z
+owner: jc
+command: add task habit-engine/habit-activity-lifecycle/activity-reactivation
+targets:
+    - T-otqpk2
+after:
+    feature: F-aotv97
+    key: habit-engine/habit-activity-lifecycle/activity-reactivation
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.md
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.yml

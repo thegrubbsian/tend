@@ -1,0 +1,13 @@
+id: EV-qaxspr
+type: spec.feature
+at: 2026-08-01T20:10:10.087662Z
+owner: jc
+command: spec feature F-aotv97
+targets:
+    - F-aotv97
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml
