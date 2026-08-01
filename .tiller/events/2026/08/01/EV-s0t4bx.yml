@@ -1,0 +1,13 @@
+id: EV-s0t4bx
+type: eval.feature
+at: 2026-08-01T19:30:30.564376Z
+owner: jc
+command: eval feature F-vrsbxv
+targets:
+    - F-vrsbxv
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml

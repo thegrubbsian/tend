@@ -9,6 +9,8 @@ public enum LogEntryDestination: Equatable, Sendable {
 public enum LogEntryOperationError: Error, Equatable, Sendable {
   case inactiveHabit
   case invalidAmount(Int)
+  case invalidTotal(Int)
+  case totalBelowProgress(current: Int, requested: Int)
   case detachedHabit
   case detachedEntry
   case detachedEntryBucket
@@ -52,77 +54,63 @@ public final class LogEntryOperations {
     guard amount > 0 else {
       throw LogEntryOperationError.invalidAmount(amount)
     }
-    guard habit.isActive else {
-      throw LogEntryOperationError.inactiveHabit
-    }
-    guard isPersisted(habit) else {
-      throw LogEntryOperationError.detachedHabit
-    }
-
-    try reconciler.reconcile(habit: habit, at: instant, timeZone: timeZone)
-
-    let cadence = try cadence(for: habit)
-    let schedule = CalendarBucketSchedule(timeZone: timeZone)
-    let currentPeriod = try schedule.period(containing: instant, cadence: cadence)
-    let destinationKey: String
-    switch destination {
-    case .current:
-      destinationKey = currentPeriod.key
-    case .periodKey(let key):
-      let selectedPeriod: CalendarBucketPeriod
-      do {
-        selectedPeriod = try schedule.period(forKey: key)
-      } catch let error as CalendarBucketScheduleError {
-        throw BucketEvaluationError.calendar(error)
-      }
-      guard selectedPeriod.cadence == cadence else {
-        throw BucketEvaluationError.periodCadenceMismatch(
-          key: key,
-          cadence: cadence
-        )
-      }
-      destinationKey = key
-    }
-    let bucket = try bucket(for: habit, periodKey: destinationKey)
-    let evaluation = try evaluator.evaluate(
-      habit: habit,
-      bucket: bucket,
+    let authorized = try authorizedDestination(
+      for: habit,
+      destination: destination,
       at: instant,
       timeZone: timeZone
     )
-    try authorize(
-      evaluation,
-      bucket: bucket,
-      currentPeriodKey: currentPeriod.key
-    )
-
-    guard let progress = evaluation.progress else {
-      throw LogEntryOperationError.destinationNotEditable(
-        key: bucket.periodKey,
-        phase: evaluation.phase
-      )
-    }
+    let progress = try checkedProgress(in: authorized)
     guard !progress.addingReportingOverflow(amount).overflow else {
       throw LogEntryOperationError.progressOverflow
     }
-
-    let entry = LogEntry(
-      timestamp: instant,
+    return try insertEntry(
       amount: amount,
-      habit: habit,
-      bucket: bucket
+      for: habit,
+      bucket: authorized.bucket,
+      at: instant
     )
-    context.insert(entry)
-    do {
-      try saveContext()
-      return entry
-    } catch {
-      entry.habit = nil
-      entry.bucket = nil
-      context.rollback()
-      throw error
-    }
   }
+
+  @discardableResult
+  public func setTotal(
+    _ total: Int,
+    for habit: Habit,
+    destination: LogEntryDestination = .current,
+    at instant: Date,
+    timeZone: TimeZone
+  ) throws -> LogEntry? {
+    guard total >= 0 else {
+      throw LogEntryOperationError.invalidTotal(total)
+    }
+    let authorized = try authorizedDestination(
+      for: habit,
+      destination: destination,
+      at: instant,
+      timeZone: timeZone
+    )
+    let progress = try checkedProgress(in: authorized)
+    if total == progress {
+      return nil
+    }
+    guard total > progress else {
+      throw LogEntryOperationError.totalBelowProgress(
+        current: progress,
+        requested: total
+      )
+    }
+    let difference = total.subtractingReportingOverflow(progress)
+    guard !difference.overflow, difference.partialValue > 0 else {
+      throw LogEntryOperationError.progressOverflow
+    }
+    return try insertEntry(
+      amount: difference.partialValue,
+      for: habit,
+      bucket: authorized.bucket,
+      at: instant
+    )
+  }
+
   public func delete(
     _ entry: LogEntry,
     from habit: Habit,
@@ -180,6 +168,94 @@ public final class LogEntryOperations {
     do {
       try saveContext()
     } catch {
+      context.rollback()
+      throw error
+    }
+  }
+
+  private func authorizedDestination(
+    for habit: Habit,
+    destination: LogEntryDestination,
+    at instant: Date,
+    timeZone: TimeZone
+  ) throws -> (bucket: HabitBucket, evaluation: BucketEvaluation) {
+    guard habit.isActive else {
+      throw LogEntryOperationError.inactiveHabit
+    }
+    guard isPersisted(habit) else {
+      throw LogEntryOperationError.detachedHabit
+    }
+
+    try reconciler.reconcile(habit: habit, at: instant, timeZone: timeZone)
+
+    let cadence = try cadence(for: habit)
+    let schedule = CalendarBucketSchedule(timeZone: timeZone)
+    let currentPeriod = try schedule.period(containing: instant, cadence: cadence)
+    let destinationKey: String
+    switch destination {
+    case .current:
+      destinationKey = currentPeriod.key
+    case .periodKey(let key):
+      let selectedPeriod: CalendarBucketPeriod
+      do {
+        selectedPeriod = try schedule.period(forKey: key)
+      } catch let error as CalendarBucketScheduleError {
+        throw BucketEvaluationError.calendar(error)
+      }
+      guard selectedPeriod.cadence == cadence else {
+        throw BucketEvaluationError.periodCadenceMismatch(
+          key: key,
+          cadence: cadence
+        )
+      }
+      destinationKey = key
+    }
+    let bucket = try bucket(for: habit, periodKey: destinationKey)
+    let evaluation = try evaluator.evaluate(
+      habit: habit,
+      bucket: bucket,
+      at: instant,
+      timeZone: timeZone
+    )
+    try authorize(
+      evaluation,
+      bucket: bucket,
+      currentPeriodKey: currentPeriod.key
+    )
+    return (bucket, evaluation)
+  }
+
+  private func checkedProgress(
+    in authorized: (bucket: HabitBucket, evaluation: BucketEvaluation)
+  ) throws -> Int {
+    guard let progress = authorized.evaluation.progress else {
+      throw LogEntryOperationError.destinationNotEditable(
+        key: authorized.bucket.periodKey,
+        phase: authorized.evaluation.phase
+      )
+    }
+    return progress
+  }
+
+  private func insertEntry(
+    amount: Int,
+    for habit: Habit,
+    bucket: HabitBucket,
+    at instant: Date
+  ) throws -> LogEntry {
+    let entry = LogEntry(
+      timestamp: instant,
+      amount: amount,
+      habit: habit,
+      bucket: bucket
+    )
+    context.insert(entry)
+    do {
+      try saveContext()
+      return entry
+    } catch {
+      entry.habit = nil
+      entry.bucket = nil
       context.rollback()
       throw error
     }

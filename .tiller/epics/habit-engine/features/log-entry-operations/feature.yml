@@ -24,3 +24,35 @@ accepted_against:
         kind: git_commit
         value: git:48e2ba2
         observed_at: 2026-08-01T17:46:00.765756Z
+gates:
+    evals:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T19:30:30.564164Z
+        against:
+            kind: sha256
+            value: sha256:bf9ff86bf0d8c0910e233bb93f3983aaa89f7fd578457836440544bc331765d4
+            observed_at: 2026-08-01T19:30:26.383504Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-bf9ff86bf0d8-out-dac544663e29657c5c3b3756902c489c61d8700720bd9eef0609aea100fe0997.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-sha256-bf9ff86bf0d8-out-ac1c055179193e70b35d01815763efac278f2912b58c5fa2a9fba195665fee6f.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-bf9ff86bf0d8-out-f3442d36ca17351179b065d2e7da0b123f96295476ef6c40acebbcdcb502bfaf.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-sha256-bf9ff86bf0d8-out-ed642863ac858ff981348823ed3edb08906766a23918dee7b7e6037bc003e67a.txt
