@@ -1,0 +1,9 @@
+id: T-imcpp0
+key: app-experience/almanac-app-shell/two-destination-shell
+title: Build accessible Today and Habits shell navigation
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-bil50m

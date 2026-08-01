@@ -1,0 +1,9 @@
+id: T-bil50m
+key: app-experience/almanac-app-shell/almanac-foundations
+title: Implement the Almanac visual foundations
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-9vxtaq
