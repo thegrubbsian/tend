@@ -11,7 +11,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/bucket-evaluation (F-6a3jmx): active
-- task habit-engine/bucket-evaluation/calendar-periods (T-24btkb): check
 - task habit-engine/bucket-evaluation/bucket-state-evaluation (T-96c5xx): ready
 - task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): ready
 
@@ -21,7 +20,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task habit-engine/bucket-evaluation/calendar-periods (T-24btkb): build pass, tests pass
 
 ### Open questions
 
