@@ -1,0 +1,13 @@
+id: EV-55dqpi
+type: start.task
+at: 2026-08-01T16:17:51.835796Z
+owner: jc
+command: start task T-96c5xx
+targets:
+    - T-96c5xx
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml

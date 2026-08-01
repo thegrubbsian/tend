@@ -1,7 +1,7 @@
 id: T-96c5xx
 key: habit-engine/bucket-evaluation/bucket-state-evaluation
 title: Evaluate bucket state and finality
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
