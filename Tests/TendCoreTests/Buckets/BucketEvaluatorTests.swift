@@ -46,6 +46,18 @@ struct BucketEvaluatorTests {
     #expect(due.finalization?.unitSnapshot == "pages")
     #expect(due.finalization?.verdict == .met)
     #expect(due.finalization?.finalizedAt == (try instant("2024-01-03T00:00:00Z")))
+    #expect(bucket.finalizedAt == nil)
+    #expect(bucket.verdictRawValue == nil)
+    #expect(bucket.targetSnapshot == nil)
+    #expect(bucket.unitSnapshot == nil)
+
+    let late = try evaluate(
+      habit: habit,
+      bucket: bucket,
+      at: "2024-02-01T12:00:00Z"
+    )
+    #expect(late.phase == .dueForFinalization)
+    #expect(late.finalization?.finalizedAt == (try instant("2024-01-03T00:00:00Z")))
   }
 
   @Test("weekly boundaries enter grace and finality exactly")
@@ -239,6 +251,16 @@ struct BucketEvaluatorTests {
 
     setEntries([Int.max, 1], on: bucket, habit: habit)
     try expectError(.progressOverflow) {
+      _ = try evaluate(habit: habit, bucket: bucket, at: "2024-01-01T12:00:00Z")
+    }
+
+    setEntries([0, Int.max, 1], on: bucket, habit: habit)
+    try expectError(.invalidEntryAmount(0)) {
+      _ = try evaluate(habit: habit, bucket: bucket, at: "2024-01-01T12:00:00Z")
+    }
+
+    setEntries([Int.max, 1, 0], on: bucket, habit: habit)
+    try expectError(.invalidEntryAmount(0)) {
       _ = try evaluate(habit: habit, bucket: bucket, at: "2024-01-01T12:00:00Z")
     }
   }

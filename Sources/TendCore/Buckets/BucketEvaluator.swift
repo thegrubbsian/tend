@@ -186,18 +186,25 @@ public struct BucketEvaluator: Sendable {
   }
 
   private func checkedProgress(in bucket: HabitBucket) throws -> Int {
+    guard let entries = bucket.entries else {
+      return 0
+    }
+
+    var invalidAmount: Int?
+    for entry in entries where entry.amount <= 0 {
+      invalidAmount = min(invalidAmount ?? entry.amount, entry.amount)
+    }
+    if let invalidAmount {
+      throw BucketEvaluationError.invalidEntryAmount(invalidAmount)
+    }
+
     var progress = 0
-    if let entries = bucket.entries {
-      for entry in entries {
-        guard entry.amount > 0 else {
-          throw BucketEvaluationError.invalidEntryAmount(entry.amount)
-        }
-        let addition = progress.addingReportingOverflow(entry.amount)
-        guard !addition.overflow else {
-          throw BucketEvaluationError.progressOverflow
-        }
-        progress = addition.partialValue
+    for entry in entries {
+      let addition = progress.addingReportingOverflow(entry.amount)
+      guard !addition.overflow else {
+        throw BucketEvaluationError.progressOverflow
       }
+      progress = addition.partialValue
     }
     return progress
   }
