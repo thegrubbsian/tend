@@ -1,0 +1,14 @@
+id: EV-3jhsfu
+type: submit.task
+at: 2026-08-01T20:50:00.962638Z
+owner: jc
+command: submit task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: check
+after:
+    pr: 12
+    status: in_review
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml

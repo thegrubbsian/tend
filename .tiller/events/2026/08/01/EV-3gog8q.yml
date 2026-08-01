@@ -1,0 +1,13 @@
+id: EV-3gog8q
+type: start.task
+at: 2026-08-01T20:25:13.737766Z
+owner: jc
+command: start task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml
