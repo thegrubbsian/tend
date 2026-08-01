@@ -1,0 +1,13 @@
+id: EV-c0aliy
+type: eval.feature
+at: 2026-08-01T17:23:31.439344Z
+owner: jc
+command: eval feature F-6a3jmx
+targets:
+    - F-6a3jmx
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

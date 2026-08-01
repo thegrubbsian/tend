@@ -12,7 +12,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/bucket-evaluation (F-6a3jmx): active
 - feature habit-engine/log-entry-operations (F-vrsbxv): ready
-- task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): ready
 - task habit-engine/log-entry-operations/entry-append-delete (T-jg4df3): ready
 - task habit-engine/log-entry-operations/bucket-total-adjustment (T-lq5y49): ready
 
@@ -22,7 +21,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): build pass, tests pass
 
 ### Open questions
 

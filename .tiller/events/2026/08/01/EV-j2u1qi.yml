@@ -1,0 +1,14 @@
+id: EV-j2u1qi
+type: submit.task
+at: 2026-08-01T17:27:06.992377Z
+owner: jc
+command: submit task T-evhkq6
+targets:
+    - T-evhkq6
+before:
+    status: check
+after:
+    pr: 9
+    status: in_review
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.yml
