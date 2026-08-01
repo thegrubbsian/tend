@@ -247,6 +247,855 @@ struct HabitActivityOperationsTests {
     #expect(!context.hasChanges)
   }
 
+  @Test("daily same-period reactivation restores the exact bucket and entries")
+  func dailySamePeriodReactivationRestoresBucketAndEntries() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T08:00:00Z"
+    )
+    let entry = try LogEntryOperations(context: context).append(
+      amount: 1,
+      to: habit,
+      at: instant("2024-01-01T10:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    let secondEntry = try LogEntryOperations(context: context).append(
+      amount: 2,
+      to: habit,
+      at: instant("2024-01-01T11:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    let exemptBucket = try #require(buckets(for: habit, in: context).first)
+    let bucketIdentifier = exemptBucket.persistentModelID
+    exemptBucket.startAt = try instant("2023-12-31T23:00:00Z")
+    exemptBucket.endAt = try instant("2024-01-01T23:00:00Z")
+    try context.save()
+    let operationInstant = try instant("2024-01-01T18:00:00Z")
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try operations.reactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("UTC")
+    )
+
+    let restored = try #require(buckets(for: habit, in: context).first)
+    let activityPeriods = try #require(habit.activityPeriods).sorted {
+      $0.startedAt < $1.startedAt
+    }
+    #expect(habit.isActive)
+    #expect(lifecycleSaveCount == 1)
+    #expect(activityPeriods.count == 2)
+    #expect(activityPeriods[0].endedAt == (try instant("2024-01-01T12:00:00Z")))
+    #expect(activityPeriods[1].startedAt == operationInstant)
+    #expect(activityPeriods[1].endedAt == nil)
+    #expect(restored.persistentModelID == bucketIdentifier)
+    #expect(!restored.isExempt)
+    #expect(restored.startAt == (try instant("2024-01-01T00:00:00Z")))
+    #expect(restored.endAt == (try instant("2024-01-02T00:00:00Z")))
+    #expect(
+      restored.entries?.map(\.persistentModelID).sorted()
+        == [
+          entry.persistentModelID, secondEntry.persistentModelID,
+        ].sorted())
+    #expect(
+      try buckets(for: habit, in: context).map(\.periodKey) == [
+        "day:2024-01-01"
+      ])
+    #expect(!context.hasChanges)
+  }
+
+  @Test("Monday weekly reactivation restores current but not prior grace")
+  func mondayWeeklyReactivationRestoresOnlyCurrentBucket() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .weekly,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    habit.pinnedWeekdaysRawValue = PinnedWeekdays.wednesday.rawValue
+    try context.save()
+    let entry = try LogEntryOperations(context: context).append(
+      amount: 1,
+      to: habit,
+      at: instant("2024-01-04T18:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: instant("2024-01-08T00:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    let before = try buckets(for: habit, in: context)
+    let graceIdentifier = try #require(
+      before.first { $0.periodKey == "week:2024-01-01" }
+    ).persistentModelID
+    let currentIdentifier = try #require(
+      before.first { $0.periodKey == "week:2024-01-08" }
+    ).persistentModelID
+    let operationInstant = try instant("2024-01-08T00:00:00Z")
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try operations.reactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("UTC")
+    )
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let grace = try #require(
+      persistedBuckets.first { $0.periodKey == "week:2024-01-01" }
+    )
+    let current = try #require(
+      persistedBuckets.first { $0.periodKey == "week:2024-01-08" }
+    )
+    let openPeriod = try #require(
+      habit.activityPeriods?.first { $0.endedAt == nil }
+    )
+    #expect(habit.isActive)
+    #expect(lifecycleSaveCount == 1)
+    #expect(openPeriod.startedAt == operationInstant)
+    #expect(grace.persistentModelID == graceIdentifier)
+    #expect(grace.isExempt)
+    #expect(grace.entries?.map(\.persistentModelID) == [entry.persistentModelID])
+    #expect(current.persistentModelID == currentIdentifier)
+    #expect(!current.isExempt)
+    #expect(current.entries?.isEmpty == true)
+    #expect(
+      persistedBuckets.map(\.periodKey) == [
+        "week:2024-01-01", "week:2024-01-08",
+      ])
+    #expect(!context.hasChanges)
+  }
+
+  @Test("later daily reactivation creates only the current DST bucket")
+  func laterDailyReactivationCreatesOnlyCurrentBucket() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-03-09T20:00:00Z"
+    )
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: instant("2024-03-09T22:00:00Z"),
+      timeZone: timeZone("America/Los_Angeles")
+    )
+    let oldBucket = try #require(buckets(for: habit, in: context).first)
+    let oldBucketIdentifier = oldBucket.persistentModelID
+    let operationInstant = try instant("2024-03-12T15:00:00Z")
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try operations.reactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("America/Los_Angeles")
+    )
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let historical = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-03-09" }
+    )
+    let current = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-03-12" }
+    )
+    #expect(habit.isActive)
+    #expect(lifecycleSaveCount == 1)
+    #expect(
+      persistedBuckets.map(\.periodKey) == [
+        "day:2024-03-09", "day:2024-03-12",
+      ])
+    #expect(historical.persistentModelID == oldBucketIdentifier)
+    #expect(historical.isExempt)
+    #expect(current.startAt == (try instant("2024-03-12T07:00:00Z")))
+    #expect(current.endAt == (try instant("2024-03-13T07:00:00Z")))
+    #expect(!current.isExempt)
+    #expect(current.finalizedAt == nil)
+    #expect(current.entries?.isEmpty == true)
+    #expect(habit.activityPeriods?.count == 2)
+    #expect(
+      habit.activityPeriods?.first { $0.endedAt == nil }?.startedAt
+        == operationInstant)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("time-zone key change creates a new bucket at a touching boundary")
+  func timeZoneKeyChangeCreatesNewBucketAtTouchingBoundary() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    let operationInstant = try instant("2024-01-01T15:00:00Z")
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("UTC")
+    )
+    let historical = try #require(buckets(for: habit, in: context).first)
+
+    try HabitActivityOperations(context: context).reactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("Asia/Tokyo")
+    )
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let current = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-01-02" }
+    )
+    let activityPeriods = try #require(habit.activityPeriods).sorted {
+      $0.startedAt < $1.startedAt
+    }
+    #expect(habit.isActive)
+    #expect(
+      persistedBuckets.map(\.periodKey) == [
+        "day:2024-01-01", "day:2024-01-02",
+      ])
+    #expect(historical.isExempt)
+    #expect(current.startAt == operationInstant)
+    #expect(current.endAt == (try instant("2024-01-02T15:00:00Z")))
+    #expect(!current.isExempt)
+    #expect(activityPeriods.count == 2)
+    #expect(activityPeriods[0].endedAt == operationInstant)
+    #expect(activityPeriods[1].startedAt == operationInstant)
+    #expect(activityPeriods[1].endedAt == nil)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("reactivation state errors win before lifecycle mutation")
+  func reactivationStateErrorsWinBeforeMutation() throws {
+    let context = try makeContext()
+    let active = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    let inactiveOpen = Habit(
+      name: "Open",
+      cadence: .daily,
+      target: 1,
+      isActive: false
+    )
+    inactiveOpen.activityPeriods = [
+      HabitActivityPeriod(startedAt: try instant("2024-01-01T00:00:00Z"))
+    ]
+    let missingClosed = Habit(
+      name: "Missing",
+      cadence: .daily,
+      target: 1,
+      isActive: false
+    )
+    let overlapping = Habit(
+      name: "Overlap",
+      cadence: .daily,
+      target: 1,
+      isActive: false
+    )
+    overlapping.activityPeriods = [
+      HabitActivityPeriod(
+        startedAt: try instant("2024-01-01T00:00:00Z"),
+        endedAt: try instant("2024-01-03T00:00:00Z")
+      ),
+      HabitActivityPeriod(
+        startedAt: try instant("2024-01-02T00:00:00Z"),
+        endedAt: try instant("2024-01-04T00:00:00Z")
+      ),
+    ]
+    let backward = Habit(
+      name: "Backward",
+      cadence: .daily,
+      target: 1,
+      isActive: false
+    )
+    backward.activityPeriods = [
+      HabitActivityPeriod(
+        startedAt: try instant("2024-01-01T00:00:00Z"),
+        endedAt: try instant("2024-01-02T00:00:00Z")
+      )
+    ]
+    let detached = Habit(
+      name: "Detached",
+      cadence: .daily,
+      target: 1,
+      isActive: false
+    )
+    detached.activityPeriods = [
+      HabitActivityPeriod(
+        startedAt: try instant("2024-01-01T00:00:00Z"),
+        endedAt: try instant("2024-01-02T00:00:00Z")
+      )
+    ]
+    context.insert(inactiveOpen)
+    context.insert(missingClosed)
+    context.insert(overlapping)
+    context.insert(backward)
+    try context.save()
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try expectActivityError(.detachedHabit) {
+      try operations.reactivate(
+        detached,
+        at: instant("2024-01-05T00:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+    try expectActivityError(.alreadyActive) {
+      try operations.reactivate(
+        active,
+        at: instant("2024-01-05T00:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+    try expectActivityError(.unexpectedOpenActivityPeriod) {
+      try operations.reactivate(
+        inactiveOpen,
+        at: instant("2024-01-05T00:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+    try expectActivityError(.missingClosedActivityPeriod) {
+      try operations.reactivate(
+        missingClosed,
+        at: instant("2024-01-05T00:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+    try expectActivityError(.invalidActivityChronology) {
+      try operations.reactivate(
+        overlapping,
+        at: instant("2024-01-05T00:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+    try expectActivityError(.invalidActivityChronology) {
+      try operations.reactivate(
+        backward,
+        at: instant("2024-01-01T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    #expect(lifecycleSaveCount == 0)
+    #expect(active.isActive)
+    #expect(!inactiveOpen.isActive)
+    #expect(!missingClosed.isActive)
+    #expect(!overlapping.isActive)
+    #expect(!backward.isActive)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("reactivation refuses contradictory current bucket state")
+  func reactivationRefusesContradictoryCurrentBuckets() throws {
+    let nonExemptContext = try makeContext()
+    let nonExemptHabit = try insertInactiveHabit(
+      in: nonExemptContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    let nonExempt = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: try instant("2024-01-01T00:00:00Z"),
+      endAt: try instant("2024-01-02T00:00:00Z"),
+      cadence: .daily,
+      habit: nonExemptHabit
+    )
+    nonExemptContext.insert(nonExempt)
+    try nonExemptContext.save()
+    var nonExemptSaveCount = 0
+    let nonExemptOperations = HabitActivityOperations(
+      context: nonExemptContext
+    ) {
+      nonExemptSaveCount += 1
+      try nonExemptContext.save()
+    }
+    try expectActivityError(
+      .unexpectedBucketPhase(key: "day:2024-01-01", phase: .open)
+    ) {
+      try nonExemptOperations.reactivate(
+        nonExemptHabit,
+        at: instant("2024-01-01T18:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    let duplicateContext = try makeContext()
+    let duplicateHabit = try insertInactiveHabit(
+      in: duplicateContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    for _ in 0..<2 {
+      duplicateContext.insert(
+        HabitBucket(
+          periodKey: "day:2024-01-01",
+          startAt: try instant("2024-01-01T00:00:00Z"),
+          endAt: try instant("2024-01-02T00:00:00Z"),
+          cadence: .daily,
+          isExempt: true,
+          habit: duplicateHabit
+        ))
+    }
+    try duplicateContext.save()
+    var duplicateSaveCount = 0
+    let duplicateOperations = HabitActivityOperations(context: duplicateContext) {
+      duplicateSaveCount += 1
+      try duplicateContext.save()
+    }
+    try expectActivityError(.duplicatePeriodKey("day:2024-01-01")) {
+      try duplicateOperations.reactivate(
+        duplicateHabit,
+        at: instant("2024-01-01T18:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    let mismatchContext = try makeContext()
+    let mismatchHabit = try insertInactiveHabit(
+      in: mismatchContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    let unrelatedCurrent = HabitBucket(
+      periodKey: "day:2024-01-02",
+      startAt: try instant("2024-01-02T00:00:00Z"),
+      endAt: try instant("2024-01-03T00:00:00Z"),
+      cadence: .daily,
+      isExempt: true,
+      habit: mismatchHabit
+    )
+    mismatchContext.insert(unrelatedCurrent)
+    try mismatchContext.save()
+    var mismatchSaveCount = 0
+    let mismatchOperations = HabitActivityOperations(context: mismatchContext) {
+      mismatchSaveCount += 1
+      try mismatchContext.save()
+    }
+    try expectActivityError(
+      .currentBucketActivityBoundaryMismatch("day:2024-01-02")
+    ) {
+      try mismatchOperations.reactivate(
+        mismatchHabit,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    let finalContext = try makeContext()
+    let finalHabit = try insertInactiveHabit(
+      in: finalContext,
+      activityStart: "2024-01-02T00:00:00Z",
+      activityEnd: "2024-01-02T02:00:00Z"
+    )
+    let finalCurrent = HabitBucket(
+      periodKey: "day:2024-01-02",
+      startAt: try instant("2024-01-02T00:00:00Z"),
+      endAt: try instant("2024-01-03T00:00:00Z"),
+      cadence: .daily,
+      finalizedAt: try instant("2024-01-02T06:00:00Z"),
+      verdict: .missed,
+      targetSnapshot: 1,
+      unitSnapshot: "times",
+      habit: finalHabit
+    )
+    finalContext.insert(finalCurrent)
+    try finalContext.save()
+    var finalSaveCount = 0
+    let finalOperations = HabitActivityOperations(context: finalContext) {
+      finalSaveCount += 1
+      try finalContext.save()
+    }
+    try expectActivityError(
+      .unexpectedBucketPhase(key: "day:2024-01-02", phase: .final)
+    ) {
+      try finalOperations.reactivate(
+        finalHabit,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    #expect(nonExemptSaveCount == 0)
+    #expect(duplicateSaveCount == 0)
+    #expect(mismatchSaveCount == 0)
+    #expect(finalSaveCount == 0)
+    #expect(!nonExemptHabit.isActive)
+    #expect(!duplicateHabit.isActive)
+    #expect(!mismatchHabit.isActive)
+    #expect(!finalHabit.isActive)
+    #expect(!nonExemptContext.hasChanges)
+    #expect(!duplicateContext.hasChanges)
+    #expect(!mismatchContext.hasChanges)
+    #expect(!finalContext.hasChanges)
+  }
+
+  @Test("reactivation propagates unrestorable bucket evaluation errors")
+  func reactivationPropagatesBucketEvaluationErrors() throws {
+    let cadenceContext = try makeContext()
+    let cadenceHabit = try insertInactiveHabit(
+      in: cadenceContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    let cadenceMismatch = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: try instant("2024-01-01T00:00:00Z"),
+      endAt: try instant("2024-01-02T00:00:00Z"),
+      cadence: .weekly,
+      isExempt: true,
+      habit: cadenceHabit
+    )
+    cadenceContext.insert(cadenceMismatch)
+    try cadenceContext.save()
+    var cadenceSaveCount = 0
+    let cadenceOperations = HabitActivityOperations(context: cadenceContext) {
+      cadenceSaveCount += 1
+      try cadenceContext.save()
+    }
+    do {
+      try cadenceOperations.reactivate(
+        cadenceHabit,
+        at: instant("2024-01-01T18:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected cadence mismatch")
+    } catch let error as BucketEvaluationError {
+      #expect(error == .cadenceMismatch(habit: .daily, bucket: .weekly))
+    }
+
+    let malformedContext = try makeContext()
+    let malformedHabit = try insertInactiveHabit(
+      in: malformedContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    let malformed = HabitBucket(
+      periodKey: "not-a-period",
+      startAt: try instant("2024-01-01T00:00:00Z"),
+      endAt: try instant("2024-01-02T00:00:00Z"),
+      cadence: .daily,
+      isExempt: true,
+      habit: malformedHabit
+    )
+    malformedContext.insert(malformed)
+    try malformedContext.save()
+    var malformedSaveCount = 0
+    let malformedOperations = HabitActivityOperations(context: malformedContext) {
+      malformedSaveCount += 1
+      try malformedContext.save()
+    }
+    do {
+      try malformedOperations.reactivate(
+        malformedHabit,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected malformed period key")
+    } catch let error as BucketEvaluationError {
+      #expect(error == .calendar(.malformedKey("not-a-period")))
+    }
+
+    let progressContext = try makeContext()
+    let progressHabit = try insertInactiveHabit(
+      in: progressContext,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z"
+    )
+    let progressBucket = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: try instant("2024-01-01T00:00:00Z"),
+      endAt: try instant("2024-01-02T00:00:00Z"),
+      cadence: .daily,
+      isExempt: true,
+      habit: progressHabit
+    )
+    let invalidEntry = LogEntry(
+      timestamp: try instant("2024-01-01T10:00:00Z"),
+      amount: 0,
+      habit: progressHabit,
+      bucket: progressBucket
+    )
+    progressContext.insert(progressBucket)
+    progressContext.insert(invalidEntry)
+    try progressContext.save()
+    var progressSaveCount = 0
+    let progressOperations = HabitActivityOperations(context: progressContext) {
+      progressSaveCount += 1
+      try progressContext.save()
+    }
+    do {
+      try progressOperations.reactivate(
+        progressHabit,
+        at: instant("2024-01-01T18:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected invalid entry amount")
+    } catch let error as BucketEvaluationError {
+      #expect(error == .invalidEntryAmount(0))
+    }
+
+    #expect(cadenceSaveCount == 0)
+    #expect(malformedSaveCount == 0)
+    #expect(progressSaveCount == 0)
+    #expect(!cadenceHabit.isActive)
+    #expect(!malformedHabit.isActive)
+    #expect(!progressHabit.isActive)
+    #expect(!cadenceContext.hasChanges)
+    #expect(!malformedContext.hasChanges)
+    #expect(!progressContext.hasChanges)
+  }
+
+  @Test("reactivation restore failure rolls back bucket and activity insertion")
+  func reactivationRestoreFailureRollsBackLifecycleMutation() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    let entry = try LogEntryOperations(context: context).append(
+      amount: 1,
+      to: habit,
+      at: instant("2024-01-01T10:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    let exemptBucket = try #require(buckets(for: habit, in: context).first)
+    exemptBucket.startAt = try instant("2023-12-31T23:00:00Z")
+    exemptBucket.endAt = try instant("2024-01-01T23:00:00Z")
+    try context.save()
+    let bucketIdentifier = exemptBucket.persistentModelID
+    let closedPeriod = try #require(habit.activityPeriods?.first)
+    let closedPeriodIdentifier = closedPeriod.persistentModelID
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      throw SaveFailure.expected
+    }
+
+    do {
+      try operations.reactivate(
+        habit,
+        at: instant("2024-01-01T18:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected save failure")
+    } catch let error as SaveFailure {
+      #expect(error == .expected)
+    }
+
+    let persistedBucket = try #require(buckets(for: habit, in: context).first)
+    let persistedPeriods = try #require(habit.activityPeriods)
+    #expect(lifecycleSaveCount == 1)
+    #expect(!habit.isActive)
+    #expect(persistedPeriods.count == 1)
+    #expect(persistedPeriods[0].persistentModelID == closedPeriodIdentifier)
+    #expect(persistedPeriods[0].endedAt == (try instant("2024-01-01T12:00:00Z")))
+    #expect(persistedPeriods[0].habit?.persistentModelID == habit.persistentModelID)
+    #expect(persistedBucket.persistentModelID == bucketIdentifier)
+    #expect(persistedBucket.isExempt)
+    #expect(persistedBucket.startAt == (try instant("2023-12-31T23:00:00Z")))
+    #expect(persistedBucket.endAt == (try instant("2024-01-01T23:00:00Z")))
+    #expect(
+      persistedBucket.entries?.map(\.persistentModelID) == [
+        entry.persistentModelID
+      ])
+    #expect(entry.habit?.persistentModelID == habit.persistentModelID)
+    #expect(entry.bucket?.persistentModelID == bucketIdentifier)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("reactivation creation failure removes inserted bucket and activity")
+  func reactivationCreationFailureRemovesInsertedModels() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    let entry = try LogEntryOperations(context: context).append(
+      amount: 1,
+      to: habit,
+      at: instant("2024-01-01T10:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try HabitActivityOperations(context: context).deactivate(
+      habit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    let historicalBucket = try #require(buckets(for: habit, in: context).first)
+    let historicalIdentifier = historicalBucket.persistentModelID
+    let closedPeriod = try #require(habit.activityPeriods?.first)
+    let closedPeriodIdentifier = closedPeriod.persistentModelID
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      throw SaveFailure.expected
+    }
+
+    do {
+      try operations.reactivate(
+        habit,
+        at: instant("2024-01-03T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      Issue.record("Expected save failure")
+    } catch let error as SaveFailure {
+      #expect(error == .expected)
+    }
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let persistedPeriods = try #require(habit.activityPeriods)
+    #expect(lifecycleSaveCount == 1)
+    #expect(!habit.isActive)
+    #expect(persistedBuckets.map(\.persistentModelID) == [historicalIdentifier])
+    #expect(persistedBuckets[0].periodKey == "day:2024-01-01")
+    #expect(persistedBuckets[0].isExempt)
+    #expect(persistedPeriods.count == 1)
+    #expect(persistedPeriods[0].persistentModelID == closedPeriodIdentifier)
+    #expect(persistedPeriods[0].endedAt == (try instant("2024-01-01T12:00:00Z")))
+    #expect(entry.habit?.persistentModelID == habit.persistentModelID)
+    #expect(entry.bucket?.persistentModelID == historicalIdentifier)
+    #expect(
+      try entries(in: context).map(\.persistentModelID) == [
+        entry.persistentModelID
+      ])
+    #expect(!context.hasChanges)
+  }
+
+  @Test("repeated lifecycle cycles keep periods ordered and bucket keys unique")
+  func repeatedLifecycleCyclesRemainCanonical() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-01-01T00:00:00Z"
+    )
+    let operations = HabitActivityOperations(context: context)
+
+    try operations.deactivate(
+      habit,
+      at: instant("2024-01-01T08:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try operations.reactivate(
+      habit,
+      at: instant("2024-01-01T10:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try operations.deactivate(
+      habit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+    try operations.reactivate(
+      habit,
+      at: instant("2024-01-01T12:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+
+    let activityPeriods = try #require(habit.activityPeriods).sorted {
+      $0.startedAt < $1.startedAt
+    }
+    let persistedBuckets = try buckets(for: habit, in: context)
+    #expect(habit.isActive)
+    #expect(activityPeriods.count == 3)
+    #expect(activityPeriods[0].startedAt == (try instant("2024-01-01T00:00:00Z")))
+    #expect(activityPeriods[0].endedAt == (try instant("2024-01-01T08:00:00Z")))
+    #expect(activityPeriods[1].startedAt == (try instant("2024-01-01T10:00:00Z")))
+    #expect(activityPeriods[1].endedAt == (try instant("2024-01-01T12:00:00Z")))
+    #expect(activityPeriods[2].startedAt == (try instant("2024-01-01T12:00:00Z")))
+    #expect(activityPeriods[2].endedAt == nil)
+    #expect(persistedBuckets.map(\.periodKey) == ["day:2024-01-01"])
+    #expect(!persistedBuckets[0].isExempt)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("reactivation isolates habits sharing an ordinary UUID")
+  func reactivationUsesPersistentHabitIdentity() throws {
+    let context = try makeContext()
+    let sharedID = UUID()
+    let first = try insertInactiveHabit(
+      in: context,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z",
+      id: sharedID
+    )
+    let second = try insertInactiveHabit(
+      in: context,
+      activityStart: "2024-01-01T00:00:00Z",
+      activityEnd: "2024-01-01T12:00:00Z",
+      id: sharedID
+    )
+    let secondBucket = HabitBucket(
+      periodKey: "day:2024-01-01",
+      startAt: try instant("2024-01-01T00:00:00Z"),
+      endAt: try instant("2024-01-02T00:00:00Z"),
+      cadence: .daily,
+      isExempt: true,
+      habit: second
+    )
+    context.insert(secondBucket)
+    try context.save()
+
+    try HabitActivityOperations(context: context).reactivate(
+      first,
+      at: instant("2024-01-01T18:00:00Z"),
+      timeZone: timeZone("UTC")
+    )
+
+    let firstBucket = try #require(buckets(for: first, in: context).first)
+    #expect(first.isActive)
+    #expect(!firstBucket.isExempt)
+    #expect(firstBucket.habit?.persistentModelID == first.persistentModelID)
+    #expect(!second.isActive)
+    #expect(second.activityPeriods?.count == 1)
+    #expect(secondBucket.isExempt)
+    #expect(secondBucket.habit?.persistentModelID == second.persistentModelID)
+    #expect(
+      try buckets(for: second, in: context).map(\.persistentModelID) == [
+        secondBucket.persistentModelID
+      ])
+    #expect(!context.hasChanges)
+  }
+
   @Test("transition state errors win before lifecycle mutation")
   func transitionStateErrorsWinBeforeMutation() throws {
     let context = try makeContext()
@@ -684,6 +1533,32 @@ struct HabitActivityOperationsTests {
     )
     habit.activityPeriods = [
       HabitActivityPeriod(startedAt: try instant(activityStart))
+    ]
+    context.insert(habit)
+    try context.save()
+    return habit
+  }
+
+  private func insertInactiveHabit(
+    in context: ModelContext,
+    cadence: HabitCadence = .daily,
+    target: Int = 1,
+    activityStart: String,
+    activityEnd: String,
+    id: UUID = UUID()
+  ) throws -> Habit {
+    let habit = Habit(
+      id: id,
+      name: "Inactive",
+      cadence: cadence,
+      target: target,
+      isActive: false
+    )
+    habit.activityPeriods = [
+      HabitActivityPeriod(
+        startedAt: try instant(activityStart),
+        endedAt: try instant(activityEnd)
+      )
     ]
     context.insert(habit)
     try context.save()

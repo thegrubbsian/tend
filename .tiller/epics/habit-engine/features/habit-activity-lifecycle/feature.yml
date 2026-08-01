@@ -24,3 +24,66 @@ accepted_against:
         kind: git_commit
         value: git:e3973ae
         observed_at: 2026-08-01T20:22:52.811604Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:10:14.833442Z
+        against:
+            kind: git_commit
+            value: git:c0e8ec6
+            observed_at: 2026-08-01T21:10:14.833236Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-c0e8ec6-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    evals:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:10:14.833442Z
+        against:
+            kind: git_commit
+            value: git:c0e8ec6
+            observed_at: 2026-08-01T21:10:14.833236Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-c0e8ec6-out-d879a728a4e927fd6e5bee8a07d7799dd52474f84be6771bd612b1b24d5a4329.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-c0e8ec6-out-7f79e092fca384dc93054d906577458fc1de5cbb8cf3b22859bffa4261e796e4.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-c0e8ec6-out-5ee0362a7e38c6c69864acb34cffb35325e602b1c87d68062e3c032f31f0362e.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-c0e8ec6-out-5ed38a64042079f1646d5437440538031c297ae7f9ece06affc373d04a702fbd.txt
+            C5:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C5-c0e8ec6-out-4566b8e39d00b03dd6e91ea0a79e4aeb5baeb12d07b4044a87d3388f6a9c2314.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:10:14.833442Z
+        against:
+            kind: git_commit
+            value: git:c0e8ec6
+            observed_at: 2026-08-01T21:10:14.833236Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-c0e8ec6-out-1b8e634c1c9a7f7ea4b844d2cb2344102ffde9721637f6e400c9fb50d3d28ee1.txt

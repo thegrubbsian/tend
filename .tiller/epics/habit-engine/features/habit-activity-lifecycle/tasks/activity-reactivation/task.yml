@@ -1,7 +1,7 @@
 id: T-otqpk2
 key: habit-engine/habit-activity-lifecycle/activity-reactivation
 title: Reactivate habits and restore the current bucket
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:e3973ae
         observed_at: 2026-08-01T20:22:52.85484Z
+pr: 13
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:09:47.472616Z
+        against:
+            kind: git_commit
+            value: git:878973d
+            observed_at: 2026-08-01T21:09:47.472609Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-878973d-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T21:09:47.472616Z
+        against:
+            kind: git_commit
+            value: git:878973d
+            observed_at: 2026-08-01T21:09:47.472609Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-878973d-out-33f61b87a3a260fda19904bddf7c9cabff50721678664c44a1c50a4e21f721b5.txt

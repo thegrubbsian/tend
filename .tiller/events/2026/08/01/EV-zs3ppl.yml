@@ -1,0 +1,13 @@
+id: EV-zs3ppl
+type: check.feature
+at: 2026-08-01T21:10:21.57161Z
+owner: jc
+command: check feature F-aotv97
+targets:
+    - F-aotv97
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml
