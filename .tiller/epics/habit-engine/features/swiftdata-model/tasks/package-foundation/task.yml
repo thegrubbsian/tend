@@ -1,7 +1,7 @@
 id: T-tj6hor
 key: habit-engine/swiftdata-model/package-foundation
 title: Create the TendCore package foundation
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,6 +15,7 @@ accepted_against:
         kind: git_commit
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.216181Z
+pr: 1
 gates:
     build:
         required: true
