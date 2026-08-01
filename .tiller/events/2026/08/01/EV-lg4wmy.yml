@@ -1,0 +1,13 @@
+id: EV-lg4wmy
+type: start.feature
+at: 2026-08-01T13:29:36.087946Z
+owner: jc
+command: start feature F-n7oy52
+targets:
+    - F-n7oy52
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml

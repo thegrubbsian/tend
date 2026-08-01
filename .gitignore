@@ -1,0 +1,14 @@
+# Tiller-generated, not source. Safe to delete; Tiller re-runs the gates and
+# regenerates the cache. Keep these out of your code diff.
+artifacts/
+.tiller/.cache/
+.bin/
+# Per-checkout identity (who you are here), written by `tiller join`; never commit it.
+.tiller/identity.yml
+
+# Tiller skill shims (installed per machine by `tiller join`; not source).
+.claude/skills/tiller-*/
+
+# Swift Package Manager build products and per-user Xcode package state.
+.build/
+.swiftpm/
