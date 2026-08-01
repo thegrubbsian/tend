@@ -1,0 +1,13 @@
+id: EV-7whcc8
+type: start.task
+at: 2026-08-01T21:47:29.893129Z
+owner: jc
+command: start task T-dqajj8
+targets:
+    - T-dqajj8
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.yml
