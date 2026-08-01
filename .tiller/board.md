@@ -7,10 +7,9 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic habit-engine (E-tslnrm): ready, active
+- epic habit-engine (E-tslnrm): ready
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature habit-engine/bucket-evaluation (F-6a3jmx): active
 - feature habit-engine/log-entry-operations (F-vrsbxv): ready
 - task habit-engine/log-entry-operations/entry-append-delete (T-jg4df3): ready
 - task habit-engine/log-entry-operations/bucket-total-adjustment (T-lq5y49): ready
@@ -21,7 +20,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): build pass, tests pass
+- (none)
 
 ### Open questions
 

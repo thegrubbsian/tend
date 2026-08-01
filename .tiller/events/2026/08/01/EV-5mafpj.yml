@@ -1,0 +1,14 @@
+id: EV-5mafpj
+type: sync.feature
+at: 2026-08-01T18:39:11.073769Z
+owner: jc
+command: sync feature F-6a3jmx
+targets:
+    - F-6a3jmx
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

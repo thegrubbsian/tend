@@ -1,0 +1,14 @@
+id: EV-4ku1jj
+type: sync.task
+at: 2026-08-01T18:39:11.007483Z
+owner: jc
+command: sync task T-evhkq6
+targets:
+    - T-evhkq6
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.yml
