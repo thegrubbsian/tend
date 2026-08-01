@@ -19,6 +19,5 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Open questions
 
-- Q-c1ostz: "When a habit is deactivated and reactivated within the same calendar bucket, are the exempted bucket and its existing entries restored, discarded, or replaced?"
 - Q-lfe6in: "How should weekly quantity habits scope logging and set-total behavior when their bucket is a week but the log sheet specifies Today and Yesterday?"
 - Q-zyqw93: "What weekly Habit Detail history layout, navigation, and state treatment should replace the day-cell garden bed specified for daily habits?"

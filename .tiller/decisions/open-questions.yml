@@ -18,5 +18,10 @@ questions:
       owner: jc
       blocks:
         - F-aotv97
-      status: open
+      status: answered
+      answer: Deactivation never deletes log entries. If a habit is reactivated within the same current calendar bucket, that bucket is restored and its existing entries count toward the current requirement. Non-current buckets exempted at deactivation, including a grace bucket, remain permanently exempt. Reactivation in a later interval begins only that interval's current bucket. Tend never creates multiple buckets for the same habit and calendar interval.
+      answer_revision:
+        kind: sha256
+        value: sha256:b1b656336d5c54492098b057d3e918af28ff1f3d49237f1b7d2311f1fac82b89
+        observed_at: 2026-08-01T07:59:39.250617Z
       source: design/02-domain-model.md
