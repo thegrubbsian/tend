@@ -1,9 +1,19 @@
 id: T-bt5coz
 key: habit-engine/swiftdata-model/bucket-entry-schema
 title: Model buckets and log entries
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-28yrbr
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:29577718a0b403a9e4b2a9c755b1a7e3be54b97f
+        path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.md
+        observed_at: 2026-08-01T13:26:49.230592Z
+    commit:
+        kind: git_commit
+        value: git:7458e30
+        observed_at: 2026-08-01T13:26:49.243765Z

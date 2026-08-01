@@ -1,0 +1,13 @@
+id: EV-t1qpmx
+type: approve.feature
+at: 2026-08-01T13:26:49.201493Z
+owner: jc
+command: approve feature F-n7oy52
+targets:
+    - F-n7oy52
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml

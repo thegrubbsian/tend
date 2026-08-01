@@ -7,10 +7,14 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic habit-engine (E-tslnrm): ready
+- epic habit-engine (E-tslnrm): ready, active
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature habit-engine/swiftdata-model (F-n7oy52): specced
+- feature habit-engine/swiftdata-model (F-n7oy52): active
+- task habit-engine/swiftdata-model/package-foundation (T-tj6hor): in_progress
+- task habit-engine/swiftdata-model/habit-activity-schema (T-28yrbr): ready
+- task habit-engine/swiftdata-model/bucket-entry-schema (T-bt5coz): ready
+- task habit-engine/swiftdata-model/durable-container (T-yjy3cq): ready
 
 ### Blocked
 

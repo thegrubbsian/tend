@@ -1,0 +1,13 @@
+id: EV-vue0bc
+type: start.task
+at: 2026-08-01T13:29:48.398712Z
+owner: jc
+command: start task T-tj6hor
+targets:
+    - T-tj6hor
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.yml

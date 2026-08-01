@@ -1,0 +1,13 @@
+id: EV-y33us8
+type: approve.task
+at: 2026-08-01T13:26:49.216232Z
+owner: jc
+command: approve task T-tj6hor
+targets:
+    - T-tj6hor
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.yml

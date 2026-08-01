@@ -1,0 +1,13 @@
+id: EV-dh7oc2
+type: approve.task
+at: 2026-08-01T13:26:49.243806Z
+owner: jc
+command: approve task T-bt5coz
+targets:
+    - T-bt5coz
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
