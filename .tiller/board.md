@@ -11,7 +11,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/log-entry-operations (F-vrsbxv): active
-- task habit-engine/log-entry-operations/bucket-total-adjustment (T-lq5y49): ready
 
 ### Blocked
 
@@ -19,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task habit-engine/log-entry-operations/bucket-total-adjustment (T-lq5y49): build pass, tests pass
 
 ### Open questions
 
