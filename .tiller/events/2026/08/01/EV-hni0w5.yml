@@ -1,0 +1,13 @@
+id: EV-hni0w5
+type: check.task
+at: 2026-08-01T22:19:18.326362Z
+owner: jc
+command: check task T-ipovyn
+targets:
+    - T-ipovyn
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.yml
