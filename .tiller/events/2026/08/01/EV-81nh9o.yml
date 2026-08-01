@@ -1,0 +1,14 @@
+id: EV-81nh9o
+type: sync.task
+at: 2026-08-01T16:14:14.013152Z
+owner: jc
+command: sync task T-24btkb
+targets:
+    - T-24btkb
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.yml

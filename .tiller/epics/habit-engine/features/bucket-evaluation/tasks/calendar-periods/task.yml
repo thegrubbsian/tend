@@ -1,7 +1,7 @@
 id: T-24btkb
 key: habit-engine/bucket-evaluation/calendar-periods
 title: Calculate local calendar bucket periods
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:a7145a5
         observed_at: 2026-08-01T15:32:54.797307Z
 pr: 7
+done_basis: ancestry
 gates:
     build:
         required: true
