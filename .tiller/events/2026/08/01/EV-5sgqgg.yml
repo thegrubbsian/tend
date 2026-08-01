@@ -1,0 +1,13 @@
+id: EV-5sgqgg
+type: approve.task
+at: 2026-08-01T21:45:05.059109Z
+owner: jc
+command: approve task T-dqajj8
+targets:
+    - T-dqajj8
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.yml

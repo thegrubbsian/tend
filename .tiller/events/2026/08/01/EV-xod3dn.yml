@@ -1,0 +1,13 @@
+id: EV-xod3dn
+type: approve.feature
+at: 2026-08-01T21:45:05.039584Z
+owner: jc
+command: approve feature F-vbsg1a
+targets:
+    - F-vbsg1a
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/feature.yml

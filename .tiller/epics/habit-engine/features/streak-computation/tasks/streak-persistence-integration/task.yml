@@ -1,9 +1,19 @@
 id: T-ipovyn
 key: habit-engine/streak-computation/streak-persistence-integration
 title: Reconcile streak state and persist finalized bests
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-dqajj8
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:aaf3e338414f19fe9ce9087219931f3255222947
+        path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.md
+        observed_at: 2026-08-01T21:45:05.059178Z
+    commit:
+        kind: git_commit
+        value: git:cec673c
+        observed_at: 2026-08-01T21:45:05.079234Z

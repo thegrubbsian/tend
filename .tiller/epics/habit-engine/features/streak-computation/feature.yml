@@ -1,10 +1,25 @@
 id: F-vbsg1a
 key: habit-engine/streak-computation
 title: Streak Computation
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-aotv97
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:c5a6a3100afc3edd7524a8e11dd973cb80da9d25
+        path: .tiller/epics/habit-engine/features/streak-computation/feature.md
+        observed_at: 2026-08-01T21:45:05.005714Z
+    eval:
+        kind: git_blob
+        value: git:7c2e7c95f539a3cc4708bfcacdc35b9bf689bdd8
+        path: .tiller/epics/habit-engine/features/streak-computation/feature.eval.md
+        observed_at: 2026-08-01T21:45:05.005714Z
+    commit:
+        kind: git_commit
+        value: git:cec673c
+        observed_at: 2026-08-01T21:45:05.039323Z
