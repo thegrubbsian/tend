@@ -1,7 +1,7 @@
 id: T-ipovyn
 key: habit-engine/streak-computation/streak-persistence-integration
 title: Reconcile streak state and persist finalized bests
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:cec673c
         observed_at: 2026-08-01T21:45:05.079234Z
+pr: 15
 gates:
     build:
         required: true
