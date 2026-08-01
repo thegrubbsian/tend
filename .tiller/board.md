@@ -21,4 +21,4 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Open questions
 
-- Q-zyqw93: "What weekly Habit Detail history layout, navigation, and state treatment should replace the day-cell garden bed specified for daily habits?"
+- (none)

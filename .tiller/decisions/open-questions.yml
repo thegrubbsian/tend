@@ -16,7 +16,12 @@ questions:
       owner: jc
       blocks:
         - F-efgzky
-      status: open
+      status: answered
+      answer: Weekly Habit Detail uses a vertical rolling 13-week history with one row per Monday-Sunday bucket, newest first. The header shows the window's date range, and previous and next chevrons move by 13-week windows. Each row shows its week range, aggregate progress with unit, and bucket state; tapping exposes the full range, state, aggregate, and applicable requirement snapshot. Final met uses moss, final missed uses withered, the current week uses a clay outline, and the grace week uses an ochre outline and at-risk treatment when unmet. Provisionally met current or grace weeks retain moss fill with the corresponding outline. Inactive and pre-creation weeks use the existing sunken ghost treatment. Weekly history never renders seven day cells or implies daily verdicts. VoiceOver announces the week range, progress, state, finality, and risk.
+      answer_revision:
+        kind: sha256
+        value: sha256:d00b26ed6ac888fda14793a73ca35fadda0c7d915d0c1ae06691f916831f7ca3
+        observed_at: 2026-08-01T08:31:22.269453Z
       source: design/05-visual-design.md
     - id: Q-c1ostz
       statement: When a habit is deactivated and reactivated within the same calendar bucket, are the exempted bucket and its existing entries restored, discarded, or replaced?
