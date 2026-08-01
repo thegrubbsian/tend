@@ -7,10 +7,13 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic habit-engine (E-tslnrm): ready
+- epic habit-engine (E-tslnrm): ready, active
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature habit-engine/bucket-evaluation (F-6a3jmx): specced
+- feature habit-engine/bucket-evaluation (F-6a3jmx): active
+- task habit-engine/bucket-evaluation/calendar-periods (T-24btkb): in_progress
+- task habit-engine/bucket-evaluation/bucket-state-evaluation (T-96c5xx): ready
+- task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): ready
 
 ### Blocked
 

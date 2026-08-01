@@ -1,7 +1,17 @@
 id: T-24btkb
 key: habit-engine/bucket-evaluation/calendar-periods
 title: Calculate local calendar bucket periods
-status: proposed
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:511561ebaa5bbc6e77f950f1aff82bcd0532275c
+        path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.md
+        observed_at: 2026-08-01T15:32:54.783312Z
+    commit:
+        kind: git_commit
+        value: git:a7145a5
+        observed_at: 2026-08-01T15:32:54.797307Z

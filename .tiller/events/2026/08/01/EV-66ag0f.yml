@@ -1,0 +1,13 @@
+id: EV-66ag0f
+type: start.feature
+at: 2026-08-01T15:34:08.91354Z
+owner: jc
+command: start feature F-6a3jmx
+targets:
+    - F-6a3jmx
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

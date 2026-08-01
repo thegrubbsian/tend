@@ -1,10 +1,26 @@
 id: F-6a3jmx
 key: habit-engine/bucket-evaluation
 title: Calendar Bucket Evaluation
-status: specced
+status: active
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-n7oy52
+branch: tiller/habit-engine/bucket-evaluation
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:234be17b42848f6616106c7dc285229f4cc96c57
+        path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.md
+        observed_at: 2026-08-01T15:32:54.748579Z
+    eval:
+        kind: git_blob
+        value: git:01ca30b3de0a144db5063b65d1acaa7f10f5bdfa
+        path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.eval.md
+        observed_at: 2026-08-01T15:32:54.748579Z
+    commit:
+        kind: git_commit
+        value: git:a7145a5
+        observed_at: 2026-08-01T15:32:54.783163Z
