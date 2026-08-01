@@ -21,24 +21,24 @@ gates:
         kind: command
         status: pass
         run_by: jc
-        run_at: 2026-08-01T20:38:36.23557Z
+        run_at: 2026-08-01T20:48:27.420914Z
         against:
             kind: sha256
-            value: sha256:10386f64ae0d4cd14dc7053c32bfd1ac17430091c23de1f3f5c34af4e6defe0a
-            observed_at: 2026-08-01T20:38:36.235567Z
+            value: sha256:9efc6b731352dca6663dd0a27f302c7e2354adc7121579b5f34658aecfa2dff8
+            observed_at: 2026-08-01T20:48:27.420911Z
         evidence:
             - kind: command_output
-              ref: artifacts/tiller/gates/build-sha256-10386f64ae0d-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+              ref: artifacts/tiller/gates/build-sha256-9efc6b731352-out-81052b4e2eb5bd48da8bb59091743984b06c9f6cec772c1c4174b7ea05154aa9.txt
     tests:
         required: true
         kind: command
         status: pass
         run_by: jc
-        run_at: 2026-08-01T20:38:36.23557Z
+        run_at: 2026-08-01T20:48:27.420914Z
         against:
             kind: sha256
-            value: sha256:10386f64ae0d4cd14dc7053c32bfd1ac17430091c23de1f3f5c34af4e6defe0a
-            observed_at: 2026-08-01T20:38:36.235567Z
+            value: sha256:9efc6b731352dca6663dd0a27f302c7e2354adc7121579b5f34658aecfa2dff8
+            observed_at: 2026-08-01T20:48:27.420911Z
         evidence:
             - kind: command_output
-              ref: artifacts/tiller/gates/tests-sha256-10386f64ae0d-out-b3e5453bcfbc50616a52a78c5bbf1d85139ef37ecfc6c5305452bd749ace29a0.txt
+              ref: artifacts/tiller/gates/tests-sha256-9efc6b731352-out-b2927387a2d68d6d763f4a3fe7b3fe318c168b7f1d4b70f1784987c0053f40ba.txt

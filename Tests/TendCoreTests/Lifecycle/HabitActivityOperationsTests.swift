@@ -143,6 +143,110 @@ struct HabitActivityOperationsTests {
     #expect(!context.hasChanges)
   }
 
+  @Test("daily grace end across spring forward finalizes before exemption")
+  func dailyGraceEndAcrossSpringForwardFinalizesBeforeExemption() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .daily,
+      target: 1,
+      activityStart: "2024-03-09T20:00:00Z"
+    )
+    let operationInstant = try instant("2024-03-11T07:00:00Z")
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try operations.deactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("America/Los_Angeles")
+    )
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let final = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-03-09" }
+    )
+    let grace = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-03-10" }
+    )
+    let current = try #require(
+      persistedBuckets.first { $0.periodKey == "day:2024-03-11" }
+    )
+    #expect(lifecycleSaveCount == 1)
+    #expect(!habit.isActive)
+    #expect(habit.activityPeriods?.first?.endedAt == operationInstant)
+    #expect(
+      persistedBuckets.map(\.periodKey) == [
+        "day:2024-03-09", "day:2024-03-10", "day:2024-03-11",
+      ])
+    #expect(final.startAt == (try instant("2024-03-09T08:00:00Z")))
+    #expect(final.endAt == (try instant("2024-03-10T08:00:00Z")))
+    #expect(final.finalizedAt == operationInstant)
+    #expect(final.verdictRawValue == BucketVerdict.missed.rawValue)
+    #expect(!final.isExempt)
+    #expect(grace.startAt == (try instant("2024-03-10T08:00:00Z")))
+    #expect(grace.endAt == operationInstant)
+    #expect(grace.endAt.timeIntervalSince(grace.startAt) == 23 * 60 * 60)
+    #expect(grace.finalizedAt == nil)
+    #expect(grace.isExempt)
+    #expect(current.startAt == operationInstant)
+    #expect(current.endAt == (try instant("2024-03-12T07:00:00Z")))
+    #expect(current.isExempt)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("weekly grace end after spring forward preserves final facts")
+  func weeklyGraceEndAfterSpringForwardPreservesFinalFacts() throws {
+    let context = try makeContext()
+    let habit = try insertHabit(
+      in: context,
+      cadence: .weekly,
+      target: 1,
+      activityStart: "2024-03-04T16:00:00Z"
+    )
+    let operationInstant = try instant("2024-03-12T07:00:00Z")
+    var lifecycleSaveCount = 0
+    let operations = HabitActivityOperations(context: context) {
+      lifecycleSaveCount += 1
+      try context.save()
+    }
+
+    try operations.deactivate(
+      habit,
+      at: operationInstant,
+      timeZone: timeZone("America/Los_Angeles")
+    )
+
+    let persistedBuckets = try buckets(for: habit, in: context)
+    let final = try #require(
+      persistedBuckets.first { $0.periodKey == "week:2024-03-04" }
+    )
+    let current = try #require(
+      persistedBuckets.first { $0.periodKey == "week:2024-03-11" }
+    )
+    #expect(lifecycleSaveCount == 1)
+    #expect(!habit.isActive)
+    #expect(habit.activityPeriods?.first?.endedAt == operationInstant)
+    #expect(
+      persistedBuckets.map(\.periodKey) == [
+        "week:2024-03-04", "week:2024-03-11",
+      ])
+    #expect(final.startAt == (try instant("2024-03-04T08:00:00Z")))
+    #expect(final.endAt == (try instant("2024-03-11T07:00:00Z")))
+    #expect(final.endAt.timeIntervalSince(final.startAt) == 167 * 60 * 60)
+    #expect(final.finalizedAt == operationInstant)
+    #expect(final.verdictRawValue == BucketVerdict.missed.rawValue)
+    #expect(!final.isExempt)
+    #expect(current.startAt == (try instant("2024-03-11T07:00:00Z")))
+    #expect(current.endAt == (try instant("2024-03-18T07:00:00Z")))
+    #expect(current.finalizedAt == nil)
+    #expect(current.isExempt)
+    #expect(!context.hasChanges)
+  }
+
   @Test("transition state errors win before lifecycle mutation")
   func transitionStateErrorsWinBeforeMutation() throws {
     let context = try makeContext()

@@ -1,0 +1,13 @@
+id: EV-0ts5q5
+type: check.task
+at: 2026-08-01T20:48:28.883756Z
+owner: jc
+command: check task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml
