@@ -1,7 +1,7 @@
 id: F-n7oy52
 key: habit-engine/swiftdata-model
 title: SwiftData Habit Model
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/04-platform-and-constraints.md
@@ -22,6 +22,23 @@ accepted_against:
         kind: git_commit
         value: git:7458e30
         observed_at: 2026-08-01T13:26:49.201406Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:bedf333ebd0e955a347dd9b82bb1d7fc4bd14278
+        path: .tiller/epics/habit-engine/features/swiftdata-model/feature.md
+        observed_at: 2026-08-01T15:18:26.807441Z
+    eval:
+        kind: git_blob
+        value: git:35a6dbc6dd9767efa4c21a2735ca1ecec6f14f76
+        path: .tiller/epics/habit-engine/features/swiftdata-model/feature.eval.md
+        observed_at: 2026-08-01T15:18:26.807441Z
+    commit:
+        kind: git_commit
+        value: git:828a8b0
+        observed_at: 2026-08-01T15:18:26.807251Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true

@@ -1,0 +1,14 @@
+id: EV-7f5vyq
+type: sync.feature
+at: 2026-08-01T15:18:26.822453Z
+owner: jc
+command: sync feature F-n7oy52
+targets:
+    - F-n7oy52
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml
