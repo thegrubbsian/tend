@@ -1,0 +1,14 @@
+id: EV-iw1zny
+type: sync.task
+at: 2026-08-01T14:01:22.692712Z
+owner: jc
+command: sync task T-tj6hor
+targets:
+    - T-tj6hor
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.yml
