@@ -1,0 +1,13 @@
+id: EV-y6fa0d
+type: check.task
+at: 2026-08-01T21:56:44.237358Z
+owner: jc
+command: check task T-dqajj8
+targets:
+    - T-dqajj8
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.yml
