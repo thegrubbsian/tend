@@ -1,0 +1,14 @@
+id: EV-axlx57
+type: add.task
+at: 2026-08-01T15:27:42.020737Z
+owner: jc
+command: add task habit-engine/bucket-evaluation/calendar-periods
+targets:
+    - T-24btkb
+after:
+    feature: F-6a3jmx
+    key: habit-engine/bucket-evaluation/calendar-periods
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.md
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.yml

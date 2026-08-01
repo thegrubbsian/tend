@@ -1,7 +1,7 @@
 id: F-6a3jmx
 key: habit-engine/bucket-evaluation
 title: Calendar Bucket Evaluation
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: design/02-domain-model.md

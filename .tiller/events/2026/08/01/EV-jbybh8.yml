@@ -1,0 +1,13 @@
+id: EV-jbybh8
+type: spec.feature
+at: 2026-08-01T15:30:08.978391Z
+owner: jc
+command: spec feature F-6a3jmx
+targets:
+    - F-6a3jmx
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

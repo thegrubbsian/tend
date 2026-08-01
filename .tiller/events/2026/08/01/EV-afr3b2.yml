@@ -1,0 +1,14 @@
+id: EV-afr3b2
+type: add.task
+at: 2026-08-01T15:27:42.173037Z
+owner: jc
+command: add task habit-engine/bucket-evaluation/bucket-reconciliation
+targets:
+    - T-evhkq6
+after:
+    feature: F-6a3jmx
+    key: habit-engine/bucket-evaluation/bucket-reconciliation
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.md
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.yml

@@ -1,0 +1,14 @@
+id: EV-u1ho7t
+type: add.task
+at: 2026-08-01T15:27:42.101822Z
+owner: jc
+command: add task habit-engine/bucket-evaluation/bucket-state-evaluation
+targets:
+    - T-96c5xx
+after:
+    feature: F-6a3jmx
+    key: habit-engine/bucket-evaluation/bucket-state-evaluation
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.md
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml

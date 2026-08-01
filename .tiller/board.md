@@ -10,6 +10,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic habit-engine (E-tslnrm): ready
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
+- feature habit-engine/bucket-evaluation (F-6a3jmx): specced
 
 ### Blocked
 

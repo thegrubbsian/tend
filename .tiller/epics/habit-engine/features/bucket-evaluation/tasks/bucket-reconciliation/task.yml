@@ -1,0 +1,9 @@
+id: T-evhkq6
+key: habit-engine/bucket-evaluation/bucket-reconciliation
+title: Reconcile persisted buckets deterministically
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-96c5xx

@@ -1,0 +1,9 @@
+id: T-96c5xx
+key: habit-engine/bucket-evaluation/bucket-state-evaluation
+title: Evaluate bucket state and finality
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-24btkb
