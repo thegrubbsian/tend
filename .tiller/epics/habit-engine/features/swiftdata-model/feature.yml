@@ -26,46 +26,46 @@ gates:
     evals:
         required: true
         kind: command
-        status: fail
+        status: pass
         run_by: jc
-        run_at: 2026-08-01T15:14:09.713094Z
+        run_at: 2026-08-01T15:17:45.206832Z
         against:
-            kind: sha256
-            value: sha256:7801db6b26f4ced8bd0b78a4bc8feccf37de1a5ea767c473fa1187230fb3f329
-            observed_at: 2026-08-01T15:14:08.078965Z
+            kind: git_commit
+            value: git:60fb098
+            observed_at: 2026-08-01T15:17:39.353464Z
         criteria:
             C1:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C1-sha256-7801db6b26f4-out-e2d3c2ed5888ad1af75953a6e83aad72b85562ecdcc60f7db09d23c3d4325adc.txt
+                      ref: artifacts/tiller/gates/eval-C1-60fb098-out-0ff197c188c411f1d06150be5292358a7552d6822c160d5028aaa9f4915e52e9.txt
             C2:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C2-sha256-7801db6b26f4-out-5264fb3e779a9d29e04edc2f2355b93a1d628bc8fb22f3378f691dfb4624ea74.txt
+                      ref: artifacts/tiller/gates/eval-C2-60fb098-out-4c1168bf511f7a445c7afb3c5583421aedd10b2ed87cb73f77ef2867b52ce9fc.txt
             C3:
-                status: fail
+                status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C3-sha256-7801db6b26f4-out-ef270a83c003e9bffeb308111fa26280917ea3fc276816615f7e77e59252b7d3.txt
+                      ref: artifacts/tiller/gates/eval-C3-60fb098-out-1e4380a97154bb5350cdb2888bbeec0c446c6281167e1d6c73d202fe96edda81.txt
             C4:
-                status: fail
+                status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C4-sha256-7801db6b26f4-out-151d4db9152af61adc669cf19005b564287fe6f4b8ea89560462d89aa96f8500.txt
+                      ref: artifacts/tiller/gates/eval-C4-60fb098-out-433f1a31f92b7590959a02b3ae64ac55e43621484ca41ff187144fcaf5bc63c7.txt
             C5:
-                status: fail
+                status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C5-sha256-7801db6b26f4-out-5db0d7ba7bdd1c9bba38e48e98e140cd705651987ad19cfb30051dcf61af5c95.txt
+                      ref: artifacts/tiller/gates/eval-C5-60fb098-out-2ae0c0c8cd36e60f030179faa673cc109cd2228f48725e059769e6a9e7468b04.txt
             C6:
-                status: fail
+                status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C6-sha256-7801db6b26f4-out-3b66d513fc0e9df14e8518734497bdafe5dd217329c4ab6aba7093289be53ce9.txt
+                      ref: artifacts/tiller/gates/eval-C6-60fb098-out-717ddd85e8c83b07fae30f3e86cc1021e1f368c4910ab97a7299be376667c09b.txt
             C7:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C7-sha256-7801db6b26f4-out-a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74.txt
+                      ref: artifacts/tiller/gates/eval-C7-60fb098-out-a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74.txt
