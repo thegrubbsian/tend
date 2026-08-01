@@ -1,0 +1,14 @@
+id: EV-oh2mf7
+type: submit.task
+at: 2026-08-01T14:33:10.405743Z
+owner: jc
+command: submit task T-bt5coz
+targets:
+    - T-bt5coz
+before:
+    status: check
+after:
+    pr: 5
+    status: in_review
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
