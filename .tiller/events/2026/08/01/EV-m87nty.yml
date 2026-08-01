@@ -1,0 +1,13 @@
+id: EV-m87nty
+type: add.feature
+at: 2026-08-01T07:39:28.803286Z
+owner: jc
+command: add feature device-readiness/local-reminders
+targets:
+    - F-zbcv8j
+after:
+    key: device-readiness/local-reminders
+    status: draft
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.md
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml

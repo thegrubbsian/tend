@@ -1,0 +1,10 @@
+id: F-tm2imn
+key: app-experience/almanac-app-shell
+title: Almanac App Shell
+status: draft
+blocked: false
+owner: jc
+source: design/05-visual-design.md
+change_type: create
+depends_on:
+    - F-n7oy52

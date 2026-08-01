@@ -1,0 +1,10 @@
+id: F-efgzky
+key: app-experience/habit-detail-history
+title: Habit Detail and History
+status: draft
+blocked: false
+owner: jc
+source: design/03-user-experience.md
+change_type: create
+depends_on:
+    - F-tih743

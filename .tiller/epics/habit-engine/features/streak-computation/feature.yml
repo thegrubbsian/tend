@@ -1,0 +1,10 @@
+id: F-vbsg1a
+key: habit-engine/streak-computation
+title: Streak Computation
+status: draft
+blocked: false
+owner: jc
+source: design/02-domain-model.md
+change_type: create
+depends_on:
+    - F-aotv97

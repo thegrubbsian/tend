@@ -1,0 +1,13 @@
+id: EV-qy07hw
+type: add.epic
+at: 2026-08-01T07:39:28.722626Z
+owner: jc
+command: add epic device-readiness
+targets:
+    - E-z3y156
+after:
+    key: device-readiness
+    status: draft
+files:
+    - path: .tiller/epics/device-readiness/epic.md
+    - path: .tiller/epics/device-readiness/epic.yml

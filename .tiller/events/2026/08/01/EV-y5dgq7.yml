@@ -1,0 +1,13 @@
+id: EV-y5dgq7
+type: add.feature
+at: 2026-08-01T07:39:28.878853Z
+owner: jc
+command: add feature device-readiness/owner-device-release
+targets:
+    - F-3vz7ho
+after:
+    key: device-readiness/owner-device-release
+    status: draft
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.md
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

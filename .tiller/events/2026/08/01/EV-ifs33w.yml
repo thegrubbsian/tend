@@ -1,0 +1,13 @@
+id: EV-ifs33w
+type: add.feature
+at: 2026-08-01T07:39:22.103203Z
+owner: jc
+command: add feature app-experience/habit-detail-history
+targets:
+    - F-efgzky
+after:
+    key: app-experience/habit-detail-history
+    status: draft
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/feature.md
+    - path: .tiller/epics/app-experience/features/habit-detail-history/feature.yml

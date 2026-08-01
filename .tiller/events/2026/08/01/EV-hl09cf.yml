@@ -1,0 +1,13 @@
+id: EV-hl09cf
+type: add.question
+at: 2026-08-01T07:39:39.295972Z
+owner: jc
+command: add question
+targets:
+    - Q-lfe6in
+after:
+    blocks:
+        - F-z8e13q
+    status: open
+files:
+    - path: .tiller/decisions/open-questions.yml

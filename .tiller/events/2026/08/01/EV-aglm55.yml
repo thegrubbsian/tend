@@ -1,0 +1,13 @@
+id: EV-aglm55
+type: add.feature
+at: 2026-08-01T07:39:21.959066Z
+owner: jc
+command: add feature app-experience/today-dashboard
+targets:
+    - F-skoqxt
+after:
+    key: app-experience/today-dashboard
+    status: draft
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.md
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.yml

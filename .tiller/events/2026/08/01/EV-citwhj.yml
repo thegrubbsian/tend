@@ -1,0 +1,13 @@
+id: EV-citwhj
+type: add.feature
+at: 2026-08-01T07:39:12.077811Z
+owner: jc
+command: add feature habit-engine/swiftdata-model
+targets:
+    - F-n7oy52
+after:
+    key: habit-engine/swiftdata-model
+    status: draft
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.md
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml

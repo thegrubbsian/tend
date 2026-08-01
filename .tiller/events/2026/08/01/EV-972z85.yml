@@ -1,0 +1,13 @@
+id: EV-972z85
+type: add.feature
+at: 2026-08-01T07:39:12.250709Z
+owner: jc
+command: add feature habit-engine/log-entry-operations
+targets:
+    - F-vrsbxv
+after:
+    key: habit-engine/log-entry-operations
+    status: draft
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.md
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml

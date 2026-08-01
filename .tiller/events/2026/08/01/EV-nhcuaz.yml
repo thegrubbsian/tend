@@ -1,0 +1,13 @@
+id: EV-nhcuaz
+type: add.epic
+at: 2026-08-01T07:38:56.517311Z
+owner: jc
+command: add epic habit-engine
+targets:
+    - E-tslnrm
+after:
+    key: habit-engine
+    status: draft
+files:
+    - path: .tiller/epics/habit-engine/epic.md
+    - path: .tiller/epics/habit-engine/epic.yml

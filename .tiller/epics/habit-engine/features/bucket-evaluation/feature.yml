@@ -1,0 +1,10 @@
+id: F-6a3jmx
+key: habit-engine/bucket-evaluation
+title: Calendar Bucket Evaluation
+status: draft
+blocked: false
+owner: jc
+source: design/02-domain-model.md
+change_type: create
+depends_on:
+    - F-n7oy52

@@ -1,0 +1,12 @@
+id: F-3vz7ho
+key: device-readiness/owner-device-release
+title: Owner Device Release
+status: draft
+blocked: false
+owner: jc
+source: design/01-overview.md
+change_type: create
+depends_on:
+    - F-zbcv8j
+    - F-z8e13q
+    - F-efgzky

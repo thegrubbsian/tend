@@ -1,0 +1,13 @@
+id: EV-i1snn7
+type: add.feature
+at: 2026-08-01T07:39:12.163333Z
+owner: jc
+command: add feature habit-engine/bucket-evaluation
+targets:
+    - F-6a3jmx
+after:
+    key: habit-engine/bucket-evaluation
+    status: draft
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.md
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml

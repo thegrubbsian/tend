@@ -1,0 +1,22 @@
+questions:
+    - id: Q-lfe6in
+      statement: How should weekly quantity habits scope logging and set-total behavior when their bucket is a week but the log sheet specifies Today and Yesterday?
+      owner: jc
+      blocks:
+        - F-z8e13q
+      status: open
+      source: design/03-user-experience.md
+    - id: Q-zyqw93
+      statement: What weekly Habit Detail history layout, navigation, and state treatment should replace the day-cell garden bed specified for daily habits?
+      owner: jc
+      blocks:
+        - F-efgzky
+      status: open
+      source: design/05-visual-design.md
+    - id: Q-c1ostz
+      statement: When a habit is deactivated and reactivated within the same calendar bucket, are the exempted bucket and its existing entries restored, discarded, or replaced?
+      owner: jc
+      blocks:
+        - F-aotv97
+      status: open
+      source: design/02-domain-model.md

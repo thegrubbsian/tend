@@ -1,0 +1,13 @@
+id: EV-lnnqct
+type: add.feature
+at: 2026-08-01T07:39:21.812032Z
+owner: jc
+command: add feature app-experience/almanac-app-shell
+targets:
+    - F-tm2imn
+after:
+    key: app-experience/almanac-app-shell
+    status: draft
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.md
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml

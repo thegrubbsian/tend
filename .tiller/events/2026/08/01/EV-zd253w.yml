@@ -1,0 +1,13 @@
+id: EV-zd253w
+type: add.feature
+at: 2026-08-01T07:39:21.88555Z
+owner: jc
+command: add feature app-experience/habit-management
+targets:
+    - F-tih743
+after:
+    key: app-experience/habit-management
+    status: draft
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/feature.md
+    - path: .tiller/epics/app-experience/features/habit-management/feature.yml

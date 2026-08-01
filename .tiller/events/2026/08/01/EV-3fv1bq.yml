@@ -1,0 +1,13 @@
+id: EV-3fv1bq
+type: add.feature
+at: 2026-08-01T07:39:12.402425Z
+owner: jc
+command: add feature habit-engine/streak-computation
+targets:
+    - F-vbsg1a
+after:
+    key: habit-engine/streak-computation
+    status: draft
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/feature.md
+    - path: .tiller/epics/habit-engine/features/streak-computation/feature.yml
