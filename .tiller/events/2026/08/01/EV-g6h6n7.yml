@@ -1,0 +1,13 @@
+id: EV-g6h6n7
+type: start.task
+at: 2026-08-01T22:03:19.192936Z
+owner: jc
+command: start task T-ipovyn
+targets:
+    - T-ipovyn
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.yml
