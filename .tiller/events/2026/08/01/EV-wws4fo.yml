@@ -1,0 +1,13 @@
+id: EV-wws4fo
+type: check.task
+at: 2026-08-01T20:38:37.40936Z
+owner: jc
+command: check task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml

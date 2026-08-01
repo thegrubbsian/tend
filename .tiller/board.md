@@ -11,7 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/habit-activity-lifecycle (F-aotv97): active
-- task habit-engine/habit-activity-lifecycle/activity-deactivation (T-obhbxb): in_progress
+- task habit-engine/habit-activity-lifecycle/activity-deactivation (T-obhbxb): check
 - task habit-engine/habit-activity-lifecycle/activity-reactivation (T-otqpk2): ready
 
 ### Blocked

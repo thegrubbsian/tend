@@ -1,7 +1,7 @@
 id: T-obhbxb
 key: habit-engine/habit-activity-lifecycle/activity-deactivation
 title: Deactivate habits and exempt editable buckets
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,30 @@ accepted_against:
         kind: git_commit
         value: git:e3973ae
         observed_at: 2026-08-01T20:22:52.834741Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T20:38:36.23557Z
+        against:
+            kind: sha256
+            value: sha256:10386f64ae0d4cd14dc7053c32bfd1ac17430091c23de1f3f5c34af4e6defe0a
+            observed_at: 2026-08-01T20:38:36.235567Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-10386f64ae0d-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-01T20:38:36.23557Z
+        against:
+            kind: sha256
+            value: sha256:10386f64ae0d4cd14dc7053c32bfd1ac17430091c23de1f3f5c34af4e6defe0a
+            observed_at: 2026-08-01T20:38:36.235567Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-10386f64ae0d-out-b3e5453bcfbc50616a52a78c5bbf1d85139ef37ecfc6c5305452bd749ace29a0.txt
