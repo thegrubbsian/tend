@@ -1,0 +1,14 @@
+id: EV-9g2go7
+type: sync.task
+at: 2026-08-01T20:52:49.241285Z
+owner: jc
+command: sync task T-obhbxb
+targets:
+    - T-obhbxb
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml
