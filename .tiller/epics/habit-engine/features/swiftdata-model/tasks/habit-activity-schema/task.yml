@@ -1,0 +1,9 @@
+id: T-28yrbr
+key: habit-engine/swiftdata-model/habit-activity-schema
+title: Model habits and activity periods
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-tj6hor

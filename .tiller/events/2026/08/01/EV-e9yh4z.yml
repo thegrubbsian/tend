@@ -1,0 +1,14 @@
+id: EV-e9yh4z
+type: add.task
+at: 2026-08-01T13:07:27.54942Z
+owner: jc
+command: add task habit-engine/swiftdata-model/habit-activity-schema
+targets:
+    - T-28yrbr
+after:
+    feature: F-n7oy52
+    key: habit-engine/swiftdata-model/habit-activity-schema
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/habit-activity-schema/task.md
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/habit-activity-schema/task.yml

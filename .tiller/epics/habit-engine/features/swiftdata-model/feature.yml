@@ -1,7 +1,7 @@
 id: F-n7oy52
 key: habit-engine/swiftdata-model
 title: SwiftData Habit Model
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: design/04-platform-and-constraints.md

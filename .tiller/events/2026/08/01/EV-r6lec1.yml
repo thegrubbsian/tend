@@ -1,0 +1,13 @@
+id: EV-r6lec1
+type: spec.feature
+at: 2026-08-01T13:10:08.940014Z
+owner: jc
+command: spec feature F-n7oy52
+targets:
+    - F-n7oy52
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml

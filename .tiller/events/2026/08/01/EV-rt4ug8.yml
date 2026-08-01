@@ -1,0 +1,14 @@
+id: EV-rt4ug8
+type: add.task
+at: 2026-08-01T13:07:27.699487Z
+owner: jc
+command: add task habit-engine/swiftdata-model/durable-container
+targets:
+    - T-yjy3cq
+after:
+    feature: F-n7oy52
+    key: habit-engine/swiftdata-model/durable-container
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.md
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.yml

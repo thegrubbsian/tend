@@ -1,0 +1,14 @@
+id: EV-tjhp64
+type: add.task
+at: 2026-08-01T13:07:27.472678Z
+owner: jc
+command: add task habit-engine/swiftdata-model/package-foundation
+targets:
+    - T-tj6hor
+after:
+    feature: F-n7oy52
+    key: habit-engine/swiftdata-model/package-foundation
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.md
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.yml

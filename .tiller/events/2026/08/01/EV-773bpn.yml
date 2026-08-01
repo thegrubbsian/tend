@@ -1,0 +1,14 @@
+id: EV-773bpn
+type: add.task
+at: 2026-08-01T13:07:27.624667Z
+owner: jc
+command: add task habit-engine/swiftdata-model/bucket-entry-schema
+targets:
+    - T-bt5coz
+after:
+    feature: F-n7oy52
+    key: habit-engine/swiftdata-model/bucket-entry-schema
+    status: proposed
+files:
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.md
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
