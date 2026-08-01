@@ -1,0 +1,14 @@
+id: EV-mdzliq
+type: submit.task
+at: 2026-08-01T19:37:11.202407Z
+owner: jc
+command: submit task T-lq5y49
+targets:
+    - T-lq5y49
+before:
+    status: check
+after:
+    pr: 11
+    status: in_review
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml
