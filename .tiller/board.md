@@ -19,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/log-entry-operations/entry-append-delete (T-jg4df3): build pass, tests pass
+- (none)
 
 ### Open questions
 

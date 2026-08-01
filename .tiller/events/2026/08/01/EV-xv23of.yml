@@ -1,0 +1,14 @@
+id: EV-xv23of
+type: sync.task
+at: 2026-08-01T19:20:45.037488Z
+owner: jc
+command: sync task T-jg4df3
+targets:
+    - T-jg4df3
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/entry-append-delete/task.yml
