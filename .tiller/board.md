@@ -10,7 +10,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic habit-engine (E-tslnrm): ready, active
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature habit-engine/streak-computation (F-vbsg1a): active
+- feature habit-engine/streak-computation (F-vbsg1a): active, awaiting check
 
 ### Blocked
 
@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task habit-engine/streak-computation/streak-persistence-integration (T-ipovyn): build pass, tests pass
+- (none)
 
 ### Open questions
 

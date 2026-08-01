@@ -1,0 +1,14 @@
+id: EV-9j6aoq
+type: sync.task
+at: 2026-08-01T22:35:09.326362Z
+owner: jc
+command: sync task T-ipovyn
+targets:
+    - T-ipovyn
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.yml
