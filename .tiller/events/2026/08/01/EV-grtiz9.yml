@@ -1,0 +1,13 @@
+id: EV-grtiz9
+type: check.task
+at: 2026-08-01T16:36:25.031644Z
+owner: jc
+command: check task T-96c5xx
+targets:
+    - T-96c5xx
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml
