@@ -1,7 +1,7 @@
 id: F-vrsbxv
 key: habit-engine/log-entry-operations
 title: Log Entry Operations
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: design/02-domain-model.md

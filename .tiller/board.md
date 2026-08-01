@@ -11,6 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
 - feature habit-engine/bucket-evaluation (F-6a3jmx): active
+- feature habit-engine/log-entry-operations (F-vrsbxv): specced
 - task habit-engine/bucket-evaluation/bucket-reconciliation (T-evhkq6): ready
 
 ### Blocked
