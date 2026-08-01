@@ -1,13 +1,14 @@
 id: F-vrsbxv
 key: habit-engine/log-entry-operations
 title: Log Entry Operations
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:
     - F-6a3jmx
+branch: tiller/habit-engine/log-entry-operations
 accepted_against:
     spec:
         kind: git_blob

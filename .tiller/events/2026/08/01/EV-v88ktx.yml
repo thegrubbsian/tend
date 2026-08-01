@@ -1,0 +1,13 @@
+id: EV-v88ktx
+type: start.feature
+at: 2026-08-01T18:42:37.024085Z
+owner: jc
+command: start feature F-vrsbxv
+targets:
+    - F-vrsbxv
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml
