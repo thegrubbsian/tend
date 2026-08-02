@@ -8,6 +8,7 @@ struct TendApp: App {
   var body: some Scene {
     WindowGroup {
       TendApplicationRoot(model: applicationModel)
+        .tint(AlmanacPalette.moss)
     }
   }
 }

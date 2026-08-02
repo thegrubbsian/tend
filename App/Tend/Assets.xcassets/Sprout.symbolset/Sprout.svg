@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ISC License
+Copyright (c) 2026 Lucide Icons and Contributors
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+-->
+<svg height="600" width="800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Notes" font-family="LucidaGrande, 'Lucida Grande', sans-serif" font-size="13">
+        <rect fill="white" height="600.0" width="800.0" x="0.0" y="0.0" />
+        <g font-size="13">
+            <text x="18.0" y="176.0">Small</text>
+            <text x="18.0" y="376.0">Medium</text>
+            <text x="18.0" y="576.0">Large</text>
+        </g>
+        <g font-size="9">
+            <text x="250.0" y="30.0">Ultralight</text>
+            <text x="450.0" y="30.0">Regular</text>
+            <text x="650.0" y="30.0">Black</text>
+            <text id="template-version" fill="#505050" text-anchor="end" x="785.0" y="575.0">Template v.3.0</text>
+        </g>
+    </g>
+    <g id="Guides" stroke="rgb(39, 170, 225)" stroke-width="0.5">
+        <path id="Capline-S" d="M18,76 l800,0" />
+        <path id="H-reference" d="M85,145.755 L87.685,145.755 L113.369,79.287 L114.052,79.287 L114.052,76 L112.148,76 L85,145.755 Z M95.693,121.536 L130.996,121.536 L130.263,119.313 L96.474,119.313 L95.693,121.536 Z M139.15,145.755 L141.787,145.755 L114.638,76 L113.466,76 L113.466,79.287 L139.15,145.755 Z" stroke="none" transform="translate(0,200)" />
+        <path id="Baseline-S" d="M18,146 l800,0" />
+        <path id="left-margin-Ultralight-S" d="M233.5,56 l0,110" />
+        <path id="right-margin-Ultralight-S" d="M296.5,56 l0,110" />
+        <path id="left-margin-Regular-S" d="M433.5,56 l0,110" />
+        <path id="right-margin-Regular-S" d="M496.5,56 l0,110" />
+        <path id="left-margin-Black-S" d="M633.5,56 l0,110" />
+        <path id="right-margin-Black-S" d="M696.5,56 l0,110" />
+        <path id="Capline-M" d="M18,276 l800,0" />
+        <path id="Baseline-M" d="M18,346 l800,0" />
+        <path id="Capline-L" d="M18,476 l800,0" />
+        <path id="Baseline-L" d="M18,546 l800,0" />
+    </g>
+    <g id="Symbols">
+        <g id="Ultralight-S" transform="translate(0,0)">
+            <path fill-rule="evenodd" d="M262,119 C252,120 242,114 238,101 C249,99 259,104 263,113 C264,116 264,118 262,119 Z M260,116 C252,116 245,111 241,103 C249,102 257,106 261,113 C262,115 262,116 260,116 Z" />
+            <path fill-rule="evenodd" d="M269,110 C269,97 277,87 291,83 C292,96 285,107 273,111 C271,112 270,112 269,110 Z M272,107 C273,97 279,90 289,86 C289,96 283,104 274,108 C273,109 272,108 272,107 Z" />
+            <path d="M264,140 C264,133 262,126 262,119 C262,114 265,109 270,106 C271,106 271,107 272,108 L270,110 C267,112 265,115 265,119 C265,126 267,133 267,140 C266,141 265,141 264,140 Z" />
+            <path d="M240,146 C239,146 238,145 238,144 C238,143 239,142 240,142 L290,142 C291,142 292,143 292,144 C292,145 291,146 290,146 Z" />
+        </g>
+        <g id="Regular-S" transform="translate(0,0)">
+            <path fill-rule="evenodd" d="M462,119 C452,120 442,114 438,101 C449,99 459,104 463,113 C464,116 464,118 462,119 Z M458,114 C452,113 448,109 445,104 C452,104 457,108 460,113 C461,114 460,114 458,114 Z" />
+            <path fill-rule="evenodd" d="M469,110 C469,97 477,87 491,83 C492,96 485,107 473,111 C471,112 470,112 469,110 Z M476,104 C478,98 481,93 487,89 C486,96 482,101 476,105 C475,105 475,105 476,104 Z" />
+            <path d="M462,140 C462,133 459,126 459,119 C459,112 463,107 469,103 C471,103 473,105 474,108 L472,111 C468,113 466,116 466,119 C466,126 469,133 469,140 C467,142 464,142 462,140 Z" />
+            <path d="M440,146 C438,146 437,144 437,142 C437,140 438,138 440,138 L490,138 C492,138 493,140 493,142 C493,144 492,146 490,146 Z" />
+        </g>
+        <g id="Black-S" transform="translate(0,0)">
+            <path fill-rule="evenodd" d="M663,120 C650,121 639,114 636,99 C650,96 661,103 666,113 C668,117 666,119 663,120 Z M657,109 C654,108 651,106 649,104 C653,104 657,106 659,109 C660,110 659,110 657,109 Z" />
+            <path fill-rule="evenodd" d="M668,111 C668,96 677,85 693,81 C694,96 686,108 673,112 C670,113 669,113 668,111 Z M680,99 C682,96 684,93 687,91 C687,95 684,98 681,100 C680,101 679,100 680,99 Z" />
+            <path d="M659,140 C659,133 655,126 655,118 C655,109 661,101 669,96 C673,95 677,98 679,102 L674,112 C671,114 669,116 669,120 C669,126 673,133 673,140 C670,144 662,144 659,140 Z" />
+            <path d="M638,146 C634,146 632,143 632,140 C632,137 634,134 638,134 L692,134 C696,134 698,137 698,140 C698,143 696,146 692,146 Z" />
+        </g>
+    </g>
+</svg>
