@@ -1,0 +1,13 @@
+id: EV-5htgn7
+type: check.task
+at: 2026-08-02T16:05:50.607584Z
+owner: jc
+command: check task T-imcpp0
+targets:
+    - T-imcpp0
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml

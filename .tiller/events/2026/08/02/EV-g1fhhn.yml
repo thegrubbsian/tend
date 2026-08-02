@@ -1,0 +1,13 @@
+id: EV-g1fhhn
+type: start.task
+at: 2026-08-02T15:30:57.967814Z
+owner: jc
+command: start task T-imcpp0
+targets:
+    - T-imcpp0
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml
