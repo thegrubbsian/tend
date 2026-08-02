@@ -1,7 +1,7 @@
 id: T-bil50m
 key: app-experience/almanac-app-shell/almanac-foundations
 title: Implement the Almanac visual foundations
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:79c9d92
         observed_at: 2026-08-02T00:05:50.476246Z
+pr: 17
 gates:
     build:
         required: true

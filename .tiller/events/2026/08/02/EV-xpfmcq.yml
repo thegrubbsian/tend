@@ -1,0 +1,14 @@
+id: EV-xpfmcq
+type: submit.task
+at: 2026-08-02T02:46:34.858676Z
+owner: jc
+command: submit task T-bil50m
+targets:
+    - T-bil50m
+before:
+    status: check
+after:
+    pr: 17
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.yml
