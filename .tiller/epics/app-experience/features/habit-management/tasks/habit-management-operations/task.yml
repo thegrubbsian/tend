@@ -1,7 +1,7 @@
 id: T-w74oy2
 key: app-experience/habit-management/habit-management-operations
 title: Implement validated habit management operations
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.892331Z
 pr: 19
+done_basis: ancestry
 gates:
     build:
         required: true

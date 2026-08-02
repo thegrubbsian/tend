@@ -1,0 +1,14 @@
+id: EV-uaw39e
+type: sync.task
+at: 2026-08-02T18:57:00.622685Z
+owner: jc
+command: sync task T-w74oy2
+targets:
+    - T-w74oy2
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml
