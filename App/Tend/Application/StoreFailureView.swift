@@ -1,24 +1,26 @@
 import SwiftUI
 
 struct StoreFailureView: View {
+  private static let readableContentWidth: CGFloat = 440
+
   let retry: () -> Void
 
   var body: some View {
-    VStack(spacing: 16) {
+    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingMedium) {
       Text("Tend couldn't open your garden.")
-        .font(.title)
+        .almanacTextStyle(.screenTitle)
         .accessibilityAddTraits(.isHeader)
 
       Text("Your records were not changed. Try again.")
-        .multilineTextAlignment(.center)
+        .almanacTextStyle(.body)
+        .fixedSize(horizontal: false, vertical: true)
 
-      Button(action: retry) {
-        Text("Retry")
-          .frame(minWidth: 44, minHeight: 44)
-      }
-      .accessibilityIdentifier("startup.retry")
+      Button("Retry", action: retry)
+        .buttonStyle(AlmanacPrimaryButtonStyle())
+        .accessibilityIdentifier("startup.retry")
     }
-    .padding(24)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .almanacScreen(readableContentWidth: Self.readableContentWidth)
     .accessibilityIdentifier("startup.failure")
   }
 }

@@ -1,0 +1,13 @@
+id: EV-gfkj2u
+type: check.task
+at: 2026-08-02T02:45:11.332816Z
+owner: jc
+command: check task T-bil50m
+targets:
+    - T-bil50m
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.yml
