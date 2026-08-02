@@ -1,7 +1,7 @@
 id: T-ogl6he
 key: app-experience/habit-management/all-habits-roster
 title: Build the truthful All Habits roster
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,3 +18,31 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.922565Z
+pr: 21
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T21:52:25.173234Z
+        against:
+            kind: sha256
+            value: sha256:35f2ca573a10596a7add28b2e8a792d7267209b60c1a71451c354ef948df3b25
+            observed_at: 2026-08-02T21:52:25.173217Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-35f2ca573a10-out-1e0b46e67fbdd632b71646ef7a915469f5c8c3a832625ae282866b20d20a5245.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T21:52:25.173234Z
+        against:
+            kind: sha256
+            value: sha256:35f2ca573a10596a7add28b2e8a792d7267209b60c1a71451c354ef948df3b25
+            observed_at: 2026-08-02T21:52:25.173217Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-35f2ca573a10-out-863121ed734431553d3e720cc346da2deae9cabc8337642cd565c97106118642.txt
