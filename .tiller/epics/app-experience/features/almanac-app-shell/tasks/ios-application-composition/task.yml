@@ -1,7 +1,17 @@
 id: T-9vxtaq
 key: app-experience/almanac-app-shell/ios-application-composition
 title: Create the native iOS application composition
-status: proposed
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:75a9a70c01ecbb130e848e3c96315b302d76adcd
+        path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.md
+        observed_at: 2026-08-02T00:05:50.446249Z
+    commit:
+        kind: git_commit
+        value: git:79c9d92
+        observed_at: 2026-08-02T00:05:50.461786Z

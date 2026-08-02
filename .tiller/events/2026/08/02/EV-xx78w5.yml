@@ -1,0 +1,13 @@
+id: EV-xx78w5
+type: start.feature
+at: 2026-08-02T00:07:55.876797Z
+owner: jc
+command: start feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml

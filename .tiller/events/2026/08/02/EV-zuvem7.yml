@@ -1,0 +1,13 @@
+id: EV-zuvem7
+type: approve.task
+at: 2026-08-02T00:05:50.490641Z
+owner: jc
+command: approve task T-imcpp0
+targets:
+    - T-imcpp0
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml

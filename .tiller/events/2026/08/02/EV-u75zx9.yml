@@ -1,0 +1,13 @@
+id: EV-u75zx9
+type: approve.feature
+at: 2026-08-02T00:05:50.446143Z
+owner: jc
+command: approve feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
