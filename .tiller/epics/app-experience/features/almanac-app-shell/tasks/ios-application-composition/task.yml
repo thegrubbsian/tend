@@ -1,7 +1,7 @@
 id: T-9vxtaq
 key: app-experience/almanac-app-shell/ios-application-composition
 title: Create the native iOS application composition
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,6 +15,7 @@ accepted_against:
         kind: git_commit
         value: git:79c9d92
         observed_at: 2026-08-02T00:05:50.461786Z
+pr: 16
 gates:
     build:
         required: true
