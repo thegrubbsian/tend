@@ -1,0 +1,14 @@
+id: EV-lcbunr
+type: submit.task
+at: 2026-08-02T21:59:38.582435Z
+owner: jc
+command: submit task T-ogl6he
+targets:
+    - T-ogl6he
+before:
+    status: check
+after:
+    pr: 21
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml
