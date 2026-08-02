@@ -1,7 +1,7 @@
 id: T-imcpp0
 key: app-experience/almanac-app-shell/two-destination-shell
 title: Build accessible Today and Habits shell navigation
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:79c9d92
         observed_at: 2026-08-02T00:05:50.490596Z
+pr: 18
 gates:
     build:
         required: true
