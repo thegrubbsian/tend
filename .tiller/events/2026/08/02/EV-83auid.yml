@@ -1,0 +1,13 @@
+id: EV-83auid
+type: approve.task
+at: 2026-08-02T18:31:01.922651Z
+owner: jc
+command: approve task T-ogl6he
+targets:
+    - T-ogl6he
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml

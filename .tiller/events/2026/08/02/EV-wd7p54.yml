@@ -1,0 +1,13 @@
+id: EV-wd7p54
+type: approve.task
+at: 2026-08-02T18:31:01.892375Z
+owner: jc
+command: approve task T-w74oy2
+targets:
+    - T-w74oy2
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml

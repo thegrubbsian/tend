@@ -1,7 +1,17 @@
 id: T-w74oy2
 key: app-experience/habit-management/habit-management-operations
 title: Implement validated habit management operations
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:061e8dc1c143c4cd8429cc45bed668148bf19774
+        path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.md
+        observed_at: 2026-08-02T18:31:01.877471Z
+    commit:
+        kind: git_commit
+        value: git:f38b038
+        observed_at: 2026-08-02T18:31:01.892331Z

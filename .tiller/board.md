@@ -9,7 +9,11 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/habit-management (F-tih743): specced
+- feature app-experience/habit-management (F-tih743): ready
+- task app-experience/habit-management/habit-management-operations (T-w74oy2): ready
+- task app-experience/habit-management/habit-form (T-me8qsx): ready
+- task app-experience/habit-management/all-habits-roster (T-ogl6he): ready
+- task app-experience/habit-management/first-habit-integration (T-94vmmx): ready
 
 ### Blocked
 

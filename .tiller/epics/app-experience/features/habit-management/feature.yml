@@ -1,7 +1,7 @@
 id: F-tih743
 key: app-experience/habit-management
 title: Habit Management
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -10,3 +10,18 @@ depends_on:
     - F-tm2imn
     - F-aotv97
     - F-vbsg1a
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:90040c992661cbb34a2f8c38745b3399d20aa225
+        path: .tiller/epics/app-experience/features/habit-management/feature.md
+        observed_at: 2026-08-02T18:31:01.848941Z
+    eval:
+        kind: git_blob
+        value: git:1239e7ac7775e9ba7431f726a01d20d2deccff3b
+        path: .tiller/epics/app-experience/features/habit-management/feature.eval.md
+        observed_at: 2026-08-02T18:31:01.848941Z
+    commit:
+        kind: git_commit
+        value: git:f38b038
+        observed_at: 2026-08-02T18:31:01.877297Z

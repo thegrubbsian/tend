@@ -1,9 +1,19 @@
 id: T-94vmmx
 key: app-experience/habit-management/first-habit-integration
 title: Integrate first-habit management flows
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-ogl6he
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:6e1af1db8b4707b06b559eddc6430962ced41424
+        path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.md
+        observed_at: 2026-08-02T18:31:01.922725Z
+    commit:
+        kind: git_commit
+        value: git:f38b038
+        observed_at: 2026-08-02T18:31:01.939068Z
