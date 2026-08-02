@@ -24,3 +24,34 @@ accepted_against:
         kind: git_commit
         value: git:79c9d92
         observed_at: 2026-08-02T00:05:50.44602Z
+gates:
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-02T17:29:17.153361Z
+        against:
+            kind: git_commit
+            value: git:40579f2
+            observed_at: 2026-08-02T17:27:54.325203Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-40579f2-out-2d5d3778a659f7d90eade06af21c03fdf551bc6e88ed040f8d46de424f90f93c.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-40579f2-out-7e77d0ee3639181072066c1073275b34146ad7d7bb10bcffea2698dacd8962d7.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-40579f2-out-ac1bc7ba2dc52dfed7ff1fcc9e5175a027439553728d22e3808452e189bc33a8.txt
+            C4:
+                status: needs_attestation
+            C5:
+                status: needs_attestation

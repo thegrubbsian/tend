@@ -1,0 +1,13 @@
+id: EV-3hu94h
+type: eval.feature
+at: 2026-08-02T17:29:17.156063Z
+owner: jc
+command: eval feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
