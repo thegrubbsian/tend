@@ -1,0 +1,14 @@
+id: EV-ep7dbf
+type: submit.task
+at: 2026-08-02T18:53:50.487952Z
+owner: jc
+command: submit task T-w74oy2
+targets:
+    - T-w74oy2
+before:
+    status: check
+after:
+    pr: 19
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml
