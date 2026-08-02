@@ -1,0 +1,14 @@
+id: EV-gdkqgj
+type: sync.task
+at: 2026-08-02T20:26:05.04032Z
+owner: jc
+command: sync task T-me8qsx
+targets:
+    - T-me8qsx
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-form/task.yml

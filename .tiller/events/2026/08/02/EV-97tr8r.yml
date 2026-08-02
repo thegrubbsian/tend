@@ -1,0 +1,13 @@
+id: EV-97tr8r
+type: attest.feature
+at: 2026-08-02T20:20:27.08733Z
+owner: jc
+command: attest feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: done
+after:
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
