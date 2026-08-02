@@ -1,7 +1,7 @@
 id: F-tm2imn
 key: app-experience/almanac-app-shell
 title: Almanac App Shell
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/05-visual-design.md
@@ -24,6 +24,23 @@ accepted_against:
         kind: git_commit
         value: git:79c9d92
         observed_at: 2026-08-02T00:05:50.44602Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:841adc9156522ad07b397bb72b48244e3e3dbcd4
+        path: .tiller/epics/app-experience/features/almanac-app-shell/feature.md
+        observed_at: 2026-08-02T17:31:52.391028Z
+    eval:
+        kind: git_blob
+        value: git:6b0e85fdd8525e84213e41d020963717b0e19cd3
+        path: .tiller/epics/app-experience/features/almanac-app-shell/feature.eval.md
+        observed_at: 2026-08-02T17:31:52.391028Z
+    commit:
+        kind: git_commit
+        value: git:b8b5c79
+        observed_at: 2026-08-02T17:31:52.229112Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true
@@ -81,3 +98,11 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-2c400e5-out-48bc8b85a983573722ab905b2c12011d6ad49f7763f9e73ed1a09f15cd9d93e2.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:b8b5c79
+        observed_at: 2026-08-02T17:31:52.229112Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-2c400e5-out-8dcc44549a70ae531682dd50a5b60496e029befb7015ba66cae0103be68b93ed.txt

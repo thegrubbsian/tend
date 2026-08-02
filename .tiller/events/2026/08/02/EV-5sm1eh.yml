@@ -1,0 +1,14 @@
+id: EV-5sm1eh
+type: sync.feature
+at: 2026-08-02T17:31:52.408091Z
+owner: jc
+command: sync feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
