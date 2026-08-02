@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/almanac-app-shell/almanac-foundations (T-bil50m): build pass, tests pass
+- (none)
 
 ### Open questions
 
