@@ -1,7 +1,7 @@
 id: T-me8qsx
 key: app-experience/habit-management/habit-form
 title: Build the Almanac New and Edit habit form
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.90748Z
+pr: 20
 gates:
     build:
         required: true
