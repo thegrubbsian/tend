@@ -1,0 +1,13 @@
+id: EV-39dx7t
+type: start.task
+at: 2026-08-02T01:28:46.269724Z
+owner: jc
+command: start task T-bil50m
+targets:
+    - T-bil50m
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.yml
