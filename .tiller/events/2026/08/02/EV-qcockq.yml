@@ -1,0 +1,13 @@
+id: EV-qcockq
+type: spec.feature
+at: 2026-08-02T18:22:50.482769Z
+owner: jc
+command: spec feature F-tih743
+targets:
+    - F-tih743
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/feature.yml

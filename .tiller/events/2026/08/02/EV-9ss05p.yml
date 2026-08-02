@@ -1,0 +1,14 @@
+id: EV-9ss05p
+type: add.task
+at: 2026-08-02T18:16:21.168642Z
+owner: jc
+command: add task app-experience/habit-management/all-habits-roster
+targets:
+    - T-ogl6he
+after:
+    feature: F-tih743
+    key: app-experience/habit-management/all-habits-roster
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.md
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml

@@ -1,0 +1,14 @@
+id: EV-hrkm5l
+type: add.task
+at: 2026-08-02T18:16:21.004047Z
+owner: jc
+command: add task app-experience/habit-management/habit-management-operations
+targets:
+    - T-w74oy2
+after:
+    feature: F-tih743
+    key: app-experience/habit-management/habit-management-operations
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.md
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml

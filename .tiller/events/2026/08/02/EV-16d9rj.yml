@@ -1,0 +1,14 @@
+id: EV-16d9rj
+type: add.task
+at: 2026-08-02T18:16:21.246739Z
+owner: jc
+command: add task app-experience/habit-management/first-habit-integration
+targets:
+    - T-94vmmx
+after:
+    feature: F-tih743
+    key: app-experience/habit-management/first-habit-integration
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.md
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml
