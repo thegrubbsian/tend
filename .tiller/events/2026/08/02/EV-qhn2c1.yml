@@ -1,0 +1,13 @@
+id: EV-qhn2c1
+type: check.feature
+at: 2026-08-02T17:31:21.626991Z
+owner: jc
+command: check feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
