@@ -1,7 +1,7 @@
 id: T-me8qsx
 key: app-experience/habit-management/habit-form
 title: Build the Almanac New and Edit habit form
-status: ready
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.90748Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T20:06:16.496897Z
+        against:
+            kind: sha256
+            value: sha256:2c981e6e3b6bfcd7537b354cf947de1faa4496bfdfb2b1b27d9bd6c741816b78
+            observed_at: 2026-08-02T20:06:16.496893Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-2c981e6e3b6b-out-6b5e08bf2c07c5ac55ac5623cd24cb9b6b5e547b22e6072170db3aba1d5109b8.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T20:06:16.496897Z
+        against:
+            kind: sha256
+            value: sha256:2c981e6e3b6bfcd7537b354cf947de1faa4496bfdfb2b1b27d9bd6c741816b78
+            observed_at: 2026-08-02T20:06:16.496893Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-2c981e6e3b6b-out-d0bbc42e70cb97daf1c32857a9e1658593bf00ced5e13aae2e262dd9dc8e094b.txt
