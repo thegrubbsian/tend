@@ -1,0 +1,13 @@
+id: EV-bi07bw
+type: check.task
+at: 2026-08-02T21:52:28.368458Z
+owner: jc
+command: check task T-ogl6he
+targets:
+    - T-ogl6he
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml

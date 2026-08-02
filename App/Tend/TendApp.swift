@@ -1,9 +1,19 @@
+import Foundation
 import SwiftData
 import SwiftUI
+import TendCore
 
 @main
 struct TendApp: App {
-  @State private var applicationModel = TendApplicationModel()
+  @State private var applicationModel: TendApplicationModel
+
+  init() {
+    let makeContainer: ModelContainerFactory =
+      ProcessInfo.processInfo.arguments.contains("-tend-ui-testing")
+        ? TendModelContainer.inMemory
+        : TendModelContainer.production
+    _applicationModel = State(initialValue: TendApplicationModel(makeContainer: makeContainer))
+  }
 
   var body: some Scene {
     WindowGroup {

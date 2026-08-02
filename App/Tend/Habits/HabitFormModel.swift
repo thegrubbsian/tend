@@ -90,6 +90,7 @@ enum HabitFormWeekday: CaseIterable {
     struct LocalizedLabel {
         let weekday: HabitFormWeekday
         let short: String
+        let abbreviated: String
         let accessibility: String
     }
 
@@ -97,12 +98,14 @@ enum HabitFormWeekday: CaseIterable {
         var calendar = calendar
         calendar.locale = locale
         let shortSymbols = calendar.veryShortStandaloneWeekdaySymbols
+        let abbreviatedSymbols = calendar.shortStandaloneWeekdaySymbols
         let fullSymbols = calendar.standaloneWeekdaySymbols
 
         return allCases.map { weekday in
             LocalizedLabel(
                 weekday: weekday,
                 short: shortSymbols[weekday.calendarIndex],
+                abbreviated: abbreviatedSymbols[weekday.calendarIndex],
                 accessibility: fullSymbols[weekday.calendarIndex]
             )
         }

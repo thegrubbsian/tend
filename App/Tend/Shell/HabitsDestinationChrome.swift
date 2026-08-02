@@ -1,17 +1,11 @@
+import SwiftData
 import SwiftUI
 
 struct HabitsDestinationChrome: View {
-  var body: some View {
-    VStack(alignment: .leading, spacing: 0) {
-      Text("Habits")
-        .almanacTextStyle(.screenTitle)
+  @Environment(\.modelContext) private var modelContext
 
-      Spacer(minLength: 0)
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
-    .accessibilityElement(children: .contain)
-    .accessibilityLabel("Habits")
-    .accessibilityIdentifier("shell.destination.habits")
+  var body: some View {
+    HabitRosterView(context: modelContext)
+      .accessibilityIdentifier("shell.destination.habits")
   }
 }

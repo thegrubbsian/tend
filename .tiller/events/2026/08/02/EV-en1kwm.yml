@@ -1,0 +1,13 @@
+id: EV-en1kwm
+type: start.task
+at: 2026-08-02T20:30:13.063657Z
+owner: jc
+command: start task T-ogl6he
+targets:
+    - T-ogl6he
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml
