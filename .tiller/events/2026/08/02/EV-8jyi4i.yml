@@ -1,0 +1,13 @@
+id: EV-8jyi4i
+type: check.task
+at: 2026-08-02T18:52:40.2441Z
+owner: jc
+command: check task T-w74oy2
+targets:
+    - T-w74oy2
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml

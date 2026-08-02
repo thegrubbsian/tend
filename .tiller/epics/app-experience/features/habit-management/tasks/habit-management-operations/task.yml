@@ -1,7 +1,7 @@
 id: T-w74oy2
 key: app-experience/habit-management/habit-management-operations
 title: Implement validated habit management operations
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,31 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.892331Z
+pr: 19
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T18:52:38.787986Z
+        against:
+            kind: sha256
+            value: sha256:a657f4f916fb9da341ee5b1ce725ac32d2468ead95dcc86f1fad94aad127c8e7
+            observed_at: 2026-08-02T18:52:38.787973Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-a657f4f916fb-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-02T18:52:38.787986Z
+        against:
+            kind: sha256
+            value: sha256:a657f4f916fb9da341ee5b1ce725ac32d2468ead95dcc86f1fad94aad127c8e7
+            observed_at: 2026-08-02T18:52:38.787973Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-a657f4f916fb-out-d01af826b48de28e51068497daea1178774683b19f41ba64fe6991607740e819.txt

@@ -1,0 +1,13 @@
+id: EV-jx1lbj
+type: start.task
+at: 2026-08-02T18:33:03.195969Z
+owner: jc
+command: start task T-w74oy2
+targets:
+    - T-w74oy2
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml

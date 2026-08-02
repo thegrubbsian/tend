@@ -1,7 +1,7 @@
 id: F-tih743
 key: app-experience/habit-management
 title: Habit Management
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -10,6 +10,7 @@ depends_on:
     - F-tm2imn
     - F-aotv97
     - F-vbsg1a
+branch: tiller/app-experience/habit-management
 accepted_against:
     spec:
         kind: git_blob
