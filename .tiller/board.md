@@ -9,7 +9,7 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/almanac-app-shell (F-tm2imn): active
+- feature app-experience/almanac-app-shell (F-tm2imn): active, awaiting check
 
 ### Blocked
 
@@ -17,7 +17,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/almanac-app-shell/two-destination-shell (T-imcpp0): build pass, tests pass
+- (none)
 
 ### Open questions
 

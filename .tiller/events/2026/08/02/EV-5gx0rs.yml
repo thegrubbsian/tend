@@ -1,0 +1,14 @@
+id: EV-5gx0rs
+type: sync.task
+at: 2026-08-02T17:27:03.773829Z
+owner: jc
+command: sync task T-imcpp0
+targets:
+    - T-imcpp0
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml
