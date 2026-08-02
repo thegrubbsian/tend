@@ -1,10 +1,26 @@
 id: F-tm2imn
 key: app-experience/almanac-app-shell
 title: Almanac App Shell
-status: draft
+status: active
 blocked: false
 owner: jc
 source: design/05-visual-design.md
 change_type: create
 depends_on:
     - F-n7oy52
+branch: tiller/app-experience/almanac-app-shell
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:841adc9156522ad07b397bb72b48244e3e3dbcd4
+        path: .tiller/epics/app-experience/features/almanac-app-shell/feature.md
+        observed_at: 2026-08-02T00:05:50.408304Z
+    eval:
+        kind: git_blob
+        value: git:6b0e85fdd8525e84213e41d020963717b0e19cd3
+        path: .tiller/epics/app-experience/features/almanac-app-shell/feature.eval.md
+        observed_at: 2026-08-02T00:05:50.408304Z
+    commit:
+        kind: git_commit
+        value: git:79c9d92
+        observed_at: 2026-08-02T00:05:50.44602Z

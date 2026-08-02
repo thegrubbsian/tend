@@ -1,0 +1,14 @@
+id: EV-1yggn6
+type: add.task
+at: 2026-08-01T22:54:04.183141Z
+owner: jc
+command: add task app-experience/almanac-app-shell/two-destination-shell
+targets:
+    - T-imcpp0
+after:
+    feature: F-tm2imn
+    key: app-experience/almanac-app-shell/two-destination-shell
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.md
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml

@@ -1,0 +1,13 @@
+id: EV-fqhawl
+type: check.task
+at: 2026-08-02T00:37:36.16897Z
+owner: jc
+command: check task T-9vxtaq
+targets:
+    - T-9vxtaq
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.yml

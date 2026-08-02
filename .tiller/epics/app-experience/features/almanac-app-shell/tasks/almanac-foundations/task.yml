@@ -1,0 +1,19 @@
+id: T-bil50m
+key: app-experience/almanac-app-shell/almanac-foundations
+title: Implement the Almanac visual foundations
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-9vxtaq
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:c1c3cfd6985a1d9541c9139d289d4d49d0a0dd72
+        path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.md
+        observed_at: 2026-08-02T00:05:50.461904Z
+    commit:
+        kind: git_commit
+        value: git:79c9d92
+        observed_at: 2026-08-02T00:05:50.476246Z

@@ -1,0 +1,14 @@
+id: EV-z7dyxl
+type: add.task
+at: 2026-08-01T22:54:04.110778Z
+owner: jc
+command: add task app-experience/almanac-app-shell/almanac-foundations
+targets:
+    - T-bil50m
+after:
+    feature: F-tm2imn
+    key: app-experience/almanac-app-shell/almanac-foundations
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.md
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.yml

@@ -1,0 +1,14 @@
+id: EV-wd4m0d
+type: add.task
+at: 2026-08-01T22:54:04.031742Z
+owner: jc
+command: add task app-experience/almanac-app-shell/ios-application-composition
+targets:
+    - T-9vxtaq
+after:
+    feature: F-tm2imn
+    key: app-experience/almanac-app-shell/ios-application-composition
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.md
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.yml

@@ -1,0 +1,76 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+  echo "usage: $0 <TestTarget[/SuiteName]>" >&2
+  exit 2
+fi
+
+selector=$1
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_root=$(dirname -- "$script_dir")
+
+if ! xcode_version=$(xcodebuild -version 2>/dev/null); then
+  echo "Xcode 26 is required; the active developer directory cannot run xcodebuild" >&2
+  exit 1
+fi
+
+xcode_major=$(printf '%s\n' "$xcode_version" | awk '
+  NR == 1 && $1 == "Xcode" {
+    split($2, parts, ".")
+    print parts[1]
+  }
+')
+if [ "$xcode_major" != "26" ]; then
+  active_version=$(printf '%s\n' "$xcode_version" | awk 'NR == 1 { print; exit }')
+  echo "Xcode 26 is required; the active developer directory reports ${active_version:-an unknown version}" >&2
+  exit 1
+fi
+
+devices=$(xcrun simctl list devices available)
+udid=$(printf '%s\n' "$devices" | awk '
+  /^-- iOS 26([.][0-9]+)* --$/ { eligible = 1; next }
+  /^-- / { eligible = 0 }
+  eligible && /iPhone/ {
+    if (match($0, /[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/)) {
+      identifier = substr($0, RSTART, RLENGTH)
+      if (first == "") first = identifier
+      if ($0 ~ /[(]Booted[)]/) {
+        print identifier
+        foundBooted = 1
+        exit
+      }
+    }
+  }
+  END {
+    if (!foundBooted && first != "") print first
+  }
+')
+
+if [ -z "$udid" ]; then
+  echo "no available iOS 26 iPhone simulator found; install one with Xcode" >&2
+  exit 1
+fi
+
+name=$(printf '%s\n' "$devices" | awk -v id="$udid" '
+  index($0, id) {
+    value = $0
+    sub(/^[[:space:]]*/, "", value)
+    sub(/[[:space:]]*[(][0-9A-F-]+[)].*$/, "", value)
+    print value
+    exit
+  }
+')
+
+if ! printf '%s\n' "$devices" | awk -v id="$udid" 'index($0, id) && /[(]Booted[)]/ { found = 1 } END { exit !found }'; then
+  xcrun simctl boot "$udid"
+  xcrun simctl bootstatus "$udid" -b
+fi
+
+echo "Using iOS 26 simulator: $name ($udid)" >&2
+exec xcodebuild \
+  -project "$repo_root/Tend.xcodeproj" \
+  -scheme Tend \
+  -destination "platform=iOS Simulator,id=$udid" \
+  -only-testing:"$selector" \
+  test

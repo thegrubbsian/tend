@@ -1,0 +1,13 @@
+id: EV-mq9cb1
+type: start.task
+at: 2026-08-02T00:08:01.50447Z
+owner: jc
+command: start task T-9vxtaq
+targets:
+    - T-9vxtaq
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.yml

@@ -1,0 +1,13 @@
+id: EV-6hv0m6
+type: spec.feature
+at: 2026-08-01T23:01:56.799733Z
+owner: jc
+command: spec feature F-tm2imn
+targets:
+    - F-tm2imn
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
