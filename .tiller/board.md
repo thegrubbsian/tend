@@ -19,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/almanac-app-shell/ios-application-composition (T-9vxtaq): build pass, tests pass
+- (none)
 
 ### Open questions
 
