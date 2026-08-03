@@ -732,6 +732,526 @@ struct HabitDetailModelTests {
         #expect(fact.amountText == "12 345 pas")
     }
 
+    @Test("entry deletion is authorized, nonreentrant, retryable, and fully refreshed")
+    func guardsAndRetriesEntryDeletion() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let entryID = UUID()
+        let january = try fixture.instant("2026-01-01T00:00:00Z")
+        let projectedEntry = HabitEditableEntry(
+            id: entryID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        var snapshotCalls = 0
+        var deleteCalls: [UUID] = []
+        var shouldFail = true
+        var model: HabitDetailModel!
+        let operations = HabitDetailOperations(
+            snapshot: { _, _, _, _ in
+                snapshotCalls += 1
+                return fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    selectedMonth: january,
+                    editableEntries: snapshotCalls == 1 || shouldFail ? [projectedEntry] : []
+                )
+            },
+            deleteEntry: { id, _, _, _ in
+                deleteCalls.append(id)
+                model.deleteEntry(id: id)
+                if shouldFail {
+                    throw HabitDetailTestError.unavailable
+                }
+                return .deleted
+            }
+        )
+        model = fixture.model(habit: habit, operations: operations)
+        model.start()
+        let verifiedPresentation = model.presentation
+
+        model.deleteEntry(id: entryID)
+
+        #expect(deleteCalls == [entryID])
+        #expect(snapshotCalls == 1)
+        #expect(model.presentation == verifiedPresentation)
+        #expect(model.operationFailure?.placement == .entries)
+        #expect(model.operationFailure?.retryTitle == "Try again")
+        #expect(!model.isOperationInFlight)
+
+        shouldFail = false
+        model.retryOperation()
+
+        #expect(deleteCalls == [entryID, entryID])
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.entries.isEmpty == true)
+        #expect(model.operationFailure == nil)
+        #expect(!model.isOperationInFlight)
+    }
+
+    @Test("unprojected entry identifiers never dispatch or refresh")
+    func refusesUnprojectedEntryDeletion() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let projectedID = UUID()
+        let finalID = UUID()
+        let exemptID = UUID()
+        let missingID = UUID()
+        let projectedEntry = HabitEditableEntry(
+            id: projectedID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        var snapshotCalls = 0
+        var deleteCalls = 0
+        let model = fixture.model(
+            habit: habit,
+            operations: HabitDetailOperations(
+                snapshot: { _, _, _, _ in
+                    snapshotCalls += 1
+                    return fixture.snapshot(
+                        habitID: habit.id,
+                        cadence: .daily,
+                        selectedMonth: try fixture.instant("2026-01-01T00:00:00Z"),
+                        editableEntries: [projectedEntry]
+                    )
+                },
+                deleteEntry: { _, _, _, _ in
+                    deleteCalls += 1
+                    return .deleted
+                }
+            )
+        )
+        model.start()
+
+        model.deleteEntry(id: finalID)
+        model.deleteEntry(id: exemptID)
+        model.deleteEntry(id: missingID)
+
+        #expect(deleteCalls == 0)
+        #expect(snapshotCalls == 1)
+        #expect(model.presentation?.entries.map(\.id) == [projectedID])
+        #expect(model.operationFailure == nil)
+    }
+
+    @Test("live deletion refreshes for vanished, foreign-only, and ambiguous owned matches")
+    func liveDeletionNeverSubstitutesAnEntry() throws {
+        let fixture = try HabitDetailFixture()
+        let container = try TendModelContainer.inMemory()
+        let context = container.mainContext
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let foreignHabit = Habit(name: "Read", cadence: .daily, target: 1)
+        context.insert(habit)
+        context.insert(foreignHabit)
+        let selectedID = UUID()
+        let owned = LogEntry(
+            id: selectedID,
+            timestamp: fixture.now,
+            amount: 1,
+            habit: habit
+        )
+        let foreign = LogEntry(
+            id: selectedID,
+            timestamp: fixture.now,
+            amount: 1,
+            habit: foreignHabit
+        )
+        context.insert(owned)
+        context.insert(foreign)
+        try context.save()
+        let projectedEntry = HabitEditableEntry(
+            id: selectedID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        var snapshotCalls = 0
+        let operations = HabitDetailOperations.live(
+            context: context,
+            snapshot: { _, _, _, _ in
+                snapshotCalls += 1
+                return fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    selectedMonth: try fixture.instant("2026-01-01T00:00:00Z"),
+                    editableEntries: snapshotCalls == 1 ? [projectedEntry] : []
+                )
+            }
+        )
+        let model = fixture.model(habit: habit, operations: operations)
+        model.start()
+        context.delete(owned)
+        try context.save()
+
+        model.deleteEntry(id: selectedID)
+
+        let foreignID = foreign.persistentModelID
+        let foreignStillExists = try context.fetch(
+            FetchDescriptor<LogEntry>(
+                predicate: #Predicate { $0.id == selectedID }
+            )
+        )
+        #expect(snapshotCalls == 2)
+        #expect(foreignStillExists.map(\.persistentModelID) == [foreignID])
+        #expect(model.presentation?.entries.isEmpty == true)
+        #expect(model.operationFailure == nil)
+
+        let ambiguousID = UUID()
+        let firstOwned = LogEntry(
+            id: ambiguousID,
+            timestamp: fixture.now,
+            amount: 1,
+            habit: habit
+        )
+        let secondOwned = LogEntry(
+            id: ambiguousID,
+            timestamp: fixture.now,
+            amount: 1,
+            habit: habit
+        )
+        context.insert(firstOwned)
+        context.insert(secondOwned)
+        try context.save()
+        snapshotCalls = 0
+        let ambiguousEntry = HabitEditableEntry(
+            id: ambiguousID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        let ambiguousModel = fixture.model(
+            habit: habit,
+            operations: .live(
+                context: context,
+                snapshot: { _, _, _, _ in
+                    snapshotCalls += 1
+                    return fixture.snapshot(
+                        habitID: habit.id,
+                        cadence: .daily,
+                        selectedMonth: try fixture.instant("2026-01-01T00:00:00Z"),
+                        editableEntries: snapshotCalls == 1 ? [ambiguousEntry] : []
+                    )
+                }
+            )
+        )
+        ambiguousModel.start()
+
+        ambiguousModel.deleteEntry(id: ambiguousID)
+
+        let ambiguousMatches = try context.fetch(
+            FetchDescriptor<LogEntry>(
+                predicate: #Predicate { $0.id == ambiguousID }
+            )
+        )
+        #expect(snapshotCalls == 2)
+        #expect(ambiguousMatches.count == 2)
+        #expect(ambiguousModel.operationFailure == nil)
+    }
+
+    @Test("Edit cancel preserves facts while one successful save recomputes")
+    func refreshesOnlyAfterSavedEdit() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        var snapshotCalls = 0
+        let model = fixture.model(
+            habit: habit,
+            operations: HabitDetailOperations(snapshot: { _, month, _, _ in
+                snapshotCalls += 1
+                return fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    selectedMonth: month
+                )
+            })
+        )
+        model.start()
+
+        model.presentEdit()
+        #expect(model.isPresentingEdit)
+        #expect(model.habitForEditing === habit)
+        model.editCancelled()
+        #expect(!model.isPresentingEdit)
+        #expect(snapshotCalls == 1)
+
+        model.presentEdit()
+        habit.name = "Evening walk"
+        model.editSaved()
+        model.editSaved()
+
+        #expect(!model.isPresentingEdit)
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.name == "Evening walk")
+    }
+
+    @Test("lifecycle mutations sample once, reject reentry, flip facts, and retry failures")
+    func dispatchesAndRetriesLifecycleMutations() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        var snapshotCalls = 0
+        var archiveCalls: [(Date, TimeZone)] = []
+        var reactivateCalls: [(Date, TimeZone)] = []
+        var archiveShouldFail = true
+        var reactivateShouldFail = true
+        var nowCalls = 0
+        var timeZoneCalls = 0
+        var model: HabitDetailModel!
+        let operations = HabitDetailOperations(
+            snapshot: { _, month, _, _ in
+                snapshotCalls += 1
+                return fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    selectedMonth: month
+                )
+            },
+            deactivate: { selectedHabit, instant, zone in
+                archiveCalls.append((instant, zone))
+                model.archive()
+                if archiveShouldFail {
+                    throw HabitDetailTestError.unavailable
+                }
+                selectedHabit.isActive = false
+            },
+            reactivate: { selectedHabit, instant, zone in
+                reactivateCalls.append((instant, zone))
+                model.reactivate()
+                if reactivateShouldFail {
+                    throw HabitDetailTestError.unavailable
+                }
+                selectedHabit.isActive = true
+            }
+        )
+        model = HabitDetailModel(
+            habit: habit,
+            operations: operations,
+            now: {
+                nowCalls += 1
+                return fixture.now
+            },
+            timeZone: {
+                timeZoneCalls += 1
+                return fixture.timeZone
+            },
+            calendar: { fixture.calendar },
+            locale: { fixture.locale },
+            boundaryScheduling: .disabled
+        )
+        model.start()
+        nowCalls = 0
+        timeZoneCalls = 0
+        let verifiedPresentation = model.presentation
+
+        model.archive()
+
+        #expect(archiveCalls.count == 1)
+        #expect(archiveCalls.first?.0 == fixture.now)
+        #expect(archiveCalls.first?.1 == fixture.timeZone)
+        #expect(nowCalls == 1)
+        #expect(timeZoneCalls == 1)
+        #expect(snapshotCalls == 1)
+        #expect(model.presentation == verifiedPresentation)
+        #expect(model.operationFailure?.placement == .lifecycle)
+
+        archiveShouldFail = false
+        model.retryOperation()
+
+        #expect(archiveCalls.count == 2)
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.isActive == false)
+        #expect(model.operationFailure == nil)
+
+        nowCalls = 0
+        timeZoneCalls = 0
+        model.reactivate()
+
+        #expect(reactivateCalls.count == 1)
+        #expect(reactivateCalls.first?.0 == fixture.now)
+        #expect(reactivateCalls.first?.1 == fixture.timeZone)
+        #expect(nowCalls == 1)
+        #expect(timeZoneCalls == 1)
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.isActive == false)
+        #expect(model.operationFailure?.placement == .lifecycle)
+
+        reactivateShouldFail = false
+        model.retryOperation()
+
+        #expect(reactivateCalls.count == 2)
+        #expect(snapshotCalls == 3)
+        #expect(model.presentation?.isActive == true)
+        #expect(model.operationFailure == nil)
+    }
+
+    @Test("successful mutation followed by refresh failure clears stale derived facts")
+    func clearsFactsWhenPostMutationRefreshFails() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let entryID = UUID()
+        let entry = HabitEditableEntry(
+            id: entryID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        var snapshotCalls = 0
+        let model = fixture.model(
+            habit: habit,
+            operations: HabitDetailOperations(
+                snapshot: { _, month, _, _ in
+                    snapshotCalls += 1
+                    if snapshotCalls > 1 {
+                        throw HabitDetailTestError.unavailable
+                    }
+                    return fixture.snapshot(
+                        habitID: habit.id,
+                        cadence: .daily,
+                        selectedMonth: month,
+                        editableEntries: [entry]
+                    )
+                },
+                deleteEntry: { _, _, _, _ in .deleted }
+            )
+        )
+        model.start()
+
+        model.deleteEntry(id: entryID)
+
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation == nil)
+        #expect(model.selectedHistory == nil)
+        #expect(model.loadFailure?.retryTitle == "Try again")
+        #expect(model.operationFailure == nil)
+    }
+
+    @Test("boundary scheduling replaces one token across start, fire, activation, and stop")
+    func replacesLocalMidnightSchedule() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let scheduler = HabitDetailBoundaryRecorder()
+        var currentNow = fixture.now
+        var snapshotCalls = 0
+        let january16Boundary = try fixture.instant("2026-01-16T00:00:00Z")
+        let january17Boundary = try fixture.instant("2026-01-17T00:00:00Z")
+        let january18Boundary = try fixture.instant("2026-01-18T00:00:00Z")
+        let model = HabitDetailModel(
+            habit: habit,
+            operations: HabitDetailOperations(snapshot: { _, month, _, _ in
+                snapshotCalls += 1
+                return fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    selectedMonth: month
+                )
+            }),
+            now: { currentNow },
+            timeZone: { fixture.timeZone },
+            calendar: { fixture.calendar },
+            locale: { fixture.locale },
+            boundaryScheduling: scheduler.scheduling
+        )
+
+        model.start()
+        #expect(scheduler.records.map(\.date) == [january16Boundary])
+        #expect(scheduler.activeCount == 1)
+
+        model.start()
+        #expect(scheduler.records.count == 2)
+        #expect(scheduler.records[0].isCancelled)
+        #expect(scheduler.activeCount == 1)
+
+        currentNow = try fixture.instant("2026-01-16T12:00:00Z")
+        scheduler.records[1].fire()
+        #expect(snapshotCalls == 3)
+        #expect(scheduler.records.count == 3)
+        #expect(scheduler.records[1].isCancelled)
+        #expect(scheduler.records[2].date == january17Boundary)
+        #expect(scheduler.activeCount == 1)
+
+        currentNow = try fixture.instant("2026-01-17T18:00:00Z")
+        model.sceneBecameActive()
+        #expect(snapshotCalls == 4)
+        #expect(scheduler.records.count == 4)
+        #expect(scheduler.records[2].isCancelled)
+        #expect(scheduler.records[3].date == january18Boundary)
+        #expect(scheduler.activeCount == 1)
+
+        model.stop()
+        #expect(scheduler.records[3].isCancelled)
+        #expect(scheduler.activeCount == 0)
+    }
+
+    @Test("next local boundary follows spring DST and rollover preserves a valid older page")
+    func schedulesAcrossDSTAndClampsOnlyFromComputation() throws {
+        let fixture = try HabitDetailFixture()
+        let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
+        var localCalendar = Calendar(identifier: .gregorian)
+        localCalendar.timeZone = losAngeles
+        localCalendar.locale = fixture.locale
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let scheduler = HabitDetailBoundaryRecorder()
+        var currentNow = try fixture.instant("2024-03-09T20:00:00Z")
+        var shouldClamp = false
+        let january = try fixture.instant("2024-01-01T08:00:00Z")
+        let march = try fixture.instant("2024-03-01T08:00:00Z")
+        let february = try fixture.instant("2024-02-01T08:00:00Z")
+        let springForwardBoundary = try fixture.instant("2024-03-10T08:00:00Z")
+        let postDSTBoundary = try fixture.instant("2024-03-11T07:00:00Z")
+        let model = HabitDetailModel(
+            habit: habit,
+            operations: HabitDetailOperations(snapshot: { _, requestedMonth, _, _ in
+                fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    earliestMonth: january,
+                    selectedMonth: shouldClamp ? march : requestedMonth,
+                    latestMonth: march
+                )
+            }),
+            now: { currentNow },
+            timeZone: { losAngeles },
+            calendar: { localCalendar },
+            locale: { fixture.locale },
+            boundaryScheduling: scheduler.scheduling
+        )
+
+        model.start()
+        #expect(model.selectedMonth == march)
+        #expect(scheduler.records[0].date == springForwardBoundary)
+
+        model.selectPreviousMonth()
+        #expect(model.selectedMonth == february)
+        currentNow = try fixture.instant("2024-03-10T19:00:00Z")
+        scheduler.records[0].fire()
+
+        #expect(model.selectedMonth == february)
+        #expect(scheduler.records[1].date == postDSTBoundary)
+        #expect(scheduler.activeCount == 1)
+
+        shouldClamp = true
+        currentNow = try fixture.instant("2024-03-11T19:00:00Z")
+        scheduler.records[1].fire()
+
+        #expect(model.selectedMonth == march)
+        #expect(scheduler.activeCount == 1)
+    }
+
     private func instant(_ value: String) throws -> Date {
         try #require(ISO8601DateFormatter().date(from: value))
     }
@@ -766,7 +1286,8 @@ private struct HabitDetailFixture {
             now: { now },
             timeZone: { timeZone },
             calendar: { calendar },
-            locale: { locale }
+            locale: { locale },
+            boundaryScheduling: .disabled
         )
     }
 
@@ -823,6 +1344,52 @@ private struct HabitDetailFixture {
 
     func instant(_ value: String) throws -> Date {
         try #require(ISO8601DateFormatter().date(from: value))
+    }
+}
+
+@MainActor
+private extension HabitDetailBoundaryScheduling {
+    static var disabled: Self {
+        Self { _, _ in HabitDetailBoundaryCancellation {} }
+    }
+}
+
+@MainActor
+private final class HabitDetailBoundaryRecorder {
+    @MainActor
+    final class Record {
+        let date: Date
+        private let action: @MainActor () -> Void
+        var isCancelled = false
+
+        init(date: Date, action: @escaping @MainActor () -> Void) {
+            self.date = date
+            self.action = action
+        }
+
+        func fire() {
+            guard !isCancelled else { return }
+            action()
+        }
+    }
+
+    private(set) var records: [Record] = []
+
+    var scheduling: HabitDetailBoundaryScheduling {
+        HabitDetailBoundaryScheduling { [weak self] date, action in
+            guard let self else {
+                return HabitDetailBoundaryCancellation {}
+            }
+            let record = Record(date: date, action: action)
+            records.append(record)
+            return HabitDetailBoundaryCancellation {
+                record.isCancelled = true
+            }
+        }
+    }
+
+    var activeCount: Int {
+        records.count { !$0.isCancelled }
     }
 }
 

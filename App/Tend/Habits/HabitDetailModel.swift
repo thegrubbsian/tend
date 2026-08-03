@@ -67,6 +67,65 @@ struct HabitDetailPresentation: Equatable, Sendable {
     let entries: [HabitDetailEntryFact]
 }
 
+enum HabitDetailDeleteEntryResult: Equatable, Sendable {
+    case deleted
+    case missing
+}
+
+struct HabitDetailOperationFailure: Equatable, Sendable {
+    enum Placement: Equatable, Sendable {
+        case entries
+        case lifecycle
+    }
+
+    let message: String
+    let retryTitle: String
+    let placement: Placement
+}
+
+@MainActor
+struct HabitDetailBoundaryCancellation {
+    private let cancellation: @MainActor () -> Void
+
+    init(_ cancellation: @escaping @MainActor () -> Void) {
+        self.cancellation = cancellation
+    }
+
+    func cancel() {
+        cancellation()
+    }
+}
+
+@MainActor
+struct HabitDetailBoundaryScheduling {
+    typealias Schedule = (
+        _ fireDate: Date,
+        _ action: @escaping @MainActor () -> Void
+    ) -> HabitDetailBoundaryCancellation
+
+    let schedule: Schedule
+
+    init(_ schedule: @escaping Schedule) {
+        self.schedule = schedule
+    }
+
+    static var live: Self {
+        Self { fireDate, action in
+            let task = Task { @MainActor in
+                let delay = fireDate.timeIntervalSinceNow
+                if delay > 0 {
+                    try? await Task.sleep(for: .seconds(delay))
+                }
+                guard !Task.isCancelled else { return }
+                action()
+            }
+            return HabitDetailBoundaryCancellation {
+                task.cancel()
+            }
+        }
+    }
+}
+
 @MainActor
 struct HabitDetailOperations {
     typealias Snapshot = (
@@ -75,35 +134,45 @@ struct HabitDetailOperations {
         _ instant: Date,
         _ timeZone: TimeZone
     ) throws -> HabitDetailSnapshot
+    typealias DeleteEntry = (
+        _ id: UUID,
+        _ habit: Habit,
+        _ instant: Date,
+        _ timeZone: TimeZone
+    ) throws -> HabitDetailDeleteEntryResult
+    typealias ChangeActivity = (
+        _ habit: Habit,
+        _ instant: Date,
+        _ timeZone: TimeZone
+    ) throws -> Void
 
     let snapshot: Snapshot
+    let deleteEntry: DeleteEntry
+    let deactivate: ChangeActivity
+    let reactivate: ChangeActivity
 
-    // Task 3 extends this boundary with mutation closures. Retaining the live
-    // operation objects here keeps every detail operation on one ModelContext.
-    private let logEntryOperations: LogEntryOperations?
-    private let activityOperations: HabitActivityOperations?
-
-    init(snapshot: @escaping Snapshot) {
-        self.snapshot = snapshot
-        logEntryOperations = nil
-        activityOperations = nil
-    }
-
-    private init(
+    init(
         snapshot: @escaping Snapshot,
-        logEntryOperations: LogEntryOperations,
-        activityOperations: HabitActivityOperations
+        deleteEntry: @escaping DeleteEntry = { _, _, _, _ in
+            throw UnsupportedOperation.mutation
+        },
+        deactivate: @escaping ChangeActivity = { _, _, _ in
+            throw UnsupportedOperation.mutation
+        },
+        reactivate: @escaping ChangeActivity = { _, _, _ in
+            throw UnsupportedOperation.mutation
+        }
     ) {
         self.snapshot = snapshot
-        self.logEntryOperations = logEntryOperations
-        self.activityOperations = activityOperations
+        self.deleteEntry = deleteEntry
+        self.deactivate = deactivate
+        self.reactivate = reactivate
     }
 
     static func live(context: ModelContext) -> Self {
         let computation = HabitDetailComputation(context: context)
-        let logEntryOperations = LogEntryOperations(context: context)
-        let activityOperations = HabitActivityOperations(context: context)
-        return Self(
+        return live(
+            context: context,
             snapshot: { habit, selectedMonth, instant, timeZone in
                 try computation.snapshot(
                     for: habit,
@@ -111,10 +180,58 @@ struct HabitDetailOperations {
                     at: instant,
                     timeZone: timeZone
                 )
-            },
-            logEntryOperations: logEntryOperations,
-            activityOperations: activityOperations
+            }
         )
+    }
+
+    static func live(
+        context: ModelContext,
+        snapshot: @escaping Snapshot
+    ) -> Self {
+        let logEntryOperations = LogEntryOperations(context: context)
+        let activityOperations = HabitActivityOperations(context: context)
+        return Self(
+            snapshot: snapshot,
+            deleteEntry: { id, habit, instant, timeZone in
+                let requestedID = id
+                let matches = try context.fetch(
+                    FetchDescriptor<LogEntry>(
+                        predicate: #Predicate { $0.id == requestedID }
+                    )
+                )
+                let owned = matches.filter {
+                    $0.habit?.persistentModelID == habit.persistentModelID
+                }
+                guard owned.count == 1, let entry = owned.first else {
+                    return .missing
+                }
+                try logEntryOperations.delete(
+                    entry,
+                    from: habit,
+                    at: instant,
+                    timeZone: timeZone
+                )
+                return .deleted
+            },
+            deactivate: { habit, instant, timeZone in
+                try activityOperations.deactivate(
+                    habit,
+                    at: instant,
+                    timeZone: timeZone
+                )
+            },
+            reactivate: { habit, instant, timeZone in
+                try activityOperations.reactivate(
+                    habit,
+                    at: instant,
+                    timeZone: timeZone
+                )
+            }
+        )
+    }
+
+    private enum UnsupportedOperation: Error {
+        case mutation
     }
 }
 
@@ -126,6 +243,9 @@ final class HabitDetailModel {
     private(set) var presentation: HabitDetailPresentation?
     private(set) var loadFailure: HabitDetailLoadFailure?
     private(set) var selectedMonth: Date?
+    private(set) var operationFailure: HabitDetailOperationFailure?
+    private(set) var isOperationInFlight = false
+    private(set) var isPresentingEdit = false
 
     var canSelectPreviousMonth: Bool {
         guard let presentation else { return false }
@@ -142,12 +262,20 @@ final class HabitDetailModel {
         return presentation?.history.first { $0.key == selectedHistoryKey }
     }
 
+    var habitForEditing: Habit? {
+        guard presentation != nil, !isOperationInFlight else { return nil }
+        return habit
+    }
+
     @ObservationIgnored private let habit: Habit
     @ObservationIgnored private let operations: HabitDetailOperations
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private let timeZone: () -> TimeZone
     @ObservationIgnored private let calendar: () -> Calendar
     @ObservationIgnored private let locale: () -> Locale
+    @ObservationIgnored private let boundaryScheduling: HabitDetailBoundaryScheduling
+    @ObservationIgnored private var boundaryCancellation: HabitDetailBoundaryCancellation?
+    @ObservationIgnored private var retryRequest: MutationRequest?
     private var selectedHistoryKey: String?
 
     convenience init(
@@ -161,7 +289,8 @@ final class HabitDetailModel {
             calendar.minimumDaysInFirstWeek = 4
             return calendar
         },
-        locale: @escaping () -> Locale = { Locale.current }
+        locale: @escaping () -> Locale = { Locale.current },
+        boundaryScheduling: HabitDetailBoundaryScheduling = .live
     ) {
         self.init(
             habit: habit,
@@ -169,7 +298,8 @@ final class HabitDetailModel {
             now: now,
             timeZone: timeZone,
             calendar: calendar,
-            locale: locale
+            locale: locale,
+            boundaryScheduling: boundaryScheduling
         )
     }
 
@@ -179,7 +309,8 @@ final class HabitDetailModel {
         now: @escaping () -> Date,
         timeZone: @escaping () -> TimeZone,
         calendar: @escaping () -> Calendar,
-        locale: @escaping () -> Locale
+        locale: @escaping () -> Locale,
+        boundaryScheduling: HabitDetailBoundaryScheduling = .live
     ) {
         habitID = habit.id
         habitName = habit.name
@@ -189,21 +320,11 @@ final class HabitDetailModel {
         self.timeZone = timeZone
         self.calendar = calendar
         self.locale = locale
+        self.boundaryScheduling = boundaryScheduling
     }
 
     func start() {
-        let context = makeLoadContext()
-        if selectedMonth == nil {
-            guard let month = monthContaining(
-                context.instant,
-                calendar: context.calendar
-            ) else {
-                failLoad(locale: context.locale)
-                return
-            }
-            selectedMonth = month
-        }
-        loadSelectedMonth(using: context)
+        refreshAndReplaceBoundary()
     }
 
     func refresh() {
@@ -217,6 +338,42 @@ final class HabitDetailModel {
     func retryLoad() {
         guard loadFailure != nil, selectedMonth != nil else { return }
         loadSelectedMonth(using: makeLoadContext())
+    }
+
+    func deleteEntry(id: UUID) {
+        perform(.deleteEntry(id))
+    }
+
+    func archive() {
+        perform(.archive)
+    }
+
+    func reactivate() {
+        perform(.reactivate)
+    }
+
+    func retryOperation() {
+        guard operationFailure != nil, let retryRequest else { return }
+        perform(retryRequest)
+    }
+
+    func presentEdit() {
+        guard presentation != nil, !isOperationInFlight else { return }
+        isPresentingEdit = true
+    }
+
+    func editCancelled() {
+        isPresentingEdit = false
+    }
+
+    func editSaved() {
+        guard isPresentingEdit else { return }
+        isPresentingEdit = false
+        refresh()
+    }
+
+    func sceneBecameActive() {
+        refreshAndReplaceBoundary()
     }
 
     func selectPreviousMonth() {
@@ -240,7 +397,125 @@ final class HabitDetailModel {
     }
 
     func stop() {
+        boundaryCancellation?.cancel()
+        boundaryCancellation = nil
         selectedHistoryKey = nil
+    }
+
+    private func refreshAndReplaceBoundary() {
+        let context = makeLoadContext()
+        if selectedMonth == nil {
+            guard let month = monthContaining(
+                context.instant,
+                calendar: context.calendar
+            ) else {
+                failLoad(locale: context.locale)
+                replaceBoundary(using: context)
+                return
+            }
+            selectedMonth = month
+        }
+        loadSelectedMonth(using: context)
+        replaceBoundary(using: context)
+    }
+
+    private func replaceBoundary(using context: LoadContext) {
+        boundaryCancellation?.cancel()
+        boundaryCancellation = nil
+        let startOfToday = context.calendar.startOfDay(for: context.instant)
+        guard let nextBoundary = context.calendar.date(
+            byAdding: .day,
+            value: 1,
+            to: startOfToday
+        ) else { return }
+        boundaryCancellation = boundaryScheduling.schedule(nextBoundary) { [weak self] in
+            self?.refreshAndReplaceBoundary()
+        }
+    }
+
+    private func perform(_ request: MutationRequest) {
+        guard !isOperationInFlight, isAuthorized(request) else { return }
+        isOperationInFlight = true
+        defer { isOperationInFlight = false }
+        let context = makeLoadContext()
+
+        do {
+            switch request {
+            case let .deleteEntry(id):
+                _ = try operations.deleteEntry(
+                    id,
+                    habit,
+                    context.instant,
+                    context.timeZone
+                )
+            case .archive:
+                try operations.deactivate(
+                    habit,
+                    context.instant,
+                    context.timeZone
+                )
+            case .reactivate:
+                try operations.reactivate(
+                    habit,
+                    context.instant,
+                    context.timeZone
+                )
+            }
+            retryRequest = nil
+            operationFailure = nil
+            loadSelectedMonth(using: context)
+        } catch {
+            retryRequest = request
+            operationFailure = operationFailure(
+                for: request,
+                locale: context.locale
+            )
+        }
+    }
+
+    private func isAuthorized(_ request: MutationRequest) -> Bool {
+        guard let presentation else { return false }
+        switch request {
+        case let .deleteEntry(id):
+            return presentation.entries.contains { $0.id == id }
+        case .archive:
+            return presentation.isActive
+        case .reactivate:
+            return !presentation.isActive
+        }
+    }
+
+    private func operationFailure(
+        for request: MutationRequest,
+        locale: Locale
+    ) -> HabitDetailOperationFailure {
+        let message: String
+        let placement: HabitDetailOperationFailure.Placement
+        switch request {
+        case .deleteEntry:
+            message = String(
+                localized: "This entry could not be deleted.",
+                locale: locale
+            )
+            placement = .entries
+        case .archive:
+            message = String(
+                localized: "This habit could not be archived.",
+                locale: locale
+            )
+            placement = .lifecycle
+        case .reactivate:
+            message = String(
+                localized: "This habit could not be reactivated.",
+                locale: locale
+            )
+            placement = .lifecycle
+        }
+        return HabitDetailOperationFailure(
+            message: message,
+            retryTitle: String(localized: "Try again", locale: locale),
+            placement: placement
+        )
     }
 
     private func navigateMonth(by offset: Int) {
@@ -307,6 +582,9 @@ final class HabitDetailModel {
     private func failLoad(locale: Locale) {
         presentation = nil
         selectedHistoryKey = nil
+        isPresentingEdit = false
+        retryRequest = nil
+        operationFailure = nil
         loadFailure = HabitDetailLoadFailure(
             message: String(
                 localized: "This habit is unavailable right now.",
@@ -370,6 +648,12 @@ final class HabitDetailModel {
 }
 
 private extension HabitDetailModel {
+    enum MutationRequest: Equatable {
+        case deleteEntry(UUID)
+        case archive
+        case reactivate
+    }
+
     struct LoadContext {
         let instant: Date
         let timeZone: TimeZone
