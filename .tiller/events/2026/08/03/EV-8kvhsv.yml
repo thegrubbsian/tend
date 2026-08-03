@@ -1,0 +1,13 @@
+id: EV-8kvhsv
+type: check.task
+at: 2026-08-03T23:29:54.662471Z
+owner: jc
+command: check task T-0i5tqj
+targets:
+    - T-0i5tqj
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml
