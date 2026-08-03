@@ -285,6 +285,25 @@ struct TendApplicationModelTests {
     }
   }
 
+  @Test("UI test launch options cannot be used as store names")
+  func uiTestLaunchOptionCannotBeStoreName() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", "-tend-ui-testing", "-tend-ui-test-store",
+          "-tend-ui-test-fixture", "habit-detail", "-tend-ui-test-reset",
+        ],
+        applicationSupportDirectory: supportDirectory
+      )
+    )
+
+    #expect(throws: TendUITestStoreError.missingName) {
+      _ = try factory()
+    }
+  }
+
   @Test("habit-detail fixture seeds the complete graph exactly once")
   func habitDetailFixtureSeedsCompleteGraphExactlyOnce() throws {
     let supportDirectory = try makeTemporarySupportDirectory()

@@ -139,7 +139,7 @@
           throw TendUITestStoreError.missingName
         }
         let name = arguments[valueIndex]
-        guard name != TendUITestStore.resetArgument else {
+        guard !Self.optionArguments.contains(name) else {
           throw TendUITestStoreError.missingName
         }
         guard Self.isValid(name: name) else {
