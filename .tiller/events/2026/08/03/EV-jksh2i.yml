@@ -1,0 +1,13 @@
+id: EV-jksh2i
+type: start.task
+at: 2026-08-03T16:21:01.271432Z
+owner: jc
+command: start task T-f5rev3
+targets:
+    - T-f5rev3
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml
