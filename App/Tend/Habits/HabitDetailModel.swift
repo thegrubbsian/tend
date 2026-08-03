@@ -570,6 +570,10 @@ final class HabitDetailModel {
             selectedMonth = snapshot.monthRange.selected
             habitName = ownerFacts.name
             loadFailure = nil
+            if let retryRequest, !isAuthorized(retryRequest) {
+                self.retryRequest = nil
+                operationFailure = nil
+            }
             if let selectedHistoryKey,
                !replacement.history.contains(where: { $0.key == selectedHistoryKey }) {
                 self.selectedHistoryKey = nil

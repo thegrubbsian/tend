@@ -1252,6 +1252,135 @@ struct HabitDetailModelTests {
         #expect(scheduler.activeCount == 1)
     }
 
+    @Test("successful refresh clears a failed deletion retry when the entry disappears")
+    func clearsStaleDeletionRetryAfterRefresh() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let entryID = UUID()
+        let entry = HabitEditableEntry(
+            id: entryID,
+            timestamp: fixture.now,
+            amount: 1,
+            bucketKey: "2026-01-15",
+            unit: "times",
+            bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+        )
+        var snapshotCalls = 0
+        var deleteCalls = 0
+        let model = fixture.model(
+            habit: habit,
+            operations: HabitDetailOperations(
+                snapshot: { _, month, _, _ in
+                    snapshotCalls += 1
+                    return fixture.snapshot(
+                        habitID: habit.id,
+                        cadence: .daily,
+                        selectedMonth: month,
+                        editableEntries: snapshotCalls == 1 ? [entry] : []
+                    )
+                },
+                deleteEntry: { _, _, _, _ in
+                    deleteCalls += 1
+                    throw HabitDetailTestError.unavailable
+                }
+            )
+        )
+        model.start()
+        model.deleteEntry(id: entryID)
+        #expect(model.operationFailure?.placement == .entries)
+
+        model.sceneBecameActive()
+
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.entries.isEmpty == true)
+        #expect(model.operationFailure == nil)
+        model.retryOperation()
+        #expect(deleteCalls == 1)
+    }
+
+    @Test("successful refresh clears a lifecycle retry after the lifecycle flips")
+    func clearsStaleLifecycleRetryAfterRefresh() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        var snapshotCalls = 0
+        var archiveCalls = 0
+        let model = fixture.model(
+            habit: habit,
+            operations: HabitDetailOperations(
+                snapshot: { _, month, _, _ in
+                    snapshotCalls += 1
+                    return fixture.snapshot(
+                        habitID: habit.id,
+                        cadence: .daily,
+                        selectedMonth: month
+                    )
+                },
+                deactivate: { _, _, _ in
+                    archiveCalls += 1
+                    throw HabitDetailTestError.unavailable
+                }
+            )
+        )
+        model.start()
+        model.archive()
+        #expect(model.operationFailure?.placement == .lifecycle)
+        habit.isActive = false
+
+        model.sceneBecameActive()
+
+        #expect(snapshotCalls == 2)
+        #expect(model.presentation?.isActive == false)
+        #expect(model.operationFailure == nil)
+        model.retryOperation()
+        #expect(archiveCalls == 1)
+    }
+
+    @Test("April rollover preserves an older valid page until computation clamps it")
+    func preservesOlderPageAcrossMonthRollover() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let scheduler = HabitDetailBoundaryRecorder()
+        let february = try fixture.instant("2026-02-01T00:00:00Z")
+        let april = try fixture.instant("2026-04-01T00:00:00Z")
+        var currentNow = try fixture.instant("2026-03-31T20:00:00Z")
+        var shouldClamp = false
+        let model = HabitDetailModel(
+            habit: habit,
+            operations: HabitDetailOperations(snapshot: { _, requestedMonth, _, _ in
+                fixture.snapshot(
+                    habitID: habit.id,
+                    cadence: .daily,
+                    earliestMonth: february,
+                    selectedMonth: shouldClamp ? april : requestedMonth,
+                    latestMonth: april
+                )
+            }),
+            now: { currentNow },
+            timeZone: { fixture.timeZone },
+            calendar: { fixture.calendar },
+            locale: { fixture.locale },
+            boundaryScheduling: scheduler.scheduling
+        )
+        model.start()
+        model.selectPreviousMonth()
+        #expect(model.selectedMonth == february)
+        #expect(scheduler.records[0].date == april)
+
+        currentNow = try fixture.instant("2026-04-01T12:00:00Z")
+        scheduler.records[0].fire()
+
+        #expect(model.selectedMonth == february)
+        #expect(scheduler.activeCount == 1)
+
+        shouldClamp = true
+        currentNow = try fixture.instant("2026-04-02T12:00:00Z")
+        scheduler.records[1].fire()
+
+        #expect(model.selectedMonth == april)
+        #expect(scheduler.activeCount == 1)
+    }
+
     private func instant(_ value: String) throws -> Date {
         try #require(ISO8601DateFormatter().date(from: value))
     }
