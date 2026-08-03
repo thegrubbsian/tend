@@ -12,6 +12,7 @@ enum AlmanacMetrics {
   static let cardRadius: CGFloat = 14
   static let insetRadius: CGFloat = 10
   static let gardenCellRadius: CGFloat = 7
+  static let gardenOutlineWidth: CGFloat = 1.5
   static let tabPillRadius: CGFloat = 36
 
   static let tabPillHeight: CGFloat = 62

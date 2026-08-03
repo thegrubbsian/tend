@@ -14,9 +14,14 @@ struct HabitFormView: View {
 
   @State private var model: HabitFormModel
   @FocusState private var focusedField: HabitFormField?
+  private let onSaved: () -> Void
 
-  init(mode: HabitFormMode) {
+  init(
+    mode: HabitFormMode,
+    onSaved: @escaping () -> Void = {}
+  ) {
     _model = State(initialValue: HabitFormModel(mode: mode))
+    self.onSaved = onSaved
   }
 
   var body: some View {
@@ -464,6 +469,7 @@ struct HabitFormView: View {
     focusedField = nil
     let persistence = HabitFormPersistence.live(context: modelContext)
     if model.save(using: persistence, at: .now, timeZone: timeZone) != nil {
+      onSaved()
       dismiss()
     } else if let persistenceError = model.persistenceError {
       announce("Save failed. \(persistenceError)")
