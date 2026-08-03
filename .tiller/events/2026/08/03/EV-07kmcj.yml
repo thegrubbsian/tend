@@ -1,0 +1,14 @@
+id: EV-07kmcj
+type: sync.task
+at: 2026-08-03T00:11:12.728914Z
+owner: jc
+command: sync task T-ogl6he
+targets:
+    - T-ogl6he
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml

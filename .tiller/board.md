@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/habit-management/all-habits-roster (T-ogl6he): build pass, tests pass
+- (none)
 
 ### Open questions
 
