@@ -40,7 +40,7 @@ private struct AlmanacTextStyleModifier: ViewModifier {
     case .caption:
       content
         .font(.caption)
-        .foregroundStyle(AlmanacPalette.inkFaint)
+        .foregroundStyle(AlmanacPalette.inkMuted)
     case .meaningfulNumeral(let relativeStyle):
       content
         .font(.system(relativeStyle, design: .serif, weight: .semibold))
