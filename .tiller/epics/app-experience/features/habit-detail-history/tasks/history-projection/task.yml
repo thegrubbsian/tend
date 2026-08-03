@@ -1,7 +1,7 @@
 id: T-dr7wdw
 key: app-experience/habit-detail-history/history-projection
 title: Project truthful habit detail history
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,30 @@ accepted_against:
         kind: git_commit
         value: git:fb6cea3
         observed_at: 2026-08-03T14:36:47.666647Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-03T15:55:03.511452Z
+        against:
+            kind: sha256
+            value: sha256:f70d797ec5b290212061be2f602444f390b32bddb82f77764be441e50215581a
+            observed_at: 2026-08-03T15:55:03.511448Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-f70d797ec5b2-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-03T15:55:03.511452Z
+        against:
+            kind: sha256
+            value: sha256:f70d797ec5b290212061be2f602444f390b32bddb82f77764be441e50215581a
+            observed_at: 2026-08-03T15:55:03.511448Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-f70d797ec5b2-out-3ac9094e1e30f85ba95b9b8536f1ace7a2bba6851fa9a0a1cc823168e5f611dd.txt
