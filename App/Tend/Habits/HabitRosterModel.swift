@@ -377,6 +377,7 @@ final class HabitRosterModel {
             let row = HabitRosterFormatter.row(
                 for: habit,
                 streak: streak,
+                timeZone: context.timeZone,
                 calendar: context.calendar,
                 locale: context.locale
             )
@@ -459,6 +460,7 @@ final class HabitRosterModel {
         let row = HabitRosterFormatter.row(
             for: request.habit,
             streak: streak,
+            timeZone: context.timeZone,
             calendar: context.calendar,
             locale: context.locale
         )
@@ -523,26 +525,26 @@ private enum HabitRosterFormatter {
     static func row(
         for habit: Habit,
         streak: HabitRosterStreakSnapshot?,
+        timeZone: TimeZone,
         calendar: Calendar,
         locale: Locale
     ) -> HabitRosterRow {
         let cadence = HabitCadence(rawValue: habit.cadenceRawValue)
-        let requirementText = requirementText(
-            target: habit.target,
-            unit: habit.unit,
-            locale: locale
+        let formatter = HabitPresentationFormatter(
+            calendar: calendar,
+            locale: locale,
+            timeZone: timeZone
         )
-        let cadenceText = cadenceText(
+        let requirementText = formatter.requirement(
+            target: habit.target,
+            unit: habit.unit
+        )
+        let cadenceText = formatter.cadence(
             cadence,
-            fallback: habit.cadenceRawValue,
-            locale: locale
+            fallback: habit.cadenceRawValue
         )
         let pinnedDaysText = cadence == .weekly
-            ? pinnedDaysText(
-                rawValue: habit.pinnedWeekdaysRawValue,
-                calendar: calendar,
-                locale: locale
-            )
+            ? formatter.pinnedDays(rawValue: habit.pinnedWeekdaysRawValue)
             : nil
         let cadenceAndPins = [cadenceText, pinnedDaysText]
             .compactMap { $0 }
@@ -554,7 +556,8 @@ private enum HabitRosterFormatter {
         let streakPresentation = streakPresentation(
             streak,
             cadence: cadence,
-            isActive: habit.isActive
+            isActive: habit.isActive,
+            formatter: formatter
         )
         let metadataText = metadataComponents.joined(separator: " · ")
         let stateText: String
@@ -600,63 +603,17 @@ private enum HabitRosterFormatter {
         return lhs.id.uuidString < rhs.id.uuidString
     }
 
-    private static func cadenceText(
-        _ cadence: HabitCadence?,
-        fallback: String,
-        locale: Locale
-    ) -> String {
-        switch cadence {
-        case .daily:
-            String(localized: "Daily", locale: locale)
-        case .weekly:
-            String(localized: "Weekly", locale: locale)
-        case nil:
-            fallback
-        }
-    }
-
-    private static func requirementText(
-        target: Int,
-        unit: String,
-        locale: Locale
-    ) -> String {
-        let number = target.formatted(.number.locale(locale))
-        let displayUnit = target == 1 && unit.caseInsensitiveCompare("times") == .orderedSame
-            ? "time"
-            : unit
-        return "\(number) \(displayUnit)"
-    }
-
-    private static func pinnedDaysText(
-        rawValue: Int,
-        calendar: Calendar,
-        locale: Locale
-    ) -> String? {
-        guard let pinnedWeekdays = PinnedWeekdays(rawValue: rawValue) else {
-            return nil
-        }
-        let labels = HabitFormWeekday.localizedLabels(calendar: calendar, locale: locale)
-            .filter { pinnedWeekdays.contains($0.weekday.pinnedWeekday) }
-            .map(\.abbreviated)
-        return labels.isEmpty ? nil : labels.joined(separator: ", ")
-    }
 
     private static func streakPresentation(
         _ streak: HabitRosterStreakSnapshot?,
         cadence: HabitCadence?,
-        isActive: Bool
+        isActive: Bool,
+        formatter: HabitPresentationFormatter
     ) -> (text: String, tone: HabitRosterStreakTone) {
         guard let streak, let cadence else {
             return ("Streak unavailable", .unavailable)
         }
-        let unit: String
-        switch cadence {
-        case .daily:
-            unit = streak.currentStreak == 1 ? "day" : "days"
-        case .weekly:
-            unit = streak.currentStreak == 1 ? "week" : "weeks"
-        }
-        let value = "\(streak.currentStreak) \(unit)"
+        let value = formatter.streak(value: streak.currentStreak, cadence: cadence)
         if !isActive {
             return ("held at \(value)", .inactive)
         }
