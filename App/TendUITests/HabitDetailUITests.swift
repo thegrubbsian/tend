@@ -198,8 +198,10 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(reopenedCurrentBucket.label.contains("3 visits"))
     let reactivatedCurrentBucketLabel = reopenedCurrentBucket.label
     let reactivatedHistoryLabels = historyLabels(in: app)
+    let reactivatedRecentEntryCount = entryDeleteElementCount(in: app)
     let reactivatedRecentEntryLabels = entryDeleteLabels(in: app)
-    XCTAssertEqual(reactivatedRecentEntryLabels.count, 1)
+    XCTAssertEqual(reactivatedRecentEntryCount, 1)
+    XCTAssertEqual(reactivatedRecentEntryLabels.count, reactivatedRecentEntryCount)
 
     element("habitDetail.back", in: app).tap()
     XCTAssertTrue(element("shell.destination.habits", in: app).waitForExistence(timeout: 5))
@@ -231,16 +233,25 @@ final class HabitDetailUITests: XCTestCase {
       assertMinimumHitRegion(strip)
       XCTAssertGreaterThan(strip.frame.width, 88)
     }
-    let expectedBoundaryRange = expectedCrossMonthWeekRange()
+    let expectedBoundary = expectedCrossMonthWeek()
+    XCTAssertNotEqual(expectedBoundary.startMonth, expectedBoundary.endMonth)
+    if expectedBoundary.pageOffset == -1 {
+      let weeklyPreviousMonth = element("habitDetail.month.previous", in: app)
+      XCTAssertTrue(weeklyPreviousMonth.isEnabled)
+      weeklyPreviousMonth.tap()
+    } else {
+      XCTAssertEqual(expectedBoundary.pageOffset, 0)
+    }
+    XCTAssertEqual(element("habitDetail.month", in: app).label, expectedBoundary.pageLabel)
     let boundaryStrip = app.buttons.matching(
       NSPredicate(
         format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@",
         "habitDetail.history.",
-        expectedBoundaryRange
+        expectedBoundary.range
       )
     ).firstMatch
     XCTAssertTrue(boundaryStrip.waitForExistence(timeout: 2))
-    XCTAssertTrue(boundaryStrip.label.hasPrefix("\(expectedBoundaryRange), "))
+    XCTAssertTrue(boundaryStrip.label.hasPrefix("\(expectedBoundary.range), "))
     boundaryStrip.tap()
     XCTAssertTrue(boundaryStrip.isSelected)
     XCTAssertEqual(element("habitDetail.history.callout", in: app).label, boundaryStrip.label)
@@ -270,6 +281,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("3 visits"))
     XCTAssertFalse(entryDeleteIdentifiers(in: app).contains(deletedIdentifier))
+    XCTAssertEqual(entryDeleteElementCount(in: app), reactivatedRecentEntryCount)
     XCTAssertEqual(entryDeleteLabels(in: app), reactivatedRecentEntryLabels)
     let relaunchedCurrentBucket = historyButton(state: "Open", in: app)
     XCTAssertTrue(relaunchedCurrentBucket.waitForExistence(timeout: 2))
@@ -369,12 +381,17 @@ final class HabitDetailUITests: XCTestCase {
   }
 
   @MainActor
-  private func entryDeleteLabels(in app: XCUIApplication) -> Set<String> {
-    Set(
-      app.buttons.matching(
-        NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.entry.delete.")
-      ).allElementsBoundByIndex.map(\.label)
-    )
+  private func entryDeleteElementCount(in app: XCUIApplication) -> Int {
+    app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.entry.delete.")
+    ).count
+  }
+
+  @MainActor
+  private func entryDeleteLabels(in app: XCUIApplication) -> [String] {
+    app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.entry.delete.")
+    ).allElementsBoundByIndex.map(\.label).sorted()
   }
 
   @MainActor
@@ -408,7 +425,13 @@ final class HabitDetailUITests: XCTestCase {
     return formatter.string(from: Date())
   }
 
-  private func expectedCrossMonthWeekRange() -> String {
+  private func expectedCrossMonthWeek() -> (
+    pageOffset: Int,
+    pageLabel: String,
+    range: String,
+    startMonth: DateComponents,
+    endMonth: DateComponents
+  ) {
     let timeZone = TimeZone(identifier: "America/Los_Angeles")!
     let locale = Locale(identifier: "en_US")
     var calendar = Calendar(identifier: .gregorian)
@@ -417,26 +440,58 @@ final class HabitDetailUITests: XCTestCase {
     calendar.firstWeekday = 2
     calendar.minimumDaysInFirstWeek = 4
 
-    let currentMonthComponents = calendar.dateComponents([.year, .month], from: Date())
-    let monthStart = calendar.date(from: currentMonthComponents)!
-    let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: monthStart)!
-    let firstWeek = calendar.dateInterval(of: .weekOfYear, for: monthStart)!
-    let currentMonth = calendar.component(.month, from: monthStart)
-    let boundaryWeek: DateInterval
-    if calendar.component(.month, from: firstWeek.start) != currentMonth {
-      boundaryWeek = firstWeek
-    } else {
+    func crossingWeek(for monthStart: Date) -> DateInterval? {
+      let pageMonth = calendar.dateComponents([.year, .month], from: monthStart)
+      let firstWeek = calendar.dateInterval(of: .weekOfYear, for: monthStart)!
+      if calendar.dateComponents([.year, .month], from: firstWeek.start) != pageMonth {
+        return firstWeek
+      }
+
+      let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: monthStart)!
       let monthEnd = calendar.date(byAdding: .day, value: -1, to: nextMonthStart)!
-      boundaryWeek = calendar.dateInterval(of: .weekOfYear, for: monthEnd)!
+      let lastWeek = calendar.dateInterval(of: .weekOfYear, for: monthEnd)!
+      let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: lastWeek.end)!
+      return calendar.dateComponents([.year, .month], from: inclusiveEnd) != pageMonth
+        ? lastWeek
+        : nil
+    }
+
+    let currentComponents = calendar.dateComponents([.year, .month], from: Date())
+    let currentMonthStart = calendar.date(from: currentComponents)!
+    let pageOffset: Int
+    let pageStart: Date
+    let boundaryWeek: DateInterval
+    if let currentBoundary = crossingWeek(for: currentMonthStart) {
+      pageOffset = 0
+      pageStart = currentMonthStart
+      boundaryWeek = currentBoundary
+    } else {
+      pageOffset = -1
+      pageStart = calendar.date(byAdding: .month, value: -1, to: currentMonthStart)!
+      boundaryWeek = crossingWeek(for: pageStart)!
     }
     let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: boundaryWeek.end)!
 
-    let formatter = DateFormatter()
-    formatter.locale = locale
-    formatter.calendar = calendar
-    formatter.timeZone = timeZone
-    formatter.setLocalizedDateFormatFromTemplate("MMM d yyyy")
-    return "\(formatter.string(from: boundaryWeek.start)) – \(formatter.string(from: inclusiveEnd))"
+    let rangeFormatter = DateFormatter()
+    rangeFormatter.locale = locale
+    rangeFormatter.calendar = calendar
+    rangeFormatter.timeZone = timeZone
+    rangeFormatter.setLocalizedDateFormatFromTemplate("MMM d yyyy")
+
+    let monthFormatter = DateFormatter()
+    monthFormatter.locale = locale
+    monthFormatter.calendar = calendar
+    monthFormatter.timeZone = timeZone
+    monthFormatter.setLocalizedDateFormatFromTemplate("MMMM yyyy")
+
+    return (
+      pageOffset: pageOffset,
+      pageLabel: monthFormatter.string(from: pageStart),
+      range:
+        "\(rangeFormatter.string(from: boundaryWeek.start)) – \(rangeFormatter.string(from: inclusiveEnd))",
+      startMonth: calendar.dateComponents([.year, .month], from: boundaryWeek.start),
+      endMonth: calendar.dateComponents([.year, .month], from: inclusiveEnd)
+    )
   }
 
   private func launchArguments(
