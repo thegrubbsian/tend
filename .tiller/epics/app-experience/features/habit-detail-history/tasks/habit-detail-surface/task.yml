@@ -1,9 +1,19 @@
 id: T-f5rev3
 key: app-experience/habit-detail-history/habit-detail-surface
 title: Build the Almanac habit detail surface
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-dr7wdw
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:8ae166236c7e357ea0643617cb768f3ace8c4a90
+        path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.md
+        observed_at: 2026-08-03T14:36:47.666803Z
+    commit:
+        kind: git_commit
+        value: git:fb6cea3
+        observed_at: 2026-08-03T14:36:47.686301Z

@@ -1,10 +1,26 @@
 id: F-efgzky
 key: app-experience/habit-detail-history
 title: Habit Detail and History
-status: specced
+status: active
 blocked: false
 owner: jc
 source: design/03-user-experience.md
 change_type: create
 depends_on:
     - F-tih743
+branch: tiller/app-experience/habit-detail-history
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:da594a097ef1679bf47c0efd5f44531f8293c489
+        path: .tiller/epics/app-experience/features/habit-detail-history/feature.md
+        observed_at: 2026-08-03T14:36:47.594114Z
+    eval:
+        kind: git_blob
+        value: git:22f3beb3ca83950691bf4e701846e5ec94575359
+        path: .tiller/epics/app-experience/features/habit-detail-history/feature.eval.md
+        observed_at: 2026-08-03T14:36:47.594114Z
+    commit:
+        kind: git_commit
+        value: git:fb6cea3
+        observed_at: 2026-08-03T14:36:47.645845Z

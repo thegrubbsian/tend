@@ -1,0 +1,13 @@
+id: EV-01xtyu
+type: check.task
+at: 2026-08-03T15:22:57.580073Z
+owner: jc
+command: check task T-dr7wdw
+targets:
+    - T-dr7wdw
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml
