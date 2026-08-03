@@ -1,0 +1,14 @@
+id: EV-wg53vm
+type: sync.feature
+at: 2026-08-03T16:18:47.281861Z
+owner: jc
+command: sync feature F-tih743
+targets:
+    - F-tih743
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/feature.yml

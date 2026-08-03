@@ -1,7 +1,7 @@
 id: T-dr7wdw
 key: app-experience/habit-detail-history/history-projection
 title: Project truthful habit detail history
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:fb6cea3
         observed_at: 2026-08-03T14:36:47.666647Z
 pr: 23
+done_basis: ancestry
 gates:
     build:
         required: true

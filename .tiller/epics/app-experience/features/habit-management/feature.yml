@@ -1,7 +1,7 @@
 id: F-tih743
 key: app-experience/habit-management
 title: Habit Management
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -26,6 +26,23 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.877297Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:90040c992661cbb34a2f8c38745b3399d20aa225
+        path: .tiller/epics/app-experience/features/habit-management/feature.md
+        observed_at: 2026-08-03T16:18:47.26492Z
+    eval:
+        kind: git_blob
+        value: git:1239e7ac7775e9ba7431f726a01d20d2deccff3b
+        path: .tiller/epics/app-experience/features/habit-management/feature.eval.md
+        observed_at: 2026-08-03T16:18:47.26492Z
+    commit:
+        kind: git_commit
+        value: git:b941a2f
+        observed_at: 2026-08-03T16:18:47.068555Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true
@@ -88,3 +105,11 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-sha256-c2d2855c6775-out-07dbe35d1c6caaea7a9eddc23e5ed293037ea28c81a60c094cee7866695b4802.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:b941a2f
+        observed_at: 2026-08-03T16:18:47.068555Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-sha256-c2d2855c6775-out-e03b31e9d039595b77c38f6da211fa85efbebf680aa16987e28237d690044315.txt

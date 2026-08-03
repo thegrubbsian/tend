@@ -1,0 +1,14 @@
+id: EV-i4sno5
+type: sync.task
+at: 2026-08-03T16:18:47.124452Z
+owner: jc
+command: sync task T-dr7wdw
+targets:
+    - T-dr7wdw
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml
