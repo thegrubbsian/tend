@@ -10,7 +10,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/habit-detail-history (F-efgzky): active
-- task app-experience/habit-detail-history/habit-detail-surface (T-f5rev3): ready
 - task app-experience/habit-detail-history/roster-detail-integration (T-0i5tqj): ready
 
 ### Blocked
@@ -19,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task app-experience/habit-detail-history/habit-detail-surface (T-f5rev3): build pass, tests pass
 
 ### Open questions
 

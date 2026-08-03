@@ -170,6 +170,31 @@ struct HabitRosterModelTests {
         #expect(weeklyRow.streakText == "0 weeks")
     }
 
+    @Test("large streak values preserve raw roster interpolation")
+    func largeStreakValuesRemainUngrouped() throws {
+        let fixture = try HabitRosterFixture()
+        let instant = try fixture.instant("2026-01-05T12:00:00Z")
+        let habit = try fixture.create(name: "Long streak", at: instant)
+        let model = HabitRosterModel(operations: HabitRosterOperations(
+            fetchHabits: { [habit] },
+            computeStreak: { _, _, _ in
+                HabitRosterStreakSnapshot(currentStreak: 1_000, isAtRisk: false)
+            },
+            deactivate: { _, _, _ in },
+            reactivate: { _, _, _ in },
+            delete: { _ in }
+        ))
+
+        model.refresh(
+            at: instant,
+            timeZone: fixture.timeZone,
+            calendar: fixture.calendar,
+            locale: fixture.locale
+        )
+
+        #expect(try #require(model.row(for: habit)).streakText == "1000 days")
+    }
+
     @Test("active, at-risk, inactive, and unavailable streaks remain truthful per row")
     func projectsTruthfulStreakStates() throws {
         let fixture = try HabitRosterFixture()

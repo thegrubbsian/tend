@@ -1,0 +1,13 @@
+id: EV-yvhka3
+type: check.task
+at: 2026-08-03T19:06:08.853151Z
+owner: jc
+command: check task T-f5rev3
+targets:
+    - T-f5rev3
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml
