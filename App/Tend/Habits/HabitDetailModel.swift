@@ -57,6 +57,7 @@ struct HabitDetailPresentation: Equatable, Sendable {
   let bestStreakText: String
   let bestStreakUnit: String
   let isAtRisk: Bool
+  let currentStreakRiskText: String?
   let earliestMonth: Date
   let selectedMonth: Date
   let latestMonth: Date
@@ -276,6 +277,8 @@ final class HabitDetailModel {
   @ObservationIgnored private let boundaryScheduling: HabitDetailBoundaryScheduling
   @ObservationIgnored private var boundaryCancellation: HabitDetailBoundaryCancellation?
   @ObservationIgnored private var retryRequest: MutationRequest?
+  @ObservationIgnored private var environmentSample: EnvironmentSample?
+  @ObservationIgnored private var selectedMonthTimeZone: TimeZone?
   private var selectedHistoryKey: String?
 
   convenience init(
@@ -327,6 +330,27 @@ final class HabitDetailModel {
     refreshAndReplaceBoundary()
   }
 
+  func synchronizeEnvironment(
+    calendar: Calendar,
+    locale: Locale,
+    timeZone: TimeZone
+  ) {
+    let fixedTimeZone = fixedTimeZone(timeZone)
+    let fixedLocale = Locale(identifier: locale.identifier)
+    let sample = EnvironmentSample(
+      timeZone: fixedTimeZone,
+      calendar: detailCalendar(
+        from: calendar,
+        timeZone: fixedTimeZone,
+        locale: fixedLocale
+      ),
+      locale: fixedLocale
+    )
+    guard sample != environmentSample else { return }
+    environmentSample = sample
+    guard selectedMonth != nil else { return }
+    refreshAndReplaceBoundary()
+  }
   func refresh() {
     guard selectedMonth != nil else {
       start()
@@ -416,6 +440,7 @@ final class HabitDetailModel {
         return
       }
       selectedMonth = month
+      selectedMonthTimeZone = context.timeZone
     }
     loadSelectedMonth(using: context)
     replaceBoundary(using: context)
@@ -525,29 +550,31 @@ final class HabitDetailModel {
   private func navigateMonth(by offset: Int) {
     guard let presentation else { return }
     let context = makeLoadContext()
+    guard rebaseSelectedMonth(using: context), let selectedMonth else { return }
     let bound =
       offset < 0
       ? presentation.earliestMonth
       : presentation.latestMonth
     guard
       !context.calendar.isDate(
-        presentation.selectedMonth,
+        selectedMonth,
         equalTo: bound,
         toGranularity: .month
       ),
       let requestedMonth = context.calendar.date(
         byAdding: .month,
         value: offset,
-        to: presentation.selectedMonth
+        to: selectedMonth
       )
     else { return }
     selectedHistoryKey = nil
-    selectedMonth = requestedMonth
+    self.selectedMonth = requestedMonth
+    selectedMonthTimeZone = context.timeZone
     loadSelectedMonth(using: context)
   }
 
   private func loadSelectedMonth(using context: LoadContext) {
-    guard let requestedMonth = selectedMonth else { return }
+    guard rebaseSelectedMonth(using: context), let requestedMonth = selectedMonth else { return }
 
     do {
       let snapshot = try operations.snapshot(
@@ -576,6 +603,7 @@ final class HabitDetailModel {
 
       presentation = replacement
       selectedMonth = snapshot.monthRange.selected
+      selectedMonthTimeZone = context.timeZone
       habitName = ownerFacts.name
       loadFailure = nil
       if let retryRequest, !isAuthorized(retryRequest) {
@@ -596,8 +624,6 @@ final class HabitDetailModel {
     presentation = nil
     selectedHistoryKey = nil
     isPresentingEdit = false
-    retryRequest = nil
-    operationFailure = nil
     loadFailure = HabitDetailLoadFailure(
       message: String(
         localized: "This habit is unavailable right now.",
@@ -609,23 +635,31 @@ final class HabitDetailModel {
 
   private func makeLoadContext() -> LoadContext {
     let instant = now()
-    let sampledTimeZone = timeZone()
-    let fixedTimeZone =
-      TimeZone(identifier: sampledTimeZone.identifier)
-      ?? sampledTimeZone
-    let sampledLocale = locale()
-    let fixedLocale = Locale(identifier: sampledLocale.identifier)
-    let calendar = detailCalendar(
-      from: self.calendar(),
-      timeZone: fixedTimeZone,
-      locale: fixedLocale
-    )
+    let dependencies = environmentSample ?? sampledEnvironment()
     return LoadContext(
       instant: instant,
+      timeZone: dependencies.timeZone,
+      calendar: dependencies.calendar,
+      locale: dependencies.locale
+    )
+  }
+
+  private func sampledEnvironment() -> EnvironmentSample {
+    let fixedTimeZone = fixedTimeZone(timeZone())
+    let fixedLocale = Locale(identifier: locale().identifier)
+    return EnvironmentSample(
       timeZone: fixedTimeZone,
-      calendar: calendar,
+      calendar: detailCalendar(
+        from: calendar(),
+        timeZone: fixedTimeZone,
+        locale: fixedLocale
+      ),
       locale: fixedLocale
     )
+  }
+
+  private func fixedTimeZone(_ timeZone: TimeZone) -> TimeZone {
+    TimeZone(identifier: timeZone.identifier) ?? timeZone
   }
 
   private func monthContaining(_ date: Date, calendar: Calendar) -> Date? {
@@ -633,17 +667,41 @@ final class HabitDetailModel {
   }
 
   private func isSameMonth(_ lhs: Date, _ rhs: Date) -> Bool {
-    let sampledTimeZone = timeZone()
-    let fixedTimeZone =
-      TimeZone(identifier: sampledTimeZone.identifier)
-      ?? sampledTimeZone
-    let fixedLocale = Locale(identifier: locale().identifier)
-    let calendar = detailCalendar(
-      from: self.calendar(),
-      timeZone: fixedTimeZone,
-      locale: fixedLocale
-    )
+    var calendar = Calendar(identifier: .gregorian)
+    if let selectedMonthTimeZone {
+      calendar.timeZone = selectedMonthTimeZone
+    }
     return calendar.isDate(lhs, equalTo: rhs, toGranularity: .month)
+  }
+
+  private func rebaseSelectedMonth(using context: LoadContext) -> Bool {
+    guard let selectedMonth else { return false }
+    guard let previousTimeZone = selectedMonthTimeZone else {
+      selectedMonthTimeZone = context.timeZone
+      return true
+    }
+    guard previousTimeZone.identifier != context.timeZone.identifier else {
+      return true
+    }
+
+    var previousCalendar = context.calendar
+    previousCalendar.timeZone = previousTimeZone
+    let components = previousCalendar.dateComponents(
+      [.era, .year, .month],
+      from: selectedMonth
+    )
+    var rebasedComponents = DateComponents()
+    rebasedComponents.era = components.era
+    rebasedComponents.year = components.year
+    rebasedComponents.month = components.month
+    rebasedComponents.day = 1
+    guard let rebasedMonth = context.calendar.date(from: rebasedComponents) else {
+      failLoad(locale: context.locale)
+      return false
+    }
+    self.selectedMonth = rebasedMonth
+    selectedMonthTimeZone = context.timeZone
+    return true
   }
 
   private func detailCalendar(
@@ -672,6 +730,12 @@ extension HabitDetailModel {
 
   fileprivate struct LoadContext {
     let instant: Date
+    let timeZone: TimeZone
+    let calendar: Calendar
+    let locale: Locale
+  }
+
+  fileprivate struct EnvironmentSample: Equatable {
     let timeZone: TimeZone
     let calendar: Calendar
     let locale: Locale
@@ -781,6 +845,7 @@ extension HabitDetailModel {
         cadence: cadence
       ),
       isAtRisk: streak.isAtRisk,
+      currentStreakRiskText: streak.isAtRisk ? formatter.currentStreakRisk() : nil,
       earliestMonth: snapshot.monthRange.earliest,
       selectedMonth: snapshot.monthRange.selected,
       latestMonth: snapshot.monthRange.latest,

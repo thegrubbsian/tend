@@ -99,6 +99,10 @@ struct HabitPresentationFormatter {
     }
   }
 
+  func currentStreakRisk() -> String {
+    String(localized: "Current streak at risk", locale: locale)
+  }
+
   func month(_ date: Date) -> String {
     monthFormatter.string(from: date)
   }

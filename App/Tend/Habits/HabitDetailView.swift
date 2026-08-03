@@ -15,6 +15,7 @@ struct HabitDetailView: View {
   @State private var hasLeftActiveScene = false
 
   private let onBack: () -> Void
+  private let synchronizesEnvironment: Bool
 
   init(
     habit: Habit,
@@ -23,6 +24,7 @@ struct HabitDetailView: View {
   ) {
     _model = State(initialValue: HabitDetailModel(habit: habit, context: context))
     self.onBack = onBack
+    synchronizesEnvironment = true
   }
 
   init(
@@ -31,6 +33,7 @@ struct HabitDetailView: View {
   ) {
     _model = State(initialValue: model)
     self.onBack = onBack
+    synchronizesEnvironment = false
   }
 
   var body: some View {
@@ -58,6 +61,13 @@ struct HabitDetailView: View {
     .onAppear {
       guard !hasStarted else { return }
       hasLeftActiveScene = false
+      if synchronizesEnvironment {
+        model.synchronizeEnvironment(
+          calendar: calendar,
+          locale: locale,
+          timeZone: timeZone
+        )
+      }
       hasStarted = true
       model.start()
     }
@@ -71,9 +81,13 @@ struct HabitDetailView: View {
         hasLeftActiveScene = true
       }
     }
-    .onChange(of: timeZone.identifier) { _, _ in
-      guard hasStarted else { return }
-      model.sceneBecameActive()
+    .onChange(of: environmentDependencies) { _, dependencies in
+      guard hasStarted, synchronizesEnvironment else { return }
+      model.synchronizeEnvironment(
+        calendar: dependencies.calendar,
+        locale: dependencies.locale,
+        timeZone: dependencies.timeZone
+      )
     }
     .onDisappear {
       guard hasStarted else { return }
@@ -150,8 +164,8 @@ struct HabitDetailView: View {
 
       streakFacts(presentation)
 
-      if presentation.isAtRisk {
-        riskCallout(presentation)
+      if let currentStreakRiskText = presentation.currentStreakRiskText {
+        riskCallout(currentStreakRiskText)
       }
 
       historySection(presentation)
@@ -235,9 +249,7 @@ struct HabitDetailView: View {
     return presentation.isActive ? AlmanacPalette.moss : AlmanacPalette.withered
   }
 
-  private func riskCallout(_ presentation: HabitDetailPresentation) -> some View {
-    let scope = presentation.cadence == .daily ? "Yesterday" : "Last week"
-    let message = "\(scope) open · \(presentation.currentStreakText) streak at risk"
+  private func riskCallout(_ message: String) -> some View {
     return HStack(spacing: AlmanacMetrics.spacingSmall) {
       Circle()
         .fill(AlmanacPalette.ochre)
@@ -256,7 +268,7 @@ struct HabitDetailView: View {
     .frame(maxWidth: .infinity, minHeight: AlmanacMetrics.minimumTarget, alignment: .leading)
     .almanacRaisedSurface()
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel(message.replacingOccurrences(of: " · ", with: ", "))
+    .accessibilityLabel(message)
     .accessibilityIdentifier("habitDetail.risk")
   }
 
@@ -553,6 +565,20 @@ struct HabitDetailView: View {
       }
     )
   }
+  private var environmentDependencies: HabitDetailEnvironmentDependencies {
+    HabitDetailEnvironmentDependencies(
+      calendar: calendar,
+      locale: locale,
+      timeZone: timeZone
+    )
+  }
+
+}
+
+private struct HabitDetailEnvironmentDependencies: Equatable {
+  let calendar: Calendar
+  let locale: Locale
+  let timeZone: TimeZone
 }
 
 private struct HabitDetailDailyGardenItem: Identifiable {
@@ -587,8 +613,17 @@ private struct HabitDetailPeriodSurface: View {
           .almanacSunkenSurface(radius: AlmanacMetrics.gardenCellRadius)
       }
     }
+    .opacity(isDormant ? 0.45 : 1)
   }
 
+  private var isDormant: Bool {
+    switch state {
+    case .inactive, .beforeCreation, .future:
+      true
+    case .met, .missed, .open, .grace:
+      false
+    }
+  }
   private func raisedOutline(_ color: Color) -> some View {
     Color.clear
       .almanacRaisedSurface(radius: AlmanacMetrics.gardenCellRadius)
@@ -642,7 +677,7 @@ private struct HabitDetailLegend: View {
               cornerRadius: AlmanacMetrics.gardenCellRadius,
               style: .continuous
             )
-            .strokeBorder(AlmanacPalette.ochre, lineWidth: AlmanacMetrics.gardenOutlineWidth)
+            .strokeBorder(AlmanacPalette.clay, lineWidth: AlmanacMetrics.gardenOutlineWidth)
           }
       }
     }

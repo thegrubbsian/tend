@@ -46,6 +46,26 @@ struct HabitDetailModelTests {
     #expect(formatter.amount(12_345, unit: longOwnerUnit) == "12,345 \(longOwnerUnit)")
   }
 
+  @Test("current streak risk copy does not assign a responsible period or state")
+  func formatsGenericCurrentStreakRisk() throws {
+    let utc = try #require(TimeZone(identifier: "UTC"))
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US")
+    calendar.timeZone = utc
+    let formatter = HabitPresentationFormatter(
+      calendar: calendar,
+      locale: Locale(identifier: "en_US"),
+      timeZone: utc
+    )
+
+    let message = formatter.currentStreakRisk()
+
+    #expect(message == "Current streak at risk")
+    #expect(!message.contains("Yesterday"))
+    #expect(!message.contains("Last week"))
+    #expect(!message.contains("Open"))
+  }
+
   @Test("half-open weeks end on the preceding local day across year and DST boundaries")
   func formatsHalfOpenWeeks() throws {
     let utc = try #require(TimeZone(identifier: "UTC"))
@@ -185,6 +205,7 @@ struct HabitDetailModelTests {
     #expect(presentation.bestStreakText == "987,654 days")
     #expect(presentation.bestStreakUnit == "days")
     #expect(presentation.isAtRisk)
+    #expect(presentation.currentStreakRiskText == "Current streak at risk")
     #expect(presentation.monthTitle == "January 2026")
     #expect(presentation.dailyLeadingFillerCount == 3)
     #expect(presentation.dailyTrailingFillerCount == 1)
@@ -266,6 +287,7 @@ struct HabitDetailModelTests {
     #expect(presentation.currentStreakUnit == "week")
     #expect(presentation.bestStreakText == "2 weeks")
     #expect(presentation.bestStreakUnit == "weeks")
+    #expect(presentation.currentStreakRiskText == nil)
     #expect(presentation.dailyLeadingFillerCount == 0)
     #expect(presentation.dailyTrailingFillerCount == 0)
     #expect(presentation.history.map(\.key) == ["2025-W53", "2026-W02"])
@@ -702,6 +724,121 @@ struct HabitDetailModelTests {
     #expect(februaryPresentation.dailyTrailingFillerCount == 1)
   }
 
+  @Test("time-zone changes preserve the selected civil Gregorian month")
+  func rebasesSelectedCivilMonthAcrossTimeZones() throws {
+    let fixture = try HabitDetailFixture()
+    let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+    let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let februaryInstant = try fixture.instant("2026-02-15T12:00:00Z")
+    var selectedTimeZone = fixture.timeZone
+    var requests: [(month: Date, timeZone: TimeZone)] = []
+    let model = HabitDetailModel(
+      habit: habit,
+      operations: HabitDetailOperations(snapshot: { _, month, _, timeZone in
+        requests.append((month, timeZone))
+        if requests.count == 2 {
+          throw HabitDetailTestError.unavailable
+        }
+        return fixture.snapshot(
+          habitID: habit.id,
+          cadence: .daily,
+          selectedMonth: month
+        )
+      }),
+      now: { februaryInstant },
+      timeZone: { selectedTimeZone },
+      calendar: { fixture.calendar },
+      locale: { fixture.locale },
+      boundaryScheduling: .disabled
+    )
+
+    model.start()
+    selectedTimeZone = losAngeles
+    model.sceneBecameActive()
+    #expect(model.presentation == nil)
+    #expect(model.loadFailure != nil)
+    model.retryLoad()
+
+    #expect(requests.count == 3)
+    #expect(requests[0].timeZone == fixture.timeZone)
+    #expect(requests[1].timeZone == losAngeles)
+    #expect(requests[2].timeZone == losAngeles)
+    var losAngelesCalendar = fixture.calendar
+    losAngelesCalendar.timeZone = losAngeles
+    let components = losAngelesCalendar.dateComponents(
+      [.year, .month, .day, .hour],
+      from: requests[2].month
+    )
+    #expect(components.year == 2026)
+    #expect(components.month == 2)
+    #expect(components.day == 1)
+    #expect(components.hour == 0)
+    #expect(model.presentation?.monthTitle == "February 2026")
+  }
+
+  @Test("environment synchronization drives first load and refresh without duplicate schedules")
+  func synchronizesEnvironmentDependencies() throws {
+    let fixture = try HabitDetailFixture()
+    let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+    let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let scheduler = HabitDetailBoundaryRecorder()
+    var snapshotCalls = 0
+    var receivedTimeZones: [TimeZone] = []
+    let model = HabitDetailModel(
+      habit: habit,
+      operations: HabitDetailOperations(snapshot: { _, month, _, timeZone in
+        snapshotCalls += 1
+        receivedTimeZones.append(timeZone)
+        return fixture.snapshot(
+          habitID: habit.id,
+          cadence: .daily,
+          selectedMonth: month
+        )
+      }),
+      now: { fixture.now },
+      timeZone: { fixture.timeZone },
+      calendar: { fixture.calendar },
+      locale: { fixture.locale },
+      boundaryScheduling: scheduler.scheduling
+    )
+    var environmentCalendar = fixture.calendar
+    environmentCalendar.timeZone = losAngeles
+    let english = Locale(identifier: "en_US")
+
+    model.synchronizeEnvironment(
+      calendar: environmentCalendar,
+      locale: english,
+      timeZone: losAngeles
+    )
+    #expect(snapshotCalls == 0)
+    #expect(scheduler.records.isEmpty)
+
+    model.start()
+    #expect(snapshotCalls == 1)
+    #expect(receivedTimeZones == [losAngeles])
+    #expect(scheduler.records.count == 1)
+    #expect(scheduler.activeCount == 1)
+
+    model.synchronizeEnvironment(
+      calendar: environmentCalendar,
+      locale: english,
+      timeZone: losAngeles
+    )
+    #expect(snapshotCalls == 1)
+    #expect(scheduler.records.count == 1)
+
+    model.synchronizeEnvironment(
+      calendar: environmentCalendar,
+      locale: Locale(identifier: "fr_FR"),
+      timeZone: losAngeles
+    )
+    #expect(snapshotCalls == 2)
+    #expect(receivedTimeZones == [losAngeles, losAngeles])
+    #expect(scheduler.records.count == 2)
+    #expect(scheduler.activeCount == 1)
+    #expect(model.presentation?.monthTitle == "janvier 2026")
+  }
+
   @Test("entry accessibility combines locale-formatted facts with its localized action")
   func localizesEntryAccessibilityLabel() throws {
     let fixture = try HabitDetailFixture()
@@ -800,6 +937,72 @@ struct HabitDetailModelTests {
     #expect(model.presentation?.entries.isEmpty == true)
     #expect(model.operationFailure == nil)
     #expect(!model.isOperationInFlight)
+  }
+
+  @Test("mutation retry survives an intervening load failure and reconciliation")
+  func preservesMutationRetryAcrossLoadFailure() throws {
+    let fixture = try HabitDetailFixture()
+    let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+    let entryID = UUID()
+    let entry = HabitEditableEntry(
+      id: entryID,
+      timestamp: fixture.now,
+      amount: 1,
+      bucketKey: "2026-01-15",
+      unit: "times",
+      bucketStart: try fixture.instant("2026-01-15T00:00:00Z"),
+      bucketEnd: try fixture.instant("2026-01-16T00:00:00Z")
+    )
+    var snapshotCalls = 0
+    var deleteCalls = 0
+    var mutationShouldFail = true
+    let model = fixture.model(
+      habit: habit,
+      operations: HabitDetailOperations(
+        snapshot: { _, month, _, _ in
+          snapshotCalls += 1
+          if snapshotCalls == 2 {
+            throw HabitDetailTestError.unavailable
+          }
+          return fixture.snapshot(
+            habitID: habit.id,
+            cadence: .daily,
+            selectedMonth: month,
+            editableEntries: mutationShouldFail ? [entry] : []
+          )
+        },
+        deleteEntry: { _, _, _, _ in
+          deleteCalls += 1
+          if mutationShouldFail {
+            throw HabitDetailTestError.unavailable
+          }
+          return .deleted
+        }
+      )
+    )
+    model.start()
+    model.deleteEntry(id: entryID)
+    let originalFailure = model.operationFailure
+
+    model.sceneBecameActive()
+
+    #expect(model.presentation == nil)
+    #expect(model.loadFailure != nil)
+    #expect(model.operationFailure == originalFailure)
+
+    model.retryLoad()
+
+    #expect(model.presentation?.entries.map(\.id) == [entryID])
+    #expect(model.loadFailure == nil)
+    #expect(model.operationFailure == originalFailure)
+
+    mutationShouldFail = false
+    model.retryOperation()
+
+    #expect(deleteCalls == 2)
+    #expect(snapshotCalls == 4)
+    #expect(model.presentation?.entries.isEmpty == true)
+    #expect(model.operationFailure == nil)
   }
 
   @Test("unprojected entry identifiers never dispatch or refresh")
