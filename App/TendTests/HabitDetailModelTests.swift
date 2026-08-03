@@ -633,6 +633,105 @@ struct HabitDetailModelTests {
         #expect(receivedInstant == firstInstant)
     }
 
+    @Test("non-Gregorian calendar injection stays aligned to Gregorian detail months")
+    func normalizesDetailNavigationToGregorianMonths() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let january = try fixture.instant("2026-01-01T00:00:00Z")
+        let february = try fixture.instant("2026-02-01T00:00:00Z")
+        var requestedMonths: [Date] = []
+        let operations = HabitDetailOperations(snapshot: { _, month, _, _ in
+            requestedMonths.append(month)
+            let dayCount = try #require(
+                fixture.calendar.range(of: .day, in: .month, for: month)?.count
+            )
+            let history = try (0..<dayCount).map { offset in
+                let start = try #require(
+                    fixture.calendar.date(byAdding: .day, value: offset, to: month)
+                )
+                let end = try #require(
+                    fixture.calendar.date(byAdding: .day, value: 1, to: start)
+                )
+                return HabitHistoryPeriod(
+                    key: "day-\(offset)",
+                    start: start,
+                    end: end,
+                    state: .future
+                )
+            }
+            return fixture.snapshot(
+                habitID: habit.id,
+                cadence: .daily,
+                earliestMonth: january,
+                selectedMonth: month,
+                latestMonth: february,
+                history: history
+            )
+        })
+        let model = HabitDetailModel(
+            habit: habit,
+            operations: operations,
+            now: { fixture.now },
+            timeZone: { fixture.timeZone },
+            calendar: { Calendar(identifier: .hebrew) },
+            locale: { fixture.locale }
+        )
+
+        model.start()
+        let januaryPresentation = try #require(model.presentation)
+        #expect(requestedMonths == [january])
+        #expect(januaryPresentation.monthTitle == "January 2026")
+        #expect(januaryPresentation.dailyLeadingFillerCount == 3)
+        #expect(januaryPresentation.dailyTrailingFillerCount == 1)
+
+        model.selectNextMonth()
+
+        let februaryPresentation = try #require(model.presentation)
+        #expect(requestedMonths == [january, february])
+        #expect(februaryPresentation.monthTitle == "February 2026")
+        #expect(februaryPresentation.dailyLeadingFillerCount == 6)
+        #expect(februaryPresentation.dailyTrailingFillerCount == 1)
+    }
+
+    @Test("entry accessibility combines locale-formatted facts with its localized action")
+    func localizesEntryAccessibilityLabel() throws {
+        let fixture = try HabitDetailFixture()
+        let habit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let entry = HabitEditableEntry(
+            id: UUID(),
+            timestamp: try fixture.instant("2026-01-05T09:05:00Z"),
+            amount: 12_345,
+            bucketKey: "2026-01-05",
+            unit: "pas",
+            bucketStart: try fixture.instant("2026-01-05T00:00:00Z"),
+            bucketEnd: try fixture.instant("2026-01-06T00:00:00Z")
+        )
+        let snapshot = fixture.snapshot(
+            habitID: habit.id,
+            cadence: .daily,
+            selectedMonth: try fixture.instant("2026-01-01T00:00:00Z"),
+            editableEntries: [entry]
+        )
+        let model = HabitDetailModel(
+            habit: habit,
+            operations: HabitDetailOperations(snapshot: { _, _, _, _ in snapshot }),
+            now: { fixture.now },
+            timeZone: { fixture.timeZone },
+            calendar: { fixture.calendar },
+            locale: { Locale(identifier: "fr_FR") }
+        )
+
+        model.start()
+
+        let fact = try #require(model.presentation?.entries.first)
+        #expect(
+            fact.accessibilityLabel
+                == "\(fact.scopeText), \(fact.timeText), \(fact.amountText), Delete entry"
+        )
+        #expect(fact.scopeText == "lundi 5 janvier 2026")
+        #expect(fact.amountText == "12 345 pas")
+    }
+
     private func instant(_ value: String) throws -> Date {
         try #require(ISO8601DateFormatter().date(from: value))
     }

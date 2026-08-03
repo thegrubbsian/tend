@@ -154,9 +154,14 @@ final class HabitDetailModel {
         habit: Habit,
         context: ModelContext,
         now: @escaping () -> Date = Date.init,
-        timeZone: @escaping () -> TimeZone = { .autoupdatingCurrent },
-        calendar: @escaping () -> Calendar = { .autoupdatingCurrent },
-        locale: @escaping () -> Locale = { .autoupdatingCurrent }
+        timeZone: @escaping () -> TimeZone = { TimeZone.current },
+        calendar: @escaping () -> Calendar = {
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.firstWeekday = 2
+            calendar.minimumDaysInFirstWeek = 4
+            return calendar
+        },
+        locale: @escaping () -> Locale = { Locale.current }
     ) {
         self.init(
             habit: habit,
@@ -313,14 +318,21 @@ final class HabitDetailModel {
 
     private func makeLoadContext() -> LoadContext {
         let instant = now()
-        let timeZone = timeZone()
-        var calendar = calendar()
-        calendar.timeZone = timeZone
+        let sampledTimeZone = timeZone()
+        let fixedTimeZone = TimeZone(identifier: sampledTimeZone.identifier)
+            ?? sampledTimeZone
+        let sampledLocale = locale()
+        let fixedLocale = Locale(identifier: sampledLocale.identifier)
+        let calendar = detailCalendar(
+            from: self.calendar(),
+            timeZone: fixedTimeZone,
+            locale: fixedLocale
+        )
         return LoadContext(
             instant: instant,
-            timeZone: timeZone,
+            timeZone: fixedTimeZone,
             calendar: calendar,
-            locale: locale()
+            locale: fixedLocale
         )
     }
 
@@ -329,10 +341,31 @@ final class HabitDetailModel {
     }
 
     private func isSameMonth(_ lhs: Date, _ rhs: Date) -> Bool {
-        let timeZone = timeZone()
-        var calendar = calendar()
-        calendar.timeZone = timeZone
+        let sampledTimeZone = timeZone()
+        let fixedTimeZone = TimeZone(identifier: sampledTimeZone.identifier)
+            ?? sampledTimeZone
+        let fixedLocale = Locale(identifier: locale().identifier)
+        let calendar = detailCalendar(
+            from: self.calendar(),
+            timeZone: fixedTimeZone,
+            locale: fixedLocale
+        )
         return calendar.isDate(lhs, equalTo: rhs, toGranularity: .month)
+    }
+
+    private func detailCalendar(
+        from injected: Calendar,
+        timeZone: TimeZone,
+        locale: Locale
+    ) -> Calendar {
+        var calendar = injected.identifier == .gregorian
+            ? injected
+            : Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        calendar.timeZone = timeZone
+        calendar.firstWeekday = 2
+        calendar.minimumDaysInFirstWeek = 4
+        return calendar
     }
 }
 
@@ -409,7 +442,12 @@ private extension HabitDetailModel {
             calendar: calendar
         )
         let entries = snapshot.editableEntries.map {
-            entryFact($0, cadence: cadence, formatter: formatter)
+            entryFact(
+                $0,
+                cadence: cadence,
+                locale: locale,
+                formatter: formatter
+            )
         }
         let streak = snapshot.streak
 
@@ -514,6 +552,7 @@ private extension HabitDetailModel {
     static func entryFact(
         _ entry: HabitEditableEntry,
         cadence: HabitCadence,
+        locale: Locale,
         formatter: HabitPresentationFormatter
     ) -> HabitDetailEntryFact {
         let scopeText = cadence == .daily
@@ -532,7 +571,12 @@ private extension HabitDetailModel {
             scopeText: scopeText,
             timeText: timeText,
             amountText: amountText,
-            accessibilityLabel: "\(scopeText), \(timeText), \(amountText), Delete entry"
+            accessibilityLabel: [
+                scopeText,
+                timeText,
+                amountText,
+                String(localized: "Delete entry", locale: locale),
+            ].joined(separator: ", ")
         )
     }
 
