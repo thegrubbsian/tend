@@ -349,7 +349,7 @@ final class HabitManagementUITests: XCTestCase {
 
   @MainActor
   private func habitRow(named name: String, in app: XCUIApplication) -> XCUIElement {
-    app.otherElements.matching(
+    app.descendants(matching: .any).matching(
       NSPredicate(
         format: "identifier BEGINSWITH %@ AND label == %@",
         "habits.row.",
