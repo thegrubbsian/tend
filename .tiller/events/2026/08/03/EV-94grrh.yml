@@ -1,0 +1,14 @@
+id: EV-94grrh
+type: sync.task
+at: 2026-08-03T20:20:31.711117Z
+owner: jc
+command: sync task T-f5rev3
+targets:
+    - T-f5rev3
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml
