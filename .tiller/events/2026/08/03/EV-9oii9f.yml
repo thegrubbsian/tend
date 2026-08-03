@@ -1,0 +1,14 @@
+id: EV-9oii9f
+type: add.task
+at: 2026-08-03T14:08:08.145264Z
+owner: jc
+command: add task app-experience/habit-detail-history/roster-detail-integration
+targets:
+    - T-0i5tqj
+after:
+    feature: F-efgzky
+    key: app-experience/habit-detail-history/roster-detail-integration
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.md
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml

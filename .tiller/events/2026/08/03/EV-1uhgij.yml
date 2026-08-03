@@ -1,0 +1,14 @@
+id: EV-1uhgij
+type: add.task
+at: 2026-08-03T14:08:08.052571Z
+owner: jc
+command: add task app-experience/habit-detail-history/habit-detail-surface
+targets:
+    - T-f5rev3
+after:
+    feature: F-efgzky
+    key: app-experience/habit-detail-history/habit-detail-surface
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.md
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml

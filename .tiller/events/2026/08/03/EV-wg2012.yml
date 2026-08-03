@@ -1,0 +1,14 @@
+id: EV-wg2012
+type: add.task
+at: 2026-08-03T14:08:07.907169Z
+owner: jc
+command: add task app-experience/habit-detail-history/history-projection
+targets:
+    - T-dr7wdw
+after:
+    feature: F-efgzky
+    key: app-experience/habit-detail-history/history-projection
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.md
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml

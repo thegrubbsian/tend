@@ -1,0 +1,13 @@
+id: EV-vb0zh4
+type: spec.feature
+at: 2026-08-03T14:13:49.614174Z
+owner: jc
+command: spec feature F-efgzky
+targets:
+    - F-efgzky
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/feature.yml

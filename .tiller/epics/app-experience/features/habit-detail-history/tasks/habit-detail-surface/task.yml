@@ -1,0 +1,9 @@
+id: T-f5rev3
+key: app-experience/habit-detail-history/habit-detail-surface
+title: Build the Almanac habit detail surface
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-dr7wdw
