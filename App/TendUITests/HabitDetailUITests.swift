@@ -32,12 +32,27 @@ final class HabitDetailUITests: XCTestCase {
     let currentMonth = element("habitDetail.month", in: app)
     XCTAssertEqual(currentMonth.label, expectedCurrentMonthLabel())
     XCTAssertEqual(element("habitDetail.legend", in: app).label, "Legend. Met, Missed, Open")
-    let initialDeleteIdentifiers = entryDeleteIdentifiers(in: app)
-    XCTAssertFalse(initialDeleteIdentifiers.isEmpty)
-    let initialDeleteControl = app.buttons[initialDeleteIdentifiers.sorted().first!]
-    XCTAssertGreaterThanOrEqual(initialDeleteControl.label.components(separatedBy: ",").count, 4)
+    let initialOpenBucket = historyButton(state: "Open", in: app)
+    XCTAssertTrue(initialOpenBucket.waitForExistence(timeout: 2))
+    XCTAssertTrue(initialOpenBucket.label.contains(", Open,"))
+    let currentDateText =
+      initialOpenBucket.label.components(separatedBy: ", Open").first ?? ""
+    XCTAssertFalse(currentDateText.isEmpty)
+    let initialDeleteControl = app.buttons.matching(
+      NSPredicate(
+        format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@",
+        "habitDetail.entry.delete.",
+        currentDateText
+      )
+    ).firstMatch
+    XCTAssertTrue(initialDeleteControl.waitForExistence(timeout: 2))
+    XCTAssertTrue(initialDeleteControl.label.hasPrefix("\(currentDateText), "))
+    XCTAssertTrue(initialDeleteControl.label.contains(", 1 times, "))
+    XCTAssertTrue(initialDeleteControl.isEnabled)
     XCTAssertTrue(initialDeleteControl.label.hasSuffix(", Delete entry"))
     assertMinimumHitRegion(initialDeleteControl)
+    let initialDeleteIdentifiers = entryDeleteIdentifiers(in: app)
+    XCTAssertEqual(initialDeleteIdentifiers.count, 3)
     recordScreenshot("Daily-current")
 
     for state in ["Open", "Grace", "Future"] {
@@ -61,6 +76,15 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertFalse(finalizedBucketIdentifier.isEmpty)
     XCTAssertTrue(finalizedBucketLabel.contains("Met"))
 
+    while previousMonth.isEnabled {
+      let priorLabel = currentMonth.label
+      previousMonth.tap()
+      XCTAssertNotEqual(currentMonth.label, priorLabel)
+    }
+    let earliestMonthLabel = currentMonth.label
+    previousMonth.tap()
+    XCTAssertEqual(currentMonth.label, earliestMonthLabel)
+
     let beforeCreation = historyButton(state: "Before creation", in: app)
     XCTAssertTrue(beforeCreation.waitForExistence(timeout: 2))
     beforeCreation.tap()
@@ -71,15 +95,6 @@ final class HabitDetailUITests: XCTestCase {
     recordScreenshot("Daily-historical-callout")
     beforeCreation.tap()
     XCTAssertFalse(historicalCallout.waitForExistence(timeout: 1))
-
-    while previousMonth.isEnabled {
-      let priorLabel = currentMonth.label
-      previousMonth.tap()
-      XCTAssertNotEqual(currentMonth.label, priorLabel)
-    }
-    let earliestMonthLabel = currentMonth.label
-    previousMonth.tap()
-    XCTAssertEqual(currentMonth.label, earliestMonthLabel)
 
     let nextMonth = element("habitDetail.month.next", in: app)
     while nextMonth.isEnabled {
@@ -96,6 +111,9 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(graceBucket.waitForExistence(timeout: 2))
     let graceBucketLabelBeforeDeletion = graceBucket.label
     XCTAssertTrue(graceBucketLabelBeforeDeletion.contains("requirement met"))
+    let graceProgressBeforeDeletion =
+      graceBucketLabelBeforeDeletion.components(separatedBy: ", ").last
+    XCTAssertEqual(graceProgressBeforeDeletion, "2 of 2 times")
     let graceDate = graceBucketLabelBeforeDeletion.components(separatedBy: ",").first ?? ""
     XCTAssertFalse(graceDate.isEmpty)
     let graceDelete = app.buttons.matching(
@@ -118,8 +136,13 @@ final class HabitDetailUITests: XCTestCase {
     let postDeletionIdentifiers = entryDeleteIdentifiers(in: app)
     XCTAssertEqual(postDeletionIdentifiers.count, initialDeleteIdentifiers.count - 1)
     XCTAssertEqual(initialDeleteIdentifiers.subtracting(postDeletionIdentifiers), [deletedIdentifier])
-    XCTAssertNotEqual(graceBucket.label, graceBucketLabelBeforeDeletion)
-    XCTAssertTrue(graceBucket.label.contains("requirement not met"))
+    let graceBucketLabelAfterDeletion = graceBucket.label
+    XCTAssertNotEqual(graceBucketLabelAfterDeletion, graceBucketLabelBeforeDeletion)
+    XCTAssertTrue(graceBucketLabelAfterDeletion.contains("requirement not met"))
+    XCTAssertEqual(
+      graceBucketLabelAfterDeletion.components(separatedBy: ", ").last,
+      "1 of 2 times"
+    )
     XCTAssertEqual(element("habitDetail.risk", in: app).label, "Current streak at risk")
     XCTAssertTrue(element("habitDetail.streak.current", in: app).label.contains("day"))
     recordScreenshot("Recent-entries")
@@ -164,6 +187,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(element("habitDetail.streak.best", in: app).label.contains("day"))
     XCTAssertTrue(historyButton(state: "Inactive", in: app).waitForExistence(timeout: 2))
     XCTAssertTrue(element("habitDetail.entries.empty", in: app).waitForExistence(timeout: 2))
+    XCTAssertTrue(entryDeleteIdentifiers(in: app).isEmpty)
     recordScreenshot("inactive-after-archive")
 
     reactivate.tap()
@@ -172,6 +196,10 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(reopenedCurrentBucket.waitForExistence(timeout: 2))
     XCTAssertTrue(reopenedCurrentBucket.label.contains("requirement not met"))
     XCTAssertTrue(reopenedCurrentBucket.label.contains("3 visits"))
+    let reactivatedCurrentBucketLabel = reopenedCurrentBucket.label
+    let reactivatedHistoryLabels = historyLabels(in: app)
+    let reactivatedRecentEntryLabels = entryDeleteLabels(in: app)
+    XCTAssertEqual(reactivatedRecentEntryLabels.count, 1)
 
     element("habitDetail.back", in: app).tap()
     XCTAssertTrue(element("shell.destination.habits", in: app).waitForExistence(timeout: 5))
@@ -203,8 +231,16 @@ final class HabitDetailUITests: XCTestCase {
       assertMinimumHitRegion(strip)
       XCTAssertGreaterThan(strip.frame.width, 88)
     }
-    let boundaryStrip = weeklyStrips[0]
-    XCTAssertFalse(boundaryStrip.label.isEmpty)
+    let expectedBoundaryRange = expectedCrossMonthWeekRange()
+    let boundaryStrip = app.buttons.matching(
+      NSPredicate(
+        format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@",
+        "habitDetail.history.",
+        expectedBoundaryRange
+      )
+    ).firstMatch
+    XCTAssertTrue(boundaryStrip.waitForExistence(timeout: 2))
+    XCTAssertTrue(boundaryStrip.label.hasPrefix("\(expectedBoundaryRange), "))
     boundaryStrip.tap()
     XCTAssertTrue(boundaryStrip.isSelected)
     XCTAssertEqual(element("habitDetail.history.callout", in: app).label, boundaryStrip.label)
@@ -233,10 +269,12 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(title.waitForExistence(timeout: 5))
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("3 visits"))
-    let relaunchedDeleteIdentifiers = entryDeleteIdentifiers(in: app)
-    XCTAssertFalse(relaunchedDeleteIdentifiers.contains(deletedIdentifier))
-    XCTAssertFalse(relaunchedDeleteIdentifiers.isEmpty)
-    XCTAssertTrue(relaunchedDeleteIdentifiers.isSubset(of: postDeletionIdentifiers))
+    XCTAssertFalse(entryDeleteIdentifiers(in: app).contains(deletedIdentifier))
+    XCTAssertEqual(entryDeleteLabels(in: app), reactivatedRecentEntryLabels)
+    let relaunchedCurrentBucket = historyButton(state: "Open", in: app)
+    XCTAssertTrue(relaunchedCurrentBucket.waitForExistence(timeout: 2))
+    XCTAssertEqual(relaunchedCurrentBucket.label, reactivatedCurrentBucketLabel)
+    XCTAssertEqual(historyLabels(in: app), reactivatedHistoryLabels)
     previousMonth.tap()
     XCTAssertEqual(element(finalizedBucketIdentifier, in: app).label, finalizedBucketLabel)
     nextMonth.tap()
@@ -331,6 +369,24 @@ final class HabitDetailUITests: XCTestCase {
   }
 
   @MainActor
+  private func entryDeleteLabels(in app: XCUIApplication) -> Set<String> {
+    Set(
+      app.buttons.matching(
+        NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.entry.delete.")
+      ).allElementsBoundByIndex.map(\.label)
+    )
+  }
+
+  @MainActor
+  private func historyLabels(in app: XCUIApplication) -> [String: String] {
+    Dictionary(
+      uniqueKeysWithValues: app.buttons.matching(
+        NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.history.")
+      ).allElementsBoundByIndex.map { ($0.identifier, $0.label) }
+    )
+  }
+
+  @MainActor
   private func launch(
     storeName: String,
     reset: Bool,
@@ -350,6 +406,37 @@ final class HabitDetailUITests: XCTestCase {
     formatter.timeZone = TimeZone(identifier: "America/Los_Angeles")
     formatter.dateFormat = "MMMM yyyy"
     return formatter.string(from: Date())
+  }
+
+  private func expectedCrossMonthWeekRange() -> String {
+    let timeZone = TimeZone(identifier: "America/Los_Angeles")!
+    let locale = Locale(identifier: "en_US")
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = locale
+    calendar.timeZone = timeZone
+    calendar.firstWeekday = 2
+    calendar.minimumDaysInFirstWeek = 4
+
+    let currentMonthComponents = calendar.dateComponents([.year, .month], from: Date())
+    let monthStart = calendar.date(from: currentMonthComponents)!
+    let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: monthStart)!
+    let firstWeek = calendar.dateInterval(of: .weekOfYear, for: monthStart)!
+    let currentMonth = calendar.component(.month, from: monthStart)
+    let boundaryWeek: DateInterval
+    if calendar.component(.month, from: firstWeek.start) != currentMonth {
+      boundaryWeek = firstWeek
+    } else {
+      let monthEnd = calendar.date(byAdding: .day, value: -1, to: nextMonthStart)!
+      boundaryWeek = calendar.dateInterval(of: .weekOfYear, for: monthEnd)!
+    }
+    let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: boundaryWeek.end)!
+
+    let formatter = DateFormatter()
+    formatter.locale = locale
+    formatter.calendar = calendar
+    formatter.timeZone = timeZone
+    formatter.setLocalizedDateFormatFromTemplate("MMM d yyyy")
+    return "\(formatter.string(from: boundaryWeek.start)) – \(formatter.string(from: inclusiveEnd))"
   }
 
   private func launchArguments(
