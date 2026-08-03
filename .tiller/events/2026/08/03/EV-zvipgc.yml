@@ -1,0 +1,14 @@
+id: EV-zvipgc
+type: submit.task
+at: 2026-08-03T15:55:47.211935Z
+owner: jc
+command: submit task T-dr7wdw
+targets:
+    - T-dr7wdw
+before:
+    status: check
+after:
+    pr: 23
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml
