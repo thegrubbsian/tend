@@ -1,0 +1,13 @@
+id: EV-8f1dmg
+type: start.task
+at: 2026-08-03T20:22:16.645237Z
+owner: jc
+command: start task T-0i5tqj
+targets:
+    - T-0i5tqj
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml
