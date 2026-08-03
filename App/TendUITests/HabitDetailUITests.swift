@@ -129,13 +129,17 @@ final class HabitDetailUITests: XCTestCase {
     graceDelete.tap()
     XCTAssertTrue(
       XCTWaiter.wait(
-        for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: deletedElement)],
+        for: [
+          XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == false"), object: deletedElement)
+        ],
         timeout: 5
       ) == .completed
     )
     let postDeletionIdentifiers = entryDeleteIdentifiers(in: app)
     XCTAssertEqual(postDeletionIdentifiers.count, initialDeleteIdentifiers.count - 1)
-    XCTAssertEqual(initialDeleteIdentifiers.subtracting(postDeletionIdentifiers), [deletedIdentifier])
+    XCTAssertEqual(
+      initialDeleteIdentifiers.subtracting(postDeletionIdentifiers), [deletedIdentifier])
     let graceBucketLabelAfterDeletion = graceBucket.label
     XCTAssertNotEqual(graceBucketLabelAfterDeletion, graceBucketLabelBeforeDeletion)
     XCTAssertTrue(graceBucketLabelAfterDeletion.contains("requirement not met"))
@@ -295,7 +299,6 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(element("shell.destination.habits", in: app).waitForExistence(timeout: 5))
     XCTAssertTrue(relaunchedHabitsTab.isSelected)
   }
-
 
   @MainActor
   func testAdaptiveDetailAccessibilityAndPersistentRelaunches() throws {

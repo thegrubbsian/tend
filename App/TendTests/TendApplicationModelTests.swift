@@ -333,11 +333,12 @@ struct TendApplicationModelTests {
       let container = try factory()
       #expect(nowCallCount == 1)
       let habits = try fetchHabitsOrderedByName(from: container)
-      #expect(habits.map(\.name) == [
-        "Daily garden",
-        "Dormant reading",
-        "Weekly field notes",
-      ])
+      #expect(
+        habits.map(\.name) == [
+          "Daily garden",
+          "Dormant reading",
+          "Weekly field notes",
+        ])
 
       let habitsByName = Dictionary(
         uniqueKeysWithValues: habits.map { ($0.name, $0) }
@@ -419,11 +420,12 @@ struct TendApplicationModelTests {
     let reopenedContainer = try reopeningFactory()
     let reopenedNames = try fetchHabitsOrderedByName(from: reopenedContainer).map(\.name)
     #expect(reopenedNames.count == 3)
-    #expect(reopenedNames == [
-      "Daily garden",
-      "Dormant reading",
-      "Weekly field notes",
-    ])
+    #expect(
+      reopenedNames == [
+        "Daily garden",
+        "Dormant reading",
+        "Weekly field notes",
+      ])
   }
 
   private func uiTestStoreFactory(
