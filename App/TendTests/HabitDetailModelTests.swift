@@ -28,6 +28,7 @@ struct HabitDetailModelTests {
 
         #expect(formatter.requirement(target: 8_000, unit: "steps") == "8,000 steps")
         #expect(formatter.requirement(target: 1, unit: "times") == "1 time")
+        #expect(formatter.requirement(target: 1, unit: "TIMES") == "1 TIMES")
         #expect(formatter.requirement(target: 1, unit: "steps") == "1 steps")
         #expect(formatter.cadence(.weekly, fallback: "weekly") == "Weekly")
         #expect(formatter.cadence(nil, fallback: "owner cadence") == "owner cadence")

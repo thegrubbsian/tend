@@ -43,7 +43,7 @@ struct HabitPresentationFormatter {
     }
 
     func requirement(target: Int, unit: String) -> String {
-        let displayUnit = target == 1 && unit.caseInsensitiveCompare("times") == .orderedSame
+        let displayUnit = target == 1 && unit == "times"
             ? "time"
             : unit
         return amount(target, unit: displayUnit)

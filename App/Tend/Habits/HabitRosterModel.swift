@@ -613,7 +613,8 @@ private enum HabitRosterFormatter {
         guard let streak, let cadence else {
             return ("Streak unavailable", .unavailable)
         }
-        let value = formatter.streak(value: streak.currentStreak, cadence: cadence)
+        let unit = formatter.streakUnit(value: streak.currentStreak, cadence: cadence)
+        let value = "\(streak.currentStreak) \(unit)"
         if !isActive {
             return ("held at \(value)", .inactive)
         }
