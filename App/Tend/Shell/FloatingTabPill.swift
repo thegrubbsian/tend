@@ -34,7 +34,7 @@ struct FloatingTabPill: View {
           .lineLimit(1)
           .fixedSize(horizontal: true, vertical: false)
       }
-      .foregroundStyle(isSelected ? AlmanacPalette.paper : AlmanacPalette.inkFaint)
+      .foregroundStyle(isSelected ? AlmanacPalette.paper : AlmanacPalette.inkMuted)
       .frame(maxWidth: .infinity)
       .frame(height: AlmanacMetrics.tabItemHeight)
       .background(isSelected ? AlmanacPalette.moss : Color.clear, in: Capsule())

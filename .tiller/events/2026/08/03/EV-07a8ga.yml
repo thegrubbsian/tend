@@ -1,0 +1,13 @@
+id: EV-07a8ga
+type: check.task
+at: 2026-08-03T03:59:18.309591Z
+owner: jc
+command: check task T-94vmmx
+targets:
+    - T-94vmmx
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml

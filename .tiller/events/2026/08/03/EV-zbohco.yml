@@ -1,0 +1,13 @@
+id: EV-zbohco
+type: check.task
+at: 2026-08-03T03:37:56.311707Z
+owner: jc
+command: check task T-94vmmx
+targets:
+    - T-94vmmx
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml

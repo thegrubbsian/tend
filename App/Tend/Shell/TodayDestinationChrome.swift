@@ -1,9 +1,13 @@
+import SwiftData
 import SwiftUI
+import TendCore
 
 struct TodayDestinationChrome: View {
   @Environment(\.calendar) private var calendar
   @Environment(\.locale) private var locale
   @Environment(\.timeZone) private var timeZone
+  @Query private var habits: [Habit]
+  @State private var isPresentingNewHabit = false
   private let fixedDate: Date?
 
   init(date: Date? = nil) {
@@ -36,13 +40,40 @@ struct TodayDestinationChrome: View {
         .almanacTextStyle(.screenTitle)
         .padding(.top, 6)
 
-      Spacer(minLength: 0)
+      ScrollView {
+        if habits.isEmpty {
+          introduction
+            .padding(.top, AlmanacMetrics.spacingExtraLarge)
+            .padding(.bottom, AlmanacMetrics.tabPillHeight)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+      }
+      .frame(maxWidth: .infinity)
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
     .accessibilityElement(children: .contain)
     .accessibilityLabel("Today")
     .accessibilityIdentifier("shell.destination.today")
+    .sheet(isPresented: $isPresentingNewHabit) {
+      HabitFormView(mode: .new)
+    }
+  }
+
+  private var introduction: some View {
+    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingLarge) {
+      Text("Tend is a quiet place to grow the habits you want to keep.")
+        .almanacTextStyle(.body)
+        .fixedSize(horizontal: false, vertical: true)
+
+      Button("Plant a habit") {
+        isPresentingNewHabit = true
+      }
+      .buttonStyle(AlmanacPrimaryButtonStyle())
+      .accessibilityHint("Opens the new habit form.")
+      .accessibilityIdentifier("today.plant-habit")
+    }
+    .accessibilityElement(children: .contain)
+    .accessibilityIdentifier("today.empty")
   }
 
   private func dateEyebrow(for date: Date) -> String {

@@ -8,11 +8,17 @@ struct TendApp: App {
   @State private var applicationModel: TendApplicationModel
 
   init() {
-    let makeContainer: ModelContainerFactory =
-      ProcessInfo.processInfo.arguments.contains("-tend-ui-testing")
-        ? TendModelContainer.inMemory
-        : TendModelContainer.production
-    _applicationModel = State(initialValue: TendApplicationModel(makeContainer: makeContainer))
+    #if DEBUG
+      let makeContainer =
+        TendUITestStore.containerFactory(
+          arguments: ProcessInfo.processInfo.arguments
+        ) ?? TendModelContainer.production
+    #else
+      let makeContainer: ModelContainerFactory = TendModelContainer.production
+    #endif
+    _applicationModel = State(
+      initialValue: TendApplicationModel(makeContainer: makeContainer)
+    )
   }
 
   var body: some Scene {

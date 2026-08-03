@@ -1,0 +1,75 @@
+{
+  "criterion": "app-experience/habit-management C6",
+  "humanAttestationRecorded": false,
+  "layoutMatrix": {
+    "test": "HabitManagementUITests/testCompleteFirstHabitOwnerJourney()",
+    "result": "passed in every configuration",
+    "configurations": [
+      "iphone-default",
+      "iphone-extra-large",
+      "iphone-extra-extra-large",
+      "ipad-default",
+      "ipad-extra-large",
+      "ipad-extra-extra-large"
+    ],
+    "artifactsPerConfiguration": [
+      "First launch Today",
+      "New Habit",
+      "Weekly warning",
+      "All Habits",
+      "Edit Habit",
+      "Delete confirmation"
+    ],
+    "manifestFact": "Every configuration manifest contains six PNG attachments with isAssociatedWithFailure=false."
+  },
+  "accessibilityAutomation": {
+    "test": "HabitManagementUITests/testHabitManagementSurfacesPassAccessibilityAudits()",
+    "result": "passed on iPhone 17 Pro at the large simulator content-size setting",
+    "appleAuditTypes": [
+      "contrast",
+      "elementDetection",
+      "hitRegion",
+      "sufficientElementDescription",
+      "textClipped",
+      "trait"
+    ],
+    "scopedExclusions": [
+      "elementDetection on the scrollable habit form because offscreen labels are intentionally scroll-reachable",
+      "elementDetection and textClipped on the half-height system deletion sheet because visible, queryable sheet text is reported as clipped"
+    ],
+    "explicitChecks": [
+      "Today Plant a habit, Daily and Weekly cadence, Save, all seven weekday, roster New habit, and roster-row frames are at least 44 by 44 points within a 0.01-point CoreGraphics tolerance.",
+      "Monday exposes the selected trait after activation.",
+      "The empty Today, new habit form, active roster, and deletion confirmation pass the applicable Apple accessibility audits.",
+      "The roster New habit control is exposed by the stable habits.add identifier and New habit accessibility label.",
+      "The Today creation control is exposed by the stable today.plant-habit identifier and Plant a habit accessibility label."
+    ]
+  },
+  "ownerJourneySemantics": {
+    "result": "passed",
+    "observed": [
+      "Name, Target, and Unit are edited through accessibility-labelled fields.",
+      "Daily and Weekly cadence are reachable; Monday, Wednesday, and Friday selected traits change with activation.",
+      "The reminder warning is exposed as complete text and clears after a day is pinned.",
+      "Locked cadence and its full explanation are queryable on edit.",
+      "Daily and weekly roster accessibility values expose target, unit, cadence, pins, streak phrase, and active state.",
+      "Edit, Archive, Reactivate, and Delete are exercised through the row context menu, so no tested lifecycle action depends on swipe.",
+      "Deletion consequence, Cancel deletion, Archive instead, and Delete permanently are queryable in the confirmation sheet.",
+      "Source inspection confirms equivalent row custom accessibility actions named Edit, Archive or Reactivate, Delete, and conditional Retry streak."
+    ]
+  },
+  "darkSystemReduceMotion": {
+    "directory": "dark-system-reduce-motion",
+    "test": "HabitManagementUITests/testCompleteFirstHabitOwnerJourney()",
+    "result": "passed",
+    "observedSystemAppearance": "dark",
+    "observedReduceMotionEnabled": true,
+    "artifactFact": "The manifest contains six PNG attachments with isAssociatedWithFailure=false; the captured app surfaces remain light while the simulator system appearance is dark.",
+    "cleanup": "The simulator was restored to light appearance with ReduceMotionEnabled=false after capture."
+  },
+  "manualGateBoundary": {
+    "voiceOver": "No physical iOS device was connected, and the iOS Simulator Accessibility settings surface does not provide VoiceOver. XCTest accessibility-tree queries and Apple audits verified labels, values, traits, hit regions, and non-swipe alternatives, but this record does not claim a physical VoiceOver traversal.",
+    "switchControl": "Not attested by the agent; actionable accessibility elements and non-swipe alternatives are recorded above for human evaluation.",
+    "decision": "C6 remains a human manual criterion. This evidence records observations only and does not attest or approve it."
+  }
+}

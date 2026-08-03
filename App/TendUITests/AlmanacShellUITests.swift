@@ -30,7 +30,10 @@ final class AlmanacShellUITests: XCTestCase {
     XCTAssertTrue(todayTab.waitForExistence(timeout: 5))
     habitsTab.tap()
 
-    XCTAssertTrue(app.otherElements["shell.destination.habits"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)[
+        "shell.destination.habits"
+      ].waitForExistence(timeout: 5))
     XCTAssertFalse(app.otherElements["shell.destination.today"].exists)
     XCTAssertFalse(todayTab.isSelected)
     XCTAssertTrue(habitsTab.isSelected)
@@ -44,12 +47,18 @@ final class AlmanacShellUITests: XCTestCase {
 
     XCTAssertTrue(todayTab.waitForExistence(timeout: 5))
     habitsTab.tap()
-    XCTAssertTrue(app.otherElements["shell.destination.habits"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)[
+        "shell.destination.habits"
+      ].waitForExistence(timeout: 5))
 
     XCUIDevice.shared.press(.home)
     app.activate()
 
-    XCTAssertTrue(app.otherElements["shell.destination.habits"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)[
+        "shell.destination.habits"
+      ].waitForExistence(timeout: 5))
     XCTAssertTrue(habitsTab.isSelected)
 
     app.terminate()
@@ -114,9 +123,10 @@ final class AlmanacShellUITests: XCTestCase {
     XCTAssertTrue(app.buttons["Delete"].waitForExistence(timeout: 2))
     app.buttons["Delete"].tap()
     XCTAssertTrue(app.staticTexts["Delete \(editedName)?"].waitForExistence(timeout: 5))
-    XCTAssertTrue(app.staticTexts.matching(
-      NSPredicate(format: "label CONTAINS %@", "This can't be undone.")
-    ).firstMatch.exists)
+    XCTAssertTrue(
+      app.staticTexts.matching(
+        NSPredicate(format: "label CONTAINS %@", "This can't be undone.")
+      ).firstMatch.exists)
     recordScreenshot(named: "All Habits — delete confirmation", of: app)
     app.buttons["Delete permanently"].tap()
 
@@ -145,7 +155,12 @@ final class AlmanacShellUITests: XCTestCase {
   @MainActor
   private func launchFreshApp() -> XCUIApplication {
     let app = XCUIApplication()
-    app.launchArguments = ["-tend-ui-testing"]
+    app.launchArguments = [
+      "-tend-ui-testing",
+      "-tend-ui-test-store",
+      "AlmanacShellUITests-\(UUID().uuidString)",
+      "-tend-ui-test-reset",
+    ]
     app.terminate()
     app.launch()
     return app
