@@ -516,7 +516,7 @@ struct HabitDetailView: View {
       }
       .font(.body.weight(.semibold))
       .foregroundStyle(
-        presentation.isActive ? AlmanacPalette.withered : AlmanacPalette.moss
+        presentation.isActive ? AlmanacPalette.inkMuted : AlmanacPalette.moss
       )
       .frame(minHeight: AlmanacMetrics.minimumTarget)
       .contentShape(Rectangle())
