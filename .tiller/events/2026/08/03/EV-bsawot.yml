@@ -1,0 +1,14 @@
+id: EV-bsawot
+type: sync.task
+at: 2026-08-03T13:57:43.233966Z
+owner: jc
+command: sync task T-94vmmx
+targets:
+    - T-94vmmx
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml

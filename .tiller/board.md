@@ -9,7 +9,7 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/habit-management (F-tih743): active
+- feature app-experience/habit-management (F-tih743): active, awaiting check
 
 ### Blocked
 
@@ -17,7 +17,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/habit-management/first-habit-integration (T-94vmmx): build pass, tests pass
+- (none)
 
 ### Open questions
 
