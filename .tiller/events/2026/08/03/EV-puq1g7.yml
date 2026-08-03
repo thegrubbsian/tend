@@ -1,0 +1,14 @@
+id: EV-puq1g7
+type: submit.task
+at: 2026-08-03T04:00:43.813285Z
+owner: jc
+command: submit task T-94vmmx
+targets:
+    - T-94vmmx
+before:
+    status: check
+after:
+    pr: 22
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml

@@ -1,7 +1,7 @@
 id: T-94vmmx
 key: app-experience/habit-management/first-habit-integration
 title: Integrate first-habit management flows
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:f38b038
         observed_at: 2026-08-02T18:31:01.939068Z
+pr: 22
 gates:
     build:
         required: true
