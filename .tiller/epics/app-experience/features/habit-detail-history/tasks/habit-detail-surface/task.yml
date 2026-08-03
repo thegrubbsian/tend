@@ -1,7 +1,7 @@
 id: T-f5rev3
 key: app-experience/habit-detail-history/habit-detail-surface
 title: Build the Almanac habit detail surface
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:fb6cea3
         observed_at: 2026-08-03T14:36:47.686301Z
+pr: 24
 gates:
     build:
         required: true

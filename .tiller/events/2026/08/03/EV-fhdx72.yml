@@ -1,0 +1,14 @@
+id: EV-fhdx72
+type: submit.task
+at: 2026-08-03T20:07:19.317615Z
+owner: jc
+command: submit task T-f5rev3
+targets:
+    - T-f5rev3
+before:
+    status: check
+after:
+    pr: 24
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml
