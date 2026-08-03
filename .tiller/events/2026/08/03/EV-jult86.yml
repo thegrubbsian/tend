@@ -1,0 +1,13 @@
+id: EV-jult86
+type: start.task
+at: 2026-08-03T14:55:24.589415Z
+owner: jc
+command: start task T-dr7wdw
+targets:
+    - T-dr7wdw
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml

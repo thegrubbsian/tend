@@ -1,7 +1,17 @@
 id: T-dr7wdw
 key: app-experience/habit-detail-history/history-projection
 title: Project truthful habit detail history
-status: proposed
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:ae4ca40a570a279bc66434271f64e8fd2db1ff72
+        path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.md
+        observed_at: 2026-08-03T14:36:47.646028Z
+    commit:
+        kind: git_commit
+        value: git:fb6cea3
+        observed_at: 2026-08-03T14:36:47.666647Z

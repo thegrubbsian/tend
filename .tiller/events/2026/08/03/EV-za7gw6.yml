@@ -1,0 +1,13 @@
+id: EV-za7gw6
+type: approve.task
+at: 2026-08-03T14:36:47.686575Z
+owner: jc
+command: approve task T-f5rev3
+targets:
+    - T-f5rev3
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml

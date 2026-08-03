@@ -9,8 +9,11 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/habit-management (F-tih743): active, awaiting check
-- feature app-experience/habit-detail-history (F-efgzky): specced
+- feature app-experience/habit-management (F-tih743): active, awaiting sync
+- feature app-experience/habit-detail-history (F-efgzky): active
+- task app-experience/habit-detail-history/history-projection (T-dr7wdw): in_progress
+- task app-experience/habit-detail-history/habit-detail-surface (T-f5rev3): ready
+- task app-experience/habit-detail-history/roster-detail-integration (T-0i5tqj): ready
 
 ### Blocked
 

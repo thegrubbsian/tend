@@ -1,0 +1,13 @@
+id: EV-o8wwol
+type: approve.task
+at: 2026-08-03T14:36:47.709005Z
+owner: jc
+command: approve task T-0i5tqj
+targets:
+    - T-0i5tqj
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml
