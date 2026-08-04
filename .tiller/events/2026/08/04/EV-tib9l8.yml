@@ -1,0 +1,14 @@
+id: EV-tib9l8
+type: submit.task
+at: 2026-08-04T14:48:58.458763Z
+owner: jc
+command: submit task T-fbpqjl
+targets:
+    - T-fbpqjl
+before:
+    status: check
+after:
+    pr: 26
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml

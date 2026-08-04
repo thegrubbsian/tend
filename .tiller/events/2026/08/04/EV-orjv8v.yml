@@ -1,0 +1,13 @@
+id: EV-orjv8v
+type: approve.task
+at: 2026-08-04T14:27:34.288393Z
+owner: jc
+command: approve task T-fbpqjl
+targets:
+    - T-fbpqjl
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml

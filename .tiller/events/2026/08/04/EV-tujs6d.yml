@@ -1,0 +1,14 @@
+id: EV-tujs6d
+type: add.task
+at: 2026-08-04T04:57:29.467632Z
+owner: jc
+command: add task app-experience/today-dashboard/today-presentation-model
+targets:
+    - T-ykjvz7
+after:
+    feature: F-skoqxt
+    key: app-experience/today-dashboard/today-presentation-model
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.md
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml

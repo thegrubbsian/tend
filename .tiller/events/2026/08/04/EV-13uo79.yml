@@ -1,0 +1,13 @@
+id: EV-13uo79
+type: check.task
+at: 2026-08-04T14:48:17.348328Z
+owner: jc
+command: check task T-fbpqjl
+targets:
+    - T-fbpqjl
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml

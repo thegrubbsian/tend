@@ -1,0 +1,13 @@
+id: EV-2hvqn1
+type: approve.task
+at: 2026-08-04T14:27:34.305752Z
+owner: jc
+command: approve task T-fjmlzm
+targets:
+    - T-fjmlzm
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml

@@ -1,0 +1,14 @@
+id: EV-l5sji3
+type: add.task
+at: 2026-08-04T04:57:29.555654Z
+owner: jc
+command: add task app-experience/today-dashboard/almanac-today-surface
+targets:
+    - T-orkj4x
+after:
+    feature: F-skoqxt
+    key: app-experience/today-dashboard/almanac-today-surface
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.md
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

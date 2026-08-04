@@ -1,0 +1,13 @@
+id: EV-21lrdy
+type: approve.feature
+at: 2026-08-04T14:27:34.269694Z
+owner: jc
+command: approve feature F-skoqxt
+targets:
+    - F-skoqxt
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.yml
