@@ -1,7 +1,7 @@
 id: T-orkj4x
 key: app-experience/today-dashboard/almanac-today-surface
 title: Render Almanac Today Surface
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -19,6 +19,7 @@ accepted_against:
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.340706Z
 pr: 29
+done_basis: ancestry
 gates:
     build:
         required: true

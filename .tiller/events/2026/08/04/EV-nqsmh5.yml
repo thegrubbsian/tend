@@ -1,0 +1,14 @@
+id: EV-nqsmh5
+type: sync.task
+at: 2026-08-04T21:24:28.205226Z
+owner: jc
+command: sync task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

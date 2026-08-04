@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/today-dashboard/almanac-today-surface (T-orkj4x): build pass, tests pass
+- (none)
 
 ### Open questions
 
