@@ -428,6 +428,446 @@ struct TendApplicationModelTests {
       ])
   }
 
+  @Test("Today fixtures require strict complete launch arguments")
+  func todayFixturesRequireStrictCompleteLaunchArguments() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+
+    for fixture in todayFixtureNames {
+      let validPrefix = [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument, fixture,
+      ]
+      try expectUITestStoreError(
+        .missingEnabledArgument,
+        arguments: Array(validPrefix.dropFirst(2)),
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateEnabledArgument,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.enabledArgument,
+          TendUITestStore.nameArgument, "fixture-store", TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .missingName,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateNameArgument,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "fixture-store", TendUITestStore.nameArgument, "other-store",
+          TendUITestStore.resetArgument, TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .fixtureRequiresReset,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "fixture-store", TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateResetArgument,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "fixture-store", TendUITestStore.resetArgument,
+          TendUITestStore.resetArgument, TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateFixtureArgument,
+        arguments: validPrefix + [TendUITestStore.fixtureArgument, fixture],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .invalidName("../fixture-store"),
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "../fixture-store", TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+        ],
+        supportDirectory: supportDirectory
+      )
+    }
+
+    try expectUITestStoreError(
+      .missingFixture,
+      arguments: [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument,
+      ],
+      supportDirectory: supportDirectory
+    )
+    try expectUITestStoreError(
+      .unsupportedFixture("today-unknown"),
+      arguments: [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument, "today-unknown",
+      ],
+      supportDirectory: supportDirectory
+    )
+  }
+
+  @Test("Today fixture names cannot stand in for a missing store name")
+  func todayFixtureNamesCannotStandInForMissingStoreName() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+
+    for fixture in todayFixtureNames {
+      try expectUITestStoreError(
+        .missingName,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          TendUITestStore.fixtureArgument, fixture, TendUITestStore.resetArgument,
+        ],
+        supportDirectory: supportDirectory
+      )
+    }
+  }
+
+  @Test("today-mixed projects exact rows across civil calendar boundaries")
+  func todayMixedProjectsExactRowsAcrossCivilCalendarBoundaries() throws {
+    let launchCases = [
+      (
+        name: "monday",
+        instant: "2026-08-03T12:00:00-07:00",
+        timeZone: "America/Los_Angeles"
+      ),
+      (
+        name: "dst-transition",
+        instant: "2026-11-01T12:00:00-08:00",
+        timeZone: "America/Los_Angeles"
+      ),
+      (
+        name: "year-boundary",
+        instant: "2026-12-31T12:00:00-08:00",
+        timeZone: "America/Los_Angeles"
+      ),
+      (
+        name: "iso-week-boundary",
+        instant: "2027-01-04T12:00:00-08:00",
+        timeZone: "America/Los_Angeles"
+      ),
+    ]
+
+    for launchCase in launchCases {
+      let supportDirectory = try makeTemporarySupportDirectory()
+      defer { try? FileManager.default.removeItem(at: supportDirectory) }
+      let launchInstant = try fixtureInstant(launchCase.instant)
+      let timeZone = try #require(TimeZone(identifier: launchCase.timeZone))
+      let factory = try todayFixtureFactory(
+        storeName: "today-mixed-\(launchCase.name)",
+        fixture: "today-mixed",
+        supportDirectory: supportDirectory,
+        launchInstant: launchInstant,
+        timeZone: timeZone
+      )
+      let container = try factory()
+      let habits = try fetchHabitsOrderedByName(from: container)
+      #expect(
+        habits.map(\.name) == [
+          "Check in",
+          "Exercise",
+          "Meditate",
+          "Read",
+          "Water seedlings",
+        ])
+      #expect(habits.allSatisfy { $0.isActive })
+
+      let computation = HabitTodayComputation(context: container.mainContext)
+      let snapshots = try Dictionary(
+        uniqueKeysWithValues: habits.map { habit in
+          (
+            habit.name,
+            try computation.snapshot(
+              for: habit,
+              at: launchInstant,
+              timeZone: timeZone
+            )
+          )
+        })
+      let unresolved = snapshots.values.filter { !$0.isMet }
+      let met = snapshots.values.filter(\.isMet)
+      #expect(unresolved.count == 3)
+      #expect(met.count == 2)
+      #expect(snapshots.values.filter(\.isAtRisk).count == 1)
+
+      let exercise = try #require(snapshots["Exercise"])
+      #expect(exercise.progress == 5_200)
+      #expect(exercise.target == 8_000)
+      #expect(exercise.unit == "steps")
+      #expect(exercise.cadence == .daily)
+      #expect(exercise.currentStreak == 12)
+      #expect(exercise.isAtRisk)
+      #expect(!exercise.isMet)
+
+      let meditate = try #require(snapshots["Meditate"])
+      #expect(meditate.progress == 0)
+      #expect(meditate.target == 1)
+      #expect(meditate.unit == "time")
+      #expect(meditate.cadence == .daily)
+      #expect(meditate.currentStreak == 0)
+      #expect(!meditate.isAtRisk)
+      #expect(!meditate.isMet)
+
+      let checkIn = try #require(snapshots["Check in"])
+      #expect(checkIn.progress == 1)
+      #expect(checkIn.target == 3)
+      #expect(checkIn.unit == "times")
+      #expect(checkIn.cadence == .weekly)
+      #expect(checkIn.currentStreak == 0)
+      #expect(!checkIn.isAtRisk)
+      #expect(!checkIn.isMet)
+      let weeklyHabit = try #require(habits.first { $0.name == "Check in" })
+      #expect(weeklyHabit.pinnedWeekdaysRawValue == PinnedWeekdays.monday.rawValue)
+
+      let read = try #require(snapshots["Read"])
+      #expect(read.progress == 20)
+      #expect(read.target == 20)
+      #expect(read.unit == "pages")
+      #expect(read.cadence == .daily)
+      #expect(read.currentStreak == 1)
+      #expect(!read.isAtRisk)
+      #expect(read.isMet)
+
+      let water = try #require(snapshots["Water seedlings"])
+      #expect(water.progress == 5)
+      #expect(water.target == 3)
+      #expect(water.unit == "times")
+      #expect(water.cadence == .daily)
+      #expect(water.currentStreak == 1)
+      #expect(!water.isAtRisk)
+      #expect(water.isMet)
+
+      let schedule = CalendarBucketSchedule(timeZone: timeZone)
+      for habit in habits {
+        let cadence = try #require(HabitCadence(rawValue: habit.cadenceRawValue))
+        let expectedKey = try schedule.period(
+          containing: launchInstant,
+          cadence: cadence
+        ).key
+        let snapshot = try #require(snapshots[habit.name])
+        #expect(snapshot.periodKey == expectedKey)
+        let currentAmounts = (habit.entries ?? [])
+          .filter { $0.bucket?.periodKey == expectedKey }
+          .map(\.amount)
+          .sorted()
+        switch habit.name {
+        case "Check in":
+          #expect(currentAmounts == [1])
+        case "Exercise":
+          #expect(currentAmounts == [2_000, 3_200])
+        case "Meditate":
+          #expect(currentAmounts.isEmpty)
+        case "Read":
+          #expect(currentAmounts == [20])
+        case "Water seedlings":
+          #expect(currentAmounts == [2, 3])
+        default:
+          Issue.record("Unexpected mixed fixture habit \(habit.name)")
+        }
+      }
+    }
+  }
+
+  @Test("today-all-tended projects a nonempty fully met set")
+  func todayAllTendedProjectsNonemptyFullyMetSet() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2026-08-05T12:00:00-07:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let factory = try todayFixtureFactory(
+      storeName: "today-all-tended",
+      fixture: "today-all-tended",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )
+    let container = try factory()
+    let habits = try fetchHabitsOrderedByName(from: container)
+    #expect(habits.map(\.name) == ["Drink water", "Weekly review"])
+    let computation = HabitTodayComputation(context: container.mainContext)
+    let snapshots = try habits.map {
+      try computation.snapshot(for: $0, at: launchInstant, timeZone: timeZone)
+    }
+    #expect(!snapshots.isEmpty)
+    #expect(snapshots.allSatisfy { $0.isMet })
+    #expect(snapshots.allSatisfy { !$0.isAtRisk })
+    #expect(Set(snapshots.map(\.cadence)) == Set([.daily, .weekly]))
+    #expect(
+      Set(snapshots.map { "\($0.progress)/\($0.target)" })
+        == Set(["1/1", "2/2"]))
+  }
+
+  @Test("today-inactive retains history without an active row")
+  func todayInactiveRetainsHistoryWithoutActiveRow() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2026-03-08T12:00:00-07:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let factory = try todayFixtureFactory(
+      storeName: "today-inactive",
+      fixture: "today-inactive",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )
+    let container = try factory()
+    let habits = try fetchHabitsOrderedByName(from: container)
+    #expect(habits.map(\.name) == ["Dormant journal"])
+    let habit = try #require(habits.first)
+    #expect(!habit.isActive)
+    #expect((habit.entries ?? []).map(\.amount) == [1])
+    #expect((habit.activityPeriods ?? []).count == 1)
+    #expect((habit.activityPeriods ?? []).allSatisfy { $0.endedAt != nil })
+    #expect(habits.filter(\.isActive).isEmpty)
+    #expect(throws: HabitTodayComputationError.inactiveHabit) {
+      _ = try HabitTodayComputation(context: container.mainContext).snapshot(
+        for: habit,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+    }
+  }
+
+  @Test("today-failure isolates one exact unsupported cadence")
+  func todayFailureIsolatesOneExactUnsupportedCadence() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2027-01-04T12:00:00-08:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let factory = try todayFixtureFactory(
+      storeName: "today-failure",
+      fixture: "today-failure",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )
+    let container = try factory()
+    let habits = try fetchHabitsOrderedByName(from: container)
+    #expect(
+      habits.map(\.name) == [
+        "Failure met",
+        "Failure open",
+        "Malformed cadence",
+      ])
+    let malformed = try #require(habits.first { $0.name == "Malformed cadence" })
+    #expect(malformed.cadenceRawValue == "unsupported-today-fixture")
+    let computation = HabitTodayComputation(context: container.mainContext)
+    #expect(
+      try habits.filter { $0 !== malformed }.map {
+        try computation.snapshot(for: $0, at: launchInstant, timeZone: timeZone)
+      }.count == 2
+    )
+    #expect(throws: BucketEvaluationError.unsupportedCadence("unsupported-today-fixture")) {
+      _ = try computation.snapshot(
+        for: malformed,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+    }
+  }
+
+  @Test("Today fixtures persist without reseeding and remain store scoped")
+  func todayFixturesPersistWithoutReseedingAndRemainStoreScoped() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2026-12-31T12:00:00-08:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let expectedNames = [
+      "today-mixed": [
+        "Check in", "Exercise", "Meditate", "Read", "Water seedlings",
+      ],
+      "today-all-tended": ["Drink water", "Weekly review"],
+      "today-inactive": ["Dormant journal"],
+      "today-failure": ["Failure met", "Failure open", "Malformed cadence"],
+    ]
+
+    for fixture in todayFixtureNames {
+      let storeName = "persistent-\(fixture)"
+      let expectedFingerprint: StoreFingerprint
+      do {
+        let factory = try todayFixtureFactory(
+          storeName: storeName,
+          fixture: fixture,
+          supportDirectory: supportDirectory,
+          launchInstant: launchInstant,
+          timeZone: timeZone
+        )
+        let container = try factory()
+        #expect(
+          try fetchHabitsOrderedByName(from: container).map(\.name)
+            == expectedNames[fixture])
+        expectedFingerprint = try storeFingerprint(of: container)
+      }
+
+      let reopeningFactory = try uiTestStoreFactory(
+        name: storeName,
+        reset: false,
+        supportDirectory: supportDirectory
+      )
+      let reopenedContainer = try reopeningFactory()
+      #expect(try storeFingerprint(of: reopenedContainer) == expectedFingerprint)
+      #expect(
+        try fetchHabitsOrderedByName(from: reopenedContainer).map(\.name)
+          == expectedNames[fixture])
+    }
+  }
+
+  @Test("Today fixture application state opens its store exactly once")
+  func todayFixtureApplicationStateOpensStoreExactlyOnce() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2026-08-03T12:00:00-07:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    var nowCallCount = 0
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "single-open", TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, "today-all-tended",
+        ],
+        applicationSupportDirectory: supportDirectory,
+        now: {
+          nowCallCount += 1
+          return launchInstant
+        },
+        fixtureTimeZone: timeZone
+      ))
+    #expect(nowCallCount == 1)
+    var factoryCallCount = 0
+    let model = TendApplicationModel {
+      factoryCallCount += 1
+      return try factory()
+    }
+
+    for _ in 0..<10 {
+      guard case .ready(let container) = model.state else {
+        Issue.record("Expected seeded fixture state to remain ready")
+        return
+      }
+      #expect(try container.mainContext.fetchCount(FetchDescriptor<Habit>()) == 2)
+    }
+    #expect(nowCallCount == 1)
+    #expect(factoryCallCount == 1)
+  }
+
   private func uiTestStoreFactory(
     name: String,
     reset: Bool,
@@ -500,6 +940,81 @@ struct TendApplicationModelTests {
     )
     return try #require(
       calendar.date(bySettingHour: 12, minute: 0, second: 0, of: day)
+    )
+  }
+
+  private static let todayFixtureNames = [
+    "today-mixed",
+    "today-all-tended",
+    "today-inactive",
+    "today-failure",
+  ]
+
+  private var todayFixtureNames: [String] {
+    Self.todayFixtureNames
+  }
+
+  private func todayFixtureFactory(
+    storeName: String,
+    fixture: String,
+    supportDirectory: URL,
+    launchInstant: Date,
+    timeZone: TimeZone
+  ) throws -> ModelContainerFactory {
+    try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          storeName, TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+        ],
+        applicationSupportDirectory: supportDirectory,
+        now: { launchInstant },
+        fixtureTimeZone: timeZone
+      ))
+  }
+
+  private func expectUITestStoreError(
+    _ expected: TendUITestStoreError,
+    arguments: [String],
+    supportDirectory: URL
+  ) throws {
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: arguments,
+        applicationSupportDirectory: supportDirectory
+      ))
+    #expect(throws: expected) {
+      _ = try factory()
+    }
+  }
+
+  private func fixtureInstant(_ value: String) throws -> Date {
+    try #require(ISO8601DateFormatter().date(from: value))
+  }
+
+  private struct StoreFingerprint: Equatable {
+    let habits: [String]
+    let buckets: [String]
+    let entries: [String]
+    let activityPeriods: [String]
+  }
+
+  private func storeFingerprint(of container: ModelContainer) throws -> StoreFingerprint {
+    let context = container.mainContext
+    return StoreFingerprint(
+      habits: try context.fetch(FetchDescriptor<Habit>())
+        .map { "\($0.id.uuidString)|\($0.name)" }
+        .sorted(),
+      buckets: try context.fetch(FetchDescriptor<HabitBucket>())
+        .map { "\($0.id.uuidString)|\($0.periodKey)" }
+        .sorted(),
+      entries: try context.fetch(FetchDescriptor<LogEntry>())
+        .map { "\($0.id.uuidString)|\($0.amount)" }
+        .sorted(),
+      activityPeriods: try context.fetch(FetchDescriptor<HabitActivityPeriod>())
+        .map { $0.id.uuidString }
+        .sorted()
     )
   }
 

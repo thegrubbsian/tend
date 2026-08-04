@@ -48,6 +48,10 @@
 
     enum Fixture: String {
       case habitDetail = "habit-detail"
+      case todayMixed = "today-mixed"
+      case todayAllTended = "today-all-tended"
+      case todayInactive = "today-inactive"
+      case todayFailure = "today-failure"
     }
 
     static func containerFactory(
@@ -107,12 +111,43 @@
         let container = try TendModelContainer.fileBacked(
           at: storeDirectory.appending(path: "Tend.store", directoryHint: .notDirectory)
         )
-        if configuration.fixture == .habitDetail {
+        switch configuration.fixture {
+        case .habitDetail:
           try HabitDetailUITestFixture.seed(
             context: container.mainContext,
             at: launchInstant,
             timeZone: fixtureTimeZone
           )
+        case .todayMixed:
+          try TodayDashboardUITestFixture.seed(
+            .mixed,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayAllTended:
+          try TodayDashboardUITestFixture.seed(
+            .allTended,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayInactive:
+          try TodayDashboardUITestFixture.seed(
+            .inactive,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayFailure:
+          try TodayDashboardUITestFixture.seed(
+            .failure,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case nil:
+          break
         }
         return container
       }
