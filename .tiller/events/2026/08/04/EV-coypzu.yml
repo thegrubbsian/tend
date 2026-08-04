@@ -1,0 +1,14 @@
+id: EV-coypzu
+type: sync.task
+at: 2026-08-04T04:48:31.44382Z
+owner: jc
+command: sync task T-0i5tqj
+targets:
+    - T-0i5tqj
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml
