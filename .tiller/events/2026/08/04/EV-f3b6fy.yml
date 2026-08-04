@@ -1,0 +1,13 @@
+id: EV-f3b6fy
+type: start.task
+at: 2026-08-04T14:31:45.347771Z
+owner: jc
+command: start task T-fbpqjl
+targets:
+    - T-fbpqjl
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml
