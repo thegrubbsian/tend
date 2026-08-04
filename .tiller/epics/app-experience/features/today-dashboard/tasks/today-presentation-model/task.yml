@@ -1,7 +1,7 @@
 id: T-ykjvz7
 key: app-experience/today-dashboard/today-presentation-model
 title: Build Today Presentation Model
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.32342Z
 pr: 28
+done_basis: ancestry
 gates:
     build:
         required: true

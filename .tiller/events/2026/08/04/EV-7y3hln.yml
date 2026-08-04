@@ -1,0 +1,14 @@
+id: EV-7y3hln
+type: sync.task
+at: 2026-08-04T18:12:44.33687Z
+owner: jc
+command: sync task T-ykjvz7
+targets:
+    - T-ykjvz7
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml
