@@ -1,0 +1,14 @@
+id: EV-skv39f
+type: sync.task
+at: 2026-08-04T15:40:44.082412Z
+owner: jc
+command: sync task T-fjmlzm
+targets:
+    - T-fjmlzm
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml
