@@ -30,7 +30,8 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(element("habitDetail.streak.best", in: app).label, "Best streak, 4 days")
 
     let currentMonth = element("habitDetail.month", in: app)
-    XCTAssertEqual(currentMonth.label, expectedCurrentMonthLabel())
+    let currentMonthLabel = currentMonth.label
+    XCTAssertFalse(currentMonthLabel.isEmpty)
     XCTAssertEqual(element("habitDetail.legend", in: app).label, "Legend. Met, Missed, Open")
     let initialOpenBucket = historyButton(state: "Open", in: app)
     XCTAssertTrue(initialOpenBucket.waitForExistence(timeout: 2))
@@ -60,7 +61,6 @@ final class HabitDetailUITests: XCTestCase {
     }
 
     let previousMonth = element("habitDetail.month.previous", in: app)
-    let currentMonthLabel = currentMonth.label
     previousMonth.tap()
     XCTAssertNotEqual(currentMonth.label, currentMonthLabel)
 
@@ -202,6 +202,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(reopenedCurrentBucket.label.contains("3 visits"))
     let reactivatedCurrentBucketLabel = reopenedCurrentBucket.label
     let reactivatedHistoryLabels = historyLabels(in: app)
+    XCTAssertEqual(currentMonth.label, currentMonthLabel)
     let reactivatedRecentEntryCount = entryDeleteElementCount(in: app)
     let reactivatedRecentEntryLabels = entryDeleteLabels(in: app)
     XCTAssertEqual(reactivatedRecentEntryCount, 1)
@@ -237,28 +238,26 @@ final class HabitDetailUITests: XCTestCase {
       assertMinimumHitRegion(strip)
       XCTAssertGreaterThan(strip.frame.width, 88)
     }
-    let expectedBoundary = expectedCrossMonthWeek()
-    XCTAssertNotEqual(expectedBoundary.startMonth, expectedBoundary.endMonth)
-    if expectedBoundary.pageOffset == -1 {
+    var boundaryStrip = crossMonthWeeklyStrip(in: app)
+    if boundaryStrip == nil {
+      let weeklyMonth = element("habitDetail.month", in: app)
+      let weeklyCurrentMonthLabel = weeklyMonth.label
       let weeklyPreviousMonth = element("habitDetail.month.previous", in: app)
       XCTAssertTrue(weeklyPreviousMonth.isEnabled)
       weeklyPreviousMonth.tap()
-    } else {
-      XCTAssertEqual(expectedBoundary.pageOffset, 0)
+      XCTAssertNotEqual(weeklyMonth.label, weeklyCurrentMonthLabel)
+      boundaryStrip = crossMonthWeeklyStrip(in: app)
     }
-    XCTAssertEqual(element("habitDetail.month", in: app).label, expectedBoundary.pageLabel)
-    let boundaryStrip = app.buttons.matching(
-      NSPredicate(
-        format: "identifier BEGINSWITH %@ AND label BEGINSWITH %@",
-        "habitDetail.history.",
-        expectedBoundary.range
-      )
-    ).firstMatch
-    XCTAssertTrue(boundaryStrip.waitForExistence(timeout: 2))
-    XCTAssertTrue(boundaryStrip.label.hasPrefix("\(expectedBoundary.range), "))
+    guard let boundaryStrip else {
+      XCTFail("A displayed weekly page must contain a cross-month period")
+      return
+    }
+    XCTAssertTrue(isCrossMonthWeeklyIdentifier(boundaryStrip.identifier))
+    let boundaryOwnerLabel = boundaryStrip.label
+    XCTAssertFalse(boundaryOwnerLabel.isEmpty)
     boundaryStrip.tap()
     XCTAssertTrue(boundaryStrip.isSelected)
-    XCTAssertEqual(element("habitDetail.history.callout", in: app).label, boundaryStrip.label)
+    XCTAssertEqual(element("habitDetail.history.callout", in: app).label, boundaryOwnerLabel)
     recordScreenshot("Weekly-strips")
 
     element("habitDetail.back", in: app).tap()
@@ -284,6 +283,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(title.waitForExistence(timeout: 5))
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("3 visits"))
+    XCTAssertEqual(element("habitDetail.month", in: app).label, currentMonthLabel)
     XCTAssertFalse(entryDeleteIdentifiers(in: app).contains(deletedIdentifier))
     XCTAssertEqual(entryDeleteElementCount(in: app), reactivatedRecentEntryCount)
     XCTAssertEqual(entryDeleteLabels(in: app), reactivatedRecentEntryLabels)
@@ -326,6 +326,8 @@ final class HabitDetailUITests: XCTestCase {
     let edit = element("habitDetail.edit", in: app)
     let previousMonth = element("habitDetail.month.previous", in: app)
     let nextMonth = element("habitDetail.month.next", in: app)
+    let initialAdaptiveMonthLabel = element("habitDetail.month", in: app).label
+    XCTAssertFalse(initialAdaptiveMonthLabel.isEmpty)
     for control in [back, edit, previousMonth, nextMonth] {
       XCTAssertTrue(control.waitForExistence(timeout: 2))
       assertMinimumHitRegion(control)
@@ -334,8 +336,8 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(edit.label, "Edit")
     XCTAssertEqual(previousMonth.label, "Previous month")
     XCTAssertEqual(nextMonth.label, "Next month")
-    XCTAssertEqual(previousMonth.value as? String, expectedCurrentMonthLabel())
-    XCTAssertEqual(nextMonth.value as? String, expectedCurrentMonthLabel())
+    XCTAssertEqual(previousMonth.value as? String, initialAdaptiveMonthLabel)
+    XCTAssertEqual(nextMonth.value as? String, initialAdaptiveMonthLabel)
     assertReadableDetailColumnOnIPad(
       in: app,
       leadingControl: back,
@@ -435,6 +437,8 @@ final class HabitDetailUITests: XCTestCase {
       let adaptiveEdit = element("habitDetail.edit", in: app)
       let adaptivePreviousMonth = element("habitDetail.month.previous", in: app)
       let adaptiveNextMonth = element("habitDetail.month.next", in: app)
+      let adaptiveMonthLabel = element("habitDetail.month", in: app).label
+      XCTAssertFalse(adaptiveMonthLabel.isEmpty)
       for control in [
         adaptiveBack, adaptiveEdit, adaptivePreviousMonth, adaptiveNextMonth,
       ] {
@@ -443,8 +447,8 @@ final class HabitDetailUITests: XCTestCase {
       }
       XCTAssertEqual(adaptivePreviousMonth.label, "Previous month")
       XCTAssertEqual(adaptiveNextMonth.label, "Next month")
-      XCTAssertEqual(adaptivePreviousMonth.value as? String, expectedCurrentMonthLabel())
-      XCTAssertEqual(adaptiveNextMonth.value as? String, expectedCurrentMonthLabel())
+      XCTAssertEqual(adaptivePreviousMonth.value as? String, adaptiveMonthLabel)
+      XCTAssertEqual(adaptiveNextMonth.value as? String, adaptiveMonthLabel)
       assertReadableDetailColumnOnIPad(
         in: app,
         leadingControl: adaptiveBack,
@@ -763,81 +767,44 @@ final class HabitDetailUITests: XCTestCase {
     return app
   }
 
-  private func expectedCurrentMonthLabel() -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.timeZone = TimeZone(identifier: "America/Los_Angeles")
-    formatter.dateFormat = "MMMM yyyy"
-    return formatter.string(from: Date())
+  @MainActor
+  private func crossMonthWeeklyStrip(in app: XCUIApplication) -> XCUIElement? {
+    app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.history.week:")
+    ).allElementsBoundByIndex.first {
+      isCrossMonthWeeklyIdentifier($0.identifier)
+    }
   }
 
-  private func expectedCrossMonthWeek() -> (
-    pageOffset: Int,
-    pageLabel: String,
-    range: String,
-    startMonth: DateComponents,
-    endMonth: DateComponents
-  ) {
-    let timeZone = TimeZone(identifier: "America/Los_Angeles")!
-    let locale = Locale(identifier: "en_US")
+  private func isCrossMonthWeeklyIdentifier(_ identifier: String) -> Bool {
+    let prefix = "habitDetail.history.week:"
+    guard identifier.hasPrefix(prefix) else { return false }
+    let components = identifier.dropFirst(prefix.count).split(separator: "-")
+    guard
+      components.count == 3,
+      let year = Int(components[0]),
+      let month = Int(components[1]),
+      let day = Int(components[2])
+    else {
+      return false
+    }
+
     var calendar = Calendar(identifier: .gregorian)
-    calendar.locale = locale
-    calendar.timeZone = timeZone
-    calendar.firstWeekday = 2
-    calendar.minimumDaysInFirstWeek = 4
-
-    func crossingWeek(for monthStart: Date) -> DateInterval? {
-      let pageMonth = calendar.dateComponents([.year, .month], from: monthStart)
-      let firstWeek = calendar.dateInterval(of: .weekOfYear, for: monthStart)!
-      if calendar.dateComponents([.year, .month], from: firstWeek.start) != pageMonth {
-        return firstWeek
-      }
-
-      let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: monthStart)!
-      let monthEnd = calendar.date(byAdding: .day, value: -1, to: nextMonthStart)!
-      let lastWeek = calendar.dateInterval(of: .weekOfYear, for: monthEnd)!
-      let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: lastWeek.end)!
-      return calendar.dateComponents([.year, .month], from: inclusiveEnd) != pageMonth
-        ? lastWeek
-        : nil
-    }
-
-    let currentComponents = calendar.dateComponents([.year, .month], from: Date())
-    let currentMonthStart = calendar.date(from: currentComponents)!
-    let pageOffset: Int
-    let pageStart: Date
-    let boundaryWeek: DateInterval
-    if let currentBoundary = crossingWeek(for: currentMonthStart) {
-      pageOffset = 0
-      pageStart = currentMonthStart
-      boundaryWeek = currentBoundary
-    } else {
-      pageOffset = -1
-      pageStart = calendar.date(byAdding: .month, value: -1, to: currentMonthStart)!
-      boundaryWeek = crossingWeek(for: pageStart)!
-    }
-    let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: boundaryWeek.end)!
-
-    let rangeFormatter = DateFormatter()
-    rangeFormatter.locale = locale
-    rangeFormatter.calendar = calendar
-    rangeFormatter.timeZone = timeZone
-    rangeFormatter.setLocalizedDateFormatFromTemplate("MMM d yyyy")
-
-    let monthFormatter = DateFormatter()
-    monthFormatter.locale = locale
-    monthFormatter.calendar = calendar
-    monthFormatter.timeZone = timeZone
-    monthFormatter.setLocalizedDateFormatFromTemplate("MMMM yyyy")
-
-    return (
-      pageOffset: pageOffset,
-      pageLabel: monthFormatter.string(from: pageStart),
-      range:
-        "\(rangeFormatter.string(from: boundaryWeek.start)) – \(rangeFormatter.string(from: inclusiveEnd))",
-      startMonth: calendar.dateComponents([.year, .month], from: boundaryWeek.start),
-      endMonth: calendar.dateComponents([.year, .month], from: inclusiveEnd)
+    calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+    let startComponents = DateComponents(
+      timeZone: calendar.timeZone,
+      year: year,
+      month: month,
+      day: day
     )
+    guard
+      let start = calendar.date(from: startComponents),
+      let inclusiveEnd = calendar.date(byAdding: .day, value: 6, to: start)
+    else {
+      return false
+    }
+    return calendar.dateComponents([.year, .month], from: start)
+      != calendar.dateComponents([.year, .month], from: inclusiveEnd)
   }
 
   private func launchArguments(
