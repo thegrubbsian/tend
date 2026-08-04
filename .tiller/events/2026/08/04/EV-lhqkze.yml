@@ -1,0 +1,14 @@
+id: EV-lhqkze
+type: submit.task
+at: 2026-08-04T16:13:08.525948Z
+owner: jc
+command: submit task T-ykjvz7
+targets:
+    - T-ykjvz7
+before:
+    status: check
+after:
+    pr: 28
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml

@@ -10,7 +10,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
-- task app-experience/today-dashboard/today-presentation-model (T-ykjvz7): ready
 - task app-experience/today-dashboard/almanac-today-surface (T-orkj4x): ready
 - task app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11): ready
 
@@ -20,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task app-experience/today-dashboard/today-presentation-model (T-ykjvz7): build pass, tests pass
 
 ### Open questions
 

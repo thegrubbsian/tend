@@ -1,0 +1,13 @@
+id: EV-6c8s8z
+type: start.task
+at: 2026-08-04T15:40:59.073293Z
+owner: jc
+command: start task T-ykjvz7
+targets:
+    - T-ykjvz7
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml
