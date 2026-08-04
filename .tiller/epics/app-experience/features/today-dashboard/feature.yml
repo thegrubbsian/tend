@@ -1,10 +1,25 @@
 id: F-skoqxt
 key: app-experience/today-dashboard
 title: Today Dashboard
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: design/03-user-experience.md
 change_type: create
 depends_on:
     - F-tih743
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:f4dfda4f830e024ce427144b3c436820086c89b7
+        path: .tiller/epics/app-experience/features/today-dashboard/feature.md
+        observed_at: 2026-08-04T14:27:34.231345Z
+    eval:
+        kind: git_blob
+        value: git:ce1dbcd7f1be4f3ed64d44278964851bb1d681ea
+        path: .tiller/epics/app-experience/features/today-dashboard/feature.eval.md
+        observed_at: 2026-08-04T14:27:34.231345Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.269604Z

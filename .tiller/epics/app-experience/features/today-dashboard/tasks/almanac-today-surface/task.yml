@@ -1,10 +1,20 @@
 id: T-orkj4x
 key: app-experience/today-dashboard/almanac-today-surface
 title: Render Almanac Today Surface
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-ykjvz7
     - T-fjmlzm
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:c289e5bb6b467843ed4c4042eef42ee519a6ce89
+        path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.md
+        observed_at: 2026-08-04T14:27:34.323546Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.340706Z

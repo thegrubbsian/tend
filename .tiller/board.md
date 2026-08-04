@@ -9,7 +9,12 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic app-experience (E-ul4fy3): ready
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/today-dashboard (F-skoqxt): specced
+- feature app-experience/today-dashboard (F-skoqxt): ready
+- task app-experience/today-dashboard/current-bucket-projection (T-fbpqjl): ready
+- task app-experience/today-dashboard/deterministic-today-fixtures (T-fjmlzm): ready
+- task app-experience/today-dashboard/today-presentation-model (T-ykjvz7): ready
+- task app-experience/today-dashboard/almanac-today-surface (T-orkj4x): ready
+- task app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11): ready
 
 ### Blocked
 

@@ -1,9 +1,19 @@
 id: T-m66b11
 key: app-experience/today-dashboard/today-dashboard-acceptance
 title: Verify Today Dashboard Journey
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-orkj4x
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:b92e9992fd651234b35a95dc379cb7b8a654d453
+        path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-dashboard-acceptance/task.md
+        observed_at: 2026-08-04T14:27:34.340831Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.357554Z

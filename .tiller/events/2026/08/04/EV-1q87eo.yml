@@ -1,0 +1,13 @@
+id: EV-1q87eo
+type: approve.task
+at: 2026-08-04T14:27:34.323485Z
+owner: jc
+command: approve task T-ykjvz7
+targets:
+    - T-ykjvz7
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml

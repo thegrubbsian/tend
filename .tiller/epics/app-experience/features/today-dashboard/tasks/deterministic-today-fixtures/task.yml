@@ -1,9 +1,19 @@
 id: T-fjmlzm
 key: app-experience/today-dashboard/deterministic-today-fixtures
 title: Seed Deterministic Today States
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-fbpqjl
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:ed6a66ad3bd4169adbe95cefee34ef1bb48649f8
+        path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.md
+        observed_at: 2026-08-04T14:27:34.289335Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.305688Z

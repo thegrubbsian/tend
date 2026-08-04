@@ -1,0 +1,13 @@
+id: EV-w4n7qz
+type: approve.task
+at: 2026-08-04T14:27:34.340776Z
+owner: jc
+command: approve task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

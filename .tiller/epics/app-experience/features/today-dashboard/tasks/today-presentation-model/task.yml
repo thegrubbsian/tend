@@ -1,9 +1,19 @@
 id: T-ykjvz7
 key: app-experience/today-dashboard/today-presentation-model
 title: Build Today Presentation Model
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-fbpqjl
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:aa8b033a4ce4636e8f88c405f6d1793804a86b63
+        path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.md
+        observed_at: 2026-08-04T14:27:34.305825Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.32342Z

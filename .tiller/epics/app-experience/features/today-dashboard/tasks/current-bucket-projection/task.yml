@@ -1,7 +1,17 @@
 id: T-fbpqjl
 key: app-experience/today-dashboard/current-bucket-projection
 title: Project Current Bucket Facts
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:5acd79ba92f1d471b05365e4b3efd56396aa8b50
+        path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.md
+        observed_at: 2026-08-04T14:27:34.269771Z
+    commit:
+        kind: git_commit
+        value: git:5c9c7b3
+        observed_at: 2026-08-04T14:27:34.288336Z
