@@ -1,13 +1,14 @@
 id: F-skoqxt
 key: app-experience/today-dashboard
 title: Today Dashboard
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/03-user-experience.md
 change_type: create
 depends_on:
     - F-tih743
+branch: tiller/app-experience/today-dashboard
 accepted_against:
     spec:
         kind: git_blob
