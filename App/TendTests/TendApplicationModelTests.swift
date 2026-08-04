@@ -246,6 +246,188 @@ struct TendApplicationModelTests {
       ) == nil)
   }
 
+  @Test("habit-detail fixture requires an enabled reset named store")
+  func habitDetailFixtureRequiresResetNamedStore() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+
+    for arguments in [
+      ["Tend", "-tend-ui-test-fixture", "habit-detail"],
+      [
+        "Tend", "-tend-ui-testing", "-tend-ui-test-store", "fixture",
+        "-tend-ui-test-fixture", "habit-detail",
+      ],
+      [
+        "Tend", "-tend-ui-testing", "-tend-ui-test-reset",
+        "-tend-ui-test-fixture", "habit-detail",
+      ],
+      [
+        "Tend", "-tend-ui-testing", "-tend-ui-test-store", "fixture",
+        "-tend-ui-test-reset", "-tend-ui-test-fixture", "unknown",
+      ],
+      [
+        "Tend", "-tend-ui-testing", "-tend-ui-test-store", "fixture",
+        "-tend-ui-test-reset", "-tend-ui-test-fixture",
+      ],
+      [
+        "Tend", "-tend-ui-testing", "-tend-ui-test-store", "fixture",
+        "-tend-ui-test-reset", "-tend-ui-test-fixture", "habit-detail",
+        "-tend-ui-test-fixture", "habit-detail",
+      ],
+    ] {
+      let factory = try #require(
+        TendUITestStore.containerFactory(
+          arguments: arguments,
+          applicationSupportDirectory: supportDirectory
+        )
+      )
+      #expect(throws: (any Error).self) { _ = try factory() }
+    }
+  }
+
+  @Test("UI test launch options cannot be used as store names")
+  func uiTestLaunchOptionCannotBeStoreName() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", "-tend-ui-testing", "-tend-ui-test-store",
+          "-tend-ui-test-fixture", "habit-detail", "-tend-ui-test-reset",
+        ],
+        applicationSupportDirectory: supportDirectory
+      )
+    )
+
+    #expect(throws: TendUITestStoreError.missingName) {
+      _ = try factory()
+    }
+  }
+
+  @Test("habit-detail fixture seeds the complete graph exactly once")
+  func habitDetailFixtureSeedsCompleteGraphExactlyOnce() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try #require(
+      ISO8601DateFormatter().date(from: "2026-08-03T12:00:00-07:00")
+    )
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    var nowCallCount = 0
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", "-tend-ui-testing", "-tend-ui-test-store", "habit-detail",
+          "-tend-ui-test-reset", "-tend-ui-test-fixture", "habit-detail",
+        ],
+        applicationSupportDirectory: supportDirectory,
+        now: {
+          nowCallCount += 1
+          return launchInstant
+        },
+        fixtureTimeZone: timeZone
+      )
+    )
+    #expect(nowCallCount == 1)
+
+    do {
+      let container = try factory()
+      #expect(nowCallCount == 1)
+      let habits = try fetchHabitsOrderedByName(from: container)
+      #expect(
+        habits.map(\.name) == [
+          "Daily garden",
+          "Dormant reading",
+          "Weekly field notes",
+        ])
+
+      let habitsByName = Dictionary(
+        uniqueKeysWithValues: habits.map { ($0.name, $0) }
+      )
+      let dailyHabit = try #require(habitsByName["Daily garden"])
+      let weeklyHabit = try #require(habitsByName["Weekly field notes"])
+      let inactiveHabit = try #require(habitsByName["Dormant reading"])
+      let computation = HabitDetailComputation(context: container.mainContext)
+      let dailyAugust = try computation.snapshot(
+        for: dailyHabit,
+        selectedMonth: launchInstant,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+      let dailyJuly = try computation.snapshot(
+        for: dailyHabit,
+        selectedMonth: try localNoon(
+          daysFromLaunch: -12,
+          launchInstant: launchInstant,
+          timeZone: timeZone
+        ),
+        at: launchInstant,
+        timeZone: timeZone
+      )
+      let weekly = try computation.snapshot(
+        for: weeklyHabit,
+        selectedMonth: launchInstant,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+      let inactive = try computation.snapshot(
+        for: inactiveHabit,
+        selectedMonth: launchInstant,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+      let dailyHistory = dailyJuly.history + dailyAugust.history
+      for state: HabitHistoryState in [.met, .missed, .inactive, .open, .grace, .future] {
+        #expect(dailyHistory.contains { $0.state == state })
+      }
+
+      let schedule = CalendarBucketSchedule(timeZone: timeZone)
+      let currentDailyKey = try schedule.period(
+        containing: launchInstant,
+        cadence: .daily
+      ).key
+      let graceDailyKey = try schedule.period(
+        containing: try localNoon(
+          daysFromLaunch: -1,
+          launchInstant: launchInstant,
+          timeZone: timeZone
+        ),
+        cadence: .daily
+      ).key
+      let currentEntries = dailyAugust.editableEntries.filter {
+        $0.bucketKey == currentDailyKey
+      }
+      let graceEntries = dailyAugust.editableEntries.filter {
+        $0.bucketKey == graceDailyKey
+      }
+      #expect(currentEntries.count == 1)
+      #expect(currentEntries.allSatisfy { $0.amount == 1 })
+      #expect(graceEntries.count == 2)
+      #expect(graceEntries.allSatisfy { $0.amount == 1 })
+      #expect(weekly.cadence == .weekly)
+      #expect(weekly.history.contains { $0.state == .open })
+      #expect(inactiveHabit.isActive == false)
+      #expect(inactive.editableEntries.isEmpty)
+    }
+
+    let reopeningFactory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", "-tend-ui-testing", "-tend-ui-test-store", "habit-detail",
+        ],
+        applicationSupportDirectory: supportDirectory
+      )
+    )
+    let reopenedContainer = try reopeningFactory()
+    let reopenedNames = try fetchHabitsOrderedByName(from: reopenedContainer).map(\.name)
+    #expect(reopenedNames.count == 3)
+    #expect(
+      reopenedNames == [
+        "Daily garden",
+        "Dormant reading",
+        "Weekly field notes",
+      ])
+  }
+
   private func uiTestStoreFactory(
     name: String,
     reset: Bool,
@@ -294,6 +476,31 @@ struct TendApplicationModelTests {
   private func habitCount(using factory: ModelContainerFactory) throws -> Int {
     let container = try factory()
     return try container.mainContext.fetchCount(FetchDescriptor<Habit>())
+  }
+
+  private func fetchHabitsOrderedByName(from container: ModelContainer) throws -> [Habit] {
+    try container.mainContext.fetch(
+      FetchDescriptor<Habit>(sortBy: [SortDescriptor(\Habit.name)])
+    )
+  }
+
+  private func localNoon(
+    daysFromLaunch: Int,
+    launchInstant: Date,
+    timeZone: TimeZone
+  ) throws -> Date {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = timeZone
+    calendar.firstWeekday = 2
+    calendar.minimumDaysInFirstWeek = 4
+    let launchDay = calendar.startOfDay(for: launchInstant)
+    let day = try #require(
+      calendar.date(byAdding: .day, value: daysFromLaunch, to: launchDay)
+    )
+    return try #require(
+      calendar.date(bySettingHour: 12, minute: 0, second: 0, of: day)
+    )
   }
 
   private enum TestStoreError: Error, Equatable {

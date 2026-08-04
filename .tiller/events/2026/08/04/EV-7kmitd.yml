@@ -1,0 +1,14 @@
+id: EV-7kmitd
+type: submit.task
+at: 2026-08-04T00:15:41.684005Z
+owner: jc
+command: submit task T-0i5tqj
+targets:
+    - T-0i5tqj
+before:
+    status: check
+after:
+    pr: 25
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml

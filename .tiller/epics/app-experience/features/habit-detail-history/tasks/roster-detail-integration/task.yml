@@ -1,7 +1,7 @@
 id: T-0i5tqj
 key: app-experience/habit-detail-history/roster-detail-integration
 title: Integrate and verify the owner detail journey
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:fb6cea3
         observed_at: 2026-08-03T14:36:47.708916Z
+pr: 25
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-04T00:14:24.112685Z
+        against:
+            kind: git_commit
+            value: git:f37b3eb
+            observed_at: 2026-08-04T00:14:24.112679Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-f37b3eb-out-19b6950713e94f91de8d9d9cc793dbd0a49136fa2bbf4bd023a250793748d0b9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-04T00:14:24.112685Z
+        against:
+            kind: git_commit
+            value: git:f37b3eb
+            observed_at: 2026-08-04T00:14:24.112679Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-f37b3eb-out-003330aee387243e5c3cbcf2bac013c52d0c61ef1db4a54a2085b5836a6158f9.txt

@@ -1,0 +1,804 @@
+{
+  "schema": "tend.evidence.v1",
+  "task": "app-experience/habit-detail-history/roster-detail-integration (T-0i5tqj)",
+  "feature": "app-experience/habit-detail-history (F-efgzky)",
+  "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+  "generatedAt": "2026-08-03T23:05:00Z",
+  "testExecutions": [
+    {
+      "id": "compact-iphone-light",
+      "command": "Scripts/tiller-xcode-test TendUITests/HabitDetailUITests",
+      "result": "passed: 2 tests, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "systemAppearancePreference": "light",
+      "simulatorContentSize": "large",
+      "reduceMotion": false,
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+      "observations": [
+        "The required wrapper selected the booted iOS 26 compact iPhone and both HabitDetailUITests passed.",
+        "The run produced the six requested owner-journey attachments plus both requested accessibility Dynamic Type attachments; inactive-after-archive was exported temporarily but intentionally not committed."
+      ]
+    },
+    {
+      "id": "centered-ipad-light",
+      "command": "xcodebuild -project Tend.xcodeproj -scheme Tend -destination \"platform=iOS Simulator,id=DA720363-3866-423D-B8CB-1A971A8B467C\" -only-testing:TendUITests/HabitDetailUITests test",
+      "result": "passed: 2 tests, 0 failures",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "systemAppearancePreference": "light",
+      "simulatorContentSize": "large",
+      "reduceMotion": false,
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+      "observations": [
+        "The UDID was the first available iOS 26 iPad returned by the required simctl JSON traversal.",
+        "Both tests passed with explicit readable-column bounds, no-split-group, hidden-shell-tab, hit-region, semantic, mutation, persistence, and Dynamic Type assertions."
+      ]
+    },
+    {
+      "id": "compact-iphone-dark-reduce-motion",
+      "command": "xcodebuild -project Tend.xcodeproj -scheme Tend -destination \"platform=iOS Simulator,id=91FCAB5E-F7C3-41DA-9289-C07258FBAE53\" -only-testing:TendUITests/HabitDetailUITests/testAdaptiveDetailAccessibilityAndPersistentRelaunches test",
+      "result": "passed: 1 test, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "systemAppearancePreference": "dark",
+      "simulatorContentSize": "large",
+      "reduceMotion": true,
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-58-52--0500.xcresult",
+      "sourceAttachments": [
+        "Daily-accessibility-large",
+        "Daily-accessibility-extra-large"
+      ],
+      "observations": [
+        "simctl ui in Xcode 26.6 does not expose a Reduce Motion option; the simulator preference com.apple.Accessibility ReduceMotionEnabled was set to 1 through simctl spawn and read back as 1 before launch.",
+        "The test exercised Back, previous/next month selection, period callout open/dismiss, Edit cancel, Edit save, entry deletion, Archive, and Reactivate while ReduceMotionEnabled was 1.",
+        "Both temporary Dynamic Type attachments were visually inspected: despite dark system preference, the app remained visibly forced-light with the #F7F2E7 Almanac paper surface and light system status chrome.",
+        "After capture, appearance was restored to light, content size to large, and ReduceMotionEnabled was restored to 0."
+      ]
+    }
+  ],
+  "accessibilityCoverage": {
+    "auditTypes": [
+      "contrast",
+      "hitRegion",
+      "sufficientElementDescription",
+      "textClipped",
+      "trait"
+    ],
+    "elementDetection": {
+      "status": "intentionally omitted",
+      "reason": "The detail is a ScrollView with intentionally offscreen content. Every actionable offscreen target is explicitly scrolled into a hittable position and asserted instead."
+    },
+    "minimumTargetPoints": 44,
+    "directlyMeasured": [
+      "Back",
+      "Edit",
+      "Previous month",
+      "Next month",
+      "every real daily period while scrolling",
+      "every weekly strip",
+      "every entry deletion control",
+      "Archive habit",
+      "Reactivate habit",
+      "Try again when present"
+    ],
+    "semanticObservations": [
+      "Title and metadata expose complete, untruncated labels at default, Accessibility Large, and Accessibility Extra Large.",
+      "Month buttons expose Previous month or Next month labels plus the displayed month as their accessibility value.",
+      "Streak facts expose complete Current streak and Best streak labels with localized units.",
+      "History buttons expose full date/range, state, standing, and progress; selected periods expose the selected trait and their default action opens or dismisses the matching callout.",
+      "Entry deletion controls expose full date, time, amount, and Delete entry labels plus a default button action.",
+      "Roster lifecycle alternatives are available without swipe through context-menu buttons and named accessibility actions Edit, Archive or Reactivate, Delete, and conditional Retry streak."
+    ]
+  },
+  "visualComparison": {
+    "source": ".tiller/design/comps/tend.pen",
+    "board": {
+      "id": "KytOH",
+      "name": "Habit Detail",
+      "pixelFrame": {
+        "width": 402,
+        "height": 874
+      }
+    },
+    "approvedVariables": {
+      "paper": "#F7F2E7",
+      "paperRaised": "#FCF9F1",
+      "paperSunken": "#EDE6D6",
+      "ink": "#2B2A26",
+      "inkMuted": "#6F6A5E",
+      "inkFaint": "#A79F8F",
+      "moss": "#3D5A3D",
+      "clay": "#C1704F",
+      "ochre": "#D9A441",
+      "withered": "#8A6A52",
+      "hairline": "#E6DEC9",
+      "serif": "New York",
+      "minimumGardenCellPoints": 44,
+      "cellRadiusPoints": 7,
+      "stateStrokePoints": 1.5
+    },
+    "observations": [
+      "Pencil MCP structural inspection found no clipped/collapsed nodes and no effects on the Habit Detail board.",
+      "Final screenshots match the paper chrome, uniform serif screen title, muted metadata, balanced default CURRENT/BEST pair, vertical accessibility adaptation, quiet ochre risk, month controls, 44-point garden, approved fills/strokes, centered legend, flat hairline entries, and quiet lifecycle action.",
+      "No final screenshot shows a shadow, alarm-red treatment, native Form chrome, iPad sidebar, split view, or floating tab pill.",
+      "The iPad screenshots visibly keep the content in a centered readable column and clear the top and bottom safe areas.",
+      "The Pencil board viewport ends after the legend; recent entries and lifecycle continuation were compared against the same approved variables, spacing, flat-surface language, and implementation tokens rather than literal entry/lifecycle nodes in KytOH."
+    ]
+  },
+  "redGreenDefect": {
+    "red": {
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-21-09--0500.xcresult",
+      "auditMessage": "Contrast nearly passed",
+      "completeIssueDescription": "Contrast is not high enough for SwiftUI.AccessibilityNode unless font size is larger.",
+      "element": "Archive habit",
+      "rendering": "AlmanacPalette.withered (#8A6A52) on AlmanacPalette.paper (#F7F2E7)",
+      "computedContrastRatio": 4.411142906926185
+    },
+    "fix": "HabitDetailView uses the existing semantic AlmanacPalette.inkMuted token for the active Archive habit label; Reactivate remains moss. No global palette or unrelated surface changed.",
+    "green": {
+      "rendering": "AlmanacPalette.inkMuted (#6F6A5E) on AlmanacPalette.paper (#F7F2E7)",
+      "computedContrastRatio": 4.824028185462986,
+      "verification": [
+        "compact-iphone-light",
+        "centered-ipad-light",
+        "compact-iphone-dark-reduce-motion"
+      ]
+    }
+  },
+  "artifacts": [
+    {
+      "id": "ipad-daily-accessibility-extra-large",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testAdaptiveDetailAccessibilityAndPersistentRelaunches()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Accessibility Extra Large (UICTContentSizeCategoryAccessibilityXL)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "841871A4-C2C0-493C-9BD5-9729413E486C.png",
+        "suggestedHumanReadableName": "Daily-accessibility-extra-large_0_1C28FF87-AFF8-4DD8-B07B-EFA07F613B7D.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797695.509
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-daily-accessibility-extra-large.png",
+      "sha256": "d9bdc8b39d3acda0c7b8fc8609812574cd87ad62786cebf1e0b960a884b8b90d",
+      "byteCount": 275553,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "The adaptive test deliberately saved a long habit name and unit to force observable wrapping at compact width; complete title and metadata labels remained exposed.",
+        "At Accessibility Extra Large, CURRENT/BEST stack vertically, month controls remain labelled with the displayed month and measure at least 44 points, and the final scroll content remains reachable.",
+        "The same store was relaunched without reset or fixture reseeding.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present.",
+        "At the wider iPad column the metadata can remain on one complete line; XCTest text-clipping audit, rather than an arbitrary wrap height, verifies it is not clipped."
+      ]
+    },
+    {
+      "id": "ipad-daily-accessibility-large",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testAdaptiveDetailAccessibilityAndPersistentRelaunches()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "B754162D-5E69-4B3E-B68A-25C3110B627E.png",
+        "suggestedHumanReadableName": "Daily-accessibility-large_0_BBDCEB61-A317-4330-9DD7-D735DC80DCEC.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797671.979
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-daily-accessibility-large.png",
+      "sha256": "d262ff869d42cdb1868abe670d986953fa4b9b10e5a6439ceeedf5ccb1c49f35",
+      "byteCount": 270276,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "The adaptive test deliberately saved a long habit name and unit to force observable wrapping at compact width; complete title and metadata labels remained exposed.",
+        "At Accessibility Large, CURRENT/BEST stack vertically, month controls remain labelled with the displayed month and measure at least 44 points, and the final scroll content remains reachable.",
+        "The same store was relaunched without reset or fixture reseeding.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present.",
+        "At the wider iPad column the metadata can remain on one complete line; XCTest text-clipping audit, rather than an arbitrary wrap height, verifies it is not clipped."
+      ]
+    },
+    {
+      "id": "ipad-daily-current",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "40A59FDE-D32A-41F6-ADFA-ED4095DECDDA.png",
+        "suggestedHumanReadableName": "Daily-current_0_3F0EF66B-1A4C-4783-839E-974874EEA6A5.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797739.584
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-daily-current.png",
+      "sha256": "e4822d8924fd7d8cab8bffa45203e0d28db395b341d14aa5c102e70861bb5faa",
+      "byteCount": 194761,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "Current Daily detail shows complete title and metadata, balanced CURRENT/BEST facts, current-month controls, the 44-point garden, legend, recent entries, and the quiet Archive action.",
+        "The detail is a full-screen flow: neither shell tab is hittable and no split group is present.",
+        "Paper, ink, muted ink, moss, clay, ochre, raised paper, and sunken paper render from the approved Almanac token palette; no shadow, alarm-red treatment, or native Form chrome is visible.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "ipad-daily-historical-callout",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "55CB72A4-C505-486A-9C7B-31435BAF8BE5.png",
+        "suggestedHumanReadableName": "Daily-historical-callout_0_965D7CB4-B2B4-4EBE-BCB7-BEE5C0E7F9DE.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797770.784
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-daily-historical-callout.png",
+      "sha256": "45f995b2dc9cba1d214d59b983e9a673622570efb920b214051dc76d4dc510e6",
+      "byteCount": 203245,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "The owner journey selected a real Before creation period in the earliest reachable month and asserted the selected trait.",
+        "The raised historical callout exposes the same complete accessibility label as the selected period and dismisses on a second default action.",
+        "Month navigation preserves the paper surface, quiet state vocabulary, legend, and 44-point garden geometry.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "ipad-edit-return",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "434FCF1B-4120-4245-AAFC-A241F59C7317.png",
+        "suggestedHumanReadableName": "Edit-return_0_A115D3B7-6CBE-45EC-947A-9A9316D738E1.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797793.898
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-edit-return.png",
+      "sha256": "e7ccd9eeda87a1e766e7c988ea29ff79ceacea037b2fa9abc9a8ffda8e90f503",
+      "byteCount": 188812,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "After Save, the Daily metadata returns as 3 visits and open/grace history labels update to the new requirement while finalized history remains unchanged.",
+        "The returned full-screen detail preserves the approved hierarchy, quiet risk callout, garden geometry, entry controls, and Archive action.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "ipad-inactive-detail",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "FCABFCB8-9A9E-4577-97AA-1DC44AF1C8FE.png",
+        "suggestedHumanReadableName": "Inactive-detail_0_282D4844-11CC-45A7-8700-84ACA4AA634B.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797823.058
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-inactive-detail.png",
+      "sha256": "1ba9871beb7ebed27549bdbe9ddb1ef4a1cdbe32e76a634a0bb51418d1233c62",
+      "byteCount": 160320,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "Dormant reading exposes complete title and metadata, day-based CURRENT/BEST facts, inactive history, the empty recent-entry message, and a Reactivate action in the tested scroll flow.",
+        "Inactive state uses the approved quiet withered/sunken treatment; the screenshot contains no shadow, alarm red, sidebar, or tab pill.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "ipad-recent-entries",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "A130B634-981A-400D-ABEF-BB655B380ADF.png",
+        "suggestedHumanReadableName": "Recent-entries_0_DABCE956-10AA-46C2-A940-A53EE1A81814.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797777.906
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-recent-entries.png",
+      "sha256": "96ff9c52e9928b03131240feb95279abb6be6889a5d0d95fd311de54d9f738b7",
+      "byteCount": 189083,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "Deleting one specifically identified contribution reduced the observable delete-control set from three to two and updated the affected period progress and risk state.",
+        "Every visible deletion control has a complete date, time, amount, and Delete entry label, is enabled, and measures at least 44 by 44 points.",
+        "Entry rows use flat hairline separation and token colors rather than native Form chrome or alarm red.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "ipad-weekly-strips",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPad Pro 13-inch (M5)",
+        "udid": "DA720363-3866-423D-B8CB-1A971A8B467C",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.4",
+        "build": "23E254a"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-52-44--0500.xcresult",
+        "exportedFileName": "38D95A0C-5C35-4B34-B22F-E4789B095AC6.png",
+        "suggestedHumanReadableName": "Weekly-strips_0_183B3D40-662D-45E2-A03F-C351903E8F84.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785797816.092
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/ipad-weekly-strips.png",
+      "sha256": "aa70d4bcad7429832b55244d59f33feb243fbd3efcacbe539d84c2183452bb02",
+      "byteCount": 205530,
+      "pixelSize": {
+        "width": 2064,
+        "height": 2752
+      },
+      "observations": [
+        "Weekly history renders as readable full-width strips within the detail column; every strip was measured at least 44 points high and more than 88 points wide.",
+        "The selected cross-month strip exposes a selected trait and a complete range, state, standing, and progress label; its raised callout matches that label.",
+        "The quiet ochre risk treatment, legend, fills, and strokes remain within the approved Almanac vocabulary.",
+        "At iPad width, navigation and content stay inside the asserted centered 600-point readable column with safe-area clearance; no sidebar, split view, or floating tab pill is present."
+      ]
+    },
+    {
+      "id": "iphone-daily-accessibility-extra-large",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testAdaptiveDetailAccessibilityAndPersistentRelaunches()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Accessibility Extra Large (UICTContentSizeCategoryAccessibilityXL)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "7451111F-AB84-4A5A-A70D-053ECD9797B8.png",
+        "suggestedHumanReadableName": "Daily-accessibility-extra-large_0_B8EF7E93-ED25-444B-BA26-BBF98DA2466B.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796606.165
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-daily-accessibility-extra-large.png",
+      "sha256": "a759550eefc081b3b072c404e5f2f980a8079a0103536fdf415420d38192e28a",
+      "byteCount": 215130,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The adaptive test deliberately saved a long habit name and unit to force observable wrapping at compact width; complete title and metadata labels remained exposed.",
+        "At Accessibility Extra Large, CURRENT/BEST stack vertically, month controls remain labelled with the displayed month and measure at least 44 points, and the final scroll content remains reachable.",
+        "The same store was relaunched without reset or fixture reseeding.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-daily-accessibility-large",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testAdaptiveDetailAccessibilityAndPersistentRelaunches()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "9A595EA8-97A6-49C3-8F70-64A00888A062.png",
+        "suggestedHumanReadableName": "Daily-accessibility-large_0_6C314E6B-C411-48E7-A4F9-799F3A650243.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796574.328
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-daily-accessibility-large.png",
+      "sha256": "547b1aa054d1834ae510c41b9394e4fec93b8a16a0817686c20e85850aa19c00",
+      "byteCount": 200225,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The adaptive test deliberately saved a long habit name and unit to force observable wrapping at compact width; complete title and metadata labels remained exposed.",
+        "At Accessibility Large, CURRENT/BEST stack vertically, month controls remain labelled with the displayed month and measure at least 44 points, and the final scroll content remains reachable.",
+        "The same store was relaunched without reset or fixture reseeding.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-daily-current",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "22A9F926-6EA3-4C92-9E56-BEA827BB7295.png",
+        "suggestedHumanReadableName": "Daily-current_0_EE4C8BE4-94A9-49BC-BD46-A33855CD7F3D.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796665.767
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-daily-current.png",
+      "sha256": "494321106f6d39366923362b7b82d11a065827683fc3d3e483bec021c3bb57b5",
+      "byteCount": 159021,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "Current Daily detail shows complete title and metadata, balanced CURRENT/BEST facts, current-month controls, the 44-point garden, legend, recent entries, and the quiet Archive action.",
+        "The detail is a full-screen flow: neither shell tab is hittable and no split group is present.",
+        "Paper, ink, muted ink, moss, clay, ochre, raised paper, and sunken paper render from the approved Almanac token palette; no shadow, alarm-red treatment, or native Form chrome is visible.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-daily-historical-callout",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "25ECA468-A215-4829-A17B-D7FE9466BC1A.png",
+        "suggestedHumanReadableName": "Daily-historical-callout_0_4CFDCDE5-C019-41AA-899F-E0BC3ED6CCC5.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796720.309
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-daily-historical-callout.png",
+      "sha256": "1369b8e7808f12ee268aeef1b6e9875e1ae6bfca82d7954616ee1632feac6b8d",
+      "byteCount": 163210,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The owner journey selected a real Before creation period in the earliest reachable month and asserted the selected trait.",
+        "The raised historical callout exposes the same complete accessibility label as the selected period and dismisses on a second default action.",
+        "Month navigation preserves the paper surface, quiet state vocabulary, legend, and 44-point garden geometry.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-edit-return",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "236673B9-9190-449A-A121-60579A873CAF.png",
+        "suggestedHumanReadableName": "Edit-return_0_D4C53A67-4DFD-441F-9842-B97ACD54E217.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796749.484
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-edit-return.png",
+      "sha256": "e4ed969482d416c000f2b0bf7c41753031e5cdf2f6cfb9fe14c8b114cb7b47b4",
+      "byteCount": 164547,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "After Save, the Daily metadata returns as 3 visits and open/grace history labels update to the new requirement while finalized history remains unchanged.",
+        "The returned full-screen detail preserves the approved hierarchy, quiet risk callout, garden geometry, entry controls, and Archive action.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-inactive-detail",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "6F74B788-E563-4160-9706-F833CCA3BC15.png",
+        "suggestedHumanReadableName": "Inactive-detail_0_43353921-22CE-4EF5-9425-69EF122E741C.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796784.461
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-inactive-detail.png",
+      "sha256": "5f8c9ca1b35601aabbaf16c22046dc131bc5844e9db92e038f52b2bfca74b588",
+      "byteCount": 146830,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "Dormant reading exposes complete title and metadata, day-based CURRENT/BEST facts, inactive history, the empty recent-entry message, and a Reactivate action in the tested scroll flow.",
+        "Inactive state uses the approved quiet withered/sunken treatment; the screenshot contains no shadow, alarm red, sidebar, or tab pill.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-recent-entries",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "2D05988E-F265-49FC-BFBA-AFBD3F472A1D.png",
+        "suggestedHumanReadableName": "Recent-entries_0_0FA80C01-1B24-4BD2-A6C6-BA740C5D0B48.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796731.483
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-recent-entries.png",
+      "sha256": "9ecaf60383dc8dd6c170fa5f5ef2d57c021695bf76a45f04d0025be2f6174216",
+      "byteCount": 165403,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "Deleting one specifically identified contribution reduced the observable delete-control set from three to two and updated the affected period progress and risk state.",
+        "Every visible deletion control has a complete date, time, amount, and Delete entry label, is enabled, and measures at least 44 by 44 points.",
+        "Entry rows use flat hairline separation and token colors rather than native Form chrome or alarm red.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    },
+    {
+      "id": "iphone-weekly-strips",
+      "testedCommit": "a304ca93eb5ea1d700f22c7dedd8f7578698620b",
+      "testIdentifier": "HabitDetailUITests/testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "dynamicType": "Large (simulator default)",
+      "reduceMotion": false,
+      "systemAppearancePreference": "light",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-ejbhgrfigfvxvrcvaddnbugxczoi/Logs/Test/Test-Tend-2026.08.03_17-33-28--0500.xcresult",
+        "exportedFileName": "1032D657-5AC8-4832-AEB0-375BAB47D9DF.png",
+        "suggestedHumanReadableName": "Weekly-strips_0_54E4D4F9-75BE-469C-B574-6AB69E836CB0.png",
+        "isAssociatedWithFailure": false,
+        "timestampUnix": 1785796776.971
+      },
+      "finalPath": ".tiller/evidence/roster-detail-integration/iphone-weekly-strips.png",
+      "sha256": "c6faba23a25026c1c1d202aa3cc2d0d31e81a0df4ea5d20fc793ed29cdf08277",
+      "byteCount": 159036,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "Weekly history renders as readable full-width strips within the detail column; every strip was measured at least 44 points high and more than 88 points wide.",
+        "The selected cross-month strip exposes a selected trait and a complete range, state, standing, and progress label; its raised callout matches that label.",
+        "The quiet ochre risk treatment, legend, fills, and strokes remain within the approved Almanac vocabulary.",
+        "The compact iPhone screenshot preserves 20-point horizontal content insets and top/bottom safe-area clearance."
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "id": "physical-voiceover-traversal",
+      "observation": "No physical iOS device was connected and reliable simulator VoiceOver traversal was not driven. This evidence does not claim traversal order, spoken cadence, rotor behavior, or physical-device VoiceOver usability.",
+      "automatedBoundary": "XCTest verified complete labels, values, selected traits, default actions, named non-swipe actions, Apple accessibility audits, and 44-point hit regions.",
+      "humanFollowUp": "A human must traverse the complete detail journey with VoiceOver on a physical iPhone and iPad before any manual accessibility criterion is attested."
+    },
+    {
+      "id": "deterministic-operation-failure-ui-capture",
+      "observation": "The approved production detail surface has no deterministic operation-failure UI seam. No fixture-controlled production failure was added and no retry screenshot was fabricated.",
+      "automatedBoundary": "The adaptive UI test measures and enables any Try again control if one is present; HabitDetailModelTests cover deterministic delete/archive/reactivate retry behavior.",
+      "humanFollowUp": "Capture a real operation failure only when a supported deterministic production or test seam exists."
+    },
+    {
+      "id": "pencil-entry-lifecycle-viewport",
+      "observation": "The approved KytOH Habit Detail Pencil board ends after the legend and contains no literal Recent entries or lifecycle nodes.",
+      "comparisonBoundary": "Final entry and lifecycle screenshots were compared to the board variables and visual language, and their behavior/accessibility was tested directly; no claim is made that those continuation nodes exist in Pencil."
+    }
+  ],
+  "manualCriteria": {
+    "C5": "not attested or marked passed",
+    "C6": "not attested or marked passed"
+  }
+}

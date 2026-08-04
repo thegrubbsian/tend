@@ -9,10 +9,14 @@ struct HabitRosterView: View {
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.timeZone) private var timeZone
 
+  private let context: ModelContext
+
   @State private var model: HabitRosterModel
   @State private var presentedForm: HabitRosterForm?
+  @State private var selectedHabit: HabitRosterSelection?
 
   init(context: ModelContext) {
+    self.context = context
     _model = State(initialValue: HabitRosterModel(context: context))
   }
 
@@ -78,6 +82,16 @@ struct HabitRosterView: View {
       )
       .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium, .large])
       .presentationDragIndicator(.visible)
+    }
+    .fullScreenCover(
+      item: $selectedHabit,
+      onDismiss: {
+        refresh(at: .now)
+      }
+    ) { selection in
+      HabitDetailView(habit: selection.habit, context: context) {
+        selectedHabit = nil
+      }
     }
   }
 
@@ -158,6 +172,13 @@ struct HabitRosterView: View {
               perform: { perform($0, on: row) }
             )
           )
+          .onTapGesture {
+            select(row)
+          }
+          .accessibilityAddTraits(.isButton)
+          .accessibilityAction {
+            select(row)
+          }
           .modifier(HabitRosterListRowModifier(verticalInset: AlmanacMetrics.spacingSmall / 2))
 
         if let failure = operationFailure(for: row) {
@@ -190,6 +211,13 @@ struct HabitRosterView: View {
       calendar: localDayCalendar,
       locale: locale
     )
+
+    if let selectedHabit,
+      !model.activeRows.contains(where: { $0.id == selectedHabit.id }),
+      !model.inactiveRows.contains(where: { $0.id == selectedHabit.id })
+    {
+      self.selectedHabit = nil
+    }
   }
 
   private func retryOperation() {
@@ -199,6 +227,11 @@ struct HabitRosterView: View {
       calendar: localDayCalendar,
       locale: locale
     )
+  }
+
+  private func select(_ row: HabitRosterRow) {
+    guard !model.isMutationInFlight(for: row.habit) else { return }
+    selectedHabit = HabitRosterSelection(id: row.id, habit: row.habit)
   }
 
   private func perform(_ action: HabitRosterAction, on row: HabitRosterRow) {
@@ -235,6 +268,11 @@ struct HabitRosterView: View {
     }
     return failure
   }
+}
+
+private struct HabitRosterSelection: Identifiable {
+  let id: PersistentIdentifier
+  let habit: Habit
 }
 
 private enum HabitRosterForm: Identifiable {
