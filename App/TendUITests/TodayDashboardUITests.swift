@@ -250,9 +250,9 @@ final class TodayDashboardUITests: XCTestCase {
       try performAdaptiveAccessibilityAudit(in: app)
       restoreTop(title, to: topTitleY, in: app)
 
-      dragToMiddle(in: app, normalizedDistance: 0.15)
+      dragToMiddle(in: app, normalizedDistance: 0.35)
       let middleTitleY = title.frame.minY
-      XCTAssertLessThan(middleTitleY, topTitleY - 60)
+      XCTAssertLessThan(middleTitleY, topTitleY - 150)
       recordScreenshot("\(device)-mixed-\(size.name)-middle", of: app)
       try performAdaptiveAccessibilityAudit(
         in: app,
@@ -442,9 +442,9 @@ final class TodayDashboardUITests: XCTestCase {
       try performAdaptiveAccessibilityAudit(in: app)
       restoreTop(malformed, to: topMalformedY, in: app)
 
-      dragToMiddle(in: app, normalizedDistance: 0.08)
+      dragToMiddle(in: app, normalizedDistance: 0.25)
       let middleMalformedY = malformed.frame.minY
-      XCTAssertLessThan(middleMalformedY, topMalformedY - 30)
+      XCTAssertLessThan(middleMalformedY, topMalformedY - 100)
       let middleRetryY = retry.frame.minY
       recordScreenshot("\(device)-failure-\(size.name)-middle", of: app)
       try performAdaptiveAccessibilityAudit(
