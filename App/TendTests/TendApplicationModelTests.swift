@@ -521,6 +521,34 @@ struct TendApplicationModelTests {
       ],
       supportDirectory: supportDirectory
     )
+
+    let validInstantArguments = [
+      "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+      "fixture-store", TendUITestStore.resetArgument,
+      TendUITestStore.fixtureArgument, "today-mixed",
+    ]
+    try expectUITestStoreError(
+      .missingEnabledArgument,
+      arguments: [
+        "Tend", TendUITestStore.instantArgument, "2026-08-03T19:00:00Z",
+      ],
+      supportDirectory: supportDirectory
+    )
+    try expectUITestStoreError(
+      .duplicateInstantArgument,
+      arguments: validInstantArguments + [
+        TendUITestStore.instantArgument, "2026-08-03T19:00:00Z",
+        TendUITestStore.instantArgument, "2026-08-04T19:00:00Z",
+      ],
+      supportDirectory: supportDirectory
+    )
+    try expectUITestStoreError(
+      .invalidInstant("not-a-date"),
+      arguments: validInstantArguments + [
+        TendUITestStore.instantArgument, "not-a-date",
+      ],
+      supportDirectory: supportDirectory
+    )
   }
 
   @Test("Today fixture names cannot stand in for a missing store name")
@@ -833,24 +861,28 @@ struct TendApplicationModelTests {
   func todayFixtureApplicationStateOpensStoreExactlyOnce() throws {
     let supportDirectory = try makeTemporarySupportDirectory()
     defer { try? FileManager.default.removeItem(at: supportDirectory) }
-    let launchInstant = try fixtureInstant("2026-08-03T12:00:00-07:00")
+    let launchInstantValue = "2026-08-03T19:00:00Z"
+    let launchInstant = try fixtureInstant(launchInstantValue)
     let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
     var nowCallCount = 0
+    let arguments = [
+      "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+      "single-open", TendUITestStore.resetArgument,
+      TendUITestStore.fixtureArgument, "today-all-tended",
+      TendUITestStore.instantArgument, launchInstantValue,
+    ]
     let factory = try #require(
       TendUITestStore.containerFactory(
-        arguments: [
-          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
-          "single-open", TendUITestStore.resetArgument,
-          TendUITestStore.fixtureArgument, "today-all-tended",
-        ],
+        arguments: arguments,
         applicationSupportDirectory: supportDirectory,
         now: {
           nowCallCount += 1
-          return launchInstant
+          return launchInstant.addingTimeInterval(1)
         },
         fixtureTimeZone: timeZone
       ))
-    #expect(nowCallCount == 1)
+    #expect(nowCallCount == 0)
+    #expect(TendUITestStore.fixedInstant(arguments: arguments) == launchInstant)
     var factoryCallCount = 0
     let model = TendApplicationModel {
       factoryCallCount += 1
@@ -864,7 +896,6 @@ struct TendApplicationModelTests {
       }
       #expect(try container.mainContext.fetchCount(FetchDescriptor<Habit>()) == 2)
     }
-    #expect(nowCallCount == 1)
     #expect(factoryCallCount == 1)
   }
 

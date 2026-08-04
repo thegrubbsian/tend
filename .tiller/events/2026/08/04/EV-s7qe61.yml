@@ -1,0 +1,13 @@
+id: EV-s7qe61
+type: start.task
+at: 2026-08-04T18:14:33.590147Z
+owner: jc
+command: start task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

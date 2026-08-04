@@ -1,0 +1,14 @@
+id: EV-zh9um5
+type: submit.task
+at: 2026-08-04T20:29:58.834836Z
+owner: jc
+command: submit task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: check
+after:
+    pr: 29
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

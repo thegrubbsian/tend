@@ -11,7 +11,8 @@ final class AlmanacShellUITests: XCTestCase {
     let todayTab = app.buttons["shell.tab.today"]
     let habitsTab = app.buttons["shell.tab.habits"]
 
-    XCTAssertTrue(app.otherElements["shell.destination.today"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
     XCTAssertTrue(todayTab.exists)
     XCTAssertEqual(todayTab.label, "Today")
     XCTAssertTrue(todayTab.isSelected)
@@ -34,7 +35,7 @@ final class AlmanacShellUITests: XCTestCase {
       app.descendants(matching: .any)[
         "shell.destination.habits"
       ].waitForExistence(timeout: 5))
-    XCTAssertFalse(app.otherElements["shell.destination.today"].exists)
+    XCTAssertFalse(app.descendants(matching: .any)["shell.destination.today"].exists)
     XCTAssertFalse(todayTab.isSelected)
     XCTAssertTrue(habitsTab.isSelected)
   }
@@ -64,7 +65,8 @@ final class AlmanacShellUITests: XCTestCase {
     app.terminate()
     app.launch()
 
-    XCTAssertTrue(app.otherElements["shell.destination.today"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
     XCTAssertTrue(todayTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
   }

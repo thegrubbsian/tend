@@ -1,0 +1,13 @@
+id: EV-wa9h26
+type: check.task
+at: 2026-08-04T20:28:41.475798Z
+owner: jc
+command: check task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml
