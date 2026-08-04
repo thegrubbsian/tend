@@ -25,8 +25,9 @@ struct TodayDestinationChrome: View {
     if let fixedDate {
       content(for: fixedDate)
     } else {
-      TimelineView(LocalDayTimelineSchedule(calendar: localCalendar)) { timeline in
-        content(for: timeline.date)
+      TimelineView(LocalDayTimelineSchedule(calendar: localCalendar)) { _ in
+        // The schedule entry invalidates at midnight; mutations still need the current instant.
+        content(for: .now)
       }
     }
   }
@@ -63,5 +64,4 @@ struct TodayDestinationChrome: View {
       HabitFormView(mode: .new)
     }
   }
-
 }

@@ -1,0 +1,13 @@
+id: EV-urc202
+type: start.task
+at: 2026-08-04T21:25:35.972455Z
+owner: jc
+command: start task T-m66b11
+targets:
+    - T-m66b11
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-dashboard-acceptance/task.yml
