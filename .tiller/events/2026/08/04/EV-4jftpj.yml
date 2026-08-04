@@ -1,0 +1,14 @@
+id: EV-4jftpj
+type: add.task
+at: 2026-08-04T04:57:29.354773Z
+owner: jc
+command: add task app-experience/today-dashboard/current-bucket-projection
+targets:
+    - T-fbpqjl
+after:
+    feature: F-skoqxt
+    key: app-experience/today-dashboard/current-bucket-projection
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.md
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml

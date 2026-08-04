@@ -1,0 +1,14 @@
+id: EV-5spr9o
+type: add.task
+at: 2026-08-04T04:59:31.337648Z
+owner: jc
+command: add task app-experience/today-dashboard/deterministic-today-fixtures
+targets:
+    - T-fjmlzm
+after:
+    feature: F-skoqxt
+    key: app-experience/today-dashboard/deterministic-today-fixtures
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.md
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml
