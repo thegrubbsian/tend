@@ -21,7 +21,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task app-experience/today-dashboard/current-bucket-projection (T-fbpqjl): build pass, tests pass
+- (none)
 
 ### Open questions
 

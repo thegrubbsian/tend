@@ -1,0 +1,14 @@
+id: EV-amrxyk
+type: sync.task
+at: 2026-08-04T15:08:42.287262Z
+owner: jc
+command: sync task T-fbpqjl
+targets:
+    - T-fbpqjl
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml
