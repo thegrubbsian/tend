@@ -1,7 +1,7 @@
 id: T-ykjvz7
 key: app-experience/today-dashboard/today-presentation-model
 title: Build Today Presentation Model
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.32342Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-04T16:12:26.494403Z
+        against:
+            kind: git_commit
+            value: git:76ba6d4
+            observed_at: 2026-08-04T16:12:26.494398Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-76ba6d4-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-04T16:12:26.494403Z
+        against:
+            kind: git_commit
+            value: git:76ba6d4
+            observed_at: 2026-08-04T16:12:26.494398Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-76ba6d4-out-960915ed0bf4766761c98ad1b9e40a42b166ce32b09b21e33ed1be70a331e303.txt
