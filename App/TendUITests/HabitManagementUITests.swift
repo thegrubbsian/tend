@@ -63,7 +63,10 @@ final class HabitManagementUITests: XCTestCase {
       app.staticTexts[
         "Tend is a quiet place to grow the habits you want to keep."
       ].exists)
-    XCTAssertTrue(app.otherElements["shell.destination.today"].exists)
+    XCTAssertTrue(app.descendants(matching: .any)["shell.destination.today"].exists)
+    let firstTodayRow = app.otherElements["today.row.Read deliberately"]
+    XCTAssertTrue(firstTodayRow.waitForExistence(timeout: 5))
+    assertValue(of: firstTodayRow, contains: ["0 of 1 time"])
 
     app.buttons["shell.tab.habits"].tap()
     XCTAssertTrue(app.buttons["habits.add"].waitForExistence(timeout: 5))
@@ -198,7 +201,8 @@ final class HabitManagementUITests: XCTestCase {
     app.terminate()
     app.launchArguments = launchArguments(reset: false)
     app.launch()
-    XCTAssertTrue(app.otherElements["shell.destination.today"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
     XCTAssertFalse(app.otherElements["today.empty"].exists)
     app.buttons["shell.tab.habits"].tap()
 
@@ -259,7 +263,8 @@ final class HabitManagementUITests: XCTestCase {
 
     replaceText(in: app.textFields["Habit name"], with: "Audit habit")
     app.buttons["Save"].tap()
-    XCTAssertTrue(app.otherElements["shell.destination.today"].waitForExistence(timeout: 5))
+    XCTAssertTrue(
+      app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
 
     app.buttons["shell.tab.habits"].tap()
     assertMinimumHitRegion(of: app.buttons["habits.add"])

@@ -18,3 +18,39 @@ accepted_against:
         kind: git_commit
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.340706Z
+gates:
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-04T19:41:16.170212Z
+        against:
+            kind: sha256
+            value: sha256:98400196cacda46efee35d4ecdfe364ba9182918e14b7befe7d2aef2d2da11c6
+            observed_at: 2026-08-04T19:33:28.031148Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-98400196cacd-out-6f0ddbaebecd9053d506bfcf806888363f4bfc492eac532feb8a7a6d19dc9273.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-sha256-98400196cacd-out-0188f281455cbf7ff472c5f2aadf6e0bbcf058c551b5d9792c77991c55678749.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-98400196cacd-out-6dc37741863ec1120016c43964cdb195d4d529a427c1b0137895531c8b89edac.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-sha256-98400196cacd-out-05e929ab4c7b33a2a9508a93e9845f128f8a0a7b08e16d2d8a1f0143331880f7.txt
+            C5:
+                status: needs_attestation
+            C6:
+                status: needs_attestation

@@ -1,0 +1,13 @@
+id: EV-kvz0nq
+type: eval.task
+at: 2026-08-04T19:41:16.172266Z
+owner: jc
+command: eval task T-orkj4x
+targets:
+    - T-orkj4x
+before:
+    status: in_progress
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml

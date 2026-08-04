@@ -12,6 +12,8 @@
     case missingFixture
     case duplicateFixtureArgument
     case unsupportedFixture(String)
+    case duplicateInstantArgument
+    case invalidInstant(String)
     case fixtureRequiresReset
 
     var errorDescription: String? {
@@ -34,6 +36,10 @@
         "Only one UI-test fixture may be provided."
       case .unsupportedFixture(let fixture):
         "The UI-test fixture \(fixture) is unsupported."
+      case .duplicateInstantArgument:
+        "Only one UI-test instant may be provided."
+      case .invalidInstant(let instant):
+        "The UI-test instant \(instant) is invalid."
       case .fixtureRequiresReset:
         "A UI-test fixture requires exactly one reset flag."
       }
@@ -45,6 +51,7 @@
     static let nameArgument = "-tend-ui-test-store"
     static let resetArgument = "-tend-ui-test-reset"
     static let fixtureArgument = "-tend-ui-test-fixture"
+    static let instantArgument = "-tend-ui-test-instant"
 
     enum Fixture: String {
       case habitDetail = "habit-detail"
@@ -66,6 +73,7 @@
         if arguments.contains(nameArgument)
           || arguments.contains(resetArgument)
           || arguments.contains(fixtureArgument)
+          || arguments.contains(instantArgument)
         {
           return { throw TendUITestStoreError.missingEnabledArgument }
         }
@@ -78,7 +86,7 @@
       } catch {
         return { throw error }
       }
-      let launchInstant = now()
+      let launchInstant = configuration.instant ?? now()
 
       return {
         let supportDirectory: URL
@@ -153,10 +161,15 @@
       }
     }
 
+    static func fixedInstant(arguments: [String]) -> Date? {
+      (try? Configuration(arguments: arguments))?.instant
+    }
+
     private struct Configuration {
       let name: String
       let resetsStore: Bool
       let fixture: Fixture?
+      let instant: Date?
 
       init(arguments: [String]) throws {
         guard arguments.count(where: { $0 == enabledArgument }) == 1 else {
@@ -211,9 +224,31 @@
           fixture = nil
         }
 
+        let instantIndices = arguments.indices.filter { arguments[$0] == instantArgument }
+        guard instantIndices.count <= 1 else {
+          throw TendUITestStoreError.duplicateInstantArgument
+        }
+        let instant: Date?
+        if let instantIndex = instantIndices.first {
+          let instantValueIndex = arguments.index(after: instantIndex)
+          guard instantValueIndex < arguments.endIndex else {
+            throw TendUITestStoreError.invalidInstant("")
+          }
+          let instantValue = arguments[instantValueIndex]
+          guard !Self.optionArguments.contains(instantValue),
+            let parsedInstant = ISO8601DateFormatter().date(from: instantValue)
+          else {
+            throw TendUITestStoreError.invalidInstant(instantValue)
+          }
+          instant = parsedInstant
+        } else {
+          instant = nil
+        }
+
         self.name = name
         resetsStore = resetCount == 1
         self.fixture = fixture
+        self.instant = instant
       }
 
       private static let optionArguments = [
@@ -221,6 +256,7 @@
         nameArgument,
         resetArgument,
         fixtureArgument,
+        instantArgument,
       ]
 
       private static func isValid(name: String) -> Bool {
