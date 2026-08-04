@@ -1,0 +1,13 @@
+id: EV-5qu2c0
+type: start.task
+at: 2026-08-04T15:09:09.11921Z
+owner: jc
+command: start task T-fjmlzm
+targets:
+    - T-fjmlzm
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml

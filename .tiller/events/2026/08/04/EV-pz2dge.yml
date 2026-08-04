@@ -1,0 +1,13 @@
+id: EV-pz2dge
+type: check.task
+at: 2026-08-04T15:24:50.233606Z
+owner: jc
+command: check task T-fjmlzm
+targets:
+    - T-fjmlzm
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml
