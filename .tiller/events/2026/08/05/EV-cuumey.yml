@@ -1,0 +1,13 @@
+id: EV-cuumey
+type: start.task
+at: 2026-08-05T19:59:42.18252Z
+owner: jc
+command: start task T-354lxo
+targets:
+    - T-354lxo
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.yml

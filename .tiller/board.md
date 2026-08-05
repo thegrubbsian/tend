@@ -11,7 +11,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
 - feature app-experience/fast-logging (F-z8e13q): active
-- task app-experience/fast-logging/times-logging-surface (T-354lxo): ready
 - task app-experience/fast-logging/fast-logging-acceptance (T-p7kknm): ready
 
 ### Blocked
@@ -21,6 +20,7 @@ this file is regenerated from the working tree on every sync. -->
 ### Gates in review
 
 - task app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11): build pass, tests pass
+- task app-experience/fast-logging/times-logging-surface (T-354lxo): build pass, tests pass
 
 ### Open questions
 

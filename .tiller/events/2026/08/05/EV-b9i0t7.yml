@@ -1,0 +1,13 @@
+id: EV-b9i0t7
+type: check.task
+at: 2026-08-05T20:27:36.786789Z
+owner: jc
+command: check task T-354lxo
+targets:
+    - T-354lxo
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.yml
