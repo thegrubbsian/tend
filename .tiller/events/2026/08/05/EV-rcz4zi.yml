@@ -1,0 +1,13 @@
+id: EV-rcz4zi
+type: approve.task
+at: 2026-08-05T00:46:02.723887Z
+owner: jc
+command: approve task T-p7kknm
+targets:
+    - T-p7kknm
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml

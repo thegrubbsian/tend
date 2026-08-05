@@ -1,0 +1,13 @@
+id: EV-jpt8f7
+type: approve.task
+at: 2026-08-05T00:46:02.611699Z
+owner: jc
+command: approve task T-qi6zgm
+targets:
+    - T-qi6zgm
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.yml

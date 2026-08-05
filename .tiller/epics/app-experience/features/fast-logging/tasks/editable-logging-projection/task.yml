@@ -1,7 +1,17 @@
 id: T-qi6zgm
 key: app-experience/fast-logging/editable-logging-projection
 title: Project Editable Logging Scopes
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:d09c90d2c7afe1fa6489bceabd8652cec8bb140f
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.md
+        observed_at: 2026-08-05T00:46:02.590704Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.611648Z

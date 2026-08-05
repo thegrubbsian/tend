@@ -1,9 +1,19 @@
 id: T-9016sz
 key: app-experience/fast-logging/fast-logging-fixtures
 title: Seed Deterministic Logging Journeys
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-qi6zgm
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:a424292794934a9021e9725d475bd193be2ed26f
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.md
+        observed_at: 2026-08-05T00:46:02.611768Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.634437Z

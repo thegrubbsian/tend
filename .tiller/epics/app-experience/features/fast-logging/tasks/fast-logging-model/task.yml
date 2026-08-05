@@ -1,9 +1,19 @@
 id: T-2tztqs
 key: app-experience/fast-logging/fast-logging-model
 title: Model Fast Logging Interactions
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-qi6zgm
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:c940fdc18eb98847d053dbb5a9366ee4e6124390
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.md
+        observed_at: 2026-08-05T00:46:02.634599Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.65907Z

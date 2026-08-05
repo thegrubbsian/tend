@@ -1,10 +1,20 @@
 id: T-and87o
 key: app-experience/fast-logging/quantity-log-sheet
 title: Build Scoped Quantity Log Sheet
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-2tztqs
     - T-9016sz
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:22e7985262e92dd7b5dcf08ddb4749aa1dd14f9c
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.md
+        observed_at: 2026-08-05T00:46:02.659221Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.681576Z
