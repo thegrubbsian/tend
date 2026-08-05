@@ -1,0 +1,9 @@
+id: T-2tztqs
+key: app-experience/fast-logging/fast-logging-model
+title: Model Fast Logging Interactions
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-qi6zgm

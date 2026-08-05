@@ -1,0 +1,10 @@
+id: T-354lxo
+key: app-experience/fast-logging/times-logging-surface
+title: Wire One-tap Count Logging
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-2tztqs
+    - T-9016sz

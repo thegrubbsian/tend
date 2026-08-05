@@ -1,0 +1,14 @@
+id: EV-uuilms
+type: add.task
+at: 2026-08-05T00:25:49.387391Z
+owner: jc
+command: add task app-experience/fast-logging/fast-logging-fixtures
+targets:
+    - T-9016sz
+after:
+    feature: F-z8e13q
+    key: app-experience/fast-logging/fast-logging-fixtures
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.md
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.yml

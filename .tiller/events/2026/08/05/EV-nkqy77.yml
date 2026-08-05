@@ -1,0 +1,13 @@
+id: EV-nkqy77
+type: spec.feature
+at: 2026-08-05T00:34:00.932892Z
+owner: jc
+command: spec feature F-z8e13q
+targets:
+    - F-z8e13q
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/feature.yml

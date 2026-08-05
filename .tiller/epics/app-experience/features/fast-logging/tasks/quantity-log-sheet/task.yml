@@ -1,0 +1,10 @@
+id: T-and87o
+key: app-experience/fast-logging/quantity-log-sheet
+title: Build Scoped Quantity Log Sheet
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-2tztqs
+    - T-9016sz
