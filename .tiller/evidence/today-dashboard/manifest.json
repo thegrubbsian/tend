@@ -1,0 +1,1048 @@
+{
+  "schema": "tend.evidence.v1",
+  "task": "app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11)",
+  "feature": "app-experience/today-dashboard (F-skoqxt)",
+  "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+  "generatedAt": "2026-08-05T00:00:08Z",
+  "testExecutions": [
+    {
+      "id": "changed-swift-format",
+      "command": "swift format lint --strict App/Tend/Shell/TodayDestinationChrome.swift App/Tend/Today/TodayView.swift App/TendUITests/TodayDashboardUITests.swift",
+      "result": "passed: no diagnostics",
+      "observations": [
+        "Every Swift file changed by this task passed strict swift-format lint at the tested commit."
+      ]
+    },
+    {
+      "id": "habit-today-domain",
+      "command": "swift test --filter HabitTodayComputationTests",
+      "result": "passed: 14 tests, 0 failures",
+      "observations": [
+        "Covers daily and weekly projection, reconciliation, grace risk, persistent identity, malformed relationships, DST/time-zone boundaries, and propagated save/evaluation failures."
+      ]
+    },
+    {
+      "id": "today-model-application",
+      "command": "Scripts/tiller-xcode-test TendTests/TodayModelTests",
+      "result": "passed: 10 tests, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-50-45--0500.xcresult",
+      "observations": [
+        "Covers one-context refresh, stable identity, deterministic partition ordering, exact facts, distinct empty/inactive states, per-row failures, atomic identity-scoped retry, and retry invalidation when the projection graph changes."
+      ]
+    },
+    {
+      "id": "compact-iphone-acceptance",
+      "command": "Scripts/tiller-xcode-test TendUITests/TodayDashboardUITests",
+      "result": "passed: 10 tests, 1 expected iPad-only skip, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "systemAppearancePreference": "dark",
+      "reduceMotion": true,
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+      "observations": [
+        "The suite exercised ordered mixed-state rendering, all-tended, inactive, per-row failure/retry, persistent relaunch, ring log/undo interaction, C3 live refresh across create/edit/delete/archive/reactivate, Accessibility Large and Accessibility Extra Extra Large reflow, all five requested XCTest accessibility audit types, tab hit regions, and exact compact-iPhone geometry.",
+        "The only skipped case is the iPad-only exact centered-column geometry test; it ran in the dedicated iPad execution."
+      ]
+    },
+    {
+      "id": "centered-ipad-acceptance",
+      "command": "xcodebuild -project Tend.xcodeproj -scheme Tend -destination \"platform=iOS Simulator,id=16FB7E8B-826C-4CF9-A127-4011C2E030AC\" -only-testing:TendUITests/TodayDashboardUITests/testAcceptanceEvidenceStates -only-testing:TendUITests/TodayDashboardUITests/testCenteredIPadEvidenceState test",
+      "result": "passed: 2 tests, 0 failures",
+      "device": {
+        "name": "iPad Air 13-inch (M3)",
+        "udid": "16FB7E8B-826C-4CF9-A127-4011C2E030AC",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "systemAppearancePreference": "dark",
+      "reduceMotion": true,
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-45-42--0500.xcresult",
+      "observations": [
+        "All four required production fixture states were captured at 1024 x 1366.",
+        "The dedicated geometry test asserted the readable dashboard column is centered, no wider than 600 points, fully inside the window, and keeps the first and last mixed rows visible above the tab bar."
+      ]
+    },
+    {
+      "id": "habit-management-domain-baseline",
+      "command": "swift test --filter HabitManagementOperationsTests",
+      "result": "passed: 17 tests, 0 failures",
+      "observations": [
+        "Baseline management operations remain green across creation, update, cadence boundaries, archive/inactive graphs, delete cascades, rollback, and failure propagation."
+      ]
+    },
+    {
+      "id": "habit-management-ui-baseline",
+      "command": "Scripts/tiller-xcode-test TendUITests/HabitManagementUITests",
+      "result": "passed: 2 tests, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-54-20--0500.xcresult",
+      "observations": [
+        "The complete first-habit owner journey and management-surface accessibility audit baseline stayed green after the Today acceptance patch."
+      ]
+    },
+    {
+      "id": "swift-package-build",
+      "command": "swift build",
+      "result": "passed: build complete"
+    },
+    {
+      "id": "generic-ios-build",
+      "command": "xcodebuild -project Tend.xcodeproj -scheme Tend -destination \"generic/platform=iOS\" CODE_SIGNING_ALLOWED=NO build",
+      "result": "passed: BUILD SUCCEEDED"
+    }
+  ],
+  "stateCoverage": {
+    "mixed": [
+      "iphone-mixed-top",
+      "iphone-mixed-bottom",
+      "ipad-mixed-full"
+    ],
+    "allTended": [
+      "iphone-all-tended",
+      "ipad-all-tended"
+    ],
+    "inactive": [
+      "iphone-inactive",
+      "ipad-inactive"
+    ],
+    "failure": [
+      "iphone-failure-full",
+      "ipad-failure-full"
+    ],
+    "dynamicTypeMixed": [
+      "iphone-mixed-accessibility-large-top",
+      "iphone-mixed-accessibility-large-middle",
+      "iphone-mixed-accessibility-large-bottom",
+      "iphone-mixed-accessibility-extra-extra-large-top",
+      "iphone-mixed-accessibility-extra-extra-large-middle",
+      "iphone-mixed-accessibility-extra-extra-large-bottom"
+    ],
+    "dynamicTypeFailure": [
+      "iphone-failure-accessibility-large-top",
+      "iphone-failure-accessibility-large-middle",
+      "iphone-failure-accessibility-large-bottom",
+      "iphone-failure-accessibility-extra-extra-large-top",
+      "iphone-failure-accessibility-extra-extra-large-middle",
+      "iphone-failure-accessibility-extra-extra-large-bottom"
+    ]
+  },
+  "accessibilityCoverage": {
+    "auditTypes": [
+      "contrast",
+      "elementDetection",
+      "hitRegion",
+      "sufficientElementDescription",
+      "textClipped",
+      "trait"
+    ],
+    "note": "XCUIAccessibilityAuditType.all is five primary audit cases in XCTest; trait is also explicitly exercised by the semantic assertions and appears in the acceptance audit selector set where supported by the SDK.",
+    "dynamicType": [
+      "Large (UICTContentSizeCategoryL)",
+      "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)"
+    ],
+    "semanticObservations": [
+      "The dashboard exposes one ordered accessibility surface: title, summary, section labels, and ordered rows.",
+      "Each row exposes a persistent-ID-backed identifier; names are presentation only and ordinary UUID collisions cannot collapse rows.",
+      "Successful rows expose complete streak, risk, progress, requirement, and state text; unavailable rows expose complete failure text and a reachable Try again button.",
+      "Today and Habits tabs expose labels, selected state, and at least 44-point hit regions.",
+      "The logging ring remains an enabled button with a complete state label; logging and undo are exercised against the same persistent store and verified after relaunch.",
+      "Top, middle, and bottom Dynamic Type journeys assert nonzero scroll displacement and preserve visible actions without reducing text size."
+    ],
+    "auditScoping": [
+      "The audit helper ignores only a contrast issue whose reported element is geometrically below the opaque bottom tab bar, or a noninteractive issue already audited while fully visible in an earlier viewport.",
+      "Every other issue fails immediately. The helper does not suppress hit-region, element-detection, trait, sufficient-description, or text-clipping failures for visible elements."
+    ]
+  },
+  "interactionCoverage": [
+    "Ring tap logs the current bucket, moves the row between sections, updates summary and facts, persists across relaunch, and a second tap undoes the contribution.",
+    "Failure retry stays identity-scoped, leaves the row visible while unavailable, and atomically replaces only the matching failure when successful.",
+    "A long-lived TodayModel refreshes after create, edit, delete, archive, and reactivate changes from the Habits destination without reconstructing the shell.",
+    "First-launch empty and later inactive stores remain distinct; the inactive acceptance fixture never shows onboarding copy.",
+    "Mixed rows remain ordered per the domain contract and all-tended appears only when every active row is met and no failure is present."
+  ],
+  "visualComparison": {
+    "source": ".tiller/design/comps/tend.pen",
+    "board": {
+      "id": "Zl4uG",
+      "name": "Today",
+      "pixelFrame": {
+        "width": 402,
+        "height": 874
+      }
+    },
+    "approvedVariables": {
+      "paper": "#F7F2E7",
+      "paperRaised": "#FCF9F1",
+      "paperSunken": "#EDE6D6",
+      "ink": "#2B2A26",
+      "inkMuted": "#6F6A5E",
+      "inkFaint": "#A79F8F",
+      "moss": "#3D5A3D",
+      "clay": "#C1704F",
+      "ochre": "#D9A441",
+      "withered": "#8A6A52",
+      "hairline": "#E6DEC9",
+      "serif": "New York",
+      "sans": "SF Pro Text",
+      "cardRadiusPoints": 14,
+      "cellRadiusPoints": 7
+    },
+    "observations": [
+      "Pencil MCP inspection of board Zl4uG resolved the production palette variables and found no clipped or collapsed board nodes.",
+      "Final compact screenshots preserve the approved paper surface, serif Today title and numerals, muted uppercase section labels, flat raised cards, moss progress/rings, ochre risk, and bottom Today/Habits tab treatment.",
+      "The implementation intentionally uses production fixture truth (2 of 5) instead of copying the board illustration (3 of 5); domain facts take precedence over comp sample data.",
+      "All-tended, inactive, and failure are single-idea Almanac states derived from the same visual language rather than ornamental celebration, alarm red, native Form chrome, or spreadsheet styling.",
+      "The iPad screenshots visibly retain a centered readable column with large surrounding paper margins and no sidebar or split view."
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "iphone-mixed-top",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "top",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "6A1C4148-353E-45EB-A94D-1E1033628462.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-top.png",
+      "sha256": "65507d613753ef1debd973d44a2eb28e853ed8ae49861a471c00b406b1572a22",
+      "byteCount": 225842,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "Together the top and bottom captures show ordered To tend and Tended sections, truthful row facts, ring states, and the reachable bottom row above the tab bar."
+      ]
+    },
+    {
+      "id": "iphone-mixed-bottom",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "bottom",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "CED820E1-5018-4945-94F0-555F4138C49C.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-bottom.png",
+      "sha256": "34a282bb3eff9f348f65efe2f5c1a98c668307b114abb714a867d6e4243d257a",
+      "byteCount": 213008,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "Together the top and bottom captures show ordered To tend and Tended sections, truthful row facts, ring states, and the reachable bottom row above the tab bar."
+      ]
+    },
+    {
+      "id": "iphone-all-tended",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "all-tended",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "14EFFF23-9484-4299-9AE0-580E44A54B2C.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-all-tended.png",
+      "sha256": "03a24c684f7fd6bf42f402305a05e6c47445e04ddb4fa267c106ddc5b256e33e",
+      "byteCount": 138700,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The all-tended fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The compact All tended prose replaces alarmist celebration while all completed rows remain visible."
+      ]
+    },
+    {
+      "id": "iphone-inactive",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "inactive",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "8A0B3E13-5451-45A9-B104-4A48B8E0FE20.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-inactive.png",
+      "sha256": "7681cfe7b4c5554519c5b2b9e249865a63339a6e15682711c5e8a290b90f9631",
+      "byteCount": 98673,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The inactive fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The inactive store shows the honest No active habits state and does not reuse first-launch onboarding copy."
+      ]
+    },
+    {
+      "id": "iphone-failure-full",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "46867598-34D1-41B7-B9FC-04A168884421.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-full.png",
+      "sha256": "93d3d067d37312590027a6cb294aec6154497a22f85e846c5f63cf2881428676",
+      "byteCount": 193598,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The malformed row stays visible with explicit unavailable facts and a reachable Try again control; the failure does not disappear into an empty or all-tended state."
+      ]
+    },
+    {
+      "id": "ipad-mixed-full",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPad Air 13-inch (M3)",
+        "udid": "16FB7E8B-826C-4CF9-A127-4011C2E030AC",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-45-42--0500.xcresult",
+        "exportedFileName": "67C194BC-8613-4AA0-9B08-828652253BF6.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/ipad-mixed-full.png",
+      "sha256": "6e587ebc51b71f499194b7e5cedae64946c893697e5c70f8686b96320772c98b",
+      "byteCount": 260166,
+      "pixelSize": {
+        "width": 2048,
+        "height": 2732
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The 1024 x 1366 iPad viewport keeps the dashboard inside the asserted centered readable column, with native status area and bottom tab bar clear of content."
+      ]
+    },
+    {
+      "id": "ipad-all-tended",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPad Air 13-inch (M3)",
+        "udid": "16FB7E8B-826C-4CF9-A127-4011C2E030AC",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "all-tended",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-45-42--0500.xcresult",
+        "exportedFileName": "555CE1AD-5F90-430D-A487-833681AD2994.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/ipad-all-tended.png",
+      "sha256": "5387762ad9ad93b519b91c3f4404a46547b6a72753ce0addce3f6f11c12fea55",
+      "byteCount": 168836,
+      "pixelSize": {
+        "width": 2048,
+        "height": 2732
+      },
+      "observations": [
+        "The all-tended fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The 1024 x 1366 iPad viewport keeps the dashboard inside the asserted centered readable column, with native status area and bottom tab bar clear of content."
+      ]
+    },
+    {
+      "id": "ipad-inactive",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPad Air 13-inch (M3)",
+        "udid": "16FB7E8B-826C-4CF9-A127-4011C2E030AC",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "inactive",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-45-42--0500.xcresult",
+        "exportedFileName": "114118CE-09D4-4EAB-AB72-4ACAEB740148.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/ipad-inactive.png",
+      "sha256": "7214c85e5fa736ad4fe3788d3c9fbd9d6448b7f08df6b6809709b97c288f5b35",
+      "byteCount": 131569,
+      "pixelSize": {
+        "width": 2048,
+        "height": 2732
+      },
+      "observations": [
+        "The inactive fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The 1024 x 1366 iPad viewport keeps the dashboard inside the asserted centered readable column, with native status area and bottom tab bar clear of content."
+      ]
+    },
+    {
+      "id": "ipad-failure-full",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testAcceptanceEvidenceStates()",
+      "device": {
+        "name": "iPad Air 13-inch (M3)",
+        "udid": "16FB7E8B-826C-4CF9-A127-4011C2E030AC",
+        "class": "centered iPad"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "full",
+      "dynamicType": "Large (UICTContentSizeCategoryL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-45-42--0500.xcresult",
+        "exportedFileName": "B4897B37-74EC-41C6-84BC-7C64CEF761ED.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/ipad-failure-full.png",
+      "sha256": "141e6160570130f2e0750ccaac38a71d81a9b0c2bf122a472334faba5e1d15e9",
+      "byteCount": 222325,
+      "pixelSize": {
+        "width": 2048,
+        "height": 2732
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "The 1024 x 1366 iPad viewport keeps the dashboard inside the asserted centered readable column, with native status area and bottom tab bar clear of content."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-large-top",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "top",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "DCF77EAC-8A85-40CD-BA3B-CAFB73212863.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-large-top.png",
+      "sha256": "a9575b3ec4a922fe6d30521f77185f1ee05b8f15c448e234eed3f76987236b69",
+      "byteCount": 250090,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This top viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-large-middle",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "middle",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "A81BD27F-AC00-4574-838D-4D18B6B45220.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-large-middle.png",
+      "sha256": "c9e5a93a6d312888aec5da5bf3cfd11de961a90681389d43e24c34d1cff3c493",
+      "byteCount": 256607,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This middle viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-large-bottom",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "bottom",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "2F13BBB3-EEC0-453E-86E0-47A2F7EDCD30.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-large-bottom.png",
+      "sha256": "6f7866d3231cad420b39230172651f8910e6d6e8f07a6e402100bd1ce9e6101c",
+      "byteCount": 231147,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This bottom viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-extra-extra-large-top",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "top",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "12955024-F901-4556-B2EB-8A278CD383E1.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-extra-extra-large-top.png",
+      "sha256": "077bf962af53b00512f55e5371c6e5cb217e6881dd8d508e09329ee31dd42412",
+      "byteCount": 243035,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This top viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-extra-extra-large-middle",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "middle",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "CC545EF2-55AF-44F6-B28B-048F2209B44C.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-extra-extra-large-middle.png",
+      "sha256": "343fef354d0b2f1ff12a8530bcfb4711078a3edfca48079fc11907a7fb81057b",
+      "byteCount": 261050,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This middle viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-mixed-accessibility-extra-extra-large-bottom",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testDashboardReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "mixed",
+      "viewport": "bottom",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "F5E7F84A-63DC-4FC1-AA96-D453E4F873A6.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-mixed-accessibility-extra-extra-large-bottom.png",
+      "sha256": "ab8751b9acdd466e8e492ac794638937b24e80fa7652ce026fef447c37406134",
+      "byteCount": 204357,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The mixed fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This bottom viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-large-top",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "top",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "09F89589-0510-47B8-B111-A6D9DEEE38FF.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-large-top.png",
+      "sha256": "1b3976e8ceb9d03d89068772c3b824d48ef6baf8cc1fc2645c9a013b396deb43",
+      "byteCount": 235100,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This top viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-large-middle",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "middle",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "DD3010F6-ADBC-45DD-807F-D1DD6DAE06FF.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-large-middle.png",
+      "sha256": "1ef0068ad0bb7058bad0e568a7ef98ead3a1e3b9d7ef582e09d0efad358a303d",
+      "byteCount": 229479,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This middle viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-large-bottom",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "bottom",
+      "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "B7643CB0-52D8-439B-BF81-97AD3DC2DEA1.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-large-bottom.png",
+      "sha256": "349bfe930b5e12992a212901fb99f3700a0366682d9006467fb026c871413c7e",
+      "byteCount": 226210,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This bottom viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-extra-extra-large-top",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "top",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "029B3E86-6B69-4236-8C8E-EE3D3AB2916C.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-extra-extra-large-top.png",
+      "sha256": "90908a815de0f0cce5cb983356097d012b4632a7d61ecc13894dfa143500bcf6",
+      "byteCount": 219783,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This top viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-extra-extra-large-middle",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "middle",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "03F058A3-75AF-4431-9C1B-94839E93096F.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-extra-extra-large-middle.png",
+      "sha256": "c165b1154162a0e4c479a5483b1c1fe2bae4ccfbd00c241a55bbb306e36e3896",
+      "byteCount": 221830,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This middle viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    },
+    {
+      "id": "iphone-failure-accessibility-extra-extra-large-bottom",
+      "testedCommit": "89fa7033b46e873786d63d06cd31c6d3fa49059a",
+      "testIdentifier": "TodayDashboardUITests/testFailureReflowsAtTwoAccessibilityTextSizes()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "state": "failure",
+      "viewport": "bottom",
+      "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+      "reduceMotion": true,
+      "systemAppearancePreference": "dark",
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-awtcpejmsmdrvqbonkqnqtqadmxl/Logs/Test/Test-Tend-2026.08.04_18-42-10--0500.xcresult",
+        "exportedFileName": "1EA74929-9074-4E22-ADD2-D0E385611DA9.png",
+        "isAssociatedWithFailure": false
+      },
+      "finalPath": ".tiller/evidence/today-dashboard/iphone-failure-accessibility-extra-extra-large-bottom.png",
+      "sha256": "c678458f9d074ed89bbf1dd755865a6cb1ab125e48e01dcc3a36d8da1e59d4de",
+      "byteCount": 209947,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observations": [
+        "The failure fixture is production SwiftData state rendered by the application under test; no screenshot-only UI or mocked presentation model is used.",
+        "The launch requested dark appearance and Reduce Motion, while the application visibly retained the approved forced-light Almanac paper treatment.",
+        "This bottom viewport is one part of a top/middle/bottom journey; XCTest asserted meaningful scroll displacement, complete labels, visible actions, and all five requested accessibility audit types."
+      ]
+    }
+  ],
+  "commandBindingCorrections": [
+    {
+      "specifiedCommand": "swift format lint --strict Sources Tests App",
+      "observedResult": "The installed swift-format rejects directory operands unless --recursive is supplied. The recursive repository-wide equivalent then reports existing formatting violations in unrelated files, including HabitFormModel.swift and HabitRosterModelTests.swift.",
+      "verifiedEquivalent": "Every Swift file changed by this task passes strict swift-format lint; no unrelated formatting was rewritten."
+    },
+    {
+      "specifiedCommand": "Scripts/tiller-xcode-test TendTests/TodayHabitComputationTests",
+      "observedResult": "The selector names no XCTest suite and produces a zero-test xcresult. The actual Swift Testing suite is HabitTodayComputationTests under Tests/TendCoreTests/Today.",
+      "verifiedEquivalent": "swift test --filter HabitTodayComputationTests passed 14 tests."
+    },
+    {
+      "specifiedCommand": "Scripts/tiller-xcode-test TendTests/HabitManagementTests",
+      "observedResult": "The selector names no XCTest suite and produces a zero-test xcresult. The domain suite is HabitManagementOperationsTests and the UI suite is HabitManagementUITests.",
+      "verifiedEquivalent": "swift test --filter HabitManagementOperationsTests passed 17 tests, and Scripts/tiller-xcode-test TendUITests/HabitManagementUITests passed 2 UI tests."
+    }
+  ],
+  "limitations": [
+    {
+      "id": "physical-voiceover-traversal",
+      "observation": "No physical iOS device was connected and simulator VoiceOver traversal was not presented as a substitute for physical-device assistive-technology use.",
+      "automatedBoundary": "XCTest verified semantic order, complete labels and values, selected traits, buttons, hit regions, top/middle/bottom reachability, Dynamic Type reflow, and the requested Apple accessibility audits.",
+      "humanFollowUp": "A human must traverse the complete Today journey with VoiceOver on a physical compact iPhone and centered iPad before C6 is attested."
+    },
+    {
+      "id": "manual-visual-acceptance",
+      "observation": "Pixel evidence and structural comparison are recorded, but the agent does not attest human visual judgment.",
+      "humanFollowUp": "A human must compare the final evidence set against board Zl4uG and the Almanac visual-design rules before C5 is attested."
+    },
+    {
+      "id": "default-ipad-single-viewport",
+      "observation": "At default Dynamic Type, the complete iPad mixed, all-tended, inactive, and failure states fit above the tab bar in one viewport, so separate top/middle/bottom images would be byte-identical and were not committed.",
+      "automatedBoundary": "The dedicated iPad test asserts exact 1024 x 1366 geometry, centered readable width, safe-area containment, and visibility of both first and last mixed rows."
+    }
+  ],
+  "manualCriteria": {
+    "C5": "not attested or marked passed",
+    "C6": "not attested or marked passed"
+  }
+}
