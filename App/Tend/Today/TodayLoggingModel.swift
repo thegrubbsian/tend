@@ -218,6 +218,18 @@ struct TodayLoggingState {
   }
 }
 
+extension TodayLoggingState {
+  func undo(for habitID: PersistentIdentifier) -> TodayLogUndo? {
+    guard undo?.habitID == habitID else { return nil }
+    return undo
+  }
+
+  func actionFailure(for habitID: PersistentIdentifier) -> TodayLoggingInlineFailure? {
+    guard actionFailure?.habitID == habitID else { return nil }
+    return actionFailure
+  }
+}
+
 @MainActor
 @Observable
 final class TodayLoggingModel {

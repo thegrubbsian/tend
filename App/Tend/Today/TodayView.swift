@@ -1,3 +1,4 @@
+import Accessibility
 import Foundation
 import SwiftData
 import SwiftUI
@@ -12,11 +13,14 @@ struct TodayView: View {
 
   let habits: [Habit]
   let instant: Date
+  let fixedOperationInstant: Date?
   let onPlantHabit: () -> Void
 
   @State private var model: TodayModel?
+  @State private var loggingModel: TodayLoggingModel?
 
   var body: some View {
+    let isPresentingLogSheet = loggingModel?.state.sheet != nil
     Group {
       if let presentation = model?.presentation {
         presentationView(presentation)
@@ -34,6 +38,43 @@ struct TodayView: View {
         return
       }
       refresh()
+    }
+    .sheet(
+      isPresented: Binding(
+        get: { isPresentingLogSheet },
+        set: { isPresented in
+          if !isPresented {
+            loggingModel?.dismissSheet()
+          }
+        }
+      )
+    ) {
+      if let loggingModel {
+        QuantityLogSheet(
+          model: loggingModel,
+          habits: habits,
+          makeContext: operationContext
+        )
+        .presentationDetents([.medium, .large])
+        .presentationContentInteraction(.scrolls)
+        .presentationDragIndicator(.visible)
+        .presentationBackground(AlmanacPalette.paper)
+        .preferredColorScheme(.light)
+      }
+    }
+    .sensoryFeedback(trigger: loggingModel?.state.feedback?.id) { _, _ in
+      sensoryFeedback(for: loggingModel?.state.feedback?.kind)
+    }
+    .onChange(of: loggingModel?.state.feedback?.id) { _, feedbackID in
+      guard let loggingModel, let feedbackID else { return }
+      Task { @MainActor in
+        await Task.yield()
+        loggingModel.consumeFeedback(feedbackID)
+      }
+    }
+    .onChange(of: loggingModel?.state.actionFailure) { _, failure in
+      guard let failure else { return }
+      AccessibilityNotification.Announcement(failure.message).post()
     }
   }
 
@@ -94,7 +135,11 @@ struct TodayView: View {
             title: "TO TEND",
             identifier: "today.section.to-tend",
             rows: dashboard.toTendRows,
-            retry: retry
+            retry: retry,
+            activate: activateCurrent,
+            activateAtRisk: activateAtRisk,
+            loggingState: loggingModel?.state,
+            performUndo: undo
           )
         }
 
@@ -103,7 +148,11 @@ struct TodayView: View {
             title: "TENDED",
             identifier: "today.section.tended",
             rows: dashboard.tendedRows,
-            retry: retry
+            retry: retry,
+            activate: activateCurrent,
+            activateAtRisk: activateAtRisk,
+            loggingState: loggingModel?.state,
+            performUndo: undo
           )
         }
       }
@@ -144,18 +193,73 @@ struct TodayView: View {
   }
 
   private func refresh() {
-    let currentModel: TodayModel
-    if let model {
-      currentModel = model
-    } else {
-      let createdModel = TodayModel(context: modelContext)
-      model = createdModel
-      currentModel = createdModel
-    }
-    currentModel.refresh(
+    resolvedLoggingModel().refresh(
       habits: habits,
       context: refreshContext
     )
+  }
+
+  private func activateCurrent(_ row: TodayHabitRow) {
+    resolvedLoggingModel().activateCurrent(
+      habit: row.habit,
+      habits: habits,
+      context: operationContext()
+    )
+  }
+
+  private func activateAtRisk(_ row: TodayHabitRow) {
+    resolvedLoggingModel().activateAtRisk(
+      habit: row.habit,
+      habits: habits,
+      context: operationContext()
+    )
+  }
+
+  private func undo(_ row: TodayHabitRow) {
+    resolvedLoggingModel().undo(
+      habits: habits,
+      context: operationContext()
+    )
+  }
+
+  private func operationContext() -> TodayRefreshContext {
+    var context = refreshContext
+    context = TodayRefreshContext(
+      instant: fixedOperationInstant ?? .now,
+      timeZone: context.timeZone,
+      calendar: context.calendar,
+      locale: context.locale
+    )
+    return context
+  }
+
+  private func sensoryFeedback(
+    for kind: TodayLoggingFeedback.Kind?
+  ) -> SensoryFeedback? {
+    switch kind {
+    case .logged:
+      .impact(weight: .light)
+    case .completion:
+      .success
+    case .undo:
+      .selection
+    case nil:
+      nil
+    }
+  }
+
+  private func resolvedLoggingModel() -> TodayLoggingModel {
+    if let loggingModel {
+      return loggingModel
+    }
+    let todayModel = model ?? TodayModel(context: modelContext)
+    model = todayModel
+    let createdModel = TodayLoggingModel(
+      context: modelContext,
+      todayModel: todayModel
+    )
+    loggingModel = createdModel
+    return createdModel
   }
 
   private func retry(_ row: TodayHabitRow) {
@@ -298,6 +402,10 @@ private struct TodayDashboardSection: View {
   let identifier: String
   let rows: [TodayHabitRow]
   let retry: (TodayHabitRow) -> Void
+  let activate: (TodayHabitRow) -> Void
+  let activateAtRisk: (TodayHabitRow) -> Void
+  let loggingState: TodayLoggingState?
+  let performUndo: (TodayHabitRow) -> Void
 
   var body: some View {
     VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
@@ -308,9 +416,27 @@ private struct TodayDashboardSection: View {
 
       VStack(spacing: AlmanacMetrics.spacingSmall) {
         ForEach(rows) { row in
-          TodayHabitCard(row: row) {
-            retry(row)
-          }
+          TodayHabitCard(
+            row: row,
+            retry: {
+              retry(row)
+            },
+            activate: row.isAvailable
+              ? {
+                activate(row)
+              }
+              : nil,
+            activateAtRisk: row.riskText != nil
+              ? {
+                activateAtRisk(row)
+              }
+              : nil,
+            actionFailure: loggingState?.actionFailure(for: row.id),
+            undo: loggingState?.undo(for: row.id),
+            performUndo: {
+              performUndo(row)
+            }
+          )
         }
       }
     }
@@ -321,11 +447,32 @@ private struct TodayHabitCard: View {
 
   let row: TodayHabitRow
   let retry: () -> Void
-
+  let activate: (() -> Void)?
+  let activateAtRisk: (() -> Void)?
+  let actionFailure: TodayLoggingInlineFailure?
+  let undo: TodayLogUndo?
+  let performUndo: () -> Void
   var body: some View {
     VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
       facts
 
+      if let actionFailure {
+        Text(actionFailure.message)
+          .almanacTextStyle(.secondary)
+          .foregroundStyle(AlmanacPalette.ochreDeep)
+          .fixedSize(horizontal: false, vertical: true)
+          .accessibilityIdentifier("today.action-error.\(row.name)")
+      }
+
+      if let undo {
+        TodayLogUndoRow(
+          undo: undo,
+          habitName: row.name,
+          identifier: "today.undo.\(row.name)",
+          actionIdentifier: "today.undo.action.\(row.name)",
+          action: performUndo
+        )
+      }
       if let failure = row.failure {
         Button(failure.retryTitle, action: retry)
           .buttonStyle(AlmanacPrimaryButtonStyle())
@@ -348,6 +495,7 @@ private struct TodayHabitCard: View {
         style: .continuous
       )
       .stroke(AlmanacPalette.hairline, lineWidth: 1)
+      .allowsHitTesting(false)
     }
   }
 
@@ -360,24 +508,33 @@ private struct TodayHabitCard: View {
       }
 
       if let riskText = row.riskText {
-        HStack(alignment: .firstTextBaseline, spacing: AlmanacMetrics.spacingSmall) {
-          Circle()
-            .fill(AlmanacPalette.ochreDeep)
-            .frame(width: 8, height: 8)
-          Text(riskText).almanacTextStyle(.secondary)
-            .fontWeight(.semibold)
-            .fixedSize(horizontal: false, vertical: true)
+        if let activateAtRisk {
+          Button(action: activateAtRisk) {
+            riskLabel(riskText)
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel("Log \(riskScopeLabel) for \(row.name)")
+          .accessibilityValue(riskText)
+          .accessibilityHint(
+            row.habit.unit == "times" ? "Logs one instance" : "Opens log sheet"
+          )
+          .accessibilityIdentifier("today.risk.\(row.name)")
+        } else {
+          riskLabel(riskText)
         }
-        .foregroundStyle(AlmanacPalette.ochreDeep)
       }
 
       if !row.isMet {
 
         if let facts = row.facts {
-          TodayProgressTrack(fraction: facts.visualProgressFraction)
-          Text(row.progressText).almanacTextStyle(.body)
-            .foregroundStyle(AlmanacPalette.inkMuted)
-            .fixedSize(horizontal: false, vertical: true)
+          Group {
+            TodayProgressTrack(fraction: facts.visualProgressFraction)
+            Text(row.progressText).almanacTextStyle(.body)
+              .foregroundStyle(AlmanacPalette.inkMuted)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+          .accessibilityElement(children: .ignore)
+          .accessibilityHidden(activate != nil)
         } else if let failure = row.failure {
           Text(row.progressText).almanacTextStyle(.body)
             .foregroundStyle(AlmanacPalette.inkMuted)
@@ -387,9 +544,9 @@ private struct TodayHabitCard: View {
         }
       }
     }
-    .accessibilityElement(children: .ignore)
-    .accessibilityLabel(row.accessibilityLabel)
-    .accessibilityValue(row.accessibilityValue)
+    .accessibilityElement(children: activate == nil ? .ignore : .contain)
+    .accessibilityLabel(activate == nil ? row.accessibilityLabel : "")
+    .accessibilityValue(activate == nil ? row.accessibilityValue : "")
     .accessibilityIdentifier("today.row.\(row.name)")
   }
 
@@ -420,6 +577,7 @@ private struct TodayHabitCard: View {
       .fixedSize(horizontal: false, vertical: true)
       .accessibilityHidden(true)
     }
+    .accessibilityHidden(activate != nil)
   }
 
   private var streakColor: Color {
@@ -432,12 +590,48 @@ private struct TodayHabitCard: View {
     return AlmanacPalette.inkMuted
   }
 
+  @ViewBuilder
   private var ring: some View {
+    if let activate {
+      Button(action: activate) {
+        ringVisual
+          .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(row.accessibilityLabel)
+      .accessibilityValue(row.accessibilityValue)
+      .accessibilityHint(row.habit.unit == "times" ? "Logs one instance" : "Opens log sheet")
+      .accessibilityIdentifier("today.log.\(row.name)")
+    } else {
+      ringVisual
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+  }
+
+  private var ringVisual: some View {
     TodayProgressRing(row: row)
       .frame(width: row.isMet ? 44 : 52, height: row.isMet ? 44 : 52)
       .fixedSize()
-      .allowsHitTesting(false)
-      .accessibilityHidden(true)
+  }
+
+  private func riskLabel(_ riskText: String) -> some View {
+    HStack(alignment: .firstTextBaseline, spacing: AlmanacMetrics.spacingSmall) {
+      Circle()
+        .fill(AlmanacPalette.ochreDeep)
+        .frame(width: 8, height: 8)
+        .accessibilityHidden(true)
+      Text(riskText).almanacTextStyle(.secondary)
+        .fontWeight(.semibold)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .foregroundStyle(AlmanacPalette.ochreDeep)
+    .frame(minHeight: AlmanacMetrics.minimumTarget)
+    .contentShape(Rectangle())
+  }
+
+  private var riskScopeLabel: String {
+    row.facts?.snapshot.cadence == .weekly ? "Last Week" : "Yesterday"
   }
 }
 
@@ -459,9 +653,47 @@ private struct TodayProgressTrack: View {
 }
 
 private struct TodayProgressRing: View {
+  private struct MotionState: Hashable {
+    let fraction: Double?
+    let isMet: Bool
+  }
+
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   let row: TodayHabitRow
 
   var body: some View {
+    if reduceMotion {
+      ZStack {
+        ring
+          .id(motionState)
+          .transition(.opacity)
+      }
+      .animation(.easeOut(duration: 0.2), value: motionState)
+    } else {
+      ZStack {
+        ring
+          .transition(.opacity)
+      }
+      .animation(.easeOut(duration: 0.25), value: motionState.fraction)
+      .animation(.easeInOut(duration: 0.2), value: motionState.isMet)
+      .keyframeAnimator(initialValue: 1.0, trigger: row.isMet) { content, scale in
+        content.scaleEffect(row.isMet ? scale : 1)
+      } keyframes: { _ in
+        SpringKeyframe(1.06, duration: 0.225, spring: .smooth)
+        SpringKeyframe(1, duration: 0.225, spring: .smooth)
+      }
+    }
+  }
+
+  private var motionState: MotionState {
+    MotionState(
+      fraction: row.facts?.visualProgressFraction,
+      isMet: row.isMet
+    )
+  }
+
+  @ViewBuilder
+  private var ring: some View {
     if row.isMet {
       Circle()
         .fill(AlmanacPalette.moss)
@@ -474,6 +706,9 @@ private struct TodayProgressRing: View {
       if fraction == 0 {
         Circle()
           .stroke(AlmanacPalette.moss, lineWidth: 1.5)
+          .overlay {
+            loggingGlyph
+          }
       } else {
         ZStack {
           Circle()
@@ -485,6 +720,7 @@ private struct TodayProgressRing: View {
               style: StrokeStyle(lineWidth: 4, lineCap: .round)
             )
             .rotationEffect(.degrees(-90))
+          loggingGlyph
         }
       }
     } else {
@@ -495,6 +731,13 @@ private struct TodayProgressRing: View {
             .stroke(AlmanacPalette.hairline, lineWidth: 1)
         }
     }
+  }
+
+  private var loggingGlyph: some View {
+    Image(systemName: "plus")
+      .font(.system(size: 16, weight: .semibold))
+      .foregroundStyle(AlmanacPalette.mossDeep)
+      .accessibilityHidden(true)
   }
 }
 

@@ -51,13 +51,19 @@ private struct AlmanacScreenModifier: ViewModifier {
 }
 
 struct AlmanacPrimaryButtonStyle: ButtonStyle {
+  let minimumTarget: CGFloat
+
+  init(minimumTarget: CGFloat = AlmanacMetrics.minimumTarget) {
+    self.minimumTarget = minimumTarget
+  }
+
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .font(.body.weight(.semibold))
       .foregroundStyle(AlmanacPalette.paper)
       .frame(
-        minWidth: AlmanacMetrics.minimumTarget,
-        minHeight: AlmanacMetrics.minimumTarget
+        minWidth: minimumTarget,
+        minHeight: minimumTarget
       )
       .padding(.horizontal, AlmanacMetrics.spacingLarge)
       .background(

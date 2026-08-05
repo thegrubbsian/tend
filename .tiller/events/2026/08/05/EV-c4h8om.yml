@@ -1,0 +1,13 @@
+id: EV-c4h8om
+type: check.task
+at: 2026-08-05T19:36:35.565351Z
+owner: jc
+command: check task T-and87o
+targets:
+    - T-and87o
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
