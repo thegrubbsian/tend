@@ -600,6 +600,37 @@ struct TodayLoggingModelTests {
     #expect(expiryModel.state.feedback?.id == expiryFeedback)
   }
 
+  @Test("Undo uses the fresh context deadline before deleting")
+  func expiredUndoIsNonmutatingWhenExpiryDeliveryIsDelayed() async throws {
+    let sleeper = ControlledSleeper()
+    let fixture = try LoggingFixture(target: 10, progress: 0)
+    let model = fixture.makeModel {
+      try await sleeper.sleep($0)
+    }
+    fixture.presentSheet(model)
+    model.appendQuickAdd(
+      amount: 1,
+      habits: fixture.habits,
+      context: fixture.refreshContext
+    )
+    await sleeper.waitForCount(1)
+    let feedbackID = model.state.feedback?.id
+    let lateContext = TodayRefreshContext(
+      instant: fixture.refreshContext.instant.addingTimeInterval(6),
+      timeZone: fixture.refreshContext.timeZone,
+      calendar: fixture.refreshContext.calendar,
+      locale: fixture.refreshContext.locale
+    )
+
+    model.undo(habits: fixture.habits, context: lateContext)
+
+    #expect(model.state.undo == nil)
+    #expect(model.state.feedback?.id == feedbackID)
+    #expect(fixture.currentEntries.count == 1)
+    #expect(fixture.deletedEntryIDs.isEmpty)
+    await sleeper.resumeOldest()
+  }
+
   @Test("model teardown cancels only pending Undo expiry work")
   func modelLifetimeCancelsOnlyExpiryWork() async throws {
     let sleeper = CancellationSleeper()
@@ -698,7 +729,7 @@ struct TodayLoggingModelTests {
     #expect(alreadyMetModel.state.feedback == nil)
   }
 
-  @Test("unavailable activation and stale Undo do not block an unrelated sheet refresh")
+  @Test("stale activation and malformed identities preserve unrelated interactions")
   func independentInteractionStateRefreshesByHabitIdentity() throws {
     let context = try makeContext()
     let refreshContext = makeRefreshContext()
@@ -708,6 +739,8 @@ struct TodayLoggingModelTests {
     var firstProgress = 0
     var secondProgress = 2
     var firstEntries: [HabitLoggingEntrySnapshot] = []
+    var firstProjectionError: (any Error)?
+    var secondProjectionError: (any Error)?
     let todayModel = TodayModel(
       operations: TodayOperations { habit, _ in
         todaySnapshot(
@@ -719,7 +752,13 @@ struct TodayLoggingModelTests {
     todayModel.refresh(habits: habits, context: refreshContext)
     let operations = TodayLoggingOperations(
       snapshot: { habit, _ in
-        loggingSnapshot(
+        if habit === first, let firstProjectionError {
+          throw firstProjectionError
+        }
+        if habit === second, let secondProjectionError {
+          throw secondProjectionError
+        }
+        return loggingSnapshot(
           habit: habit,
           progress: habit === first ? firstProgress : secondProgress,
           currentEntries: habit === first ? firstEntries : []
@@ -763,11 +802,16 @@ struct TodayLoggingModelTests {
 
     model.activateCurrent(habit: second, habits: habits, context: refreshContext)
     secondProgress = 7
-    first.isActive = false
+    firstProjectionError = HabitLoggingComputationError.detachedHabit
     model.refresh(habits: habits, context: refreshContext)
     #expect(model.state.undo == nil)
+    #expect(model.state.feedback == nil)
     #expect(model.state.sheet?.habitID == second.persistentModelID)
     #expect(model.state.sheet?.progress == 7)
+
+    secondProjectionError = BucketEvaluationError.invalidRequirement(0)
+    model.refresh(habits: habits, context: refreshContext)
+    #expect(model.state.sheet == nil)
   }
 
   private actor ControlledSleeper {

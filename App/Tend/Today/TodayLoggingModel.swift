@@ -426,7 +426,11 @@ final class TodayLoggingModel {
               changedWithoutSheet = true
             }
           } catch {
-            replacement.undo = replacing(undo, error: message(for: error))
+            if invalidatesInteractionState(error) {
+              clearIneligibleState(for: undo.habitID, in: &replacement)
+            } else {
+              replacement.undo = replacing(undo, error: message(for: error))
+            }
             changedWithoutSheet = true
           }
         }
@@ -479,13 +483,17 @@ final class TodayLoggingModel {
       replacement.actionFailure = nil
       state = replacement
     } catch {
-      replacement.sheet = replacing(
-        openSheet,
-        amountEditorMode: openSheet.amountEditorMode,
-        amountInput: openSheet.amountInput,
-        amountError: nil,
-        sheetError: message(for: error)
-      )
+      if invalidatesInteractionState(error) {
+        clearIneligibleState(for: openSheet.habitID, in: &replacement)
+      } else {
+        replacement.sheet = replacing(
+          openSheet,
+          amountEditorMode: openSheet.amountEditorMode,
+          amountInput: openSheet.amountInput,
+          amountError: nil,
+          sheetError: message(for: error)
+        )
+      }
       state = replacement
     }
   }
@@ -544,6 +552,10 @@ final class TodayLoggingModel {
     context: TodayRefreshContext
   ) {
     guard let pending = state.undo else { return }
+    guard context.instant < pending.expiresAt else {
+      clearUndo(matching: pending.entryID)
+      return
+    }
     guard let habit = liveHabit(matching: pending.habitID, in: habits) else {
       clearIneligibleState(for: pending.habitID)
       return
@@ -585,7 +597,11 @@ final class TodayLoggingModel {
       expiryTask?.cancel()
       state = replacement
     } catch {
-      publishUndoFailure(message(for: error))
+      if invalidatesInteractionState(error) {
+        clearIneligibleState(for: pending.habitID)
+      } else {
+        publishUndoFailure(message(for: error))
+      }
     }
   }
 
@@ -720,6 +736,12 @@ final class TodayLoggingModel {
   }
 
   private func publishSheetFailure(_ error: Error) {
+    if invalidatesInteractionState(error) {
+      if let habitID = state.sheet?.habitID {
+        clearIneligibleState(for: habitID)
+      }
+      return
+    }
     guard let sheet = state.sheet else { return }
     var replacement = state
     replacement.sheet = replacing(
@@ -1009,7 +1031,18 @@ final class TodayLoggingModel {
     state = replacement
   }
 
+  private func invalidatesInteractionState(_ error: Error) -> Bool {
+    error is HabitLoggingComputationError
+      || error is BucketEvaluationError
+      || error is BucketReconciliationError
+      || error is CalendarBucketScheduleError
+  }
+
   private func publishActionFailure(_ error: Error, habitID: PersistentIdentifier) {
+    if invalidatesInteractionState(error) {
+      clearIneligibleState(for: habitID)
+      return
+    }
     var replacement = state
     replacement.actionFailure = TodayLoggingInlineFailure(
       habitID: habitID,
