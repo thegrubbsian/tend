@@ -11,7 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
 - feature app-experience/fast-logging (F-z8e13q): active
-- task app-experience/fast-logging/fast-logging-acceptance (T-p7kknm): ready
+- task app-experience/fast-logging/fast-logging-acceptance (T-p7kknm): in_progress
 
 ### Blocked
 
