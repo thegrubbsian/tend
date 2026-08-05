@@ -1,7 +1,7 @@
 id: F-z8e13q
 key: app-experience/fast-logging
 title: Fast Logging and Back-fill
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -16,6 +16,7 @@ surface:
         - App/TendUITests
 depends_on:
     - F-skoqxt
+branch: tiller/app-experience/fast-logging
 accepted_against:
     spec:
         kind: git_blob

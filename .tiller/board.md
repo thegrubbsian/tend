@@ -10,8 +10,8 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
-- feature app-experience/fast-logging (F-z8e13q): ready
-- task app-experience/fast-logging/editable-logging-projection (T-qi6zgm): ready
+- feature app-experience/fast-logging (F-z8e13q): active
+- task app-experience/fast-logging/editable-logging-projection (T-qi6zgm): in_progress
 - task app-experience/fast-logging/fast-logging-fixtures (T-9016sz): ready
 - task app-experience/fast-logging/fast-logging-model (T-2tztqs): ready
 - task app-experience/fast-logging/quantity-log-sheet (T-and87o): ready
