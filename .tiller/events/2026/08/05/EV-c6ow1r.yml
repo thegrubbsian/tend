@@ -1,0 +1,13 @@
+id: EV-c6ow1r
+type: start.task
+at: 2026-08-05T15:18:00.016005Z
+owner: jc
+command: start task T-2tztqs
+targets:
+    - T-2tztqs
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.yml
