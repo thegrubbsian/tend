@@ -15,6 +15,7 @@
     case duplicateInstantArgument
     case invalidInstant(String)
     case fixtureRequiresReset
+    case fixtureRequiresInstant
 
     var errorDescription: String? {
       switch self {
@@ -42,6 +43,8 @@
         "The UI-test instant \(instant) is invalid."
       case .fixtureRequiresReset:
         "A UI-test fixture requires exactly one reset flag."
+      case .fixtureRequiresInstant:
+        "A Fast Logging UI-test fixture requires a fixed instant."
       }
     }
   }
@@ -59,6 +62,8 @@
       case todayAllTended = "today-all-tended"
       case todayInactive = "today-inactive"
       case todayFailure = "today-failure"
+      case fastLoggingDaily = "fast-logging-daily"
+      case fastLoggingWeekly = "fast-logging-weekly"
     }
 
     static func containerFactory(
@@ -154,6 +159,20 @@
             at: launchInstant,
             timeZone: fixtureTimeZone
           )
+        case .fastLoggingDaily:
+          try FastLoggingUITestFixture.seed(
+            .daily,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .fastLoggingWeekly:
+          try FastLoggingUITestFixture.seed(
+            .weekly,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
         case nil:
           break
         }
@@ -243,6 +262,11 @@
           instant = parsedInstant
         } else {
           instant = nil
+        }
+        if fixture == .fastLoggingDaily || fixture == .fastLoggingWeekly,
+          instant == nil
+        {
+          throw TendUITestStoreError.fixtureRequiresInstant
         }
 
         self.name = name

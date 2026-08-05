@@ -551,6 +551,366 @@ struct TendApplicationModelTests {
     )
   }
 
+  @Test("Fast Logging fixtures require strict complete launch arguments")
+  func fastLoggingFixturesRequireStrictCompleteLaunchArguments() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let instant = "2027-01-04T20:00:00Z"
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+
+    for fixture in fastLoggingFixtureNames {
+      let validArguments = [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument, fixture,
+        TendUITestStore.instantArgument, instant,
+      ]
+      let factory = try #require(
+        TendUITestStore.containerFactory(
+          arguments: validArguments,
+          applicationSupportDirectory: supportDirectory,
+          fixtureTimeZone: timeZone
+        ))
+      let container = try factory()
+      #expect(try container.mainContext.fetchCount(FetchDescriptor<Habit>()) > 0)
+      try expectUITestStoreError(
+        .fixtureRequiresInstant,
+        arguments: validArguments.filter {
+          $0 != TendUITestStore.instantArgument && $0 != instant
+        },
+        supportDirectory: supportDirectory
+      )
+
+      try expectUITestStoreError(
+        .missingEnabledArgument,
+        arguments: Array(validArguments.dropFirst(2)),
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateEnabledArgument,
+        arguments: validArguments + [TendUITestStore.enabledArgument],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .missingName,
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+          TendUITestStore.instantArgument, instant,
+        ],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateNameArgument,
+        arguments: validArguments + [TendUITestStore.nameArgument, "other-store"],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .fixtureRequiresReset,
+        arguments: validArguments.filter { $0 != TendUITestStore.resetArgument },
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateResetArgument,
+        arguments: validArguments + [TendUITestStore.resetArgument],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateFixtureArgument,
+        arguments: validArguments + [TendUITestStore.fixtureArgument, fixture],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .duplicateInstantArgument,
+        arguments: validArguments + [TendUITestStore.instantArgument, instant],
+        supportDirectory: supportDirectory
+      )
+      try expectUITestStoreError(
+        .invalidName("../fixture-store"),
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          "../fixture-store", TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+          TendUITestStore.instantArgument, instant,
+        ],
+        supportDirectory: supportDirectory
+      )
+    }
+
+    try expectUITestStoreError(
+      .missingFixture,
+      arguments: [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument,
+      ],
+      supportDirectory: supportDirectory
+    )
+    try expectUITestStoreError(
+      .unsupportedFixture("../fast-logging-daily"),
+      arguments: [
+        "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+        "fixture-store", TendUITestStore.resetArgument,
+        TendUITestStore.fixtureArgument, "../fast-logging-daily",
+      ],
+      supportDirectory: supportDirectory
+    )
+  }
+
+  @Test("fast-logging-daily projects exact current and grace facts")
+  func fastLoggingDailyProjectsExactCurrentAndGraceFacts() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2026-12-31T12:00:00-08:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let container = try fastLoggingFixtureFactory(
+      storeName: "fast-logging-daily",
+      fixture: "fast-logging-daily",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )()
+    let habits = try fetchHabitsOrderedByName(from: container)
+    #expect(
+      habits.map(\.name) == [
+        "Feed the cat",
+        "Meditate",
+        "Posture checks",
+        "Read 20 pages",
+        "Walk 8K steps",
+      ])
+
+    let schedule = CalendarBucketSchedule(timeZone: timeZone)
+    let currentPeriod = try schedule.period(containing: launchInstant, cadence: .daily)
+    let gracePeriod = try schedule.period(
+      containing: currentPeriod.start.addingTimeInterval(-1),
+      cadence: .daily
+    )
+    let logging = HabitLoggingComputation(context: container.mainContext)
+    let today = HabitTodayComputation(context: container.mainContext)
+    let loggingSnapshots = try Dictionary(
+      uniqueKeysWithValues: habits.map {
+        ($0.name, try logging.snapshot(for: $0, at: launchInstant, timeZone: timeZone))
+      })
+    let todaySnapshots = try Dictionary(
+      uniqueKeysWithValues: habits.map {
+        ($0.name, try today.snapshot(for: $0, at: launchInstant, timeZone: timeZone))
+      })
+    #expect(loggingSnapshots.values.allSatisfy { $0.current.periodKey == currentPeriod.key })
+    #expect(loggingSnapshots.values.allSatisfy { $0.current.phase == .open })
+    #expect(todaySnapshots.values.filter(\.isAtRisk).count == 1)
+
+    let targetOne = try #require(loggingSnapshots["Feed the cat"])
+    #expect(targetOne.cadence == .daily)
+    #expect(targetOne.target == 1)
+    #expect(targetOne.unit == "times")
+    #expect(targetOne.current.progress == 0)
+    #expect(!targetOne.current.isMet)
+    #expect(targetOne.current.entries.isEmpty)
+    #expect(targetOne.grace == nil)
+
+    let exactTime = try #require(loggingSnapshots["Meditate"])
+    #expect(exactTime.target == 10)
+    #expect(exactTime.unit == "time")
+    #expect(exactTime.current.progress == 0)
+    #expect(!exactTime.current.isMet)
+    #expect(exactTime.current.entries.isEmpty)
+    #expect(exactTime.grace == nil)
+
+    let multiCount = try #require(loggingSnapshots["Posture checks"])
+    #expect(multiCount.target == 4)
+    #expect(multiCount.unit == "times")
+    #expect(multiCount.current.progress == 4)
+    #expect(multiCount.current.entries.map(\.amount) == [4])
+    #expect(multiCount.current.isMet)
+    #expect(multiCount.grace == nil)
+
+    let completedQuantity = try #require(loggingSnapshots["Read 20 pages"])
+    #expect(completedQuantity.target == 20)
+    #expect(completedQuantity.unit == "pages")
+    #expect(completedQuantity.current.progress == 20)
+    #expect(completedQuantity.current.entries.map(\.amount) == [20])
+    #expect(completedQuantity.current.isMet)
+    #expect(completedQuantity.grace == nil)
+
+    let partialQuantity = try #require(loggingSnapshots["Walk 8K steps"])
+    #expect(partialQuantity.target == 8_000)
+    #expect(partialQuantity.unit == "steps")
+    #expect(partialQuantity.current.progress == 4_000)
+    #expect(partialQuantity.current.entries.map(\.amount) == [2_000, 2_000])
+    #expect(partialQuantity.current.entries.map(\.timestamp) == [launchInstant, launchInstant])
+    #expect(Set(partialQuantity.current.entries.map(\.uuid)).count == 2)
+    #expect(Set(partialQuantity.current.entries.map(\.id)).count == 2)
+    #expect(partialQuantity.current.entries[0].id < partialQuantity.current.entries[1].id)
+    #expect(!partialQuantity.current.isMet)
+    let grace = try #require(partialQuantity.grace)
+    #expect(grace.periodKey == gracePeriod.key)
+    #expect(grace.phase == .grace)
+    #expect(grace.progress == 3_000)
+    #expect(grace.target == 8_000)
+    #expect(grace.unit == "steps")
+    #expect(!grace.isMet)
+    #expect(grace.entries.map(\.amount) == [3_000])
+
+    let partialToday = try #require(todaySnapshots["Walk 8K steps"])
+    #expect(partialToday.periodKey == currentPeriod.key)
+    #expect(partialToday.progress == 4_000)
+    #expect(partialToday.target == 8_000)
+    #expect(partialToday.unit == "steps")
+    #expect(partialToday.cadence == .daily)
+    #expect(partialToday.currentStreak == 3)
+    #expect(partialToday.isAtRisk)
+    #expect(!partialToday.isMet)
+    #expect(try #require(todaySnapshots["Read 20 pages"]).isMet)
+    #expect(try #require(todaySnapshots["Posture checks"]).isMet)
+    #expect(!(try #require(todaySnapshots["Feed the cat"])).isMet)
+  }
+
+  @Test("fast-logging-weekly projects This Week and Last Week on Monday")
+  func fastLoggingWeeklyProjectsCurrentAndGraceFacts() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2027-01-04T12:00:00-08:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let container = try fastLoggingFixtureFactory(
+      storeName: "fast-logging-weekly",
+      fixture: "fast-logging-weekly",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )()
+    let habits = try fetchHabitsOrderedByName(from: container)
+    #expect(habits.map(\.name) == ["Weekly check-ins", "Weekly field notes"])
+
+    let schedule = CalendarBucketSchedule(timeZone: timeZone)
+    let currentPeriod = try schedule.period(containing: launchInstant, cadence: .weekly)
+    let gracePeriod = try schedule.period(
+      containing: currentPeriod.start.addingTimeInterval(-1),
+      cadence: .weekly
+    )
+    #expect(currentPeriod.key == "week:2027-01-04")
+    #expect(gracePeriod.key == "week:2026-12-28")
+
+    let logging = HabitLoggingComputation(context: container.mainContext)
+    let today = HabitTodayComputation(context: container.mainContext)
+    let snapshots = try Dictionary(
+      uniqueKeysWithValues: habits.map {
+        ($0.name, try logging.snapshot(for: $0, at: launchInstant, timeZone: timeZone))
+      })
+    let todaySnapshots = try habits.map {
+      try today.snapshot(for: $0, at: launchInstant, timeZone: timeZone)
+    }
+    #expect(todaySnapshots.allSatisfy { $0.periodKey == currentPeriod.key })
+    #expect(todaySnapshots.allSatisfy { $0.cadence == .weekly })
+    #expect(todaySnapshots.allSatisfy { !$0.isMet && !$0.isAtRisk })
+
+    let checkInsHabit = try #require(habits.first { $0.name == "Weekly check-ins" })
+    #expect(checkInsHabit.pinnedWeekdaysRawValue == PinnedWeekdays.monday.rawValue)
+    let checkIns = try #require(snapshots[checkInsHabit.name])
+    #expect(checkIns.target == 3)
+    #expect(checkIns.unit == "times")
+    #expect(checkIns.current.periodKey == currentPeriod.key)
+    #expect(checkIns.current.phase == .open)
+    #expect(checkIns.current.progress == 1)
+    #expect(checkIns.current.entries.map(\.amount) == [1])
+    let checkInsGrace = try #require(checkIns.grace)
+    #expect(checkInsGrace.periodKey == gracePeriod.key)
+    #expect(checkInsGrace.phase == .grace)
+    #expect(checkInsGrace.progress == 1)
+    #expect(checkInsGrace.entries.map(\.amount) == [1])
+
+    let notesHabit = try #require(habits.first { $0.name == "Weekly field notes" })
+    #expect(notesHabit.pinnedWeekdaysRawValue == PinnedWeekdays.friday.rawValue)
+    let notes = try #require(snapshots[notesHabit.name])
+    #expect(notes.target == 100)
+    #expect(notes.unit == "pages")
+    #expect(notes.current.periodKey == currentPeriod.key)
+    #expect(notes.current.phase == .open)
+    #expect(notes.current.progress == 40)
+    #expect(notes.current.entries.map(\.amount) == [20, 20])
+    #expect(notes.current.entries.map(\.timestamp) == [launchInstant, launchInstant])
+    #expect(Set(notes.current.entries.map(\.uuid)).count == 2)
+    #expect(Set(notes.current.entries.map(\.id)).count == 2)
+    #expect(notes.current.entries[0].id < notes.current.entries[1].id)
+    let notesGrace = try #require(notes.grace)
+    #expect(notesGrace.periodKey == gracePeriod.key)
+    #expect(notesGrace.phase == .grace)
+    #expect(notesGrace.progress == 30)
+    #expect(notesGrace.entries.map(\.amount) == [30])
+  }
+
+  @Test("Fast Logging fixtures persist mutations without cross-store reseeding")
+  func fastLoggingFixturesPersistMutationsAndRemainStoreScoped() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let launchInstant = try fixtureInstant("2027-01-04T12:00:00-08:00")
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let dailyStore = "persistent-fast-logging-daily"
+    let weeklyStore = "persistent-fast-logging-weekly"
+    let expectedDailyFingerprint: StoreFingerprint
+
+    do {
+      let dailyContainer = try fastLoggingFixtureFactory(
+        storeName: dailyStore,
+        fixture: "fast-logging-daily",
+        supportDirectory: supportDirectory,
+        launchInstant: launchInstant,
+        timeZone: timeZone
+      )()
+      let targetOne = try #require(
+        try fetchHabitsOrderedByName(from: dailyContainer)
+          .first { $0.name == "Feed the cat" }
+      )
+      try LogEntryOperations(context: dailyContainer.mainContext).append(
+        amount: 1,
+        to: targetOne,
+        at: launchInstant,
+        timeZone: timeZone
+      )
+      expectedDailyFingerprint = try storeFingerprint(of: dailyContainer)
+    }
+
+    let weeklyContainer = try fastLoggingFixtureFactory(
+      storeName: weeklyStore,
+      fixture: "fast-logging-weekly",
+      supportDirectory: supportDirectory,
+      launchInstant: launchInstant,
+      timeZone: timeZone
+    )()
+    #expect(
+      try fetchHabitsOrderedByName(from: weeklyContainer).map(\.name)
+        == ["Weekly check-ins", "Weekly field notes"])
+
+    let reopeningFactory = try uiTestStoreFactory(
+      name: dailyStore,
+      reset: false,
+      supportDirectory: supportDirectory
+    )
+    let reopenedDaily = try reopeningFactory()
+    #expect(try storeFingerprint(of: reopenedDaily) == expectedDailyFingerprint)
+    #expect(
+      try fetchHabitsOrderedByName(from: reopenedDaily).map(\.name) == [
+        "Feed the cat",
+        "Meditate",
+        "Posture checks",
+        "Read 20 pages",
+        "Walk 8K steps",
+      ])
+    let reopenedTargetOne = try #require(
+      try fetchHabitsOrderedByName(from: reopenedDaily)
+        .first { $0.name == "Feed the cat" }
+    )
+    let reopenedSnapshot = try HabitLoggingComputation(
+      context: reopenedDaily.mainContext
+    ).snapshot(
+      for: reopenedTargetOne,
+      at: launchInstant,
+      timeZone: timeZone
+    )
+    #expect(reopenedSnapshot.current.progress == 1)
+    #expect(reopenedSnapshot.current.entries.map(\.amount) == [1])
+  }
+
   @Test("Today fixture names cannot stand in for a missing store name")
   func todayFixtureNamesCannotStandInForMissingStoreName() throws {
     let supportDirectory = try makeTemporarySupportDirectory()
@@ -983,6 +1343,36 @@ struct TendApplicationModelTests {
 
   private var todayFixtureNames: [String] {
     Self.todayFixtureNames
+  }
+
+  private static let fastLoggingFixtureNames = [
+    "fast-logging-daily",
+    "fast-logging-weekly",
+  ]
+
+  private var fastLoggingFixtureNames: [String] {
+    Self.fastLoggingFixtureNames
+  }
+
+  private func fastLoggingFixtureFactory(
+    storeName: String,
+    fixture: String,
+    supportDirectory: URL,
+    launchInstant: Date,
+    timeZone: TimeZone
+  ) throws -> ModelContainerFactory {
+    try #require(
+      TendUITestStore.containerFactory(
+        arguments: [
+          "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+          storeName, TendUITestStore.resetArgument,
+          TendUITestStore.fixtureArgument, fixture,
+          TendUITestStore.instantArgument,
+          ISO8601DateFormatter().string(from: launchInstant),
+        ],
+        applicationSupportDirectory: supportDirectory,
+        fixtureTimeZone: timeZone
+      ))
   }
 
   private func todayFixtureFactory(

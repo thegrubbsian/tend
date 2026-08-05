@@ -1,7 +1,7 @@
 id: T-9016sz
 key: app-experience/fast-logging/fast-logging-fixtures
 title: Seed Deterministic Logging Journeys
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.634437Z
+pr: 32
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T14:53:56.49469Z
+        against:
+            kind: git_commit
+            value: git:7733d8b
+            observed_at: 2026-08-05T14:53:56.494683Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-7733d8b-out-2e71531854e1df73110494349178e520b66586e3ebfb04643218f01259b5662b.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T14:53:56.49469Z
+        against:
+            kind: git_commit
+            value: git:7733d8b
+            observed_at: 2026-08-05T14:53:56.494683Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-7733d8b-out-2f9a0466748ff44dd1b9336c2a78bedaa26d36ee70647b4a9383df13c1e307c3.txt
