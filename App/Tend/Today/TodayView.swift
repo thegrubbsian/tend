@@ -118,6 +118,7 @@ struct TodayView: View {
       VStack(alignment: .leading, spacing: AlmanacMetrics.spacingLarge) {
         content()
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
       .frame(maxWidth: AlmanacMetrics.readableContentWidth)
       .frame(maxWidth: .infinity, alignment: .center)
       .padding(.horizontal, AlmanacMetrics.screenPadding)
@@ -127,6 +128,18 @@ struct TodayView: View {
       .accessibilityIdentifier(identifier)
     }
     .scrollIndicators(.hidden)
+    .overlay {
+      GeometryReader { geometry in
+        VStack(spacing: 0) {
+          AlmanacPalette.paper
+            .frame(height: geometry.safeAreaInsets.top)
+          Spacer(minLength: 0)
+        }
+        .ignoresSafeArea()
+      }
+      .allowsHitTesting(false)
+      .accessibilityHidden(true)
+    }
     .background(AlmanacPalette.paper)
   }
 
