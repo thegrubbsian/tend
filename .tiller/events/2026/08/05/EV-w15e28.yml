@@ -1,0 +1,14 @@
+id: EV-w15e28
+type: sync.task
+at: 2026-08-05T15:17:36.869066Z
+owner: jc
+command: sync task T-9016sz
+targets:
+    - T-9016sz
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.yml

@@ -1,0 +1,14 @@
+id: EV-l2dobd
+type: submit.task
+at: 2026-08-05T16:21:21.359239Z
+owner: jc
+command: submit task T-2tztqs
+targets:
+    - T-2tztqs
+before:
+    status: check
+after:
+    pr: 33
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.yml

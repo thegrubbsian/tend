@@ -1,0 +1,13 @@
+id: EV-y2geh5
+type: check.task
+at: 2026-08-05T16:10:24.512795Z
+owner: jc
+command: check task T-2tztqs
+targets:
+    - T-2tztqs
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.yml

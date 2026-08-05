@@ -1,7 +1,7 @@
 id: T-2tztqs
 key: app-experience/fast-logging/fast-logging-model
 title: Model Fast Logging Interactions
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.65907Z
+pr: 33
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T16:20:46.83Z
+        against:
+            kind: git_commit
+            value: git:1a1f698
+            observed_at: 2026-08-05T16:20:46.829989Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-1a1f698-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T16:20:46.83Z
+        against:
+            kind: git_commit
+            value: git:1a1f698
+            observed_at: 2026-08-05T16:20:46.829989Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-1a1f698-out-3c6b193528165fe55d9a356c5bfe9f65d936712b26bbadcf290649a1506e0a5f.txt
