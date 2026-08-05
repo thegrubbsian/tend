@@ -1,0 +1,14 @@
+id: EV-gluq9a
+type: sync.task
+at: 2026-08-05T21:22:52.719331Z
+owner: jc
+command: sync task T-354lxo
+targets:
+    - T-354lxo
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.yml
