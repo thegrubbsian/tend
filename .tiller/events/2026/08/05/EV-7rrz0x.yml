@@ -1,0 +1,14 @@
+id: EV-7rrz0x
+type: submit.task
+at: 2026-08-05T01:33:28.142357Z
+owner: jc
+command: submit task T-qi6zgm
+targets:
+    - T-qi6zgm
+before:
+    status: check
+after:
+    pr: 31
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.yml
