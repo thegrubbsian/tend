@@ -59,6 +59,8 @@
       case todayAllTended = "today-all-tended"
       case todayInactive = "today-inactive"
       case todayFailure = "today-failure"
+      case fastLoggingDaily = "fast-logging-daily"
+      case fastLoggingWeekly = "fast-logging-weekly"
     }
 
     static func containerFactory(
@@ -150,6 +152,20 @@
         case .todayFailure:
           try TodayDashboardUITestFixture.seed(
             .failure,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .fastLoggingDaily:
+          try FastLoggingUITestFixture.seed(
+            .daily,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .fastLoggingWeekly:
+          try FastLoggingUITestFixture.seed(
+            .weekly,
             context: container.mainContext,
             at: launchInstant,
             timeZone: fixtureTimeZone
