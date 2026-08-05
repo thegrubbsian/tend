@@ -1,7 +1,7 @@
 id: T-qi6zgm
 key: app-experience/fast-logging/editable-logging-projection
 title: Project Editable Logging Scopes
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.611648Z
 pr: 31
+done_basis: ancestry
 gates:
     build:
         required: true
