@@ -1,7 +1,7 @@
 id: T-m66b11
 key: app-experience/today-dashboard/today-dashboard-acceptance
 title: Verify Today Dashboard Journey
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.357554Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T00:01:16.691604Z
+        against:
+            kind: git_commit
+            value: git:48894f6
+            observed_at: 2026-08-05T00:01:16.691586Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-48894f6-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T00:01:16.691604Z
+        against:
+            kind: git_commit
+            value: git:48894f6
+            observed_at: 2026-08-05T00:01:16.691586Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-48894f6-out-ab6e446571341e9f2e6914ab623d695fc10269ced2e71e95bc9b0ad26d50b9b7.txt

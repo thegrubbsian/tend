@@ -1,0 +1,13 @@
+id: EV-zo8dzn
+type: check.task
+at: 2026-08-05T00:01:20.583502Z
+owner: jc
+command: check task T-m66b11
+targets:
+    - T-m66b11
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-dashboard-acceptance/task.yml
