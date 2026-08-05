@@ -1,0 +1,14 @@
+id: EV-4suvsm
+type: submit.task
+at: 2026-08-05T14:55:05.513638Z
+owner: jc
+command: submit task T-9016sz
+targets:
+    - T-9016sz
+before:
+    status: check
+after:
+    pr: 32
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.yml
