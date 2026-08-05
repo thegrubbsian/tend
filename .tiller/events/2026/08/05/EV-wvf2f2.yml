@@ -1,0 +1,13 @@
+id: EV-wvf2f2
+type: start.task
+at: 2026-08-05T16:52:48.696987Z
+owner: jc
+command: start task T-and87o
+targets:
+    - T-and87o
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
