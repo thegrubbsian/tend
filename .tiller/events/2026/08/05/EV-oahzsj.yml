@@ -1,0 +1,13 @@
+id: EV-oahzsj
+type: check.task
+at: 2026-08-05T01:32:36.187903Z
+owner: jc
+command: check task T-qi6zgm
+targets:
+    - T-qi6zgm
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.yml
