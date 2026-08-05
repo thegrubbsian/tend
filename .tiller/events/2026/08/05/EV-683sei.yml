@@ -1,0 +1,14 @@
+id: EV-683sei
+type: submit.task
+at: 2026-08-05T19:37:56.032947Z
+owner: jc
+command: submit task T-and87o
+targets:
+    - T-and87o
+before:
+    status: check
+after:
+    pr: 34
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
