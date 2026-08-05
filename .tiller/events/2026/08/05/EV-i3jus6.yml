@@ -1,0 +1,14 @@
+id: EV-i3jus6
+type: sync.task
+at: 2026-08-05T19:59:11.460752Z
+owner: jc
+command: sync task T-and87o
+targets:
+    - T-and87o
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
