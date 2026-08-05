@@ -28,13 +28,14 @@ final class TodayDashboardUITests: XCTestCase {
       XCTAssertLessThan(pair.0.frame.minY, pair.1.frame.minY)
     }
 
-    let exerciseValue = element("today.row.Exercise", in: app).value as? String ?? ""
+    let exerciseValue = app.buttons["today.log.Exercise"].value as? String ?? ""
     XCTAssertTrue(exerciseValue.contains("5,200 of 8,000 steps"))
     XCTAssertTrue(exerciseValue.contains("12 days"))
     XCTAssertTrue(exerciseValue.contains("Yesterday open · 12 day streak at risk"))
-    let waterValue = element("today.row.Water seedlings", in: app).value as? String ?? ""
+    let waterValue = app.buttons["today.log.Water seedlings"].value as? String ?? ""
     XCTAssertTrue(waterValue.contains("5 of 3 times"))
-    XCTAssertEqual(element("today.row.Exercise", in: app).descendants(matching: .button).count, 0)
+    XCTAssertTrue(app.buttons["today.log.Exercise"].exists)
+    XCTAssertTrue(app.buttons["today.risk.Exercise"].exists)
 
     recordScreenshot("Today-mixed", of: app)
   }
@@ -103,14 +104,16 @@ final class TodayDashboardUITests: XCTestCase {
     let app = launch(fixture: "today-mixed", storeName: storeName)
 
     XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
-    let exercise = element("today.row.Exercise", in: app)
+    let exerciseRow = element("today.row.Exercise", in: app)
+    let exercise = app.buttons["today.log.Exercise"]
     let exerciseValue = exercise.value as? String
     XCTAssertTrue(exerciseValue?.contains("5,200 of 8,000 steps") == true)
-    XCTAssertEqual(exercise.descendants(matching: .button).count, 0)
+    XCTAssertTrue(app.buttons["today.risk.Exercise"].exists)
 
-    scroll(exercise, above: app.buttons["shell.tab.today"], in: app)
-    exercise.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.2)).tap()
-    XCTAssertEqual(element("today.row.Exercise", in: app).value as? String, exerciseValue)
+    scroll(exerciseRow, above: app.buttons["shell.tab.today"], in: app)
+    exercise.tap()
+    XCTAssertTrue(element("log-sheet", in: app).waitForExistence(timeout: 5))
+    XCTAssertEqual(element("log-sheet.progress", in: app).label, "5,200 of 8,000 steps")
 
     app.terminate()
     app.launchArguments = launchArguments(
@@ -122,7 +125,8 @@ final class TodayDashboardUITests: XCTestCase {
 
     XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
     XCTAssertEqual(element("today.summary", in: app).label, "2 of 5")
-    XCTAssertEqual(element("today.row.Exercise", in: app).value as? String, exerciseValue)
+    XCTAssertEqual(app.buttons["today.log.Exercise"].value as? String, exerciseValue)
+    XCTAssertFalse(element("log-sheet", in: app).exists)
   }
 
   @MainActor
@@ -143,7 +147,9 @@ final class TodayDashboardUITests: XCTestCase {
     app.buttons["shell.tab.today"].tap()
     let createdRow = element("today.row.Journey habit", in: app)
     XCTAssertTrue(createdRow.waitForExistence(timeout: 5))
-    XCTAssertTrue((createdRow.value as? String)?.contains("0 of 1 time") == true)
+    XCTAssertTrue(
+      (app.buttons["today.log.Journey habit"].value as? String)?.contains("0 of 1 time") == true
+    )
 
     app.buttons["shell.tab.habits"].tap()
     var journeyRow = habitRow(named: "Journey habit", in: app)
@@ -159,7 +165,11 @@ final class TodayDashboardUITests: XCTestCase {
     let editedRow = element("today.row.Journey habit renewed", in: app)
     XCTAssertTrue(editedRow.waitForExistence(timeout: 5))
     XCTAssertTrue(element("today.row.Journey habit", in: app).waitForNonExistence(timeout: 2))
-    XCTAssertTrue((editedRow.value as? String)?.contains("0 of 2 pages") == true)
+    XCTAssertTrue(
+      (app.buttons["today.log.Journey habit renewed"].value as? String)?.contains(
+        "0 of 2 pages"
+      ) == true
+    )
 
     app.buttons["shell.tab.habits"].tap()
     journeyRow = habitRow(named: "Journey habit renewed", in: app)
@@ -241,7 +251,7 @@ final class TodayDashboardUITests: XCTestCase {
       XCTAssertGreaterThanOrEqual(firstRow.frame.minX, window.frame.minX)
       XCTAssertLessThanOrEqual(firstRow.frame.maxX, window.frame.maxX)
       XCTAssertTrue(
-        (firstRow.value as? String)?.contains("1 of 3 times") == true
+        (app.buttons["today.log.Check in"].value as? String)?.contains("1 of 3 times") == true
       )
 
       let topTitleY = title.frame.minY
@@ -300,10 +310,12 @@ final class TodayDashboardUITests: XCTestCase {
         ],
         in: app
       )
-      XCTAssertEqual(
-        element("today.row.Exercise", in: app).descendants(matching: .button).count,
-        0
-      )
+      let exerciseLog = app.buttons["today.log.Exercise"]
+      let exerciseRisk = app.buttons["today.risk.Exercise"]
+      XCTAssertTrue(exerciseLog.exists)
+      XCTAssertTrue(exerciseRisk.exists)
+      assertMinimumHitRegion(of: exerciseLog)
+      assertMinimumHitRegion(of: exerciseRisk)
       XCTAssertEqual(
         element("today.row.Exercise", in: app).descendants(matching: .progressIndicator).count,
         0

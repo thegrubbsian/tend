@@ -797,12 +797,12 @@ struct TendApplicationModelTests {
       uniqueKeysWithValues: habits.map {
         ($0.name, try logging.snapshot(for: $0, at: launchInstant, timeZone: timeZone))
       })
-    let todaySnapshots = try habits.map {
-      try today.snapshot(for: $0, at: launchInstant, timeZone: timeZone)
-    }
-    #expect(todaySnapshots.allSatisfy { $0.periodKey == currentPeriod.key })
-    #expect(todaySnapshots.allSatisfy { $0.cadence == .weekly })
-    #expect(todaySnapshots.allSatisfy { !$0.isMet && !$0.isAtRisk })
+    let todaySnapshots = try Dictionary(
+      uniqueKeysWithValues: habits.map {
+        ($0.name, try today.snapshot(for: $0, at: launchInstant, timeZone: timeZone))
+      })
+    #expect(todaySnapshots.values.allSatisfy { $0.periodKey == currentPeriod.key })
+    #expect(todaySnapshots.values.allSatisfy { $0.cadence == .weekly })
 
     let checkInsHabit = try #require(habits.first { $0.name == "Weekly check-ins" })
     #expect(checkInsHabit.pinnedWeekdaysRawValue == PinnedWeekdays.monday.rawValue)
@@ -818,6 +818,10 @@ struct TendApplicationModelTests {
     #expect(checkInsGrace.phase == .grace)
     #expect(checkInsGrace.progress == 1)
     #expect(checkInsGrace.entries.map(\.amount) == [1])
+    let checkInsToday = try #require(todaySnapshots[checkInsHabit.name])
+    #expect(checkInsToday.currentStreak == 3)
+    #expect(checkInsToday.isAtRisk)
+    #expect(!checkInsToday.isMet)
 
     let notesHabit = try #require(habits.first { $0.name == "Weekly field notes" })
     #expect(notesHabit.pinnedWeekdaysRawValue == PinnedWeekdays.friday.rawValue)
@@ -837,6 +841,9 @@ struct TendApplicationModelTests {
     #expect(notesGrace.phase == .grace)
     #expect(notesGrace.progress == 30)
     #expect(notesGrace.entries.map(\.amount) == [30])
+    let notesToday = try #require(todaySnapshots[notesHabit.name])
+    #expect(!notesToday.isAtRisk)
+    #expect(!notesToday.isMet)
   }
 
   @Test("Fast Logging fixtures persist mutations without cross-store reseeding")

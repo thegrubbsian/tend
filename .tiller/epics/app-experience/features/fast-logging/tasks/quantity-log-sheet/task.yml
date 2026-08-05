@@ -1,7 +1,7 @@
 id: T-and87o
 key: app-experience/fast-logging/quantity-log-sheet
 title: Build Scoped Quantity Log Sheet
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,3 +18,30 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.681576Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T19:36:33.348312Z
+        against:
+            kind: sha256
+            value: sha256:86b3092e921bd8c7fdb46d3ab91b156d66d48d0167b93c6d1e9b934f28ac1ab7
+            observed_at: 2026-08-05T19:36:33.34831Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-86b3092e921b-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T19:36:33.348312Z
+        against:
+            kind: sha256
+            value: sha256:86b3092e921bd8c7fdb46d3ab91b156d66d48d0167b93c6d1e9b934f28ac1ab7
+            observed_at: 2026-08-05T19:36:33.34831Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-86b3092e921b-out-f406e608afb8ecef78338436670b988bc377d2ba59ea261a4753a3ceb005d194.txt

@@ -183,6 +183,79 @@ struct TodayLoggingModelTests {
     #expect(model.state.sheet == nil)
   }
 
+  @Test("transient card state resolves only for its persistent habit identity")
+  func transientCardStateIsHabitScoped() throws {
+    let context = try makeContext()
+    let refreshContext = makeRefreshContext()
+    let first = try insertHabit(in: context, name: "First", target: 2, unit: "times")
+    let second = try insertHabit(in: context, name: "Second", target: 10, unit: "steps")
+    let habits = [first, second]
+    var shouldFail = true
+    var progress = 0
+    var entries: [HabitLoggingEntrySnapshot] = []
+    let todayModel = TodayModel(
+      operations: TodayOperations { habit, _ in
+        todaySnapshot(
+          progress: habit === first ? progress : 0,
+          target: habit.target,
+          unit: habit.unit
+        )
+      })
+    todayModel.refresh(habits: habits, context: refreshContext)
+    let operations = TodayLoggingOperations(
+      snapshot: { habit, _ in
+        loggingSnapshot(
+          habit: habit,
+          progress: habit === first ? progress : 0,
+          currentEntries: habit === first ? entries : []
+        )
+      },
+      append: { amount, habit, _, receivedContext in
+        if shouldFail {
+          throw FixtureFailure.operation
+        }
+        let entry = try insertEntry(
+          in: context,
+          habit: habit,
+          amount: amount,
+          timestamp: receivedContext.instant
+        )
+        progress += amount
+        entries = [
+          HabitLoggingEntrySnapshot(
+            id: entry.persistentModelID,
+            uuid: entry.id,
+            timestamp: entry.timestamp,
+            amount: entry.amount,
+            entry: entry
+          )
+        ]
+        return entry
+      },
+      setTotal: { _, _, _, _ in nil },
+      delete: { _, _, _ in }
+    )
+    let model = TodayLoggingModel(
+      todayModel: todayModel,
+      operations: operations,
+      sleep: longSleep
+    )
+
+    model.activateCurrent(habit: first, habits: habits, context: refreshContext)
+
+    #expect(
+      model.state.actionFailure(for: first.persistentModelID)?.message
+        == "Fixture operation failed.")
+    #expect(model.state.actionFailure(for: second.persistentModelID) == nil)
+
+    shouldFail = false
+    model.activateCurrent(habit: first, habits: habits, context: refreshContext)
+
+    #expect(model.state.undo(for: first.persistentModelID)?.habitID == first.persistentModelID)
+    #expect(model.state.undo(for: second.persistentModelID) == nil)
+    #expect(model.state.actionFailure(for: first.persistentModelID) == nil)
+  }
+
   @Test("friendly quick-add values are overflow-safe ordered and deduplicated from Finish")
   func quickAddAmountsMatchContract() {
     #expect(QuickAddAmounts(target: 3, progress: 0) == .init(presets: [1], finish: 3))

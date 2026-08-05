@@ -51,6 +51,7 @@ struct TodayDestinationChrome: View {
         TodayView(
           habits: habits,
           instant: date,
+          fixedOperationInstant: fixedDate,
           onPlantHabit: {
             isPresentingNewHabit = true
           }

@@ -223,6 +223,9 @@
         let current = try schedule.period(containing: launchInstant, cadence: .weekly)
         let grace = try period(before: current)
         let graceInstant = try noon(in: grace)
+        let twoWeeksBefore = try period(before: grace)
+        let threeWeeksBefore = try period(before: twoWeeksBefore)
+        let fourWeeksBefore = try period(before: threeWeeksBefore)
 
         let checkIns = try create(
           name: "Weekly check-ins",
@@ -230,8 +233,16 @@
           unit: "times",
           cadence: .weekly,
           pinnedWeekdays: .monday,
-          at: graceInstant
+          at: try noon(in: fourWeeksBefore)
         )
+        for period in [fourWeeksBefore, threeWeeksBefore, twoWeeksBefore] {
+          try logging.append(
+            amount: 3,
+            to: checkIns,
+            at: try noon(in: period),
+            timeZone: timeZone
+          )
+        }
         let checkInsGraceEntry = try logging.append(
           amount: 1,
           to: checkIns,
@@ -288,8 +299,8 @@
             progress: 1,
             entries: [checkInsGraceEntry]
           ),
-          currentStreak: 0,
-          isAtRisk: false,
+          currentStreak: 3,
+          isAtRisk: true,
           isMet: false
         )
         try verify(
