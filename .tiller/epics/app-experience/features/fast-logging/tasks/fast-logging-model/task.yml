@@ -1,7 +1,7 @@
 id: T-2tztqs
 key: app-experience/fast-logging/fast-logging-model
 title: Model Fast Logging Interactions
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.65907Z
+pr: 33
 gates:
     build:
         required: true
