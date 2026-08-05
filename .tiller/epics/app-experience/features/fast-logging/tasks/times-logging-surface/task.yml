@@ -1,7 +1,7 @@
 id: T-354lxo
 key: app-experience/fast-logging/times-logging-surface
 title: Wire One-tap Count Logging
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,3 +18,30 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.701971Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T20:27:34.164719Z
+        against:
+            kind: sha256
+            value: sha256:531ba9d4e41ff33a9ade5eaf6c7f46190bf3391b312357f5bc80cc083dc22c9d
+            observed_at: 2026-08-05T20:27:34.164711Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-531ba9d4e41f-out-19b6950713e94f91de8d9d9cc793dbd0a49136fa2bbf4bd023a250793748d0b9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T20:27:34.164719Z
+        against:
+            kind: sha256
+            value: sha256:531ba9d4e41ff33a9ade5eaf6c7f46190bf3391b312357f5bc80cc083dc22c9d
+            observed_at: 2026-08-05T20:27:34.164711Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-531ba9d4e41f-out-df9a3cd342ef6eeeec5110ad2e36a6eba5aaaa02ca985e9c15283409b28a5baf.txt

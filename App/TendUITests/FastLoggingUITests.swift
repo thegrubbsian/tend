@@ -16,6 +16,199 @@ final class FastLoggingUITests: XCTestCase {
     verifyWeeklyPriorSetTotalValidationAndUndo()
     verifyAdaptiveQuantitySheet()
   }
+
+  @MainActor
+  func testTimesLoggingJourneys() {
+    verifyDailyTargetOneRoutingAndReducedMotion()
+    verifyWeeklyCountGraceUndoAndRelaunch()
+  }
+
+  @MainActor
+  private func verifyDailyTargetOneRoutingAndReducedMotion() {
+    let storeName = "FastLoggingUITests-times-daily-\(UUID().uuidString)"
+    let app = launch(
+      fixture: "fast-logging-daily",
+      storeName: storeName,
+      additionalArguments: [
+        "-UIAccessibilityReduceMotionEnabled",
+        "YES",
+      ]
+    )
+
+    XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
+    let summary = element("today.summary", in: app)
+    XCTAssertEqual(summary.label, "2 of 5")
+    let tabButton = app.buttons["shell.tab.today"]
+    let tendedSection = element("today.section.tended", in: app)
+    let targetOne = app.buttons["today.log.Feed the cat"]
+    makeHittable(targetOne, above: tabButton, in: app)
+    XCTAssertEqual(targetOne.label, "Feed the cat")
+    assertValueContains("0 of 1 time", for: targetOne)
+    XCTAssertEqual(targetOne.value as? String, "0 of 1 time, 0 days, Unmet")
+    assertMinimumTarget(targetOne)
+    XCTAssertEqual(targetOne.frame.width, 52, accuracy: 0.5)
+    XCTAssertEqual(targetOne.frame.height, 52, accuracy: 0.5)
+    XCTAssertLessThan(targetOne.frame.maxY, tendedSection.frame.minY)
+    XCTAssertFalse(app.buttons["today.row.Feed the cat"].exists)
+
+    targetOne.tap()
+
+    assertValueContains("1 of 1 time", for: targetOne)
+    XCTAssertEqual(targetOne.value as? String, "1 of 1 time, 1 day, Met")
+    assertLabel("3 of 5", for: summary)
+    makeHittable(targetOne, above: tabButton, in: app)
+    XCTAssertGreaterThan(targetOne.frame.minY, tendedSection.frame.maxY)
+    XCTAssertEqual(targetOne.frame.width, 44, accuracy: 0.5)
+    XCTAssertEqual(targetOne.frame.height, 44, accuracy: 0.5)
+    XCTAssertFalse(element("log-sheet", in: app).exists)
+    let undo = element("today.undo.Feed the cat", in: app)
+    XCTAssertTrue(undo.waitForExistence(timeout: 2))
+    XCTAssertEqual(undo.label, "Feed the cat. Logged 1 times. Undo available.")
+    let undoButton = app.buttons["today.undo.action.Feed the cat"]
+    assertMinimumTarget(undoButton)
+    undoButton.tap()
+    assertValueContains("0 of 1 time", for: targetOne)
+    XCTAssertEqual(targetOne.value as? String, "0 of 1 time, 0 days, Unmet")
+    assertLabel("2 of 5", for: summary)
+    makeHittable(targetOne, above: tabButton, in: app)
+    XCTAssertLessThan(targetOne.frame.maxY, tendedSection.frame.minY)
+    XCTAssertTrue(waitForDisappearance(undo))
+
+    makeHittable(targetOne, above: tabButton, in: app)
+    targetOne.tap()
+    assertValueContains("1 of 1 time", for: targetOne)
+    app.terminate()
+    app.launchArguments = launchArguments(
+      storeName: storeName,
+      reset: false,
+      fixture: nil,
+      fixtureInstant: laterFixtureInstantArgument
+    )
+    app.launch()
+
+    XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
+    let relaunchedTargetOne = app.buttons["today.log.Feed the cat"]
+    makeHittable(relaunchedTargetOne, above: app.buttons["shell.tab.today"], in: app)
+    assertValueContains("1 of 1 time", for: relaunchedTargetOne)
+    XCTAssertEqual(element("today.summary", in: app).label, "3 of 5")
+    XCTAssertFalse(element("today.undo.Feed the cat", in: app).exists)
+    XCTAssertFalse(element("log-sheet", in: app).exists)
+
+    let exactTime = app.buttons["today.log.Meditate"]
+    makeHittable(exactTime, above: app.buttons["shell.tab.today"], in: app)
+    assertValueContains("0 of 10 time", for: exactTime)
+    exactTime.tap()
+    let sheet = element("log-sheet", in: app)
+    XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+    XCTAssertEqual(element("log-sheet.progress", in: app).label, "0 of 10 time")
+    dismissSheet(sheet, in: app)
+    assertValueContains("0 of 10 time", for: exactTime)
+
+    let quantity = app.buttons["today.log.Walk 8K steps"]
+    makeHittable(quantity, above: app.buttons["shell.tab.today"], in: app)
+    assertValueContains("4,000 of 8,000 steps", for: quantity)
+    quantity.tap()
+    XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+    XCTAssertEqual(element("log-sheet.progress", in: app).label, "4,000 of 8,000 steps")
+    dismissSheet(sheet, in: app)
+    assertValueContains("4,000 of 8,000 steps", for: quantity)
+  }
+
+  @MainActor
+  private func verifyWeeklyCountGraceUndoAndRelaunch() {
+    let storeName = "FastLoggingUITests-times-weekly-\(UUID().uuidString)"
+    let app = launch(
+      fixture: "fast-logging-weekly",
+      storeName: storeName,
+      fixtureInstant: weeklyFixtureInstantArgument
+    )
+
+    XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
+    let summary = element("today.summary", in: app)
+    XCTAssertEqual(summary.label, "0 of 2")
+    let tabButton = app.buttons["shell.tab.today"]
+    let count = app.buttons["today.log.Weekly check-ins"]
+    let risk = app.buttons["today.risk.Weekly check-ins"]
+    makeHittable(risk, above: tabButton, in: app)
+    XCTAssertEqual(risk.label, "Log Last Week for Weekly check-ins")
+    assertValueContains("Last week open", for: risk)
+    assertValueContains("3 week streak at risk", for: risk)
+    XCTAssertEqual(
+      count.value as? String,
+      "1 of 3 times, 3 weeks, Unmet, Last week open · 3 week streak at risk"
+    )
+    assertMinimumTarget(risk)
+
+    risk.tap()
+
+    assertValueContains("1 of 3 times", for: count)
+    XCTAssertTrue(risk.exists)
+    XCTAssertFalse(element("log-sheet", in: app).exists)
+    let undo = element("today.undo.Weekly check-ins", in: app)
+    XCTAssertTrue(undo.waitForExistence(timeout: 2))
+    XCTAssertEqual(undo.label, "Weekly check-ins. Logged 1 times. Undo available.")
+
+    makeHittable(risk, above: tabButton, in: app)
+    risk.tap()
+    assertValueContains("1 of 3 times", for: count)
+    XCTAssertTrue(waitForDisappearance(risk))
+    app.buttons["today.undo.action.Weekly check-ins"].tap()
+    XCTAssertTrue(risk.waitForExistence(timeout: 2))
+
+    makeHittable(risk, above: tabButton, in: app)
+    risk.tap()
+    XCTAssertTrue(waitForDisappearance(risk))
+    XCTAssertEqual(count.value as? String, "1 of 3 times, 4 weeks, Unmet")
+
+    makeHittable(count, above: tabButton, in: app)
+    XCTAssertEqual(count.frame.width, 52, accuracy: 0.5)
+    XCTAssertEqual(count.frame.height, 52, accuracy: 0.5)
+    count.tap()
+    assertValueContains("2 of 3 times", for: count)
+    XCTAssertEqual(count.value as? String, "2 of 3 times, 4 weeks, Unmet")
+    XCTAssertTrue(undo.exists)
+    makeHittable(count, above: tabButton, in: app)
+    count.tap()
+    assertValueContains("3 of 3 times", for: count)
+    XCTAssertEqual(count.value as? String, "3 of 3 times, 5 weeks, Met")
+    assertLabel("1 of 2", for: summary)
+    makeHittable(count, above: tabButton, in: app)
+    XCTAssertEqual(count.frame.width, 44, accuracy: 0.5)
+    XCTAssertEqual(count.frame.height, 44, accuracy: 0.5)
+
+    app.buttons["today.undo.action.Weekly check-ins"].tap()
+    assertValueContains("2 of 3 times", for: count)
+    XCTAssertEqual(count.value as? String, "2 of 3 times, 4 weeks, Unmet")
+    assertLabel("0 of 2", for: summary)
+    XCTAssertTrue(waitForDisappearance(undo))
+
+    makeHittable(count, above: tabButton, in: app)
+    count.tap()
+    assertValueContains("3 of 3 times", for: count)
+    makeHittable(count, above: tabButton, in: app)
+    count.tap()
+    assertValueContains("4 of 3 times", for: count)
+    XCTAssertEqual(count.value as? String, "4 of 3 times, 5 weeks, Met")
+    XCTAssertFalse(element("log-sheet", in: app).exists)
+
+    app.terminate()
+    app.launchArguments = launchArguments(
+      storeName: storeName,
+      reset: false,
+      fixture: nil,
+      fixtureInstant: weeklyFixtureInstantArgument
+    )
+    app.launch()
+
+    XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
+    let relaunchedCount = app.buttons["today.log.Weekly check-ins"]
+    makeHittable(relaunchedCount, above: app.buttons["shell.tab.today"], in: app)
+    assertValueContains("4 of 3 times", for: relaunchedCount)
+    XCTAssertEqual(relaunchedCount.value as? String, "4 of 3 times, 5 weeks, Met")
+    XCTAssertEqual(element("today.summary", in: app).label, "1 of 2")
+    XCTAssertFalse(element("today.undo.Weekly check-ins", in: app).exists)
+    XCTAssertFalse(element("log-sheet", in: app).exists)
+  }
   @MainActor
   private func verifyDailyCurrentQuickAddCustomAmountDeleteAndRelaunch() {
     let storeName = "FastLoggingUITests-daily-\(UUID().uuidString)"

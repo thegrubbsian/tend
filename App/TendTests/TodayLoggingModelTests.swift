@@ -673,6 +673,41 @@ struct TodayLoggingModelTests {
     #expect(expiryModel.state.feedback?.id == expiryFeedback)
   }
 
+  @Test("direct count Undo expires without reverting committed progress")
+  func directCountUndoExpiresWithoutMutation() async throws {
+    let sleeper = ControlledSleeper()
+    let fixture = try LoggingFixture(target: 2, progress: 0, unit: "times")
+    let model = fixture.makeModel {
+      try await sleeper.sleep($0)
+    }
+    fixture.todayModel.refresh(
+      habits: fixture.habits,
+      context: fixture.refreshContext
+    )
+
+    model.activateCurrent(
+      habit: fixture.habit,
+      habits: fixture.habits,
+      context: fixture.refreshContext
+    )
+
+    await sleeper.waitForCount(1)
+    #expect(await sleeper.recordedDurations == [.seconds(5)])
+    #expect(fixture.progress == 1)
+    #expect(fixture.currentEntries.count == 1)
+    #expect(model.state.undo?.amount == 1)
+
+    await sleeper.resumeOldest()
+    for _ in 0..<100 where model.state.undo != nil {
+      await Task.yield()
+    }
+
+    #expect(model.state.undo == nil)
+    #expect(fixture.progress == 1)
+    #expect(fixture.currentEntries.count == 1)
+    #expect(fixture.deletedEntryIDs.isEmpty)
+  }
+
   @Test("Undo uses the fresh context deadline before deleting")
   func expiredUndoIsNonmutatingWhenExpiryDeliveryIsDelayed() async throws {
     let sleeper = ControlledSleeper()
