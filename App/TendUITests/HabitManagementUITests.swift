@@ -66,7 +66,9 @@ final class HabitManagementUITests: XCTestCase {
     XCTAssertTrue(app.descendants(matching: .any)["shell.destination.today"].exists)
     let firstTodayRow = app.otherElements["today.row.Read deliberately"]
     XCTAssertTrue(firstTodayRow.waitForExistence(timeout: 5))
-    assertValue(of: firstTodayRow, contains: ["0 of 1 time"])
+    let firstTodayLogButton = app.buttons["today.log.Read deliberately"]
+    XCTAssertTrue(firstTodayLogButton.waitForExistence(timeout: 5))
+    assertValue(of: firstTodayLogButton, contains: ["0 of 1 time"])
 
     app.buttons["shell.tab.habits"].tap()
     XCTAssertTrue(app.buttons["habits.add"].waitForExistence(timeout: 5))
