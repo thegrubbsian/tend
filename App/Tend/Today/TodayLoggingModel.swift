@@ -133,7 +133,7 @@ struct LogSheetScope: Identifiable, Equatable {
   let showsUnfinishedMarker: Bool
 }
 
-struct LogSheetEntryPresentation: Identifiable {
+struct LogSheetEntryPresentation: Identifiable, Equatable {
   let id: PersistentIdentifier
   let uuid: UUID
   let timestamp: Date
@@ -141,19 +141,6 @@ struct LogSheetEntryPresentation: Identifiable {
   let timestampText: String
   let amountText: String
   let accessibilityLabel: String
-  let entry: LogEntry
-}
-
-extension LogSheetEntryPresentation: Equatable {
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.id == rhs.id
-      && lhs.uuid == rhs.uuid
-      && lhs.timestamp == rhs.timestamp
-      && lhs.amount == rhs.amount
-      && lhs.timestampText == rhs.timestampText
-      && lhs.amountText == rhs.amountText
-      && lhs.accessibilityLabel == rhs.accessibilityLabel
-  }
 }
 
 enum LogAmountEditorMode: Equatable {
@@ -184,7 +171,6 @@ struct LogSheetPresentation: Equatable {
 struct TodayLogUndo {
   let habitID: PersistentIdentifier
   let entryID: PersistentIdentifier
-  let entry: LogEntry
   let amount: Int
   let unit: String
   let originPeriodKey: String
@@ -268,6 +254,10 @@ final class TodayLoggingModel {
       operations: .live(context: context),
       sleep: sleep
     )
+  }
+
+  deinit {
+    expiryTask?.cancel()
   }
 
   func activateCurrent(
@@ -422,38 +412,60 @@ final class TodayLoggingModel {
     context: TodayRefreshContext
   ) {
     todayModel.refresh(habits: habits, context: context)
-    if let undo = state.undo {
-      guard let undoHabit = liveHabit(matching: undo.habitID, in: habits) else {
-        clearIneligibleState(for: undo.habitID)
-        return
-      }
-      if state.sheet?.habitID != undo.habitID {
-        do {
-          let undoSnapshot = try operations.snapshot(undoHabit, context)
-          if !containsEntry(undo.entryID, in: undoSnapshot) {
-            clearUndo(matching: undo.entryID)
+    var replacement = state
+    var changedWithoutSheet = false
+
+    if let undo = replacement.undo {
+      if let undoHabit = liveHabit(matching: undo.habitID, in: habits) {
+        if replacement.sheet?.habitID != undo.habitID {
+          do {
+            let undoSnapshot = try operations.snapshot(undoHabit, context)
+            if !containsEntry(undo.entryID, in: undoSnapshot) {
+              replacement.undo = nil
+              expiryTask?.cancel()
+              changedWithoutSheet = true
+            }
+          } catch {
+            replacement.undo = replacing(undo, error: message(for: error))
+            changedWithoutSheet = true
           }
-        } catch {
-          publishUndoFailure(message(for: error))
         }
+      } else {
+        clearIneligibleState(for: undo.habitID, in: &replacement)
+        changedWithoutSheet = true
       }
     }
-    guard let openSheet = state.sheet else { return }
+
+    guard let openSheet = replacement.sheet else {
+      if changedWithoutSheet {
+        state = replacement
+      }
+      return
+    }
     guard let habit = liveHabit(matching: openSheet.habitID, in: habits) else {
-      clearIneligibleState(for: openSheet.habitID)
+      clearIneligibleState(for: openSheet.habitID, in: &replacement)
+      state = replacement
       return
     }
 
     do {
       let snapshot = try operations.snapshot(habit, context)
       let selected = bucket(in: snapshot, periodKey: openSheet.selectedPeriodKey)
-      var replacement = state
       replacement.sheet = presentation(
         snapshot: snapshot,
         selectedPeriodKey: selected?.periodKey ?? snapshot.current.periodKey,
         context: context,
         prior: selected == nil ? nil : openSheet
       )
+      if let refreshedSheet = replacement.sheet {
+        replacement.sheet = replacing(
+          refreshedSheet,
+          amountEditorMode: refreshedSheet.amountEditorMode,
+          amountInput: refreshedSheet.amountInput,
+          amountError: refreshedSheet.amountError,
+          sheetError: nil
+        )
+      }
       if let undo = replacement.undo,
         undo.habitID == snapshot.habitID,
         !containsEntry(undo.entryID, in: snapshot)
@@ -467,7 +479,14 @@ final class TodayLoggingModel {
       replacement.actionFailure = nil
       state = replacement
     } catch {
-      publishSheetFailure(error)
+      replacement.sheet = replacing(
+        openSheet,
+        amountEditorMode: openSheet.amountEditorMode,
+        amountInput: openSheet.amountInput,
+        amountError: nil,
+        sheetError: message(for: error)
+      )
+      state = replacement
     }
   }
 
@@ -532,10 +551,12 @@ final class TodayLoggingModel {
 
     do {
       let before = try operations.snapshot(habit, context)
-      guard let origin = bucket(in: before, periodKey: pending.originPeriodKey),
-        let entry = origin.entries.first(where: { $0.id == pending.entryID })?.entry
-      else {
+      guard let origin = bucket(in: before, periodKey: pending.originPeriodKey) else {
         publishUndoFailure("That log can no longer be undone.")
+        return
+      }
+      guard let entry = origin.entries.first(where: { $0.id == pending.entryID })?.entry else {
+        clearUndo(matching: pending.entryID)
         return
       }
       try operations.delete(entry, habit, context)
@@ -727,18 +748,21 @@ final class TodayLoggingModel {
   private func publishUndoFailure(_ message: String) {
     guard let undo = state.undo else { return }
     var replacement = state
-    replacement.undo = TodayLogUndo(
+    replacement.undo = replacing(undo, error: message)
+    state = replacement
+  }
+
+  private func replacing(_ undo: TodayLogUndo, error: String?) -> TodayLogUndo {
+    TodayLogUndo(
       habitID: undo.habitID,
       entryID: undo.entryID,
-      entry: undo.entry,
       amount: undo.amount,
       unit: undo.unit,
       originPeriodKey: undo.originPeriodKey,
       generation: undo.generation,
       expiresAt: undo.expiresAt,
-      error: message
+      error: error
     )
-    state = replacement
   }
 
   private func publishStaleSelection(
@@ -806,7 +830,6 @@ final class TodayLoggingModel {
     do {
       let before = try operations.snapshot(liveHabit, context)
       guard let selectedBefore = bucket(in: before, selection: selection) else {
-        clearIneligibleState(for: liveHabit.persistentModelID)
         return
       }
       if before.unit == "times" {
@@ -942,8 +965,7 @@ final class TodayLoggingModel {
       amount: entry.amount,
       timestampText: timestampText,
       amountText: amountText,
-      accessibilityLabel: "\(timestampText), \(amountText)",
-      entry: entry.entry
+      accessibilityLabel: "\(timestampText), \(amountText)"
     )
   }
 
@@ -958,7 +980,6 @@ final class TodayLoggingModel {
     TodayLogUndo(
       habitID: habitID,
       entryID: entry.persistentModelID,
-      entry: entry,
       amount: amount,
       unit: unit,
       originPeriodKey: periodKey,
@@ -999,6 +1020,14 @@ final class TodayLoggingModel {
 
   private func clearIneligibleState(for habitID: PersistentIdentifier) {
     var replacement = state
+    clearIneligibleState(for: habitID, in: &replacement)
+    state = replacement
+  }
+
+  private func clearIneligibleState(
+    for habitID: PersistentIdentifier,
+    in replacement: inout TodayLoggingState
+  ) {
     if replacement.sheet?.habitID == habitID {
       replacement.sheet = nil
     }
@@ -1009,8 +1038,9 @@ final class TodayLoggingModel {
     if replacement.feedback?.habitID == habitID {
       replacement.feedback = nil
     }
-    replacement.actionFailure = nil
-    state = replacement
+    if replacement.actionFailure?.habitID == habitID {
+      replacement.actionFailure = nil
+    }
   }
 
   private func clearUndo(matching entryID: PersistentIdentifier) {

@@ -309,6 +309,7 @@ struct TodayLoggingModelTests {
     #expect(fixture.events == ["snapshot", "append", "snapshot", "today"])
     #expect(fixture.receivedContexts == Array(repeating: fixture.refreshContext, count: 4))
     #expect(model.state.sheet?.progress == 2)
+    fixture.onTodayProjection = nil
 
     let acceptedUndo = try #require(model.state.undo?.generation)
     let acceptedFeedback = try #require(model.state.feedback?.id)
@@ -335,6 +336,9 @@ struct TodayLoggingModelTests {
     #expect(model.state.sheet?.sheetError == "Fixture projection failed.")
     #expect(model.state.undo?.generation == acceptedUndo)
     #expect(model.state.feedback?.id == acceptedFeedback)
+    model.refresh(habits: fixture.habits, context: fixture.refreshContext)
+    #expect(model.state.sheet?.progress == 4)
+    #expect(model.state.sheet?.sheetError == nil)
   }
 
   @Test("refresh preserves valid selection then falls back or dismisses by identity")
@@ -524,13 +528,37 @@ struct TodayLoggingModelTests {
     )
     let externalUndo = try #require(externalModel.state.undo)
     let externalFeedback = externalModel.state.feedback?.id
-    try externalFixture.removeEntry(externalUndo.entry)
-    externalModel.refresh(
+    let externallyDeletedEntry = try #require(
+      externalFixture.currentEntries.first {
+        $0.persistentModelID == externalUndo.entryID
+      })
+    try externalFixture.removeEntry(externallyDeletedEntry)
+    externalModel.undo(
       habits: externalFixture.habits,
       context: externalFixture.refreshContext
     )
     #expect(externalModel.state.undo == nil)
     #expect(externalModel.state.feedback?.id == externalFeedback)
+    #expect(externalFixture.deletedEntryIDs.isEmpty)
+
+    externalModel.appendQuickAdd(
+      amount: 1,
+      habits: externalFixture.habits,
+      context: externalFixture.refreshContext
+    )
+    let refreshUndo = try #require(externalModel.state.undo)
+    let refreshFeedback = externalModel.state.feedback?.id
+    let refreshDeletedEntry = try #require(
+      externalFixture.currentEntries.first {
+        $0.persistentModelID == refreshUndo.entryID
+      })
+    try externalFixture.removeEntry(refreshDeletedEntry)
+    externalModel.refresh(
+      habits: externalFixture.habits,
+      context: externalFixture.refreshContext
+    )
+    #expect(externalModel.state.undo == nil)
+    #expect(externalModel.state.feedback?.id == refreshFeedback)
 
     let sleeper = ControlledSleeper()
     let expiryFixture = try LoggingFixture(target: 10, progress: 0)
@@ -570,6 +598,36 @@ struct TodayLoggingModelTests {
     #expect(expiryModel.state.undo == nil)
     #expect(expiryFixture.deletedEntryIDs.isEmpty)
     #expect(expiryModel.state.feedback?.id == expiryFeedback)
+  }
+
+  @Test("model teardown cancels only pending Undo expiry work")
+  func modelLifetimeCancelsOnlyExpiryWork() async throws {
+    let sleeper = CancellationSleeper()
+    let fixture = try LoggingFixture(target: 10, progress: 0)
+    var model: TodayLoggingModel? = fixture.makeModel {
+      try await sleeper.sleep($0)
+    }
+    fixture.presentSheet(try #require(model))
+    model?.appendQuickAdd(
+      amount: 1,
+      habits: fixture.habits,
+      context: fixture.refreshContext
+    )
+    await sleeper.waitUntilStarted()
+    weak let releasedModel = model
+
+    model = nil
+    for _ in 0..<100 {
+      if await sleeper.wasCancelled {
+        break
+      }
+      await Task.yield()
+    }
+
+    #expect(releasedModel == nil)
+    #expect(await sleeper.wasCancelled)
+    #expect(fixture.progress == 1)
+    #expect(fixture.currentEntries.count == 1)
   }
 
   @Test("feedback represents value transitions and ignores non-feedback operations")
@@ -640,6 +698,78 @@ struct TodayLoggingModelTests {
     #expect(alreadyMetModel.state.feedback == nil)
   }
 
+  @Test("unavailable activation and stale Undo do not block an unrelated sheet refresh")
+  func independentInteractionStateRefreshesByHabitIdentity() throws {
+    let context = try makeContext()
+    let refreshContext = makeRefreshContext()
+    let first = try insertHabit(in: context, name: "First", target: 10, unit: "steps")
+    let second = try insertHabit(in: context, name: "Second", target: 10, unit: "steps")
+    let habits = [first, second]
+    var firstProgress = 0
+    var secondProgress = 2
+    var firstEntries: [HabitLoggingEntrySnapshot] = []
+    let todayModel = TodayModel(
+      operations: TodayOperations { habit, _ in
+        todaySnapshot(
+          progress: habit === first ? firstProgress : secondProgress,
+          target: habit.target,
+          unit: habit.unit
+        )
+      })
+    todayModel.refresh(habits: habits, context: refreshContext)
+    let operations = TodayLoggingOperations(
+      snapshot: { habit, _ in
+        loggingSnapshot(
+          habit: habit,
+          progress: habit === first ? firstProgress : secondProgress,
+          currentEntries: habit === first ? firstEntries : []
+        )
+      },
+      append: { amount, habit, _, receivedContext in
+        guard habit === first else { throw FixtureFailure.operation }
+        let entry = try insertEntry(
+          in: context,
+          habit: habit,
+          amount: amount,
+          timestamp: receivedContext.instant
+        )
+        firstProgress += amount
+        firstEntries.insert(
+          HabitLoggingEntrySnapshot(
+            id: entry.persistentModelID,
+            uuid: entry.id,
+            timestamp: entry.timestamp,
+            amount: entry.amount,
+            entry: entry
+          ),
+          at: 0
+        )
+        return entry
+      },
+      setTotal: { _, _, _, _ in nil },
+      delete: { _, _, _ in }
+    )
+    let model = TodayLoggingModel(
+      todayModel: todayModel,
+      operations: operations,
+      sleep: longSleep
+    )
+
+    model.activateCurrent(habit: first, habits: habits, context: refreshContext)
+    model.appendQuickAdd(amount: 1, habits: habits, context: refreshContext)
+    let firstUndo = try #require(model.state.undo?.generation)
+    model.activateAtRisk(habit: first, habits: habits, context: refreshContext)
+    #expect(model.state.undo?.generation == firstUndo)
+
+    model.activateCurrent(habit: second, habits: habits, context: refreshContext)
+    secondProgress = 7
+    first.isActive = false
+    model.refresh(habits: habits, context: refreshContext)
+    #expect(model.state.undo == nil)
+    #expect(model.state.sheet?.habitID == second.persistentModelID)
+    #expect(model.state.sheet?.progress == 7)
+  }
+
   private actor ControlledSleeper {
     private var durations: [Duration] = []
     private var continuations: [CheckedContinuation<Void, any Error>] = []
@@ -663,6 +793,27 @@ struct TodayLoggingModelTests {
 
     func resumeOldest() {
       continuations.removeFirst().resume()
+    }
+  }
+
+  private actor CancellationSleeper {
+    private var started = false
+    private(set) var wasCancelled = false
+
+    func sleep(_ duration: Duration) async throws {
+      started = true
+      do {
+        try await Task.sleep(for: duration + .seconds(60))
+      } catch {
+        wasCancelled = true
+        throw error
+      }
+    }
+
+    func waitUntilStarted() async {
+      while !started {
+        await Task.yield()
+      }
     }
   }
 
