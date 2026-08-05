@@ -1,0 +1,20 @@
+id: T-p7kknm
+key: app-experience/fast-logging/fast-logging-acceptance
+title: Verify Fast Logging Journey
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-354lxo
+    - T-and87o
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:70878d1d16ec57eff057ebaa2bae968172060a9e
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.md
+        observed_at: 2026-08-05T00:46:02.702136Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.723752Z

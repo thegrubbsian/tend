@@ -1,0 +1,14 @@
+id: EV-qv6rev
+type: add.task
+at: 2026-08-05T00:25:49.469293Z
+owner: jc
+command: add task app-experience/fast-logging/times-logging-surface
+targets:
+    - T-354lxo
+after:
+    feature: F-z8e13q
+    key: app-experience/fast-logging/times-logging-surface
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.md
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.yml

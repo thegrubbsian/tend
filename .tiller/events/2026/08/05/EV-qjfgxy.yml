@@ -1,0 +1,14 @@
+id: EV-qjfgxy
+type: submit.task
+at: 2026-08-05T00:14:52.319105Z
+owner: jc
+command: submit task T-m66b11
+targets:
+    - T-m66b11
+before:
+    status: check
+after:
+    pr: 30
+    status: in_review
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-dashboard-acceptance/task.yml

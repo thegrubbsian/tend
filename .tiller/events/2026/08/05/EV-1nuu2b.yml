@@ -1,0 +1,13 @@
+id: EV-1nuu2b
+type: start.task
+at: 2026-08-05T00:48:39.101334Z
+owner: jc
+command: start task T-qi6zgm
+targets:
+    - T-qi6zgm
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.yml

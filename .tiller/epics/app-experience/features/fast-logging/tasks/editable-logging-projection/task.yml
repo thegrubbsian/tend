@@ -1,0 +1,45 @@
+id: T-qi6zgm
+key: app-experience/fast-logging/editable-logging-projection
+title: Project Editable Logging Scopes
+status: in_review
+blocked: false
+owner: jc
+proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:d09c90d2c7afe1fa6489bceabd8652cec8bb140f
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.md
+        observed_at: 2026-08-05T00:46:02.590704Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.611648Z
+pr: 31
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T01:32:34.291278Z
+        against:
+            kind: git_commit
+            value: git:08de43f
+            observed_at: 2026-08-05T01:32:34.291272Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-08de43f-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-05T01:32:34.291278Z
+        against:
+            kind: git_commit
+            value: git:08de43f
+            observed_at: 2026-08-05T01:32:34.291272Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-08de43f-out-341c02a5a24f2fe0ed17ca37fc5b54d47134b1c081eb8f6375aff3b05f5bd0a2.txt

@@ -1,10 +1,34 @@
 id: F-z8e13q
 key: app-experience/fast-logging
 title: Fast Logging and Back-fill
-status: draft
+status: active
 blocked: false
 owner: jc
 source: design/03-user-experience.md
 change_type: create
+surface:
+    paths:
+        - App/Tend/Today
+        - App/Tend/Shell/TodayDestinationChrome.swift
+        - Sources/TendCore/Logging
+        - Tests/TendCoreTests/Logging
+        - App/TendTests
+        - App/TendUITests
 depends_on:
     - F-skoqxt
+branch: tiller/app-experience/fast-logging
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:2095e0a90b41106a80c54cbc08a287737d4ce6f5
+        path: .tiller/epics/app-experience/features/fast-logging/feature.md
+        observed_at: 2026-08-05T00:46:02.556572Z
+    eval:
+        kind: git_blob
+        value: git:0d6be5d34d606f1f23b65045b53d59e5253db6bf
+        path: .tiller/epics/app-experience/features/fast-logging/feature.eval.md
+        observed_at: 2026-08-05T00:46:02.556572Z
+    commit:
+        kind: git_commit
+        value: git:51a1619
+        observed_at: 2026-08-05T00:46:02.590479Z

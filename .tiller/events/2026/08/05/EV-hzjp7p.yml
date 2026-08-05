@@ -1,0 +1,14 @@
+id: EV-hzjp7p
+type: add.task
+at: 2026-08-05T00:25:49.627801Z
+owner: jc
+command: add task app-experience/fast-logging/fast-logging-acceptance
+targets:
+    - T-p7kknm
+after:
+    feature: F-z8e13q
+    key: app-experience/fast-logging/fast-logging-acceptance
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.md
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml

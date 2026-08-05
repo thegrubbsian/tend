@@ -1,0 +1,14 @@
+id: EV-qrlg39
+type: add.task
+at: 2026-08-05T00:25:49.307487Z
+owner: jc
+command: add task app-experience/fast-logging/fast-logging-model
+targets:
+    - T-2tztqs
+after:
+    feature: F-z8e13q
+    key: app-experience/fast-logging/fast-logging-model
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.md
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.yml

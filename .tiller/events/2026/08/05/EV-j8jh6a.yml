@@ -1,0 +1,17 @@
+id: EV-j8jh6a
+type: link.surface.feature
+at: 2026-08-05T00:29:54.270719Z
+owner: jc
+command: link feature F-z8e13q
+targets:
+    - F-z8e13q
+after:
+    surface:
+        - App/Tend/Today
+        - App/Tend/Shell/TodayDestinationChrome.swift
+        - Sources/TendCore/Logging
+        - Tests/TendCoreTests/Logging
+        - App/TendTests
+        - App/TendUITests
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/feature.yml

@@ -1,0 +1,13 @@
+id: EV-lyvp4t
+type: approve.task
+at: 2026-08-05T00:46:02.681651Z
+owner: jc
+command: approve task T-and87o
+targets:
+    - T-and87o
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
