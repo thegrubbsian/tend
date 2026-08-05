@@ -22,7 +22,6 @@ this file is regenerated from the working tree on every sync. -->
 ### Gates in review
 
 - task app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11): build pass, tests pass
-- task app-experience/fast-logging/fast-logging-model (T-2tztqs): build pass, tests pass
 
 ### Open questions
 
