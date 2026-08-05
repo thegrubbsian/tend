@@ -1,0 +1,13 @@
+id: EV-2iv60g
+type: start.task
+at: 2026-08-05T14:10:34.826274Z
+owner: jc
+command: start task T-9016sz
+targets:
+    - T-9016sz
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.yml

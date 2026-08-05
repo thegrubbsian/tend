@@ -1,7 +1,7 @@
 id: T-9016sz
 key: app-experience/fast-logging/fast-logging-fixtures
 title: Seed Deterministic Logging Journeys
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
