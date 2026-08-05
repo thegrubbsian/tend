@@ -15,6 +15,7 @@
     case duplicateInstantArgument
     case invalidInstant(String)
     case fixtureRequiresReset
+    case fixtureRequiresInstant
 
     var errorDescription: String? {
       switch self {
@@ -42,6 +43,8 @@
         "The UI-test instant \(instant) is invalid."
       case .fixtureRequiresReset:
         "A UI-test fixture requires exactly one reset flag."
+      case .fixtureRequiresInstant:
+        "A Fast Logging UI-test fixture requires a fixed instant."
       }
     }
   }
@@ -259,6 +262,11 @@
           instant = parsedInstant
         } else {
           instant = nil
+        }
+        if fixture == .fastLoggingDaily || fixture == .fastLoggingWeekly,
+          instant == nil
+        {
+          throw TendUITestStoreError.fixtureRequiresInstant
         }
 
         self.name = name

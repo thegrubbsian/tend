@@ -93,7 +93,7 @@
           at: launchInstant
         )
         let multiCountEntry = try logging.append(
-          amount: 1,
+          amount: 4,
           to: multiCount,
           at: launchInstant,
           timeZone: timeZone
@@ -180,12 +180,12 @@
           target: 4,
           unit: "times",
           currentPeriod: current,
-          currentProgress: 1,
+          currentProgress: 4,
           currentEntries: [multiCountEntry],
           grace: nil,
-          currentStreak: 0,
+          currentStreak: 1,
           isAtRisk: false,
-          isMet: false
+          isMet: true
         )
         try verify(
           completedQuantity,

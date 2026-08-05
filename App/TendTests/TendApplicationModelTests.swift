@@ -573,6 +573,13 @@ struct TendApplicationModelTests {
         ))
       let container = try factory()
       #expect(try container.mainContext.fetchCount(FetchDescriptor<Habit>()) > 0)
+      try expectUITestStoreError(
+        .fixtureRequiresInstant,
+        arguments: validArguments.filter {
+          $0 != TendUITestStore.instantArgument && $0 != instant
+        },
+        supportDirectory: supportDirectory
+      )
 
       try expectUITestStoreError(
         .missingEnabledArgument,
@@ -713,9 +720,9 @@ struct TendApplicationModelTests {
     let multiCount = try #require(loggingSnapshots["Posture checks"])
     #expect(multiCount.target == 4)
     #expect(multiCount.unit == "times")
-    #expect(multiCount.current.progress == 1)
-    #expect(multiCount.current.entries.map(\.amount) == [1])
-    #expect(!multiCount.current.isMet)
+    #expect(multiCount.current.progress == 4)
+    #expect(multiCount.current.entries.map(\.amount) == [4])
+    #expect(multiCount.current.isMet)
     #expect(multiCount.grace == nil)
 
     let completedQuantity = try #require(loggingSnapshots["Read 20 pages"])
@@ -755,6 +762,7 @@ struct TendApplicationModelTests {
     #expect(partialToday.isAtRisk)
     #expect(!partialToday.isMet)
     #expect(try #require(todaySnapshots["Read 20 pages"]).isMet)
+    #expect(try #require(todaySnapshots["Posture checks"]).isMet)
     #expect(!(try #require(todaySnapshots["Feed the cat"])).isMet)
   }
 
