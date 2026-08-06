@@ -1,0 +1,13 @@
+id: EV-cy4udm
+type: check.task
+at: 2026-08-06T18:41:23.684597Z
+owner: jc
+command: check task T-p7kknm
+targets:
+    - T-p7kknm
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml
