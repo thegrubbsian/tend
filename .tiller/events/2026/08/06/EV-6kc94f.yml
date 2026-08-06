@@ -1,0 +1,13 @@
+id: EV-6kc94f
+type: approve.task
+at: 2026-08-06T21:14:48.922689Z
+owner: jc
+command: approve task T-aocwl9
+targets:
+    - T-aocwl9
+before:
+    status: ready
+after:
+    status: ready
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml

@@ -31,7 +31,10 @@ pixel dimensions, SHA-256, observed result, and honest limitations.
 
 ## Surfaces
 
-- The application and every test target must already declare device family `1`.
+- Exercise only a compact iPhone runtime. Device-family `1` target settings and
+  removal of native iPad support belong to the subsequent
+  `device-readiness/owner-device-release/iphone-only-cutover` (T-3vfq8c), so
+  evidence from this prerequisite task remains valid before that cutover.
 - Extend `App/TendUITests/FastLoggingUITests.swift` only when an iPhone
   acceptance gap or witnessed defect requires stronger executable coverage.
 - Modify `App/Tend/Today/*`,

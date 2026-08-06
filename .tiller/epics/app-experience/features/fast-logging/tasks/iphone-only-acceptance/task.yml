@@ -8,10 +8,10 @@ proposed_by: jc
 accepted_against:
     spec:
         kind: git_blob
-        value: git:2fd15b2ba4bd946ee3b6af397e65aad1b71f59c8
+        value: git:6d0ca6d94b85633f9156f10178832a3fe985f563
         path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.md
-        observed_at: 2026-08-06T20:34:22.239409Z
+        observed_at: 2026-08-06T21:14:48.898967Z
     commit:
         kind: git_commit
-        value: git:92c8d3a
-        observed_at: 2026-08-06T20:34:22.263696Z
+        value: git:787fc3a
+        observed_at: 2026-08-06T21:14:48.921204Z
