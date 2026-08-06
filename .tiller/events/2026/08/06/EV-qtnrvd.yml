@@ -1,0 +1,14 @@
+id: EV-qtnrvd
+type: add.task
+at: 2026-08-06T20:28:33.902156Z
+owner: jc
+command: add task app-experience/fast-logging/iphone-only-acceptance
+targets:
+    - T-aocwl9
+after:
+    feature: F-z8e13q
+    key: app-experience/fast-logging/iphone-only-acceptance
+    status: proposed
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.md
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml

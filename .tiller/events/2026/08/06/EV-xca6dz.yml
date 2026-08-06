@@ -1,0 +1,13 @@
+id: EV-xca6dz
+type: spec.feature
+at: 2026-08-06T20:33:23.511397Z
+owner: jc
+command: spec feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

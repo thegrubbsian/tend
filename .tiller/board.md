@@ -10,7 +10,9 @@ this file is regenerated from the working tree on every sync. -->
 - epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
-- feature app-experience/fast-logging (F-z8e13q): active, awaiting check
+- feature app-experience/fast-logging (F-z8e13q): active
+- feature device-readiness/owner-device-release (F-3vz7ho): specced
+- task app-experience/fast-logging/iphone-only-acceptance (T-aocwl9): ready
 
 ### Blocked
 

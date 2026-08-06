@@ -1,7 +1,7 @@
 id: F-3vz7ho
 key: device-readiness/owner-device-release
 title: Owner Device Release
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: design/01-overview.md

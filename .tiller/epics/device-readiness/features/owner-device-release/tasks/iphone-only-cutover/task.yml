@@ -1,0 +1,7 @@
+id: T-3vfq8c
+key: device-readiness/owner-device-release/iphone-only-cutover
+title: Remove Native iPad Support
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc

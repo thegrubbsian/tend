@@ -1,0 +1,17 @@
+id: T-aocwl9
+key: app-experience/fast-logging/iphone-only-acceptance
+title: Verify iPhone-Only Fast Logging Journey
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:2fd15b2ba4bd946ee3b6af397e65aad1b71f59c8
+        path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.md
+        observed_at: 2026-08-06T20:34:22.239409Z
+    commit:
+        kind: git_commit
+        value: git:92c8d3a
+        observed_at: 2026-08-06T20:34:22.263696Z

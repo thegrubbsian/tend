@@ -42,7 +42,7 @@ Excluded from v1.0.0, possible later:
 - Charts and trend visualizations beyond the history grid
 - Data export
 - Device-to-device sync
-- Layouts designed specifically for iPad
+- Native iPad support and iPad-specific layouts
 
 
 

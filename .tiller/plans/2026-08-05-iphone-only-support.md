@@ -27,23 +27,30 @@
 ### Task 1: Record the iPhone-only product and Tiller contract
 
 **Files:**
+- Create: `.tiller/decisions/2026-08-06-iphone-only.md`
 - Modify: `.tiller/design/01-overview.md:37-45`
 - Modify: `.tiller/design/04-platform-and-constraints.md:3-11`
 - Modify: `.tiller/epics/device-readiness/features/owner-device-release/feature.md`
 - Create through `tiller-specify`: `.tiller/epics/device-readiness/features/owner-device-release/feature.eval.md`
 - Create through `tiller-specify`: `.tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.md`
-- Modify: `.tiller/epics/app-experience/features/fast-logging/feature.md:236-286`
-- Modify: `.tiller/epics/app-experience/features/fast-logging/feature.eval.md:37-40,84-90`
-- Modify: `.tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.md:11-20,45-47,91-95`
-- Do not modify: `.tiller/orientation.md`, completed task specs, `.tiller/plans/*` other than this plan, `.tiller/events/**`, or `.tiller/evidence/**`
+- Modify: `.tiller/epics/app-experience/features/fast-logging/feature.md:236-296`
+- Modify: `.tiller/epics/app-experience/features/fast-logging/feature.eval.md:24-40,83-90`
+- Create: `.tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.md`
+- Do not modify: `.tiller/orientation.md`, `app-experience/fast-logging/fast-logging-acceptance` (T-p7kknm), completed task specs, other completed plans, `.tiller/events/**` except generated new events, or `.tiller/evidence/**`
 
 **Interfaces:**
 - Consumes: the owner's decision that v1 is native iPhone-only and iPad may return as a separately designed future feature.
 - Produces: an approved forward feature and task whose acceptance contract owns the target-family, live-code inventory, and complete iPhone verification requirements.
 
-- [ ] **Step 1: Update the durable platform decision**
+- [ ] **Step 1: Record the decision, then update the durable platform inputs**
 
-Change the v1 exclusion in `01-overview.md` from iPad-specific layouts to native iPad support as a whole:
+Before any other repository edit, create
+`.tiller/decisions/2026-08-06-iphone-only.md`. Record the native iPhone-only v1
+decision, its rationale, the two amended design docs, the superseded and
+replacement Fast Logging tasks by full reference, the forward Owner Device
+Release feature, and the done/in-review work deliberately left untouched.
+
+Then change the v1 exclusion in `01-overview.md` to:
 
 ```markdown
 - Native iPad support and iPad-specific layouts
@@ -67,19 +74,27 @@ Invoke `tiller-specify` for `device-readiness/owner-device-release` (F-3vz7ho). 
 
 Create one proposed task with canonical key `device-readiness/owner-device-release/iphone-only-cutover`; do not split configuration, production cleanup, and test cleanup into independently shippable states because the target must never claim iPhone-only while live tablet contracts remain.
 
-- [ ] **Step 3: Re-scope pending fast-logging acceptance**
+- [ ] **Step 3: Re-scope Fast Logging and mint replacement acceptance**
 
-In the active Fast Logging feature and its not-yet-submitted acceptance task:
+Update only the active Fast Logging feature and evaluation:
 
 - Replace “compact iPhone and centered iPad” with “compact iPhone.”
 - Delete the iPad sheet-chrome allowance.
-- Require only `iphone-*` evidence names.
 - Keep all daily/weekly, current/grace, Undo, validation, long-content, Dynamic Type, keyboard, accessibility, Reduce Motion, and forced-light requirements.
 - Keep C6 required and manual; narrow only its device scope.
+- Delete C5’s semicolon-joined `baseline.artifact` line. The optional field names one repo-relative file, and C5’s command binding already names every required test.
 
-Do not edit the in-review Today Dashboard acceptance task or any done feature/task. Their historical claims remain true for the commits they verified and are superseded forward by Owner Device Release.
+Create `app-experience/fast-logging/iphone-only-acceptance` (T-aocwl9). Its
+`task.md` must name
+`app-experience/fast-logging/fast-logging-acceptance` (T-p7kknm) as superseded,
+point to `.tiller/decisions/2026-08-06-iphone-only.md`, and require only iPhone
+journeys and `iphone-*` evidence. Do not edit the superseded checked task.
 
-- [ ] **Step 4: Run the Tiller drift oracle and present the basis changes**
+Do not edit the in-review Today Dashboard acceptance task or any done
+feature/task. Their historical claims remain true for the commits they verified
+and are superseded forward by Owner Device Release.
+
+- [ ] **Step 4: Run the Tiller drift oracle and inspect every affected node**
 
 Run:
 
@@ -87,31 +102,62 @@ Run:
 tiller drift
 tiller status feature app-experience/fast-logging
 tiller status task app-experience/fast-logging/fast-logging-acceptance
+tiller status task app-experience/fast-logging/iphone-only-acceptance
 tiller status feature device-readiness/owner-device-release
 ```
 
-Expected: Fast Logging reports `active_basis` after its accepted spec/task basis changes; existing unrelated `orphan_eval` candidates may remain. No iPad test or code file may become an orphaned required binding.
+Expected: Fast Logging reports `active_basis`; the superseded task remains
+unchanged at `check`; the replacement is `proposed`; Owner Device Release is
+`specced`; C5 no longer produces the semicolon-list `ref_unreadable` report.
 
-- [ ] **Step 5: Stop at the human gates**
+- [ ] **Step 5: Show both diffs, then record only the named approvals**
 
-Present the exact changes and these node-qualified basis commands. Do not run them without a new explicit human instruction naming the nodes:
+Show the Fast Logging feature/eval diff before running:
 
 ```bash
 tiller approve feature app-experience/fast-logging --refresh-basis
-tiller approve task app-experience/fast-logging/fast-logging-acceptance --refresh-basis
 ```
 
-Present the normal `tiller-specify` approval command for `device-readiness/owner-device-release` exactly as the status oracle emits it. Continue only after the human approves the new feature/task plan and both refreshed bases.
-
-- [ ] **Step 6: Commit the accepted contract cutover**
-
-Commit only the Tiller-owned contract, state, board, and event files generated by the approved operations:
+Show `app-experience/fast-logging/iphone-only-acceptance` (T-aocwl9)’s complete
+task diff before running:
 
 ```bash
-git commit -m "define iPhone-only release scope"
+tiller approve task app-experience/fast-logging/iphone-only-acceptance
 ```
 
-Do not include production code, tests, generated `.tiller/orientation.md` from another worktree, or historical evidence.
+The owner has explicitly authorized those two gates. Do not refresh, approve,
+submit, or cancel the superseded task.
+
+- [ ] **Step 6: Commit the durable Tiller reshape**
+
+Commit the decision record, design inputs, active Fast Logging contract,
+replacement task, specced Owner Device Release plan, generated board/state/event
+files, and this corrected plan together:
+
+```bash
+git commit -m "define durable iPhone-only release scope"
+```
+
+Do not include production code, tests, generated `.tiller/orientation.md`,
+historical evidence, or any done/in-review node.
+
+- [ ] **Step 7: Hand the superseded-task cancellation to the human**
+
+From the reshape worktree, the human runs:
+
+```bash
+tiller cancel task T-p7kknm --reason "superseded by app-experience/fast-logging/iphone-only-acceptance (T-aocwl9) under the iPhone-only decision (.tiller/decisions/2026-08-06-iphone-only.md)"
+```
+
+Also present, but do not run without a separate explicit approval naming the
+node:
+
+```bash
+tiller approve feature device-readiness/owner-device-release
+```
+
+Continue to implementation only after the human records the cancellation and
+approves `device-readiness/owner-device-release` (F-3vz7ho).
 
 ---
 
