@@ -1,7 +1,7 @@
 id: F-3vz7ho
 key: device-readiness/owner-device-release
 title: Owner Device Release
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: design/01-overview.md
@@ -10,3 +10,18 @@ depends_on:
     - F-zbcv8j
     - F-z8e13q
     - F-efgzky
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:a283f17ebb8e2cac43c0bf8eda96b3b21c19e8fb
+        path: .tiller/epics/device-readiness/features/owner-device-release/feature.md
+        observed_at: 2026-08-06T20:40:57.393744Z
+    eval:
+        kind: git_blob
+        value: git:2d700cbac77988c779b41bc4fd1f2ec001bd259c
+        path: .tiller/epics/device-readiness/features/owner-device-release/feature.eval.md
+        observed_at: 2026-08-06T20:40:57.393744Z
+    commit:
+        kind: git_commit
+        value: git:0ad0413
+        observed_at: 2026-08-06T20:40:57.426439Z

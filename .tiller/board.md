@@ -11,8 +11,9 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
 - feature app-experience/fast-logging (F-z8e13q): active
-- feature device-readiness/owner-device-release (F-3vz7ho): specced
+- feature device-readiness/owner-device-release (F-3vz7ho): ready
 - task app-experience/fast-logging/iphone-only-acceptance (T-aocwl9): ready
+- task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
 
 ### Blocked
 
