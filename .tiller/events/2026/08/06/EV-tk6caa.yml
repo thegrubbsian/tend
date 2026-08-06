@@ -1,0 +1,17 @@
+id: EV-tk6caa
+type: cancel.task
+at: 2026-08-06T20:38:07.184163Z
+owner: jc
+command: cancel task T-p7kknm
+targets:
+    - T-p7kknm
+before:
+    status: check
+after:
+    reason: |-
+        superseded by
+        app-experience/fast-logging/iphone-only-acceptance (T-aocwl9) under the iPhone-only decision
+        (.tiller/decisions/2026-08-06-iphone-only.md)
+    status: cancelled
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml
