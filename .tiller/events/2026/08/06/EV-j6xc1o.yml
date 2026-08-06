@@ -1,0 +1,13 @@
+id: EV-j6xc1o
+type: start.task
+at: 2026-08-06T21:15:04.212916Z
+owner: jc
+command: start task T-aocwl9
+targets:
+    - T-aocwl9
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml
