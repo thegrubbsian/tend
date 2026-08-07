@@ -1,0 +1,13 @@
+id: EV-ojd2iq
+type: check.task
+at: 2026-08-07T03:45:05.822126Z
+owner: jc
+command: check task T-aocwl9
+targets:
+    - T-aocwl9
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml
