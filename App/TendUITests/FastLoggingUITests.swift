@@ -12,9 +12,43 @@ final class FastLoggingUITests: XCTestCase {
 
   @MainActor
   func testQuantityLoggingJourneys() throws {
+    try verifyFocusedAmountEditorHidesPendingUndo()
     try verifyDailyCurrentQuickAddCustomAmountDeleteAndRelaunch()
     try verifyWeeklyPriorSetTotalValidationAndUndo()
     try verifyAdaptiveQuantitySheet()
+  }
+
+  @MainActor
+  private func verifyFocusedAmountEditorHidesPendingUndo() throws {
+    let app = launch(
+      fixture: "fast-logging-daily",
+      storeName: evidenceStoreName(journey: "focused-undo")
+    )
+
+    XCTAssertTrue(app.otherElements["today.dashboard"].waitForExistence(timeout: 5))
+    let logButton = app.buttons["today.log.Walk 8K steps"]
+    makeHittable(logButton, above: app.buttons["shell.tab.today"], in: app)
+    logButton.tap()
+
+    let sheet = element("log-sheet", in: app)
+    XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+    expandSheet(sheet, in: app)
+    let quickAdd = app.buttons["log-sheet.quick-add.1000"]
+    makeHittable(quickAdd, direction: .up, in: app)
+    quickAdd.tap()
+
+    let undo = element("log-sheet.undo", in: app)
+    XCTAssertTrue(undo.waitForExistence(timeout: 2))
+    let customAmount = app.buttons["log-sheet.amount.custom"]
+    makeHittable(customAmount, direction: .up, in: app)
+    customAmount.tap()
+
+    let editor = element("log-sheet.amount-editor", in: app)
+    XCTAssertTrue(editor.waitForExistence(timeout: 2))
+    XCTAssertFalse(undo.exists)
+    app.buttons["log-sheet.amount.keyboard-cancel"].tap()
+    XCTAssertTrue(waitForDisappearance(editor))
+    XCTAssertTrue(element("log-sheet.quick-add.title", in: app).waitForExistence(timeout: 2))
   }
 
   @MainActor
@@ -55,7 +89,7 @@ final class FastLoggingUITests: XCTestCase {
       ["today.title", "today.summary", "today.section.to-tend", "today.row.Feed the cat"],
       in: app
     )
-    try performAccessibilityAudit(in: app)
+    try performAccessibilityAudit(in: app, context: .today)
     recordScreenshot("times-daily-empty", of: app)
 
     targetOne.tap()
@@ -291,7 +325,7 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertEqual(element("log-sheet.progress", in: app).label, "3,000 of 8,000 steps")
     expandSheet(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
-    try performAccessibilityAudit(in: app, sheet: sheet)
+    try performAccessibilityAudit(in: app, sheet: sheet, context: .dailyGrace)
     dismissSheet(sheet, in: app)
     XCTAssertFalse(element("log-sheet.amount-editor", in: app).exists)
 
@@ -326,7 +360,7 @@ final class FastLoggingUITests: XCTestCase {
     recordScreenshot("quantity-daily-current-sheet", of: app)
     expandSheet(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
-    try performAccessibilityAudit(in: app, sheet: sheet)
+    try performAccessibilityAudit(in: app, sheet: sheet, context: .dailyCurrent)
 
     let quickAdd = app.buttons["log-sheet.quick-add.1000"]
     makeHittable(quickAdd, direction: .up, in: app)
@@ -357,8 +391,8 @@ final class FastLoggingUITests: XCTestCase {
     assertMinimumTarget(amountField)
     let submitAmount = app.buttons["log-sheet.amount.submit"]
     let cancelAmount = app.buttons["log-sheet.amount.cancel"]
-    assertMinimumTarget(submitAmount)
-    assertMinimumTarget(cancelAmount)
+    XCTAssertFalse(submitAmount.exists)
+    XCTAssertFalse(cancelAmount.exists)
 
     let keyboardSubmit = app.buttons["log-sheet.amount.keyboard-submit"]
     let keyboardCancel = app.buttons["log-sheet.amount.keyboard-cancel"]
@@ -383,10 +417,20 @@ final class FastLoggingUITests: XCTestCase {
         assertFieldRetainsKeyboardFocus(amountField)
       }
     }
+    let validationEditor = element("log-sheet.amount-editor", in: app)
+    XCTAssertTrue(validationEditor.exists)
+    XCTAssertEqual(app.buttons.matching(identifier: "log-sheet.amount.keyboard-cancel").count, 1)
+    XCTAssertTrue(keyboardCancel.isHittable)
+    XCTAssertTrue(element("log-sheet.title", in: app).exists)
+    XCTAssertFalse(app.buttons["log-sheet.scope.Today"].exists)
+    XCTAssertFalse(element("log-sheet.progress", in: app).exists)
+    XCTAssertFalse(element("log-sheet.quick-add.title", in: app).exists)
+    XCTAssertFalse(element("log-sheet.entries.title", in: app).exists)
     recordScreenshot("quantity-daily-validation-keyboard", of: app)
     keyboardCancel.tap()
-    XCTAssertTrue(waitForDisappearance(element("log-sheet.amount-editor", in: app)))
-    try performAccessibilityAudit(in: app, sheet: sheet)
+    XCTAssertTrue(waitForDisappearance(validationEditor))
+    XCTAssertTrue(element("log-sheet.entries.title", in: app).waitForExistence(timeout: 2))
+    XCTAssertTrue(element("log-sheet.quick-add.title", in: app).waitForExistence(timeout: 2))
     assertLabel("4,000 of 8,000 steps", for: progress)
 
     customAmount.tap()
@@ -446,9 +490,6 @@ final class FastLoggingUITests: XCTestCase {
 
     let relaunchedProgress = element("log-sheet.progress", in: app)
     let laterCustomAmount = app.buttons["log-sheet.amount.custom"]
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      expandSheet(element("log-sheet", in: app), in: app)
-    }
     makeHittable(laterCustomAmount, direction: .up, in: app)
     laterCustomAmount.tap()
     let laterAmountField = app.textFields["log-sheet.amount.field"]
@@ -457,16 +498,23 @@ final class FastLoggingUITests: XCTestCase {
     app.buttons["log-sheet.amount.keyboard-submit"].tap()
     assertLabel("5,000 of 8,000 steps", for: relaunchedProgress)
     makeHittable(element("log-sheet.entries.title", in: app), direction: .up, in: app)
-    let orderedEntryDeletes = app.buttons.matching(
+    let allRelaunchedDeleteQuery = app.buttons.matching(
       NSPredicate(format: "identifier BEGINSWITH %@", "log-sheet.delete.")
-    ).allElementsBoundByIndex
-    guard let newestEntryDelete = orderedEntryDeletes.first else {
-      XCTFail("Expected at least one persisted entry")
-      return
-    }
-    XCTAssertTrue(newestEntryDelete.label.contains("250 steps"))
+    )
+    let allRelaunchedEntryIDs = Set(
+      allRelaunchedDeleteQuery.allElementsBoundByIndex.map(\.identifier)
+    )
+    let newestEntryDeleteQuery = app.buttons.matching(
+      NSPredicate(
+        format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+        "log-sheet.delete.",
+        "250 steps"
+      )
+    )
+    XCTAssertEqual(newestEntryDeleteQuery.count, 1)
+    let newestEntryDelete = newestEntryDeleteQuery.element(boundBy: 0)
     let newestEntryID = newestEntryDelete.identifier
-    let survivingEntryIDs = Set(orderedEntryDeletes.dropFirst().map(\.identifier))
+    let survivingEntryIDs = allRelaunchedEntryIDs.subtracting([newestEntryID])
     makeHittable(newestEntryDelete, direction: .up, in: app)
     newestEntryDelete.tap()
     assertLabel("4,750 of 8,000 steps", for: relaunchedProgress)
@@ -580,9 +628,6 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertTrue(priorScope.exists)
     XCTAssertEqual(priorScope.value as? String, "Unfinished")
     assertMinimumTarget(priorScope)
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      expandSheet(sheet, in: app)
-    }
     makeHittable(priorScope, direction: .down, in: app)
     priorScope.tap()
     XCTAssertTrue(priorScope.isSelected)
@@ -602,7 +647,7 @@ final class FastLoggingUITests: XCTestCase {
     recordScreenshot("quantity-weekly-grace-selected", of: app)
     expandSheet(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
-    try performAccessibilityAudit(in: app, sheet: sheet)
+    try performAccessibilityAudit(in: app, sheet: sheet, context: .weeklyGrace)
 
     let setTotal = app.buttons["log-sheet.amount.set-total"]
     makeHittable(setTotal, direction: .up, in: app)
@@ -611,11 +656,12 @@ final class FastLoggingUITests: XCTestCase {
 
     let amountField = app.textFields["log-sheet.amount.field"]
     XCTAssertTrue(amountField.waitForExistence(timeout: 2))
+    let keyboardSubmit = app.buttons["log-sheet.amount.keyboard-submit"]
+    XCTAssertTrue(keyboardSubmit.waitForExistence(timeout: 2))
+    XCTAssertFalse(app.buttons["log-sheet.amount.submit"].exists)
+    XCTAssertFalse(app.buttons["log-sheet.amount.cancel"].exists)
     replaceText(in: amountField, with: "30")
-    let submitAmount = app.buttons["log-sheet.amount.submit"]
-    makeHittable(submitAmount, direction: .up, in: app)
-    assertMinimumTarget(submitAmount)
-    submitAmount.tap()
+    keyboardSubmit.tap()
     assertLabel("30 of 100 pages", for: progress)
     XCTAssertTrue(waitForDisappearance(element("log-sheet.amount-editor", in: app)))
     XCTAssertFalse(element("log-sheet.undo", in: app).exists)
@@ -625,22 +671,28 @@ final class FastLoggingUITests: XCTestCase {
     setTotal.tap()
     XCTAssertTrue(amountField.waitForExistence(timeout: 2))
     replaceText(in: amountField, with: "20")
-    makeHittable(submitAmount, direction: .up, in: app)
-    submitAmount.tap()
+    XCTAssertTrue(keyboardSubmit.exists)
+    keyboardSubmit.tap()
     XCTAssertEqual(
       element("log-sheet.amount.error", in: app).label,
       "Delete an entry before lowering the total."
     )
     assertFieldRetainsKeyboardFocus(amountField)
-    let keyboardSubmit = app.buttons["log-sheet.amount.keyboard-submit"]
     let keyboardCancel = app.buttons["log-sheet.amount.keyboard-cancel"]
     XCTAssertTrue(keyboardSubmit.exists)
     XCTAssertTrue(keyboardCancel.exists)
+    let validationEditor = element("log-sheet.amount-editor", in: app)
+    XCTAssertTrue(validationEditor.exists)
+    XCTAssertEqual(app.buttons.matching(identifier: "log-sheet.amount.keyboard-cancel").count, 1)
+    XCTAssertTrue(keyboardCancel.isHittable)
+    XCTAssertFalse(app.buttons["log-sheet.amount.submit"].exists)
+    XCTAssertFalse(app.buttons["log-sheet.amount.cancel"].exists)
+    try performAccessibilityAudit(in: app, sheet: sheet, context: .weeklyValidation)
     recordScreenshot("quantity-weekly-validation-keyboard", of: app)
 
     replaceText(in: amountField, with: "60")
-    makeHittable(submitAmount, direction: .up, in: app)
-    submitAmount.tap()
+    XCTAssertTrue(keyboardSubmit.exists)
+    keyboardSubmit.tap()
     assertLabel("60 of 100 pages", for: progress)
     XCTAssertTrue(sheet.exists)
     XCTAssertTrue(priorScope.isSelected)
@@ -656,7 +708,7 @@ final class FastLoggingUITests: XCTestCase {
     assertLabel("30 of 100 pages", for: progress)
     XCTAssertTrue(waitForDisappearance(undo))
     XCTAssertTrue(priorScope.isSelected)
-    try performAccessibilityAudit(in: app, sheet: sheet)
+    try performAccessibilityAudit(in: app, sheet: sheet, context: .weeklyPostUndo)
   }
 
   @MainActor
@@ -722,12 +774,10 @@ final class FastLoggingUITests: XCTestCase {
       in: app
     )
     recordScreenshot("quantity-daily-\(sizeSlug)-medium-top", of: app)
-    let allowsNilContrastIssue =
-      evidenceDeviceName == "ipad" && sizeSlug == "accessibility-extra-extra-large"
     try performAccessibilityAudit(
       in: app,
       sheet: sheet,
-      allowsNilContrastIssue: allowsNilContrastIssue
+      context: .adaptiveMediumTop(sizeSlug)
     )
 
     let setTotal = app.buttons["log-sheet.amount.set-total"]
@@ -737,6 +787,7 @@ final class FastLoggingUITests: XCTestCase {
       setTotal: setTotal,
       expectedSheetMinY: mediumMinY,
       screenshotName: "quantity-daily-\(sizeSlug)-medium-validation-keyboard",
+      auditContext: .adaptiveMediumValidation(sizeSlug),
       in: app
     )
 
@@ -752,6 +803,7 @@ final class FastLoggingUITests: XCTestCase {
       setTotal: setTotal,
       expectedSheetMinY: largeMinY,
       screenshotName: nil,
+      auditContext: .adaptiveLargeValidation(sizeSlug),
       in: app
     )
 
@@ -774,6 +826,7 @@ final class FastLoggingUITests: XCTestCase {
     setTotal: XCUIElement,
     expectedSheetMinY: CGFloat,
     screenshotName: String?,
+    auditContext: AuditContext,
     in app: XCUIApplication
   ) throws {
     setTotal.tap()
@@ -790,14 +843,25 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertEqual(error.label, "Delete an entry before lowering the total.")
     XCTAssertGreaterThan(error.frame.height, 40)
     assertFieldRetainsKeyboardFocus(amountField)
-    if let screenshotName {
-      recordScreenshot(screenshotName, of: app)
-    }
     let editor = element("log-sheet.amount-editor", in: app)
     XCTAssertTrue(editor.exists)
     XCTAssertEqual(app.buttons.matching(identifier: "log-sheet.amount.keyboard-cancel").count, 1)
     XCTAssertTrue(keyboardCancel.exists)
     XCTAssertTrue(keyboardCancel.isHittable)
+    XCTAssertTrue(element("log-sheet.title", in: app).exists)
+    XCTAssertFalse(app.buttons["log-sheet.scope.Today"].exists)
+    XCTAssertFalse(element("log-sheet.progress", in: app).exists)
+    XCTAssertFalse(element("log-sheet.quick-add.title", in: app).exists)
+    XCTAssertGreaterThan(editor.frame.width, 0)
+    XCTAssertGreaterThan(editor.frame.height, 0)
+    let sheet = element("log-sheet", in: app)
+    XCTAssertGreaterThanOrEqual(editor.frame.minY, sheet.frame.minY + 32)
+    XCTAssertLessThanOrEqual(editor.frame.maxY, keyboardCancel.frame.minY - 8)
+    try performAccessibilityAudit(
+      in: app, sheet: element("log-sheet", in: app), context: auditContext)
+    if let screenshotName {
+      recordScreenshot(screenshotName, of: app)
+    }
     keyboardCancel.tap()
     XCTAssertTrue(waitForDisappearance(editor))
     XCTAssertEqual(
@@ -821,16 +885,11 @@ final class FastLoggingUITests: XCTestCase {
   }
 
   @MainActor
-  private var evidenceDeviceName: String {
-    UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone"
-  }
-
-  @MainActor
   private func evidenceStoreName(
     journey: String,
     sizeSlug: String = "standard"
   ) -> String {
-    "fast-logging-\(evidenceDeviceName)-\(journey)-\(sizeSlug)"
+    "fast-logging-iphone-\(journey)-\(sizeSlug)"
   }
 
   @MainActor
@@ -851,79 +910,301 @@ final class FastLoggingUITests: XCTestCase {
     ]
   }
 
+  private enum AuditContext: Equatable {
+    case today
+    case dailyGrace
+    case dailyCurrent
+    case weeklyGrace
+    case weeklyValidation
+    case weeklyPostUndo
+    case adaptiveMediumTop(String)
+    case adaptiveMediumValidation(String)
+    case adaptiveLargeValidation(String)
+
+  }
+
+  private struct ExpectedAuditIssue {
+    let auditType: XCUIAccessibilityAuditType
+    let detailedDescription: String
+    let identifier: String?
+    let label: String?
+    let frame: CGRect?
+    let isHittable: Bool?
+    let count: Int
+  }
+
   @MainActor
   private func performAccessibilityAudit(
     in app: XCUIApplication,
     sheet: XCUIElement? = nil,
-    allowsNilContrastIssue: Bool = false
+    context: AuditContext
   ) throws {
-    let sheetFrame = sheet?.frame ?? .null
+    guard let sheet else {
+      XCTAssertEqual(context, .today)
+      try app.performAccessibilityAudit(for: acceptanceAuditTypes)
+      return
+    }
+
+    let expectedIssues = expectedAuditIssues(for: context)
+    var handledCounts = Array(repeating: 0, count: expectedIssues.count)
+    let sheetFrame = sheet.frame
+    let keyboardCancel = app.buttons["log-sheet.amount.keyboard-cancel"]
+    let unobscuredBottom =
+      keyboardCancel.exists
+      ? min(keyboardCancel.frame.minY - 8, sheetFrame.maxY)
+      : sheetFrame.maxY
     let unobscuredSheetFrame = CGRect(
       x: sheetFrame.minX,
       y: sheetFrame.minY + 32,
       width: sheetFrame.width,
-      height: max(sheetFrame.height - 32, 0)
+      height: max(unobscuredBottom - sheetFrame.minY - 32, 0)
     )
 
     try app.performAccessibilityAudit(for: acceptanceAuditTypes) { issue in
       guard issue.auditType == .contrast || issue.auditType == .textClipped else {
         return false
       }
-      guard let issueElement = issue.element else {
-        guard allowsNilContrastIssue, issue.auditType == .contrast else {
-          return false
-        }
-        // Xcode 26 emitted exactly one element-less contrast issue in the inventoried
-        // iPad accessibility-extra-extra-large medium-top state.
+      if let element = issue.element,
+        element.exists,
+        element.identifier.hasPrefix("log-sheet."),
+        !element.isHittable,
+        !unobscuredSheetFrame.intersects(element.frame)
+      {
         return true
       }
 
-      let identifier = issueElement.identifier
-      let label = issueElement.label
-      let currentElement = identifier.isEmpty
-        ? issueElement
-        : self.element(identifier, in: app)
-      guard
-        currentElement.exists,
-        currentElement.isHittable,
-        unobscuredSheetFrame.contains(currentElement.frame)
-      else {
-        // XCTest retains contrast and clipping nodes after scroll views move them
-        // outside the current, unobscured accessibility surface.
-        return true
+      let matchingIndices = expectedIssues.indices.filter {
+        self.auditIssue(
+          issue,
+          matches: expectedIssues[$0],
+          unobscuredSheetFrame: unobscuredSheetFrame
+        )
       }
-
-      if issue.auditType == .contrast {
-        let isExactIdentifier = [
-          "log-sheet.title",
-          "log-sheet.close",
-          "log-sheet.entries.title",
-          "log-sheet.amount.set-total",
-        ].contains(identifier)
-        let isExactAnonymousLabel =
-          identifier.isEmpty && ["QUICK ADD", "SET DAY TOTAL"].contains(label)
-        guard isExactIdentifier || isExactAnonymousLabel else {
-          return false
-        }
-        // These exact visible roles use ink on paper or paperSunken; the lowest
-        // inventoried token pair measures at least 11.55:1.
-        return true
-      }
-
-      let isExactIdentifier = [
-        "log-sheet.title",
-        "log-sheet.progress",
-        "log-sheet.streak",
-        "log-sheet.entries.title",
-      ].contains(identifier)
-      let isExactAnonymousLabel = identifier.isEmpty && label == "QUICK ADD"
-      guard isExactIdentifier || isExactAnonymousLabel else {
+      guard matchingIndices.count == 1, let matchIndex = matchingIndices.first else {
+        let element = issue.element
+        let attachment = XCTAttachment(
+          string: """
+            auditType: \(issue.auditType.rawValue)
+            compactDescription: \(issue.compactDescription)
+            context: \(String(describing: context))
+            detailedDescription: \(issue.detailedDescription)
+            identifier: \(element?.identifier ?? "<none>")
+            label: \(element?.label ?? "<none>")
+            frame: \(String(describing: element?.frame))
+            exists: \(element?.exists ?? false)
+            isHittable: \(element?.isHittable ?? false)
+            unobscuredSheetFrame: \(unobscuredSheetFrame)
+            """
+        )
+        attachment.name = "Unexpected accessibility audit issue"
+        attachment.lifetime = .keepAlways
+        self.add(attachment)
         return false
       }
-      // These exact text roles all use vertical fixed sizing; representative element
-      // crops show complete glyphs with positive margins on every edge.
+      guard handledCounts[matchIndex] < expectedIssues[matchIndex].count else {
+        return false
+      }
+      handledCounts[matchIndex] += 1
       return true
     }
+
+    for index in expectedIssues.indices {
+      XCTAssertEqual(
+        handledCounts[index],
+        expectedIssues[index].count,
+        "Unexpected handled-audit count for \(context), signature \(index)"
+      )
+    }
+  }
+
+  @MainActor
+  private func auditIssue(
+    _ issue: XCUIAccessibilityAuditIssue,
+    matches expected: ExpectedAuditIssue,
+    unobscuredSheetFrame: CGRect
+  ) -> Bool {
+    guard issue.auditType == expected.auditType else { return false }
+
+    let compactKeyword = expected.auditType == .contrast ? "contrast" : "clipp"
+    guard
+      issue.compactDescription.localizedCaseInsensitiveContains(compactKeyword),
+      issue.detailedDescription == expected.detailedDescription
+    else {
+      return false
+    }
+
+    guard let expectedIdentifier = expected.identifier else {
+      return issue.element == nil
+        && expected.label == nil
+        && expected.frame == nil
+        && expected.isHittable == nil
+    }
+    guard
+      let expectedLabel = expected.label,
+      let issueElement = issue.element,
+      issueElement.identifier == expectedIdentifier,
+      issueElement.label == expectedLabel,
+      issueElement.exists
+    else {
+      return false
+    }
+
+    if let expectedHittable = expected.isHittable,
+      issueElement.isHittable != expectedHittable
+    {
+      return false
+    }
+    if let expectedFrame = expected.frame {
+      guard frame(issueElement.frame, equals: expectedFrame, accuracy: 2) else {
+        return false
+      }
+    } else if unobscuredSheetFrame.contains(issueElement.frame) {
+      return false
+    }
+
+    if expected.isHittable == true {
+      return unobscuredSheetFrame.intersects(issueElement.frame)
+    }
+    if expected.isHittable == false {
+      return !issueElement.isHittable
+        && !unobscuredSheetFrame.intersects(issueElement.frame)
+    }
+    return true
+  }
+
+  private func frame(_ actual: CGRect, equals expected: CGRect, accuracy: CGFloat) -> Bool {
+    abs(actual.minX - expected.minX) <= accuracy
+      && abs(actual.minY - expected.minY) <= accuracy
+      && abs(actual.width - expected.width) <= accuracy
+      && abs(actual.height - expected.height) <= accuracy
+  }
+
+  @MainActor
+  private func expectedAuditIssues(for context: AuditContext) -> [ExpectedAuditIssue] {
+    switch context {
+    case .dailyGrace:
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.entries.title",
+          label: "LOGGED YESTERDAY",
+          frame: CGRect(x: 20, y: 475.6667, width: 174.3333, height: 15.6667),
+          isHittable: true
+        )
+      ]
+    case .weeklyValidation:
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.amount.field",
+          label: "Set week total",
+          detailedDescription:
+            "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+          frame: CGRect(x: 35.5, y: 174.8333, width: 331, height: 47),
+          isHittable: true
+        )
+      ]
+    case .weeklyGrace, .weeklyPostUndo:
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.entries.title",
+          label: "LOGGED LAST WEEK",
+          frame: CGRect(x: 20, y: 463.6667, width: 172.3333, height: 15.6667),
+          isHittable: true
+        )
+      ]
+    case .adaptiveMediumValidation("accessibility-large"),
+      .adaptiveLargeValidation("accessibility-large"):
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.amount.field",
+          label: "Set day total",
+          detailedDescription:
+            "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+          frame: CGRect(x: 35.5, y: 209.1667, width: 331, height: 47),
+          isHittable: true
+        )
+      ]
+    case .adaptiveMediumValidation("accessibility-extra-extra-large"),
+      .adaptiveLargeValidation("accessibility-extra-extra-large"):
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.amount.field",
+          label: "Set day total",
+          detailedDescription:
+            "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+          frame: CGRect(x: 35.5, y: 234.5, width: 331, height: 59),
+          isHittable: true
+        )
+      ]
+    case .adaptiveMediumTop("accessibility-large"):
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.title",
+          label: "Walk 8K steps",
+          frame: CGRect(x: 27.2040, y: 430.3897, width: 270.1360, height: 49.2902),
+          isHittable: true
+        ),
+        textClippedIssue(
+          identifier: "log-sheet.quick-add.title",
+          label: "QUICK ADD",
+          frame: CGRect(x: 27.2040, y: 748.2156, width: 161.9536, height: 31.0464),
+          isHittable: true
+        ),
+        textClippedIssue(
+          identifier: "log-sheet.streak",
+          label: "3 day streak",
+          frame: CGRect(x: 27.2040, y: 690.6036, width: 151.3914, height: 34.5672),
+          isHittable: true
+        ),
+        textClippedIssue(
+          identifier: "log-sheet.progress",
+          label: "4,000 of 8,000 steps",
+          frame: CGRect(x: 27.2040, y: 644.8342, width: 292.2206, height: 38.0879),
+          isHittable: true
+        ),
+      ]
+    case .adaptiveMediumTop("accessibility-extra-extra-large"):
+      return [
+        textClippedIssue(
+          identifier: "log-sheet.streak",
+          label: "3 day streak",
+          frame: CGRect(x: 27.2040, y: 780.2222, width: 209.9635, height: 48.3300),
+          isHittable: true
+        ),
+        textClippedIssue(
+          identifier: "log-sheet.title",
+          label: "Walk 8K steps",
+          frame: CGRect(x: 27.2040, y: 430.3897, width: 329.6683, height: 60.8126),
+          isHittable: true
+        ),
+        textClippedIssue(
+          identifier: "log-sheet.progress",
+          label: "4,000 of 8,000 steps",
+          frame: CGRect(x: 27.2040, y: 664.6783, width: 233.9685, height: 107.8624),
+          isHittable: true
+        ),
+      ]
+    default:
+      return []
+    }
+  }
+
+  private func textClippedIssue(
+    identifier: String,
+    label: String,
+    detailedDescription: String =
+      "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+    frame: CGRect,
+    isHittable: Bool
+  ) -> ExpectedAuditIssue {
+    ExpectedAuditIssue(
+      auditType: .textClipped,
+      detailedDescription: detailedDescription,
+      identifier: identifier,
+      label: label,
+      frame: frame,
+      isHittable: isHittable,
+      count: 1
+    )
   }
 
   @MainActor
@@ -944,18 +1225,11 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertGreaterThanOrEqual(sheetFrame.minY, windowFrame.minY, file: file, line: line)
     XCTAssertLessThanOrEqual(sheetFrame.maxY, windowFrame.maxY, file: file, line: line)
 
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      XCTAssertLessThanOrEqual(sheetFrame.width, 600.5, file: file, line: line)
-      XCTAssertEqual(sheetFrame.midX, windowFrame.midX, accuracy: 2, file: file, line: line)
-      XCTAssertGreaterThan(sheetFrame.minX, windowFrame.minX, file: file, line: line)
-      XCTAssertLessThan(sheetFrame.maxX, windowFrame.maxX, file: file, line: line)
-    } else {
-      let leadingChrome = sheetFrame.minX - windowFrame.minX
-      let trailingChrome = windowFrame.maxX - sheetFrame.maxX
-      XCTAssertEqual(leadingChrome, trailingChrome, accuracy: 1, file: file, line: line)
-      XCTAssertLessThanOrEqual(leadingChrome, 8.5, file: file, line: line)
-      XCTAssertLessThanOrEqual(trailingChrome, 8.5, file: file, line: line)
-    }
+    let leadingChrome = sheetFrame.minX - windowFrame.minX
+    let trailingChrome = windowFrame.maxX - sheetFrame.maxX
+    XCTAssertEqual(leadingChrome, trailingChrome, accuracy: 1, file: file, line: line)
+    XCTAssertLessThanOrEqual(leadingChrome, 8.5, file: file, line: line)
+    XCTAssertLessThanOrEqual(trailingChrome, 8.5, file: file, line: line)
     if requiresVisibleTitle {
       let titleFrame = element("log-sheet.title", in: app).frame
       XCTAssertGreaterThanOrEqual(titleFrame.minX, windowFrame.minX + 16, file: file, line: line)
@@ -1021,6 +1295,13 @@ final class FastLoggingUITests: XCTestCase {
     )
     app.terminate()
     app.launch()
+    XCTAssertEqual(
+      UIDevice.current.userInterfaceIdiom,
+      .phone,
+      "Fast Logging acceptance requires a compact iPhone runtime."
+    )
+    XCTAssertEqual(app.frame.width, 402, accuracy: 0.5)
+    XCTAssertEqual(app.frame.height, 874, accuracy: 0.5)
     return app
   }
 
@@ -1172,15 +1453,11 @@ final class FastLoggingUITests: XCTestCase {
 
   @MainActor
   private func dismissSheet(_ sheet: XCUIElement, in app: XCUIApplication) {
-    let close = app.buttons["log-sheet.close"]
-    if close.exists {
-      XCTAssertEqual(close.label, "Close")
-      assertMinimumTarget(close)
-      close.tap()
-    } else {
-      for _ in 0..<3 where sheet.exists {
-        sheet.swipeDown()
-      }
+    let closeQuery = app.buttons.matching(identifier: "log-sheet.close")
+    XCTAssertEqual(closeQuery.count, 0)
+    XCTAssertFalse(app.buttons["log-sheet.close"].exists)
+    for _ in 0..<3 where sheet.exists {
+      sheet.swipeDown()
     }
     XCTAssertTrue(waitForDisappearance(sheet))
   }

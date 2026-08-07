@@ -5,6 +5,7 @@ enum AlmanacTextStyle {
   case body
   case secondary
   case label
+  case emphasizedLabel
   case tabLabel
   case caption
   case meaningfulNumeral(Font.TextStyle)
@@ -32,6 +33,12 @@ private struct AlmanacTextStyleModifier: ViewModifier {
         .textCase(.uppercase)
         .tracking(2.5)
         .foregroundStyle(AlmanacPalette.inkMuted)
+    case .emphasizedLabel:
+      content
+        .font(.footnote.weight(.semibold))
+        .textCase(.uppercase)
+        .tracking(2.5)
+        .foregroundStyle(AlmanacPalette.ink)
     case .tabLabel:
       content
         .font(.caption2.weight(.semibold))
