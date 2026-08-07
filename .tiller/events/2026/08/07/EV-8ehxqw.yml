@@ -1,0 +1,14 @@
+id: EV-8ehxqw
+type: sync.task
+at: 2026-08-07T04:02:18.742783Z
+owner: jc
+command: sync task T-aocwl9
+targets:
+    - T-aocwl9
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml

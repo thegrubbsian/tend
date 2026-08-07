@@ -1,7 +1,7 @@
 id: T-aocwl9
 key: app-experience/fast-logging/iphone-only-acceptance
 title: Verify iPhone-Only Fast Logging Journey
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:787fc3a
         observed_at: 2026-08-06T21:14:48.921204Z
 pr: 36
+done_basis: ancestry
 gates:
     build:
         required: true
