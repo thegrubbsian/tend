@@ -1,0 +1,14 @@
+id: EV-0s1k85
+type: add.task
+at: 2026-08-06T20:31:08.619704Z
+owner: jc
+command: add task device-readiness/owner-device-release/iphone-only-cutover
+targets:
+    - T-3vfq8c
+after:
+    feature: F-3vz7ho
+    key: device-readiness/owner-device-release/iphone-only-cutover
+    status: proposed
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.md
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.yml

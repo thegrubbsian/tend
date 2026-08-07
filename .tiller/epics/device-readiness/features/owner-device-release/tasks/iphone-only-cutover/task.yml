@@ -1,0 +1,17 @@
+id: T-3vfq8c
+key: device-readiness/owner-device-release/iphone-only-cutover
+title: Remove Native iPad Support
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:31e69e3cfeb6958fa712a0c1614c91aaa513688d
+        path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.md
+        observed_at: 2026-08-06T20:40:57.428071Z
+    commit:
+        kind: git_commit
+        value: git:0ad0413
+        observed_at: 2026-08-06T20:40:57.448458Z

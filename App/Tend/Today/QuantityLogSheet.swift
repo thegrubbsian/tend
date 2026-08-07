@@ -9,35 +9,37 @@ private enum QuantityLogSheetMetrics {
 
 struct QuantityLogSheet: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @Environment(\.dismiss) private var dismiss
   @FocusState private var isAmountFieldFocused: Bool
   @AccessibilityFocusState private var isProgressFocused: Bool
 
   let model: TodayLoggingModel
   let habits: [Habit]
+  let showsCloseButton: Bool
   let makeContext: () -> TodayRefreshContext
 
   var body: some View {
     ScrollView {
       if let sheet = model.state.sheet {
         VStack(alignment: .leading, spacing: AlmanacMetrics.spacingLarge) {
-          Text(sheet.habitName)
-            .almanacTextStyle(.screenTitle)
-            .foregroundStyle(AlmanacPalette.ink)
-            .fixedSize(horizontal: false, vertical: true)
-            .accessibilityIdentifier("log-sheet.title")
-            .accessibilityAddTraits(.isHeader)
+          sheetHeader(sheet)
 
-          scopeControl(sheet)
-          progressSection(sheet)
-          quickAddSection(sheet)
-          amountSection(sheet)
+          if sheet.amountEditorMode != nil {
+            amountSection(sheet)
+          } else {
+            scopeControl(sheet)
+            progressSection(sheet)
+            quickAddSection(sheet)
+            amountSection(sheet)
+          }
 
           if let sheetError = sheet.sheetError {
             inlineError(sheetError, identifier: "log-sheet.error")
           }
 
-          entrySection(sheet)
-
+          if sheet.amountEditorMode == nil {
+            entrySection(sheet)
+          }
         }
         .frame(maxWidth: AlmanacMetrics.readableContentWidth)
         .frame(maxWidth: .infinity, alignment: .center)
@@ -52,6 +54,7 @@ struct QuantityLogSheet: View {
     .background(AlmanacPalette.paper)
     .safeAreaInset(edge: .bottom, spacing: 0) {
       if let sheet = model.state.sheet,
+        sheet.amountEditorMode == nil,
         let undo = model.state.undo(for: sheet.habitID)
       {
         TodayLogUndoBar(undo: undo, habitName: sheet.habitName) {
@@ -79,6 +82,39 @@ struct QuantityLogSheet: View {
       guard let sheet = model.state.sheet else { return }
       AccessibilityNotification.Announcement(progressText(for: sheet)).post()
     }
+  }
+
+  @ViewBuilder
+  private func sheetHeader(_ sheet: LogSheetPresentation) -> some View {
+    if showsCloseButton {
+      HStack(alignment: .top, spacing: AlmanacMetrics.spacingMedium) {
+        sheetTitle(sheet)
+        Spacer(minLength: AlmanacMetrics.spacingMedium)
+        Button("Close") {
+          dismiss()
+        }
+        .buttonStyle(.plain)
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(AlmanacPalette.ink)
+        .frame(
+          minWidth: QuantityLogSheetMetrics.minimumTarget,
+          minHeight: QuantityLogSheetMetrics.minimumTarget
+        )
+        .contentShape(Rectangle())
+        .accessibilityIdentifier("log-sheet.close")
+      }
+    } else {
+      sheetTitle(sheet)
+    }
+  }
+
+  private func sheetTitle(_ sheet: LogSheetPresentation) -> some View {
+    Text(sheet.habitName)
+      .almanacTextStyle(.screenTitle)
+      .foregroundStyle(AlmanacPalette.ink)
+      .fixedSize(horizontal: false, vertical: true)
+      .accessibilityIdentifier("log-sheet.title")
+      .accessibilityAddTraits(.isHeader)
   }
 
   @ViewBuilder
@@ -131,7 +167,7 @@ struct QuantityLogSheet: View {
           .font(.subheadline.weight(.semibold))
           .fixedSize(horizontal: false, vertical: true)
       }
-      .foregroundStyle(isSelected ? AlmanacPalette.paper : AlmanacPalette.inkMuted)
+      .foregroundStyle(isSelected ? AlmanacPalette.paper : AlmanacPalette.ink)
       .frame(maxWidth: .infinity, minHeight: QuantityLogSheetMetrics.minimumTarget)
       .padding(.horizontal, AlmanacMetrics.spacingSmall)
       .background(isSelected ? AlmanacPalette.moss : Color.clear, in: Capsule())
@@ -171,9 +207,10 @@ struct QuantityLogSheet: View {
     if !amounts.presets.isEmpty || amounts.finish != nil {
       VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
         Text("QUICK ADD")
-          .almanacTextStyle(.label)
-          .foregroundStyle(AlmanacPalette.inkMuted)
+          .almanacTextStyle(.emphasizedLabel)
+          .fixedSize(horizontal: false, vertical: true)
           .accessibilityAddTraits(.isHeader)
+          .accessibilityIdentifier("log-sheet.quick-add.title")
 
         Group {
           if dynamicTypeSize.isAccessibilitySize {
@@ -309,7 +346,7 @@ struct QuantityLogSheet: View {
     }
     .buttonStyle(.plain)
     .font(.subheadline.weight(.semibold))
-    .foregroundStyle(AlmanacPalette.clayDeep)
+    .foregroundStyle(AlmanacPalette.ink)
     .frame(maxWidth: .infinity, minHeight: QuantityLogSheetMetrics.minimumTarget)
     .padding(.horizontal, AlmanacMetrics.spacingSmall)
     .contentShape(Rectangle())
@@ -325,8 +362,7 @@ struct QuantityLogSheet: View {
 
     return VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
       Text(title)
-        .almanacTextStyle(.label)
-        .foregroundStyle(AlmanacPalette.inkMuted)
+        .almanacTextStyle(.emphasizedLabel)
         .accessibilityAddTraits(.isHeader)
 
       TextField("Whole number", text: amountInputBinding)
@@ -348,9 +384,17 @@ struct QuantityLogSheet: View {
         .accessibilityIdentifier("log-sheet.amount.field")
         .toolbar {
           ToolbarItemGroup(placement: .keyboard) {
-            Button("Cancel") {
-              model.cancelAmountEditing()
+            Button(action: cancelAmountEditor) {
+              Text("Cancel")
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
             }
+            .buttonStyle(.plain)
+            .frame(
+              minWidth: QuantityLogSheetMetrics.minimumTarget * 2,
+              minHeight: QuantityLogSheetMetrics.minimumTarget
+            )
+            .contentShape(Rectangle())
             .accessibilityIdentifier("log-sheet.amount.keyboard-cancel")
             Spacer()
             Button(submitLabel, action: submitAmount)
@@ -362,26 +406,26 @@ struct QuantityLogSheet: View {
         inlineError(amountError, identifier: "log-sheet.amount.error")
       }
 
-      HStack(spacing: AlmanacMetrics.spacingSmall) {
-        Button(submitLabel, action: submitAmount)
-          .buttonStyle(
-            AlmanacPrimaryButtonStyle(minimumTarget: QuantityLogSheetMetrics.minimumTarget)
-          )
-          .accessibilityIdentifier("log-sheet.amount.submit")
+      if !isAmountFieldFocused {
+        HStack(spacing: AlmanacMetrics.spacingSmall) {
+          Button(submitLabel, action: submitAmount)
+            .buttonStyle(
+              AlmanacPrimaryButtonStyle(minimumTarget: QuantityLogSheetMetrics.minimumTarget)
+            )
+            .accessibilityIdentifier("log-sheet.amount.submit")
 
-        Button("Cancel") {
-          model.cancelAmountEditing()
+          Button("Cancel", action: cancelAmountEditor)
+            .buttonStyle(.plain)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(AlmanacPalette.ink)
+            .frame(
+              minWidth: QuantityLogSheetMetrics.minimumTarget,
+              minHeight: QuantityLogSheetMetrics.minimumTarget
+            )
+            .padding(.horizontal, AlmanacMetrics.spacingSmall)
+            .contentShape(Rectangle())
+            .accessibilityIdentifier("log-sheet.amount.cancel")
         }
-        .buttonStyle(.plain)
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(AlmanacPalette.inkMuted)
-        .frame(
-          minWidth: QuantityLogSheetMetrics.minimumTarget,
-          minHeight: QuantityLogSheetMetrics.minimumTarget
-        )
-        .padding(.horizontal, AlmanacMetrics.spacingSmall)
-        .contentShape(Rectangle())
-        .accessibilityIdentifier("log-sheet.amount.cancel")
       }
     }
     .padding(AlmanacMetrics.spacingMedium)
@@ -401,13 +445,19 @@ struct QuantityLogSheet: View {
     model.submitAmount(habits: habits, context: makeContext())
   }
 
+  private func cancelAmountEditor() {
+    guard model.state.sheet?.amountEditorMode != nil else { return }
+    isAmountFieldFocused = false
+    model.cancelAmountEditing()
+  }
+
   @ViewBuilder
   private func entrySection(_ sheet: LogSheetPresentation) -> some View {
     if let scope = sheet.scopes.first(where: { $0.periodKey == sheet.selectedPeriodKey }) {
       VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
         Text(scope.entryListLabel)
-          .almanacTextStyle(.label)
-          .foregroundStyle(AlmanacPalette.inkMuted)
+          .almanacTextStyle(.emphasizedLabel)
+          .fixedSize(horizontal: false, vertical: true)
           .accessibilityIdentifier("log-sheet.entries.title")
           .accessibilityAddTraits(.isHeader)
 

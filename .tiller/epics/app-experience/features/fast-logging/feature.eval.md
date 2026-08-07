@@ -31,11 +31,10 @@ criteria:
         value: git:7a3fd678e2abb2df414bada027e01796e829b9c7
         path: App/Tend/Today
         observed_at: 2026-08-05T00:33:37Z
-      artifact: App/TendUITests/TodayDashboardUITests.swift; App/TendUITests/HabitManagementUITests.swift; App/TendUITests/AlmanacShellUITests.swift; Tests/TendCoreTests/Logging/LogEntryOperationsTests.swift
     binding: { type: test, run: "Scripts/tiller-xcode-test TendUITests/TodayDashboardUITests && Scripts/tiller-xcode-test TendUITests/HabitManagementUITests && Scripts/tiller-xcode-test TendUITests/AlmanacShellUITests && Scripts/tiller-swift-test Tests/TendCoreTests/Logging/LogEntryOperationsTests.swift" }
     required: true
   - id: C6
-    statement: On compact iPhone and centered iPad, empty, in-progress, complete, Undo, current/grace, daily/weekly, validation, empty-entry, and long-content states match the approved Pencil Today, Log Sheet, and Affordance States boards and Almanac tokens for hierarchy, sheet detents, ring/chip geometry, color roles, readable width, safe areas, scrolling, and forced-light appearance without clipping, broken reflow, or unintended navigation.
+    statement: On compact iPhone, empty, in-progress, complete, Undo, current/grace, daily/weekly, validation, empty-entry, and long-content states match the approved Pencil Today, Log Sheet, and Affordance States boards and Almanac tokens for hierarchy, sheet detents, ring/chip geometry, color roles, readable width, safe areas, scrolling, and forced-light appearance without clipping, broken reflow, or unintended navigation.
     polarity: introduce
     binding: { type: manual }
     required: true
@@ -81,13 +80,13 @@ contract; all unrelated dashboard, lifecycle, shell, and TendCore mutation
 behavior remains baseline. This is not permission to rewrite fixtures or weaken
 truthful projection checks merely to make the interactive suites pass.
 
-For C6, compare complete surfaces with nodes `Zl4uG` (**Today**), `KUuoB`
-(**Log Sheet**), and `afx4Y` (**Affordance States**) in
+For C6, compare complete compact-iPhone surfaces with nodes `Zl4uG` (**Today**),
+`KUuoB` (**Log Sheet**), and `afx4Y` (**Affordance States**) in
 `.tiller/design/comps/tend.pen`. Record top, middle, and bottom of any scrollable
 sheet or dashboard. The comp’s fictional names and numbers are illustrative;
-layout, spacing, color roles, and state grammar are normative. A standard iOS
-sheet’s platform adaptation may differ in outer chrome on iPad, but its Almanac
-content hierarchy and readable width must remain recognizable and centered.
+layout, spacing, color roles, and state grammar are normative. The sheet’s
+Almanac content hierarchy must remain recognizable within the compact iPhone
+viewport.
 
 For C7, record exact accessibility labels, values, hints, traits, selected state,
 reading order, focus after scope changes and errors, keyboard submit/cancel,

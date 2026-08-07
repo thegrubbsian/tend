@@ -1,0 +1,13 @@
+id: EV-9hyw9g
+type: start.task
+at: 2026-08-05T21:24:09.467133Z
+owner: jc
+command: start task T-p7kknm
+targets:
+    - T-p7kknm
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml

@@ -1,0 +1,13 @@
+id: EV-cdn1mn
+type: approve.feature
+at: 2026-08-06T20:40:57.427765Z
+owner: jc
+command: approve feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

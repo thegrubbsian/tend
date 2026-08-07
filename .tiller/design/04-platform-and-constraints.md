@@ -4,7 +4,7 @@
 
 These are product decisions, made deliberately:
 
-- **Platform**: iOS, native. iPhone is the primary device. The app is universal and must run acceptably on iPad, but v1 requires no iPad-specific layouts; the iPhone experience adapting reasonably is enough.
+- **Platform**: iOS 26, native, iPhone only. The application, unit-test target, and UI-test target build for device family 1. Native iPad support is excluded from v1; adding it later requires a new product contract, adaptive design pass, and device-specific evidence.
 - **Minimum OS**: iOS 26. This is a single-user personal app on a device that stays current, so the deployment target tracks the latest major release and the build uses the current toolchain (Xcode 26, Swift 6 language mode).
 - **UI framework**: SwiftUI.
 - **Persistence**: SwiftData, on-device.

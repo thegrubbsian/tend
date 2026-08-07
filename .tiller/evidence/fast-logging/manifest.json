@@ -1,0 +1,1753 @@
+{
+  "schema": "tend.fast-logging.evidence.v1",
+  "task": "app-experience/fast-logging/iphone-only-acceptance (T-aocwl9)",
+  "feature": "app-experience/fast-logging (F-z8e13q)",
+  "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+  "generatedAt": "2026-08-07T03:37:04Z",
+  "testExecutions": [
+    {
+      "id": "changed-swift-format",
+      "command": "swift format lint --strict App/Tend/Today/QuantityLogSheet.swift App/TendUITests/FastLoggingUITests.swift",
+      "result": "passed: no diagnostics",
+      "observations": [
+        "Every Swift source or test file changed after the iPhone-only source commit passed strict swift-format lint."
+      ]
+    },
+    {
+      "id": "editable-logging-domain",
+      "criteria": [
+        "C1"
+      ],
+      "command": "Scripts/tiller-swift-test Tests/TendCoreTests/Logging/HabitLoggingComputationTests.swift",
+      "result": "passed: 11 tests, 0 failures",
+      "observations": [
+        "Covers daily and weekly current/grace projection, deterministic entry order, malformed relationships, calendar boundaries, and propagated reconciliation/evaluation failures."
+      ]
+    },
+    {
+      "id": "logging-model-application",
+      "criteria": [
+        "C2"
+      ],
+      "command": "Scripts/tiller-xcode-test TendTests/TodayLoggingModelTests",
+      "result": "passed: TEST SUCCEEDED, 0 failures",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_21-40-29--0500.xcresult",
+      "observations": [
+        "Covers exact-times dispatch, quantity validation, stable entry deletion, atomic mutation refresh, failure retention, scope identity, feedback value semantics, and identity-safe Undo expiry."
+      ]
+    },
+    {
+      "id": "times-logging-evidence",
+      "criteria": [
+        "C3"
+      ],
+      "command": "Scripts/tiller-xcode-test TendUITests/FastLoggingUITests/testTimesLoggingJourneys",
+      "result": "passed: 1 test, 0 failures; 7 final PNG attachments",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+      "observations": [
+        "Final evidence rerun occurred after every source/test commit and after the complete verification gates.",
+        "Covers daily target-one routing, weekly current and grace direct append, exact-entry Undo, over-target progress, persisted relaunch, and absence of quantity sheets for exact times."
+      ]
+    },
+    {
+      "id": "quantity-logging-evidence",
+      "criteria": [
+        "C4"
+      ],
+      "command": "Scripts/tiller-xcode-test TendUITests/FastLoggingUITests/testQuantityLoggingJourneys",
+      "result": "passed: 1 test, 0 failures; 19 final PNG attachments",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone"
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+      "observations": [
+        "Final evidence rerun occurred after every source/test commit and after the complete verification gates.",
+        "Covers daily and weekly current/grace sheets, quick add, Finish, custom amount, set total, lower-total validation, stable delete, completed access, transient Undo, relaunch, strict accessibility audits, and two larger Dynamic Type steps."
+      ]
+    },
+    {
+      "id": "today-dashboard-preservation",
+      "criteria": [
+        "C5"
+      ],
+      "command": "Scripts/tiller-xcode-test TendUITests/TodayDashboardUITests",
+      "result": "passed: 10 tests, 1 intentional iPad-only skip, 0 failures",
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_21-48-07--0500.xcresult"
+    },
+    {
+      "id": "habit-management-preservation",
+      "criteria": [
+        "C5"
+      ],
+      "command": "Scripts/tiller-xcode-test TendUITests/HabitManagementUITests",
+      "result": "passed on rerun: 2 tests, 0 failures",
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_21-54-52--0500.xcresult",
+      "observations": [
+        "The immediately preceding attempt hit the suite’s existing keyboard-dismissal swipe race and failed to locate the next form; the unchanged suite passed on rerun and also passed inside the later complete UI suite."
+      ]
+    },
+    {
+      "id": "shell-preservation",
+      "criteria": [
+        "C5"
+      ],
+      "command": "Scripts/tiller-xcode-test TendUITests/AlmanacShellUITests",
+      "result": "passed: 4 tests, 0 failures",
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_21-58-42--0500.xcresult"
+    },
+    {
+      "id": "log-entry-preservation",
+      "criteria": [
+        "C5"
+      ],
+      "command": "Scripts/tiller-swift-test Tests/TendCoreTests/Logging/LogEntryOperationsTests.swift",
+      "result": "passed: 23 tests, 0 failures"
+    },
+    {
+      "id": "complete-package-suite",
+      "command": "Scripts/tiller-swift-test",
+      "result": "passed: 217 tests in 18 suites, 0 failures"
+    },
+    {
+      "id": "complete-app-unit-suite",
+      "command": "Scripts/tiller-xcode-test TendTests",
+      "result": "passed: TEST SUCCEEDED, 0 failures",
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-00-42--0500.xcresult"
+    },
+    {
+      "id": "complete-ui-suite",
+      "command": "Scripts/tiller-xcode-test TendUITests",
+      "result": "passed: 20 tests, 1 intentional iPad-only skip, 0 failures",
+      "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-01-46--0500.xcresult"
+    },
+    {
+      "id": "swift-package-build",
+      "command": "swift build",
+      "result": "passed: build complete"
+    },
+    {
+      "id": "generic-ios-build",
+      "command": "xcodebuild -project Tend.xcodeproj -scheme Tend -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build",
+      "result": "passed: BUILD SUCCEEDED"
+    },
+    {
+      "id": "repository-format-baseline",
+      "command": "swift format lint --recursive --strict Sources Tests App",
+      "result": "failed: existing unrelated Habit-source and Habit-test formatting diagnostics",
+      "observations": [
+        "The changed files pass the strict command recorded by changed-swift-format.",
+        "The repository-wide output is confined to pre-existing HabitFormModel, HabitRosterModel, HabitRosterView, HabitManagementOperationsTests, and HabitRosterModelTests formatting debt; this task did not rewrite unrelated files."
+      ]
+    }
+  ],
+  "criteriaCoverage": {
+    "C1": {
+      "status": "automated binding passed",
+      "executions": [
+        "editable-logging-domain"
+      ]
+    },
+    "C2": {
+      "status": "automated binding passed",
+      "executions": [
+        "logging-model-application"
+      ]
+    },
+    "C3": {
+      "status": "automated binding passed",
+      "executions": [
+        "times-logging-evidence"
+      ],
+      "artifacts": [
+        "iphone-times-daily-empty",
+        "iphone-times-daily-undo",
+        "iphone-times-daily-complete",
+        "iphone-times-weekly-grace-open",
+        "iphone-times-weekly-grace-undo",
+        "iphone-times-weekly-over-target",
+        "iphone-times-weekly-relaunch"
+      ]
+    },
+    "C4": {
+      "status": "automated binding passed",
+      "executions": [
+        "quantity-logging-evidence"
+      ],
+      "artifacts": [
+        "iphone-quantity-daily-empty-entries",
+        "iphone-quantity-daily-current-sheet",
+        "iphone-quantity-daily-current-undo",
+        "iphone-quantity-daily-validation-keyboard",
+        "iphone-quantity-daily-complete",
+        "iphone-quantity-daily-over-target",
+        "iphone-quantity-daily-completed-access",
+        "iphone-quantity-weekly-current-entries",
+        "iphone-quantity-weekly-grace-selected",
+        "iphone-quantity-weekly-validation-keyboard",
+        "iphone-quantity-weekly-grace-undo",
+        "iphone-quantity-daily-accessibility-large-medium-top",
+        "iphone-quantity-daily-accessibility-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-large-large-middle",
+        "iphone-quantity-daily-accessibility-large-grace-bottom",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-top",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-extra-extra-large-large-middle",
+        "iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom"
+      ]
+    },
+    "C5": {
+      "status": "preservation bindings passed",
+      "executions": [
+        "today-dashboard-preservation",
+        "habit-management-preservation",
+        "shell-preservation",
+        "log-entry-preservation"
+      ]
+    },
+    "C6": {
+      "status": "supporting pixel and executable evidence recorded; human criterion not attested",
+      "artifacts": [
+        "iphone-times-daily-empty",
+        "iphone-times-daily-undo",
+        "iphone-times-daily-complete",
+        "iphone-times-weekly-grace-open",
+        "iphone-times-weekly-grace-undo",
+        "iphone-times-weekly-over-target",
+        "iphone-times-weekly-relaunch",
+        "iphone-quantity-daily-empty-entries",
+        "iphone-quantity-daily-current-sheet",
+        "iphone-quantity-daily-current-undo",
+        "iphone-quantity-daily-validation-keyboard",
+        "iphone-quantity-daily-complete",
+        "iphone-quantity-daily-over-target",
+        "iphone-quantity-daily-completed-access",
+        "iphone-quantity-weekly-current-entries",
+        "iphone-quantity-weekly-grace-selected",
+        "iphone-quantity-weekly-validation-keyboard",
+        "iphone-quantity-weekly-grace-undo",
+        "iphone-quantity-daily-accessibility-large-medium-top",
+        "iphone-quantity-daily-accessibility-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-large-large-middle",
+        "iphone-quantity-daily-accessibility-large-grace-bottom",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-top",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-extra-extra-large-large-middle",
+        "iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom"
+      ]
+    },
+    "C7": {
+      "status": "simulator, keyboard, semantic, Dynamic Type, Reduce Motion launch, and audit evidence recorded; physical VoiceOver and haptic criterion not attested",
+      "executions": [
+        "times-logging-evidence",
+        "quantity-logging-evidence"
+      ],
+      "artifacts": [
+        "iphone-quantity-daily-accessibility-large-medium-top",
+        "iphone-quantity-daily-accessibility-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-large-large-middle",
+        "iphone-quantity-daily-accessibility-large-grace-bottom",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-top",
+        "iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard",
+        "iphone-quantity-daily-accessibility-extra-extra-large-large-middle",
+        "iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom"
+      ]
+    }
+  },
+  "stateCoverage": {
+    "timesDaily": [
+      "iphone-times-daily-empty",
+      "iphone-times-daily-undo",
+      "iphone-times-daily-complete"
+    ],
+    "timesWeekly": [
+      "iphone-times-weekly-grace-open",
+      "iphone-times-weekly-grace-undo",
+      "iphone-times-weekly-over-target",
+      "iphone-times-weekly-relaunch"
+    ],
+    "quantityDaily": [
+      "iphone-quantity-daily-empty-entries",
+      "iphone-quantity-daily-current-sheet",
+      "iphone-quantity-daily-current-undo",
+      "iphone-quantity-daily-validation-keyboard",
+      "iphone-quantity-daily-complete",
+      "iphone-quantity-daily-over-target",
+      "iphone-quantity-daily-completed-access"
+    ],
+    "quantityWeekly": [
+      "iphone-quantity-weekly-current-entries",
+      "iphone-quantity-weekly-grace-selected",
+      "iphone-quantity-weekly-validation-keyboard",
+      "iphone-quantity-weekly-grace-undo"
+    ],
+    "dynamicTypeAccessibilityLarge": [
+      "iphone-quantity-daily-accessibility-large-medium-top",
+      "iphone-quantity-daily-accessibility-large-medium-validation-keyboard",
+      "iphone-quantity-daily-accessibility-large-large-middle",
+      "iphone-quantity-daily-accessibility-large-grace-bottom"
+    ],
+    "dynamicTypeAccessibilityExtraExtraLarge": [
+      "iphone-quantity-daily-accessibility-extra-extra-large-medium-top",
+      "iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard",
+      "iphone-quantity-daily-accessibility-extra-extra-large-large-middle",
+      "iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom"
+    ]
+  },
+  "accessibilityCoverage": {
+    "auditTypes": [
+      "contrast",
+      "hitRegion",
+      "sufficientElementDescription",
+      "textClipped",
+      "trait"
+    ],
+    "dynamicType": [
+      "Large (system default)",
+      "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+      "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)"
+    ],
+    "semanticObservations": [
+      "Rings, risk lines, Undo, scope selectors, quick-add and amount actions, and delete controls are targeted by stable accessibility identifiers and asserted for complete labels, values, selected state, or minimum hit regions.",
+      "Validation keeps keyboard focus by proving subsequent typed input lands in the same text field; Cancel and submit remain distinct controls, and Cancel is at least 88 points wide on compact iPhone.",
+      "Top, middle, validation-keyboard, and grace-bottom captures prove nonzero scrolling and reachable content at both larger Dynamic Type steps without reducing text size.",
+      "Adaptive launches request dark appearance and Reduce Motion while the application visibly retains its intentional forced-light Almanac surface."
+    ],
+    "auditScoping": [
+      "Unexpected hit-region, sufficient-description, trait, contrast, or text-clipping issues on visible content fail the test.",
+      "Only contrast or text-clipping reports for log-sheet content extending below the currently unobscured sheet viewport may be ignored; keyboard toolbar controls remain strict and fully visible.",
+      "Known XCTest false-positive signatures are matched exactly by audit type, description, identifier, label, frame, hittability, and count; stale or broad matches fail."
+    ]
+  },
+  "interactionCoverage": [
+    "Exact unit times uses direct append and never presents the Log Sheet, including target-one, repeated weekly count, and preceding grace-bucket paths.",
+    "Quantity units present the scoped Log Sheet and prove exact progress, entry order, period selection, quick add, Finish, custom amount, set total, lower-total validation, stable entry delete, Undo, and completed-habit access.",
+    "Same-store relaunch omits reset and fixture arguments, preserves persisted facts, and clears transient sheet, editor, and Undo presentation state.",
+    "Tests assert owner-visible state before and after each action; screenshots are support rather than substitutes for dispatch, identity, rollback, and persistence checks."
+  ],
+  "visualComparison": {
+    "source": ".tiller/design/comps/tend.pen",
+    "boards": [
+      {
+        "id": "Zl4uG",
+        "name": "Today"
+      },
+      {
+        "id": "KUuoB",
+        "name": "Log Sheet"
+      },
+      {
+        "id": "afx4Y",
+        "name": "Affordance States"
+      }
+    ],
+    "observations": [
+      "The 26 final compact-iPhone images retain the approved paper surface, serif titles and numerals, muted uppercase hierarchy, flat raised cards, moss progress and rings, ochre risk, and Today/Habits destination treatment.",
+      "The Log Sheet retains the approved hierarchy of title, scope, progress, quick add, custom/set-total actions, transient feedback, and logged-entry list across medium and large detents.",
+      "Production fixture facts intentionally replace illustrative comp names and values; domain truth takes precedence over sample data.",
+      "Top, middle, keyboard, and bottom captures show readable reflow and reachability at 402 by 874 points for default and both larger Dynamic Type steps."
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "iphone-times-daily-empty",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Today dashboard / daily current bucket",
+      "state": "unmet target-one habit before logging",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "37849E9D-A135-439F-AD87-C475831DA9A8.png",
+        "suggestedName": "times-daily-empty_0_59E880ED-DDF2-4653-A131-671FBA02E4D6.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073053.739
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-daily-empty.png",
+      "sha256": "1aad48b20b829f09b2c77fdaf9ba1ff077716065bf4845a0707bb0ac809dcff9",
+      "byteCount": 223213,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Feed the cat is 0 of 1 time and unmet; Today summary is 2 of 5; the production ring is 52 by 52 points and no Log Sheet is present.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-daily-undo",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Today dashboard / daily current bucket",
+      "state": "target-one habit immediately after direct append",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "DE4079D1-33E0-4653-858C-CF92EDEA6F90.png",
+        "suggestedName": "times-daily-undo_0_09168784-C400-4A68-BCE6-83CB7BE84CED.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073057.785
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-daily-undo.png",
+      "sha256": "efd129b4e07e021e5c7901807ae80e55fee431350b0cc25f5295ae49cac824cc",
+      "byteCount": 220509,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Feed the cat is 1 of 1 time and met in Tended; Today summary is 3 of 5; exact-entry Undo is visible and reachable above the tab bar; no Log Sheet is present.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-daily-complete",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Today dashboard / daily current bucket",
+      "state": "target-one habit completed after undo and re-log",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "587EC58B-D79D-460A-9225-82FC6AC9FE79.png",
+        "suggestedName": "times-daily-complete_0_2CD1FF75-E23E-4049-A697-D0412CDDAAC2.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073063.195
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-daily-complete.png",
+      "sha256": "efd129b4e07e021e5c7901807ae80e55fee431350b0cc25f5295ae49cac824cc",
+      "byteCount": 220509,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Feed the cat is again 1 of 1 time and met after a verified undo and second direct append; no Log Sheet is present.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-weekly-grace-open",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Today dashboard / preceding weekly grace bucket",
+      "state": "unfinished prior week before direct append",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "31A96DA5-F74B-4545-AC8D-6CD096F43BDB.png",
+        "suggestedName": "times-weekly-grace-open_0_559D5FD5-4F04-40AC-9F00-962FA75B071A.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073087.723
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-weekly-grace-open.png",
+      "sha256": "4cec540a6a0956fc0d3810320de7db1e534496841252a7394f41046cbe2cd417",
+      "byteCount": 175448,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Weekly check-ins exposes Last week open with a 3 week streak at risk and 1 of 3 times before the direct grace-bucket append.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-weekly-grace-undo",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Today dashboard / preceding weekly grace bucket",
+      "state": "prior week immediately after direct append",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "0DEB450D-F010-4687-87FF-AA4D7F4294DB.png",
+        "suggestedName": "times-weekly-grace-undo_0_D4DE310C-A251-478F-BA7B-D22635DC3B83.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073090.319
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-weekly-grace-undo.png",
+      "sha256": "aa5f756851e5d5362d026b76be6d0abfdc3d2147fec0b453344815c5ea0c578b",
+      "byteCount": 184470,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Weekly check-ins shows the persisted grace contribution and exact-entry Undo while the Log Sheet remains absent.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-weekly-over-target",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Today dashboard / current weekly bucket",
+      "state": "completed count above target",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "E7D634FC-EBD0-4955-A113-E31511FA4D7E.png",
+        "suggestedName": "times-weekly-over-target_0_B192AE9A-F3D1-4EB8-8351-74C4C4784DDF.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073106.211
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-weekly-over-target.png",
+      "sha256": "5937fce0126bc1d6ca48eb780c664d3c3d1c59269afa1e4d9351da2a35f3de07",
+      "byteCount": 165097,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Weekly check-ins is projected in Tended at 5 of 4 times after repeated direct count append; Undo remains reachable.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-times-weekly-relaunch",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testTimesLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Today dashboard / current weekly bucket",
+      "state": "persisted over-target count after same-store relaunch",
+      "viewport": "complete dashboard",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-24-01--0500.xcresult",
+        "exportedFileName": "457B772F-CB96-49B8-8681-F71DEEB7B770.png",
+        "suggestedName": "times-weekly-relaunch_0_F8571360-59EE-4E6E-A2B8-FF9E14F3C054.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073111.755
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-times-weekly-relaunch.png",
+      "sha256": "7cc504be047d807dce401f3a940ac44193fbd4c653f98bb41a21961730f760a7",
+      "byteCount": 154508,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Same-store relaunch preserves Weekly check-ins at 5 of 4 times while transient Undo, Log Sheet, and amount editor are absent.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-empty-entries",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "empty selected period",
+      "viewport": "bottom / entry region",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "44EF3FD2-C9CE-4FD7-8149-335A0932858A.png",
+        "suggestedName": "quantity-daily-empty-entries_0_DCD9312D-F452-4371-832D-3CBBE2248338.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073178.82
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-empty-entries.png",
+      "sha256": "81ea590cb9eaf3cce749ca79c17b72c1f46c9cfe811cdba6a3d88faf93ff6dc2",
+      "byteCount": 250872,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Meditate opens the quantity Log Sheet rather than direct-writing despite its singular unit; the selected period reports Nothing logged in this period and no delete controls.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-current-sheet",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "in-progress quantity with stable entries",
+      "viewport": "bottom / entry region",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "69EEE314-D90F-4D25-8C45-D8942C91C1FE.png",
+        "suggestedName": "quantity-daily-current-sheet_0_DDA1CB28-D5A4-4044-9DD6-C913ABEFB82B.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073199.287
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-current-sheet.png",
+      "sha256": "35e832e919b67338fa2fc8daff826f377cf06bc0d8ca509c1bcf403fc54bcb31",
+      "byteCount": 284408,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Walk 8K steps shows 4,000 of 8,000 steps with deterministic logged entries and stable delete actions.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-current-undo",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "current quantity immediately after quick add",
+      "viewport": "complete sheet with transient feedback",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "F62FCF87-A3C0-4918-ACB1-F1CEFEDBF33B.png",
+        "suggestedName": "quantity-daily-current-undo_0_C2F378E1-E605-4588-92B5-6FFC7AD32017.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073205.422
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-current-undo.png",
+      "sha256": "d4a6698fdd5895bd8002dc84f31b427d701a2ffb9b8c5311e0b2a92d7232bf92",
+      "byteCount": 208343,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Quick add persists 1,000 steps, updates progress to 5,000 of 8,000, inserts a newest entry, and exposes exact-entry Undo.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-validation-keyboard",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "invalid custom amount",
+      "viewport": "keyboard editor",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "B5BE080E-62EB-49BD-852B-4FB9F4DA5890.png",
+        "suggestedName": "quantity-daily-validation-keyboard_0_4E0B63CD-2451-4AAD-89EE-0148A13B8314.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073231.668
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-validation-keyboard.png",
+      "sha256": "b4b751c05a91c06a247e93fb28277b998b253c104803eaec5642ac001122cd96",
+      "byteCount": 168658,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "An overlong base-ten amount remains in the focused field, Add stays unavailable, the sheet entry list is obscured rather than duplicated, and Cancel remains reachable.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-complete",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "exact Finish reaches target",
+      "viewport": "medium sheet",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "E4A46AD9-62E4-4BD1-BB07-305957256AED.png",
+        "suggestedName": "quantity-daily-complete_0_D423FB6A-7963-459A-B792-6EC023E2E3F7.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073262.287
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-complete.png",
+      "sha256": "00e5c25918eec5b75cfc0b13cb3fa0d7e4d725d60bdf4a0665777c8b4baa186a",
+      "byteCount": 286850,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Finish persists the exact remaining amount, projects 8,000 of 8,000 steps, and removes the now-redundant Finish action.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-over-target",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Today dashboard and Log Sheet / Today",
+      "state": "completed quantity above target",
+      "viewport": "dashboard with sheet feedback",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "6A30095D-5C4F-449C-BE6C-BEB0303650D4.png",
+        "suggestedName": "quantity-daily-over-target_0_939C0971-E784-4587-908A-DD43DCBC0D92.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073263.901
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-over-target.png",
+      "sha256": "4db63f1ec60057e0a0a8cb87696ccdcd5f4ed42379e62ba28db1ffc312ab75bd",
+      "byteCount": 286014,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "A further quick add persists 9,000 of 8,000 steps without clamping; Today retains truthful over-target progress and transient Undo.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-completed-access",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "already-completed quantity opened for editing",
+      "viewport": "medium sheet",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "39F90BC6-E341-4B7E-BF04-B96176B831FE.png",
+        "suggestedName": "quantity-daily-completed-access_0_B9B33A52-3DD7-44CF-A668-86C1C14C768E.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073270.047
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-completed-access.png",
+      "sha256": "bf170475bcac2468d931f926673b294d278cef8a4b94be204978f93523f0c607",
+      "byteCount": 254846,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Read 20 pages remains editable after completion and opens the production Log Sheet at 20 of 20 pages with its stored entry history.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-weekly-current-entries",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Log Sheet / This Week",
+      "state": "weekly current period with two entries",
+      "viewport": "bottom / entry region",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "0BD2B879-5612-40EB-95A8-6C58C78363D8.png",
+        "suggestedName": "quantity-weekly-current-entries_0_C293A398-5041-4484-AD70-5A6E5CE6561A.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073290.908
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-weekly-current-entries.png",
+      "sha256": "065a5769fcb09941963c9b036eecfdfe741efb9d0832dd22f4757dd5f5b81bab",
+      "byteCount": 286733,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Weekly field notes shows This Week selected, 40 of 100 pages, and two stable current-period entries in deterministic order.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-weekly-grace-selected",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Log Sheet / Last Week",
+      "state": "unfinished preceding weekly grace period",
+      "viewport": "bottom / entry region",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "5FFE8967-AC23-4965-B46A-8158BC764B5E.png",
+        "suggestedName": "quantity-weekly-grace-selected_0_D2ECE052-8AD7-4DED-8611-9F06860DEB96.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073292.624
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-weekly-grace-selected.png",
+      "sha256": "d08b90ee8d6759651b92fdfb3b025536ace4b9259ee84104ea4a530694c812b2",
+      "byteCount": 287116,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Last Week is selected and marked unfinished at 30 of 100 pages with only prior-period entries visible.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-weekly-validation-keyboard",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Log Sheet / Last Week",
+      "state": "lower set-total validation",
+      "viewport": "keyboard editor",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "68BCEE77-A1DD-4DB6-B3FD-F97E88FCDB42.png",
+        "suggestedName": "quantity-weekly-validation-keyboard_0_C37072EE-6008-4E35-9FAF-CF6D2FBC25F7.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073310.22
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-weekly-validation-keyboard.png",
+      "sha256": "189015805a910bd7bb820c82e76193ac5f1a2ebde290bb87ff0ece7cf3174549",
+      "byteCount": 174794,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "Set week total retains keyboard focus on rejected lower input, leaves submission unavailable, and keeps Cancel reachable without mutation.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-weekly-grace-undo",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-weekly",
+      "fixtureInstant": "2027-01-04T20:00:00Z",
+      "scope": "Log Sheet / Last Week",
+      "state": "prior weekly grace immediately after set total",
+      "viewport": "complete sheet with transient feedback",
+      "accessibilitySettings": {
+        "dynamicType": "Large (system default)",
+        "reduceMotion": "not overridden",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "not overridden",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "F1152FBF-3551-4081-87AD-303AFF1753DF.png",
+        "suggestedName": "quantity-weekly-grace-undo_0_3A739189-0BA5-4177-8116-588A4E21C367.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073315.474
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-weekly-grace-undo.png",
+      "sha256": "4f68b96ca167d7bc0ae3ef2e5218054a45b0134a6ab561210255e0680c557ee8",
+      "byteCount": 201683,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "A valid prior-week total of 60 pages persists, refreshes exact progress and entries, and exposes exact-entry Undo; undo is then verified to restore 30 pages.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-large-medium-top",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "in-progress quantity at larger Dynamic Type",
+      "viewport": "medium detent top",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "4F4A1FE5-6D5C-46F9-96B8-04186411A506.png",
+        "suggestedName": "quantity-daily-accessibility-large-medium-top_0_0C025A58-9407-4753-A179-B3FF49508F03.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073332.273
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-large-medium-top.png",
+      "sha256": "2983ce0886e6df4896761bc14c88d08d33e6096c7f443f5277097b1ecd375946",
+      "byteCount": 278764,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The medium sheet preserves title, selected scope, progress, streak, quick-add actions, and accessible scrolling under Accessibility Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-large-medium-validation-keyboard",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "invalid set-total input at larger Dynamic Type",
+      "viewport": "medium detent keyboard editor",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "92F26A89-3BA2-45EB-B75D-B33D4040C48A.png",
+        "suggestedName": "quantity-daily-accessibility-large-medium-validation-keyboard_0_55F9637A-9CFA-45F2-B9FF-17C3867ADBF7.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073344.694
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-large-medium-validation-keyboard.png",
+      "sha256": "1ac50d7121091a2b06eb84af9775be0e6eb01a837438c23744552cbc71077ed1",
+      "byteCount": 191209,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The validation editor retains keyboard focus, an 88-point Cancel target, readable field content, and strict keyboard-control audits under Accessibility Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-large-large-middle",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "long in-progress content at larger Dynamic Type",
+      "viewport": "large detent middle",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "A74B9F7C-F79A-40D7-AC12-2F84E38C5809.png",
+        "suggestedName": "quantity-daily-accessibility-large-large-middle_0_35FFC498-B446-43FD-A960-E271CE2B0814.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073348.531
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-large-large-middle.png",
+      "sha256": "640b98192dd443d309b0e3a5ae6029434d6f0a904a119d4b58b998e048995d8f",
+      "byteCount": 237990,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The expanded sheet preserves scope, progress, quick-add actions, and scrollable logged entries without shrinking text under Accessibility Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-large-grace-bottom",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Yesterday",
+      "state": "long grace content at larger Dynamic Type",
+      "viewport": "large detent bottom",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Large (UICTContentSizeCategoryAccessibilityL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "DDCA002B-5C22-4A85-A37D-FBF43E44C33C.png",
+        "suggestedName": "quantity-daily-accessibility-large-grace-bottom_0_682E58D9-D907-4A36-9A68-D9ADC7530375.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073359.775
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-large-grace-bottom.png",
+      "sha256": "a822c37607a9142f23598a0b31e32f0cacb663b25dfb5bc7a59b7c54671deb28",
+      "byteCount": 243896,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The Yesterday scope, long logged-entry content, and delete actions remain reachable at the bottom under Accessibility Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-extra-extra-large-medium-top",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "in-progress quantity at second larger Dynamic Type step",
+      "viewport": "medium detent top",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "9DA39591-2BBE-462B-AC76-31A60155DB58.png",
+        "suggestedName": "quantity-daily-accessibility-extra-extra-large-medium-top_0_D6DBCA4B-C11D-4864-8A18-13F021013BAD.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073374.793
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-extra-extra-large-medium-top.png",
+      "sha256": "59422cc559f31b6d2ec65b9c0ac2b506294d52571a2dbe99a6f4f46f1e8ec4ed",
+      "byteCount": 290353,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The medium sheet reflows title, scope, progress, streak, and quick-add controls into a scrollable hierarchy at Accessibility Extra Extra Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "invalid set-total input at second larger Dynamic Type step",
+      "viewport": "medium detent keyboard editor",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "508953AC-2D09-493D-9410-380F4D6FE4C2.png",
+        "suggestedName": "quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard_0_B3A65BA5-8F42-4A18-9CB0-438A0E8821CC.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073388.207
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-extra-extra-large-medium-validation-keyboard.png",
+      "sha256": "08aee0c1c230bf17e6e0b7dd9bbbf2cba96be16e13759d86626c92b618717301",
+      "byteCount": 201491,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The validation editor retains keyboard focus, readable input, and reachable Cancel and submit controls at Accessibility Extra Extra Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-extra-extra-large-large-middle",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Today",
+      "state": "long in-progress content at second larger Dynamic Type step",
+      "viewport": "large detent middle",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "16688980-27C5-4DEA-A6ED-E1E99DFF4A6E.png",
+        "suggestedName": "quantity-daily-accessibility-extra-extra-large-large-middle_0_ED211907-F6B9-4E8A-81DF-1EA8A4911C9D.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073391.996
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-extra-extra-large-large-middle.png",
+      "sha256": "2e0e8b0bcd4f828a525538990b607f8ef3e3371a6f5a435bae8a571094eb44b6",
+      "byteCount": 239271,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The expanded sheet keeps scope, progress, actions, and logged-content hierarchy readable without text-size reduction at Accessibility Extra Extra Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    },
+    {
+      "id": "iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom",
+      "testedCommit": "9a0b88fa3ed4f0293208e2573bd659018314fa0e",
+      "testIdentifier": "FastLoggingUITests/testQuantityLoggingJourneys()",
+      "device": {
+        "name": "iPhone 17 Pro",
+        "udid": "91FCAB5E-F7C3-41DA-9289-C07258FBAE53",
+        "class": "compact iPhone",
+        "logicalViewport": {
+          "width": 402,
+          "height": 874
+        }
+      },
+      "runtime": {
+        "platform": "iOS Simulator",
+        "version": "26.2",
+        "build": "23C54"
+      },
+      "fixture": "fast-logging-daily",
+      "fixtureInstant": "2026-08-05T19:00:00Z",
+      "scope": "Log Sheet / Yesterday",
+      "state": "long grace content at second larger Dynamic Type step",
+      "viewport": "large detent bottom",
+      "accessibilitySettings": {
+        "dynamicType": "Accessibility Extra Extra Large (UICTContentSizeCategoryAccessibilityXXL)",
+        "reduceMotion": "enabled",
+        "voiceOverTraversal": "not performed"
+      },
+      "appearance": {
+        "requested": "dark",
+        "rendered": "application-enforced light"
+      },
+      "sourceAttachment": {
+        "xcresultPath": "/Users/jcgrubbs/Library/Developer/Xcode/DerivedData/Tend-gfmosmplgldgmvftjaxuihvanjjn/Logs/Test/Test-Tend-2026.08.06_22-25-49--0500.xcresult",
+        "exportedFileName": "39A580E2-E793-4CA6-AE2D-4457BFEC15F1.png",
+        "suggestedName": "quantity-daily-accessibility-extra-extra-large-grace-bottom_0_1A48D37A-0053-49FD-B141-2146935DD1E7.png",
+        "isAssociatedWithFailure": false,
+        "timestamp": 1786073404.205
+      },
+      "finalPath": ".tiller/evidence/fast-logging/iphone-quantity-daily-accessibility-extra-extra-large-grace-bottom.png",
+      "sha256": "81833fed039ec49a849638f4e9967d5f73e4c66535e72cd6277913b849da9e72",
+      "byteCount": 230728,
+      "pixelSize": {
+        "width": 1206,
+        "height": 2622
+      },
+      "observedResult": "The Yesterday scope and long grace entry list remain reachable at the bottom with complete labels and delete controls at Accessibility Extra Extra Large.",
+      "limitations": [
+        "Pixel evidence supports visual and geometry review; persisted dispatch, identity, rollback, Undo, and relaunch facts come from the paired executable assertions."
+      ]
+    }
+  ],
+  "manifestValidation": {
+    "artifactChecks": [
+      "26 paths are lowercase, relative, unique, and confined to .tiller/evidence/fast-logging.",
+      "Every path exists, is a nonempty PNG, is 1206 by 2622 pixels, and matches the recorded SHA-256 and byte count.",
+      "Every artifact testedCommit equals the manifest testedCommit and every source attachment came from a final post-source-commit passing xcresult."
+    ],
+    "schemaCommand": {
+      "specified": "tiller evidence schema fast-logging.evidence.v1",
+      "observed": "unavailable: installed Tiller reports unknown command evidence",
+      "fallback": "JSON parse plus explicit invariant validation recorded after manifest creation."
+    }
+  },
+  "limitations": [
+    {
+      "id": "physical-voiceover-traversal",
+      "observation": "No physical iPhone VoiceOver traversal was performed; simulator semantics, reading-order assertions, and accessibility audits are not presented as a substitute.",
+      "humanFollowUp": "A human must traverse both direct-times and scoped quantity journeys with VoiceOver on a compact iPhone before attesting C7."
+    },
+    {
+      "id": "physical-haptic-character",
+      "observation": "Unit tests verify emitted feedback decisions, but neither simulator output nor screenshots prove physical light, success, or Undo haptic character.",
+      "humanFollowUp": "A human must exercise ordinary log, unmet-to-met completion, and Undo on a physical iPhone before attesting C7."
+    },
+    {
+      "id": "manual-visual-acceptance",
+      "observation": "The agent reviewed all 26 final PNGs and recorded structural comparisons, but does not attest the human visual-design gate.",
+      "humanFollowUp": "A human must compare the evidence set against Today Zl4uG, Log Sheet KUuoB, and Affordance States afx4Y before attesting C6."
+    },
+    {
+      "id": "pixel-proof-boundary",
+      "observation": "Screenshots cannot prove save dispatch, persistent identity, rollback, exact period keys, keyboard focus, Reduce Motion transitions, or relaunch persistence.",
+      "automatedBoundary": "The paired executable assertions cover those observable contracts; artifact observations intentionally cite those tests rather than claiming pixels prove them."
+    },
+    {
+      "id": "repository-format-baseline",
+      "observation": "Repository-wide strict swift-format remains red on unrelated pre-existing Habit files; the two Swift files changed by this task pass strict lint.",
+      "humanFollowUp": "Resolve repository-wide Habit formatting debt in its owning scope rather than broadening this iPhone-only acceptance task."
+    },
+    {
+      "id": "tiller-evidence-schema-command",
+      "observation": "The installed Tiller binary does not provide the task-specified evidence schema command, so no CLI-produced schema was available.",
+      "automatedBoundary": "Manifest JSON parsing and artifact path, hash, byte-count, pixel-size, commit, uniqueness, and schema-name invariants are checked directly."
+    }
+  ],
+  "manualCriteria": {
+    "C6": "not attested or marked passed",
+    "C7": "not attested or marked passed"
+  }
+}

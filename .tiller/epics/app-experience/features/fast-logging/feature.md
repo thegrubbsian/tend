@@ -239,8 +239,7 @@ Controls meet 44-point targets. Owner names, units, progress, chip labels,
 entries, and errors wrap without truncation through two larger Dynamic Type
 steps. Chips and scope controls reflow rather than shrink below target size. The
 sheet remains keyboard- and VoiceOver-operable at medium and large detents,
-clear of the home indicator and floating shell pill. On iPad retain the centered
-Almanac readable field and platform sheet adaptation. Forced light appearance
+clear of the home indicator and floating shell pill. Forced light appearance
 remains unchanged.
 
 ## Consistency and failure boundaries
@@ -279,14 +278,13 @@ entry deletion, completed quantity access, persistence across dismissal and
 relaunch, and the exact-unit boundary where `time` opens a sheet but `times`
 does not.
 
-Visual evidence compares compact iPhone and centered iPad states with the
-approved `Today`, `Log Sheet`, and `Affordance States` boards. Exercise empty,
-in-progress, completion, Undo, current/grace, daily/weekly, validation, empty
-entries, and long-content states. Repeat representative journeys at two larger
-Dynamic Type steps with VoiceOver, Reduce Motion, forced light appearance, and
-keyboard presentation. Physical-device review verifies haptic character and
-manual VoiceOver traversal; automation and simulator screenshots never attest
-those observations.
+Visual evidence compares compact iPhone states with the approved `Today`, `Log
+Sheet`, and `Affordance States` boards. Exercise empty, in-progress, completion,
+Undo, current/grace, daily/weekly, validation, empty entries, and long-content
+states. Repeat representative journeys at two larger Dynamic Type steps with
+VoiceOver, Reduce Motion, forced light appearance, and keyboard presentation.
+Physical-device review verifies haptic character and manual VoiceOver traversal;
+automation and simulator screenshots never attest those observations.
 
 ## Out of scope
 
@@ -294,4 +292,4 @@ Do not add fractional or negative amounts, entry editing, bulk logging, arbitrar
 historical dates, buckets older than grace, weekly daily sub-buckets, reminders,
 notification permission, Habit Detail navigation, habit-management changes,
 cloud/network behavior, analytics, a third destination, a third-party
-dependency, dark appearance, or release packaging.
+dependency, dark appearance, native iPad support, or release packaging.

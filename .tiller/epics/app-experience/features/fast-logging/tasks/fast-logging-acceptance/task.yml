@@ -1,7 +1,7 @@
 id: T-p7kknm
 key: app-experience/fast-logging/fast-logging-acceptance
 title: Verify Fast Logging Journey
-status: ready
+status: cancelled
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,3 +18,30 @@ accepted_against:
         kind: git_commit
         value: git:51a1619
         observed_at: 2026-08-05T00:46:02.723752Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-06T18:41:21.600705Z
+        against:
+            kind: sha256
+            value: sha256:9ab2ad51f8e9580f1459c4ba504916621e185471742795a23fbf61e8da31d978
+            observed_at: 2026-08-06T18:41:21.6007Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-9ab2ad51f8e9-out-81052b4e2eb5bd48da8bb59091743984b06c9f6cec772c1c4174b7ea05154aa9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-06T18:41:21.600705Z
+        against:
+            kind: sha256
+            value: sha256:9ab2ad51f8e9580f1459c4ba504916621e185471742795a23fbf61e8da31d978
+            observed_at: 2026-08-06T18:41:21.6007Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-9ab2ad51f8e9-out-b2fbe1ebded10443a26701b34248c3403ff4e6af278553bc22e335443c5aabe5.txt

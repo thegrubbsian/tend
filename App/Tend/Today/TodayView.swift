@@ -6,6 +6,7 @@ import TendCore
 
 struct TodayView: View {
   @Environment(\.calendar) private var calendar
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.locale) private var locale
   @Environment(\.modelContext) private var modelContext
   @Environment(\.scenePhase) private var scenePhase
@@ -53,6 +54,7 @@ struct TodayView: View {
         QuantityLogSheet(
           model: loggingModel,
           habits: habits,
+          showsCloseButton: horizontalSizeClass == .regular,
           makeContext: operationContext
         )
         .presentationDetents([.medium, .large])

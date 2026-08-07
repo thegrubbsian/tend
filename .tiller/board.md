@@ -11,7 +11,8 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready
 - feature app-experience/today-dashboard (F-skoqxt): active
 - feature app-experience/fast-logging (F-z8e13q): active
-- task app-experience/fast-logging/fast-logging-acceptance (T-p7kknm): ready
+- feature device-readiness/owner-device-release (F-3vz7ho): ready
+- task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
 
 ### Blocked
 
@@ -20,6 +21,7 @@ this file is regenerated from the working tree on every sync. -->
 ### Gates in review
 
 - task app-experience/today-dashboard/today-dashboard-acceptance (T-m66b11): build pass, tests pass
+- task app-experience/fast-logging/iphone-only-acceptance (T-aocwl9): build pass, tests pass
 
 ### Open questions
 

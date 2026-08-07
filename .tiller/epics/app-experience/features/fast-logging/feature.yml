@@ -20,15 +20,15 @@ branch: tiller/app-experience/fast-logging
 accepted_against:
     spec:
         kind: git_blob
-        value: git:2095e0a90b41106a80c54cbc08a287737d4ce6f5
+        value: git:173dae7fdd4dda2b644cbe333acc018f9a7ad9ac
         path: .tiller/epics/app-experience/features/fast-logging/feature.md
-        observed_at: 2026-08-05T00:46:02.556572Z
+        observed_at: 2026-08-06T20:34:07.530353Z
     eval:
         kind: git_blob
-        value: git:0d6be5d34d606f1f23b65045b53d59e5253db6bf
+        value: git:1c9bd67ab16b77b0d104dda26799e92dec267d70
         path: .tiller/epics/app-experience/features/fast-logging/feature.eval.md
-        observed_at: 2026-08-05T00:46:02.556572Z
+        observed_at: 2026-08-06T20:34:07.530353Z
     commit:
         kind: git_commit
-        value: git:51a1619
-        observed_at: 2026-08-05T00:46:02.590479Z
+        value: git:92c8d3a
+        observed_at: 2026-08-06T20:34:07.563754Z
