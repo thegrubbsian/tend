@@ -32,3 +32,70 @@ accepted_against:
         kind: git_commit
         value: git:92c8d3a
         observed_at: 2026-08-06T20:34:07.563754Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-07T04:21:34.869353Z
+        against:
+            kind: sha256
+            value: sha256:3c3e4bc5bad884fb27169d9129ca0e87506ac38ef34e1d39420cc2a684cbd50d
+            observed_at: 2026-08-07T04:21:34.869134Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-3c3e4bc5bad8-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-07T04:21:34.869353Z
+        against:
+            kind: sha256
+            value: sha256:3c3e4bc5bad884fb27169d9129ca0e87506ac38ef34e1d39420cc2a684cbd50d
+            observed_at: 2026-08-07T04:21:34.869134Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-3c3e4bc5bad8-out-06c8d254d659ee3a7bcbe21cac1a96c9b2e6c0d27803b77e866a17e46aa29944.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-sha256-3c3e4bc5bad8-out-5ad777fe1bed0b153dc3f31e2cc3843400d81b6e9d38383e7e693806a256caee.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-3c3e4bc5bad8-out-9f214c4d471d5e68a65c62e74d7233949d5cc2c36096b78483f7d6f1d5a63678.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-sha256-3c3e4bc5bad8-out-586b05de4ad6a2d3fa25e74a11e415e78f683dea1dd33f19cad38f0d7b7c8e4a.txt
+            C5:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C5-sha256-3c3e4bc5bad8-out-9e826e90737ea64cdb1545e226f53ead3271789062a014c7966a035fd271d08e.txt
+            C6:
+                status: needs_attestation
+            C7:
+                status: needs_attestation
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-07T04:21:34.869353Z
+        against:
+            kind: sha256
+            value: sha256:3c3e4bc5bad884fb27169d9129ca0e87506ac38ef34e1d39420cc2a684cbd50d
+            observed_at: 2026-08-07T04:21:34.869134Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-3c3e4bc5bad8-out-76040ddda8f517bd2eab5db15ae3362c027569b69033c74c54dc7981ee652a83.txt
