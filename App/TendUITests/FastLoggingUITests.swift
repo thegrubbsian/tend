@@ -848,6 +848,11 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertEqual(app.buttons.matching(identifier: "log-sheet.amount.keyboard-cancel").count, 1)
     XCTAssertTrue(keyboardCancel.exists)
     XCTAssertTrue(keyboardCancel.isHittable)
+    XCTAssertGreaterThanOrEqual(
+      keyboardCancel.frame.width,
+      80,
+      "Keyboard Cancel must remain visibly readable at larger Dynamic Type sizes."
+    )
     XCTAssertTrue(element("log-sheet.title", in: app).exists)
     XCTAssertFalse(app.buttons["log-sheet.scope.Today"].exists)
     XCTAssertFalse(element("log-sheet.progress", in: app).exists)
@@ -967,8 +972,8 @@ final class FastLoggingUITests: XCTestCase {
       if let element = issue.element,
         element.exists,
         element.identifier.hasPrefix("log-sheet."),
-        !element.isHittable,
-        !unobscuredSheetFrame.intersects(element.frame)
+        !element.identifier.hasPrefix("log-sheet.amount.keyboard-"),
+        element.frame.maxY > unobscuredBottom
       {
         return true
       }

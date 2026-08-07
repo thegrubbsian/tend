@@ -384,14 +384,18 @@ struct QuantityLogSheet: View {
         .accessibilityIdentifier("log-sheet.amount.field")
         .toolbar {
           ToolbarItemGroup(placement: .keyboard) {
-            Button("Cancel", action: cancelAmountEditor)
-              .buttonStyle(.plain)
-              .frame(
-                minWidth: QuantityLogSheetMetrics.minimumTarget,
-                minHeight: QuantityLogSheetMetrics.minimumTarget
-              )
-              .contentShape(Rectangle())
-              .accessibilityIdentifier("log-sheet.amount.keyboard-cancel")
+            Button(action: cancelAmountEditor) {
+              Text("Cancel")
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+            }
+            .buttonStyle(.plain)
+            .frame(
+              minWidth: QuantityLogSheetMetrics.minimumTarget * 2,
+              minHeight: QuantityLogSheetMetrics.minimumTarget
+            )
+            .contentShape(Rectangle())
+            .accessibilityIdentifier("log-sheet.amount.keyboard-cancel")
             Spacer()
             Button(submitLabel, action: submitAmount)
               .accessibilityIdentifier("log-sheet.amount.keyboard-submit")
