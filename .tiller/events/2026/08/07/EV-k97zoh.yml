@@ -1,0 +1,14 @@
+id: EV-k97zoh
+type: sync.feature
+at: 2026-08-07T19:10:05.426513Z
+owner: jc
+command: sync feature F-z8e13q
+targets:
+    - F-z8e13q
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/fast-logging/feature.yml

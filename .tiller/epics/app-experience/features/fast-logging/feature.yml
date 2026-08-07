@@ -1,7 +1,7 @@
 id: F-z8e13q
 key: app-experience/fast-logging
 title: Fast Logging and Back-fill
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -32,6 +32,76 @@ accepted_against:
         kind: git_commit
         value: git:92c8d3a
         observed_at: 2026-08-06T20:34:07.563754Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:173dae7fdd4dda2b644cbe333acc018f9a7ad9ac
+        path: .tiller/epics/app-experience/features/fast-logging/feature.md
+        observed_at: 2026-08-07T19:10:05.206974Z
+    eval:
+        kind: git_blob
+        value: git:1c9bd67ab16b77b0d104dda26799e92dec267d70
+        path: .tiller/epics/app-experience/features/fast-logging/feature.eval.md
+        observed_at: 2026-08-07T19:10:05.206974Z
+    commit:
+        kind: git_commit
+        value: git:f103cbf
+        observed_at: 2026-08-07T19:10:04.50156Z
+    surfaces:
+        - path: App/Tend/Today
+          kind: git_tree
+          value: git:9444caaae3a4d652d292b78df18f0a2522d360bb
+          inventory:
+            - App/Tend/Today/QuantityLogSheet.swift
+            - App/Tend/Today/TodayLoggingModel.swift
+            - App/Tend/Today/TodayModel.swift
+            - App/Tend/Today/TodayPresentationFormatter.swift
+            - App/Tend/Today/TodayView.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+        - path: App/Tend/Shell/TodayDestinationChrome.swift
+          kind: git_blob
+          value: git:c8b5703d8b6320bbbfbb89ba90c1a662f694c30e
+          inventory:
+            - App/Tend/Shell/TodayDestinationChrome.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+        - path: Sources/TendCore/Logging
+          kind: git_tree
+          value: git:0fa3ed5e3f413915dc893e4e30a22d4913671ae8
+          inventory:
+            - Sources/TendCore/Logging/HabitLoggingComputation.swift
+            - Sources/TendCore/Logging/LogEntryOperations.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+        - path: Tests/TendCoreTests/Logging
+          kind: git_tree
+          value: git:b0ef97f108f87494c6014df641fee6f641f0f719
+          inventory:
+            - Tests/TendCoreTests/Logging/BucketTotalOperationsTests.swift
+            - Tests/TendCoreTests/Logging/HabitLoggingComputationTests.swift
+            - Tests/TendCoreTests/Logging/LogEntryOperationsTests.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+        - path: App/TendTests
+          kind: git_tree
+          value: git:e5434494551b78fb1ea981785993c54a9c1e8557
+          inventory:
+            - App/TendTests/HabitDetailModelTests.swift
+            - App/TendTests/HabitFormModelTests.swift
+            - App/TendTests/HabitRosterModelTests.swift
+            - App/TendTests/LocalDayTimelineScheduleTests.swift
+            - App/TendTests/TendApplicationModelTests.swift
+            - App/TendTests/TodayLoggingModelTests.swift
+            - App/TendTests/TodayModelTests.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+        - path: App/TendUITests
+          kind: git_tree
+          value: git:b91b2254ca82c7220fb48a0b9dba33d85217353b
+          inventory:
+            - App/TendUITests/AlmanacShellUITests.swift
+            - App/TendUITests/FastLoggingUITests.swift
+            - App/TendUITests/HabitDetailUITests.swift
+            - App/TendUITests/HabitManagementUITests.swift
+            - App/TendUITests/TodayDashboardUITests.swift
+          observed_at: 2026-08-07T19:10:05.206974Z
+done_basis: rollup
 gates:
     build:
         required: true
@@ -99,3 +169,11 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-sha256-3c3e4bc5bad8-out-76040ddda8f517bd2eab5db15ae3362c027569b69033c74c54dc7981ee652a83.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:f103cbf
+        observed_at: 2026-08-07T19:10:04.50156Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-sha256-3c3e4bc5bad8-out-06c8d254d659ee3a7bcbe21cac1a96c9b2e6c0d27803b77e866a17e46aa29944.txt
