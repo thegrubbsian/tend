@@ -42,19 +42,23 @@ struct ReminderAppIntegrationTests {
     let model = HabitFormModel(mode: .new)
     model.name = "Walk"
 
-    await model.enableReminder(requestAuthorization: controller.requestIfNeeded)
-
+    let authorization = model.enableReminder(
+      requestAuthorization: controller.requestIfNeeded
+    )
     #expect(model.reminderTime == ReminderTime(hour: 9, minute: 0))
     #expect(model.canSave)
+    await authorization?.value
     #expect(center.requestedAuthorizationOptions == [[.alert, .sound]])
     #expect(center.requestAuthorizationCallCount == 1)
     #expect(refreshes.count == 1)
 
     model.setReminderEnabled(false)
-    await model.enableReminder(requestAuthorization: controller.requestIfNeeded)
-
+    let repeatedAuthorization = model.enableReminder(
+      requestAuthorization: controller.requestIfNeeded
+    )
     #expect(model.reminderTime == ReminderTime(hour: 9, minute: 0))
     #expect(model.canSave)
+    await repeatedAuthorization?.value
     #expect(center.requestAuthorizationCallCount == 1)
     #expect(refreshes.count == 1)
   }

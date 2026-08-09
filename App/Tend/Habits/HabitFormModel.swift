@@ -354,11 +354,14 @@ final class HabitFormModel {
         return true
     }
 
+    @discardableResult
     func enableReminder(
-        requestAuthorization: ReminderAuthorizationRequest
-    ) async {
-        guard setReminderEnabled(true) else { return }
-        await requestAuthorization()
+        requestAuthorization: @escaping ReminderAuthorizationRequest
+    ) -> Task<Void, Never>? {
+        guard setReminderEnabled(true) else { return nil }
+        return Task {
+            await requestAuthorization()
+        }
     }
 
     func save(
