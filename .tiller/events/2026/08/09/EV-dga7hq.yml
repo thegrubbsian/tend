@@ -1,0 +1,14 @@
+id: EV-dga7hq
+type: sync.task
+at: 2026-08-09T22:16:57.818309Z
+owner: jc
+command: sync task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

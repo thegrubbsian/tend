@@ -8,7 +8,7 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic device-readiness (E-z3y156): ready, active
-- feature device-readiness/local-reminders (F-zbcv8j): active
+- feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
 - feature device-readiness/owner-device-release (F-3vz7ho): ready
 - task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
 
@@ -18,7 +18,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task device-readiness/local-reminders/reminder-app-integration (T-hpts9u): build pass, tests pass
+- (none)
 
 ### Open questions
 
