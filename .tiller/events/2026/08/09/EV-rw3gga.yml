@@ -1,0 +1,13 @@
+id: EV-rw3gga
+type: start.task
+at: 2026-08-09T19:29:17.063236Z
+owner: jc
+command: start task T-oeg8ua
+targets:
+    - T-oeg8ua
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/notification-reconciliation/task.yml

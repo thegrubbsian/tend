@@ -1,7 +1,7 @@
 id: T-oeg8ua
 key: device-readiness/local-reminders/notification-reconciliation
 title: Reconcile reminder plans with UserNotifications
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
