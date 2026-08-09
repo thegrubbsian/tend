@@ -907,6 +907,7 @@ final class TodayLoggingModel {
     context: TodayRefreshContext
   ) throws {
     let entry = try operations.append(1, habit, destination, context)
+    reminderRefresh()
     let after = try operations.snapshot(habit, context)
     todayModel.refresh(habits: habits, context: context)
     let selectedAfter = bucket(in: after, periodKey: before.periodKey) ?? after.current

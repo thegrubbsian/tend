@@ -362,10 +362,10 @@ struct HabitFormView: View {
         .almanacSunkenSurface()
       } else {
         Button {
-          if model.setReminderEnabled(true) {
-            Task {
-              await requestReminderAuthorization()
-            }
+          Task {
+            await model.enableReminder(
+              requestAuthorization: requestReminderAuthorization
+            )
           }
         } label: {
           HStack {

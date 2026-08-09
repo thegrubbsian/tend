@@ -21,6 +21,7 @@ struct TodayLoggingModelTests {
     var progressByID = Dictionary(
       uniqueKeysWithValues: habits.map { ($0.persistentModelID, 0) })
     var appendCalls: [(Int, PersistentIdentifier, LogEntryDestination, TodayRefreshContext)] = []
+    var reminderRefreshCount = 0
     let todayModel = TodayModel(
       operations: TodayOperations { habit, _ in
         todaySnapshot(
@@ -53,9 +54,9 @@ struct TodayLoggingModelTests {
     let model = TodayLoggingModel(
       todayModel: todayModel,
       operations: operations,
-      sleep: longSleep
+      sleep: longSleep,
+      reminderRefresh: { reminderRefreshCount += 1 }
     )
-
     model.activateCurrent(habit: times, habits: habits, context: refreshContext)
 
     #expect(appendCalls.count == 1)
@@ -67,6 +68,7 @@ struct TodayLoggingModelTests {
     #expect(model.state.undo?.habitID == times.persistentModelID)
     #expect(model.state.undo?.amount == 1)
     #expect(model.state.feedback?.kind == .logged)
+    #expect(reminderRefreshCount == 1)
 
     for quantity in quantities {
       model.activateCurrent(habit: quantity, habits: habits, context: refreshContext)
@@ -100,6 +102,7 @@ struct TodayLoggingModelTests {
     )
     let habits = [daily, weekly, count]
     var appendDestinations: [LogEntryDestination] = []
+    var reminderRefreshCount = 0
     let snapshots: [PersistentIdentifier: HabitLoggingSnapshot] = [
       daily.persistentModelID: loggingSnapshot(
         habit: daily,
@@ -155,9 +158,9 @@ struct TodayLoggingModelTests {
     let model = TodayLoggingModel(
       todayModel: todayModel,
       operations: operations,
-      sleep: longSleep
+      sleep: longSleep,
+      reminderRefresh: { reminderRefreshCount += 1 }
     )
-
     model.activateCurrent(habit: daily, habits: habits, context: refreshContext)
     var sheet = try #require(model.state.sheet)
     #expect(sheet.selectedPeriodKey == "day:2026-08-05")
@@ -181,6 +184,7 @@ struct TodayLoggingModelTests {
     model.activateAtRisk(habit: count, habits: habits, context: refreshContext)
     #expect(appendDestinations == [.periodKey("day:2026-08-04")])
     #expect(model.state.sheet == nil)
+    #expect(reminderRefreshCount == 1)
   }
 
   @Test("transient card state resolves only for its persistent habit identity")

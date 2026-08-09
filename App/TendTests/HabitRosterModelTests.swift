@@ -30,8 +30,7 @@ struct HabitRosterModelTests {
             calendar: fixture.calendar,
             locale: fixture.locale
         )
-    #expect(
-      model.activeRows.map { $0.habit.persistentModelID } == [
+        #expect(model.activeRows.map { $0.habit.persistentModelID } == [
             firstActive.persistentModelID
         ])
         #expect(model.inactiveRows.isEmpty)
@@ -73,16 +72,13 @@ struct HabitRosterModelTests {
     func localizedOrderingUsesDocumentedTieBreakers() throws {
         let fixture = try HabitRosterFixture()
         let instant = try fixture.instant("2026-01-05T12:00:00Z")
-    let firstIdentifier = try #require(
-      UUID(
+        let firstIdentifier = try #require(UUID(
             uuidString: "00000000-0000-0000-0000-000000000001"
         ))
-    let secondIdentifier = try #require(
-      UUID(
+        let secondIdentifier = try #require(UUID(
             uuidString: "00000000-0000-0000-0000-000000000002"
         ))
-    let thirdIdentifier = try #require(
-      UUID(
+        let thirdIdentifier = try #require(UUID(
             uuidString: "00000000-0000-0000-0000-000000000003"
         ))
         let first = try fixture.create(name: "ALPHA", at: instant)
@@ -112,8 +108,7 @@ struct HabitRosterModelTests {
             locale: fixture.locale
         )
 
-    #expect(
-      firstOrder == [
+        #expect(firstOrder == [
             firstIdentifier,
             secondIdentifier,
             thirdIdentifier,
@@ -127,8 +122,7 @@ struct HabitRosterModelTests {
     func formatsRosterFacts() throws {
         let fixture = try HabitRosterFixture()
         let instant = try fixture.instant("2026-01-05T12:00:00Z")
-    let mondayAndWednesday = try #require(
-      PinnedWeekdays(
+        let mondayAndWednesday = try #require(PinnedWeekdays(
             rawValue: PinnedWeekdays.monday.rawValue | PinnedWeekdays.wednesday.rawValue
         ))
         let steps = try fixture.create(
@@ -181,8 +175,7 @@ struct HabitRosterModelTests {
         let fixture = try HabitRosterFixture()
         let instant = try fixture.instant("2026-01-05T12:00:00Z")
         let habit = try fixture.create(name: "Long streak", at: instant)
-    let model = HabitRosterModel(
-      operations: HabitRosterOperations(
+        let model = HabitRosterModel(operations: HabitRosterOperations(
             fetchHabits: { [habit] },
             computeStreak: { _, _, _ in
                 HabitRosterStreakSnapshot(currentStreak: 1_000, isAtRisk: false)
@@ -494,8 +487,7 @@ struct HabitRosterModelTests {
         #expect(model.inactiveRows.count == 1)
         #expect(model.operationError == nil)
         #expect(requestedInstants == [instant, retryInstant])
-    #expect(
-      requestedTimeZones.map(\.identifier) == [
+        #expect(requestedTimeZones.map(\.identifier) == [
             fixture.timeZone.identifier,
             retryTimeZone.identifier,
         ])
@@ -513,7 +505,7 @@ struct HabitRosterModelTests {
         let habit = Habit(name: "Garden", cadence: .daily, target: 1)
         habit.isActive = scenario != .reactivate
         var fetchCallCount = 0
-    var reminderRefreshCount = 0
+        var reminderRefreshCount = 0
         let operations = HabitRosterOperations(
             fetchHabits: {
                 fetchCallCount += 1
@@ -533,10 +525,10 @@ struct HabitRosterModelTests {
             },
             delete: { _ in }
         )
-    let model = HabitRosterModel(
-      operations: operations,
-      reminderRefresh: { reminderRefreshCount += 1 }
-    )
+        let model = HabitRosterModel(
+            operations: operations,
+            reminderRefresh: { reminderRefreshCount += 1 }
+        )
         model.refresh(
             at: instant,
             timeZone: fixture.timeZone,
@@ -573,7 +565,7 @@ struct HabitRosterModelTests {
 
         #expect(model.rosterErrorMessage == "The roots are still holding.")
         #expect(fetchCallCount == 2)
-    #expect(reminderRefreshCount == 1)
+        #expect(reminderRefreshCount == 1)
         switch scenario {
         case .archive:
             #expect(model.activeRows.isEmpty)
@@ -662,7 +654,7 @@ struct HabitRosterModelTests {
         let habit = Habit(name: "Garden", cadence: .daily, target: 1)
         var isDeleted = false
         var deleteCallCount = 0
-    var reminderRefreshCount = 0
+        var reminderRefreshCount = 0
         let operations = HabitRosterOperations(
             fetchHabits: { isDeleted ? [] : [habit] },
             computeStreak: { _, _, _ in
@@ -678,10 +670,10 @@ struct HabitRosterModelTests {
                 isDeleted = true
             }
         )
-    let model = HabitRosterModel(
-      operations: operations,
-      reminderRefresh: { reminderRefreshCount += 1 }
-    )
+        let model = HabitRosterModel(
+            operations: operations,
+            reminderRefresh: { reminderRefreshCount += 1 }
+        )
         model.refresh(
             at: instant,
             timeZone: fixture.timeZone,
@@ -700,7 +692,7 @@ struct HabitRosterModelTests {
         #expect(model.activeRows.count == 1)
         #expect(model.operationError?.message == "The roots are still holding.")
         #expect(deleteCallCount == 1)
-    #expect(reminderRefreshCount == 0)
+        #expect(reminderRefreshCount == 0)
 
         model.retryOperation(
             at: instant.addingTimeInterval(60),
@@ -712,7 +704,7 @@ struct HabitRosterModelTests {
         #expect(model.activeRows.isEmpty)
         #expect(model.operationError == nil)
         #expect(deleteCallCount == 2)
-    #expect(reminderRefreshCount == 1)
+        #expect(reminderRefreshCount == 1)
     }
 
     @Test("failed archive alternative retry dismisses confirmation after success")
@@ -870,8 +862,8 @@ private enum HabitRosterTestError: LocalizedError {
     }
 }
 
-extension HabitRosterModel {
-  fileprivate func row(for habit: Habit) -> HabitRosterRow? {
+private extension HabitRosterModel {
+    func row(for habit: Habit) -> HabitRosterRow? {
         (activeRows + inactiveRows).first {
             $0.habit.persistentModelID == habit.persistentModelID
         }

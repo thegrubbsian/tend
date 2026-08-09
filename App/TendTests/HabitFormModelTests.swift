@@ -96,10 +96,8 @@ struct HabitFormModelTests {
 
         let labels = HabitFormWeekday.localizedLabels(calendar: calendar, locale: locale)
         #expect(labels.map(\.short) == ["M", "T", "W", "T", "F", "S", "S"])
-    #expect(
-      labels.map(\.accessibility) == [
-        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
-      ])
+        #expect(labels.map(\.accessibility) ==
+            ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
     }
 
     @Test("weekday controls honor an injected non-Gregorian calendar and locale")
@@ -110,8 +108,7 @@ struct HabitFormModelTests {
         let labels = HabitFormWeekday.localizedLabels(calendar: calendar, locale: locale)
 
         #expect(labels.map(\.short) == ["ن", "ث", "ر", "خ", "ج", "س", "ح"])
-    #expect(
-      labels.map(\.accessibility) == [
+        #expect(labels.map(\.accessibility) == [
             "الاثنين",
             "الثلاثاء",
             "الأربعاء",
@@ -146,8 +143,7 @@ struct HabitFormModelTests {
                     calendar: calendar,
                     timeZone: timeZone
                 )
-        #expect(
-          HabitFormReminderDateAdapter.reminderTime(
+                #expect(HabitFormReminderDateAdapter.reminderTime(
                     from: date,
                     calendar: calendar,
                     timeZone: timeZone
@@ -159,8 +155,7 @@ struct HabitFormModelTests {
                 calendar: calendar,
                 timeZone: timeZone
             )
-      #expect(
-        HabitFormReminderDateAdapter.reminderTime(
+            #expect(HabitFormReminderDateAdapter.reminderTime(
                 from: defaultDate,
                 calendar: calendar,
                 timeZone: timeZone
@@ -245,9 +240,8 @@ struct HabitFormModelTests {
         )
 
         #expect(model.cadenceDisplayName == "Unsupported cadence")
-    #expect(
-      model.configurationErrorMessage
-        == "This habit has an unsupported stored cadence and can’t be edited.")
+        #expect(model.configurationErrorMessage ==
+            "This habit has an unsupported stored cadence and can’t be edited.")
         #expect(model.reminderTime == ReminderTime(hour: 7, minute: 30))
         #expect(model.showsReminderControl)
         #expect(!model.canSave)
@@ -262,9 +256,8 @@ struct HabitFormModelTests {
         invalidPinsHabit.reminderMinuteOfDay = 450
         let invalidPinsModel = HabitFormModel(mode: .edit(invalidPinsHabit))
 
-    #expect(
-      invalidPinsModel.configurationErrorMessage
-        == "This habit has invalid stored pinned days and can’t be edited.")
+        #expect(invalidPinsModel.configurationErrorMessage ==
+            "This habit has invalid stored pinned days and can’t be edited.")
         #expect(invalidPinsModel.reminderTime == ReminderTime(hour: 7, minute: 30))
         #expect(invalidPinsModel.showsReminderControl)
         #expect(!invalidPinsModel.showsPinnedWeekdays)
@@ -274,9 +267,8 @@ struct HabitFormModelTests {
         invalidReminderHabit.reminderMinuteOfDay = 24 * 60
         let invalidReminderModel = HabitFormModel(mode: .edit(invalidReminderHabit))
 
-    #expect(
-      invalidReminderModel.configurationErrorMessage
-        == "This habit has an invalid stored reminder time and can’t be edited.")
+        #expect(invalidReminderModel.configurationErrorMessage ==
+            "This habit has an invalid stored reminder time and can’t be edited.")
         #expect(!invalidReminderModel.showsReminderControl)
         #expect(!invalidReminderModel.canSave)
 
@@ -285,123 +277,115 @@ struct HabitFormModelTests {
         multipleErrorsHabit.reminderMinuteOfDay = 24 * 60
         let multipleErrorsModel = HabitFormModel(mode: .edit(multipleErrorsHabit))
 
-    #expect(
-      multipleErrorsModel.configurationErrorMessage
-        == "This habit has invalid stored pinned days and can’t be edited. "
-        + "This habit has an invalid stored reminder time and can’t be edited.")
+        #expect(multipleErrorsModel.configurationErrorMessage ==
+            "This habit has invalid stored pinned days and can’t be edited. " +
+            "This habit has an invalid stored reminder time and can’t be edited.")
         #expect(!multipleErrorsModel.showsPinnedWeekdays)
         #expect(!multipleErrorsModel.showsReminderControl)
         #expect(!multipleErrorsModel.canSave)
     }
 
-  @Test("reminder permission gesture honors draft provenance exactly once")
-  func reminderPermissionGestureHonorsDraftProvenanceExactlyOnce() {
-    let newModel = HabitFormModel(mode: .new)
+    @Test("reminder permission gesture honors draft provenance exactly once")
+    func reminderPermissionGestureHonorsDraftProvenanceExactlyOnce() {
+        let newModel = HabitFormModel(mode: .new)
 
-    #expect(newModel.setReminderEnabled(true))
-    newModel.setReminderEnabled(false)
-    #expect(!newModel.setReminderEnabled(true))
+        #expect(newModel.setReminderEnabled(true))
+        newModel.setReminderEnabled(false)
+        #expect(!newModel.setReminderEnabled(true))
 
-    let remindedHabit = Habit(
-      name: "Walk",
-      cadence: .daily,
-      target: 1,
-      reminderTime: ReminderTime(hour: 9, minute: 0)
-    )
-    let editModel = HabitFormModel(mode: .edit(remindedHabit))
-    editModel.setReminderEnabled(false)
+        let remindedHabit = Habit(
+            name: "Walk",
+            cadence: .daily,
+            target: 1,
+            reminderTime: ReminderTime(hour: 9, minute: 0)
+        )
+        let editModel = HabitFormModel(mode: .edit(remindedHabit))
+        editModel.setReminderEnabled(false)
 
-    #expect(!editModel.setReminderEnabled(true))
-    #expect(editModel.reminderTime == ReminderTime(hour: 9, minute: 0))
-    #expect(editModel.canSave)
-  }
+        #expect(!editModel.setReminderEnabled(true))
+        #expect(editModel.reminderTime == ReminderTime(hour: 9, minute: 0))
+        #expect(editModel.canSave)
+    }
 
-  @Test("successful create and update signal reminder refresh exactly once")
-  func successfulSavesSignalReminderRefreshExactlyOnce() throws {
-    let instant = Date(timeIntervalSince1970: 1_725_214_400)
-    let timeZone = try #require(TimeZone(identifier: "UTC"))
-    let createdHabit = Habit(name: "Walk", cadence: .daily, target: 1)
-    var createRefreshCount = 0
-    let createModel = HabitFormModel(
-      mode: .new,
-      reminderRefresh: { createRefreshCount += 1 }
-    )
-    createModel.name = "Walk"
-    let createPersistence = HabitFormPersistence(
-      create: { _, _, _, _ in createdHabit },
-      update: { _, _, _, _ in
-        Issue.record("Create must not dispatch update")
-      }
-    )
+    @Test("successful create and update signal reminder refresh exactly once")
+    func successfulSavesSignalReminderRefreshExactlyOnce() throws {
+        let instant = Date(timeIntervalSince1970: 1_725_214_400)
+        let timeZone = try #require(TimeZone(identifier: "UTC"))
+        let createdHabit = Habit(name: "Walk", cadence: .daily, target: 1)
+        var createRefreshCount = 0
+        let createModel = HabitFormModel(
+            mode: .new,
+            reminderRefresh: { createRefreshCount += 1 }
+        )
+        createModel.name = "Walk"
+        let createPersistence = HabitFormPersistence(
+            create: { _, _, _, _ in createdHabit },
+            update: { _, _, _, _ in
+                Issue.record("Create must not dispatch update")
+            }
+        )
 
-    #expect(
-      createModel.save(
-        using: createPersistence,
-        at: instant,
-        timeZone: timeZone
-      ) === createdHabit
-    )
-    #expect(createRefreshCount == 1)
+        #expect(createModel.save(
+            using: createPersistence,
+            at: instant,
+            timeZone: timeZone
+        ) === createdHabit)
+        #expect(createRefreshCount == 1)
 
-    var updateRefreshCount = 0
-    let updateModel = HabitFormModel(
-      mode: .edit(createdHabit),
-      reminderRefresh: { updateRefreshCount += 1 }
-    )
-    let updatePersistence = HabitFormPersistence(
-      create: { _, _, _, _ in
-        Issue.record("Update must not dispatch create")
-        return createdHabit
-      },
-      update: { _, _, _, _ in }
-    )
+        var updateRefreshCount = 0
+        let updateModel = HabitFormModel(
+            mode: .edit(createdHabit),
+            reminderRefresh: { updateRefreshCount += 1 }
+        )
+        let updatePersistence = HabitFormPersistence(
+            create: { _, _, _, _ in
+                Issue.record("Update must not dispatch create")
+                return createdHabit
+            },
+            update: { _, _, _, _ in }
+        )
 
-    #expect(
-      updateModel.save(
-        using: updatePersistence,
-        at: instant,
-        timeZone: timeZone
-      ) === createdHabit
-    )
-    #expect(updateRefreshCount == 1)
-  }
+        #expect(updateModel.save(
+            using: updatePersistence,
+            at: instant,
+            timeZone: timeZone
+        ) === createdHabit)
+        #expect(updateRefreshCount == 1)
+    }
 
-  @Test("invalid and failed saves signal only after retry succeeds")
-  func invalidAndFailedSavesSignalOnlyAfterRetrySucceeds() {
-    var refreshCount = 0
-    var saveAttempts = 0
-    let expectedHabit = Habit(name: "Walk", cadence: .daily, target: 1)
-    let persistence = HabitFormPersistence(
-      create: { _, _, _, _ in
-        saveAttempts += 1
-        if saveAttempts == 1 {
-          throw TestSaveFailure.expected
-        }
-        return expectedHabit
-      },
-      update: { _, _, _, _ in }
-    )
-    let model = HabitFormModel(
-      mode: .new,
-      reminderRefresh: { refreshCount += 1 }
-    )
+    @Test("invalid and failed saves signal only after retry succeeds")
+    func invalidAndFailedSavesSignalOnlyAfterRetrySucceeds() {
+        var refreshCount = 0
+        var saveAttempts = 0
+        let expectedHabit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let persistence = HabitFormPersistence(
+            create: { _, _, _, _ in
+                saveAttempts += 1
+                if saveAttempts == 1 {
+                    throw TestSaveFailure.expected
+                }
+                return expectedHabit
+            },
+            update: { _, _, _, _ in }
+        )
+        let model = HabitFormModel(
+            mode: .new,
+            reminderRefresh: { refreshCount += 1 }
+        )
 
-    #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
-    #expect(saveAttempts == 0)
-    #expect(refreshCount == 0)
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
+        #expect(saveAttempts == 0)
+        #expect(refreshCount == 0)
 
-    model.name = "Walk"
-    #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
-    #expect(saveAttempts == 1)
-    #expect(refreshCount == 0)
+        model.name = "Walk"
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
+        #expect(saveAttempts == 1)
+        #expect(refreshCount == 0)
 
-    #expect(
-      model.save(using: persistence, at: .now, timeZone: .gmt)
-        === expectedHabit
-    )
-    #expect(saveAttempts == 2)
-    #expect(refreshCount == 1)
-  }
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) === expectedHabit)
+        #expect(saveAttempts == 2)
+        #expect(refreshCount == 1)
+    }
 
     @Test("New Save dispatches create exactly once with the current boundary values")
     func newSaveDispatchesCreateExactlyOnce() throws {
@@ -483,9 +467,7 @@ struct HabitFormModelTests {
 
         #expect(savedHabit === habit)
         #expect(receivedHabit === habit)
-    #expect(
-      receivedFields
-        == HabitEditableFields(
+        #expect(receivedFields == HabitEditableFields(
             name: "Read fiction",
             target: 2,
             unit: "chapters",
@@ -510,8 +492,7 @@ struct HabitFormModelTests {
         model.setReminderEnabled(true)
         model.reminderTime = ReminderTime(hour: 7, minute: 30)
 
-    let savedHabit = try #require(
-      model.save(
+        let savedHabit = try #require(model.save(
             using: .live(context: context),
             at: instant,
             timeZone: .gmt
@@ -556,8 +537,7 @@ struct HabitFormModelTests {
         model.unit = "chapters"
         model.togglePinnedWeekday(.friday)
 
-    let savedHabit = try #require(
-      model.save(
+        let savedHabit = try #require(model.save(
             using: .live(context: context),
             at: instant.addingTimeInterval(60),
             timeZone: .gmt
@@ -572,9 +552,8 @@ struct HabitFormModelTests {
         #expect(persistedHabit.target == 2)
         #expect(persistedHabit.unit == "chapters")
         #expect(persistedHabit.cadenceRawValue == HabitCadence.weekly.rawValue)
-    #expect(
-      persistedHabit.pinnedWeekdaysRawValue == PinnedWeekdays.wednesday.rawValue
-        | PinnedWeekdays.friday.rawValue)
+        #expect(persistedHabit.pinnedWeekdaysRawValue ==
+            PinnedWeekdays.wednesday.rawValue | PinnedWeekdays.friday.rawValue)
         #expect(model.persistenceError == nil)
     }
 
@@ -607,8 +586,7 @@ struct HabitFormModelTests {
     func failedSaveRetainsEveryDraftValueAndRetriesSameSubmission() throws {
         let timeZone = try #require(TimeZone(identifier: "UTC"))
         let instant = Date(timeIntervalSince1970: 1_725_214_400)
-    let pinnedWeekdays = try #require(
-      PinnedWeekdays(
+        let pinnedWeekdays = try #require(PinnedWeekdays(
             rawValue: PinnedWeekdays.tuesday.rawValue | PinnedWeekdays.saturday.rawValue
         ))
         let reminderTime = try #require(ReminderTime(hour: 23, minute: 59))

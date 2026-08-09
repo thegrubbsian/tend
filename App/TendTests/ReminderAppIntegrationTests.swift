@@ -28,6 +28,37 @@ struct ReminderAppIntegrationTests {
     #expect(refreshes.count == 1)
   }
 
+  @Test("form reminder gesture reaches authorization once and preserves a denied draft")
+  func formReminderGestureRequestsAuthorizationOnce() async {
+    let center = IntegrationNotificationCenter(
+      authorizationStatus: .notDetermined,
+      requestAuthorizationResult: false
+    )
+    let refreshes = IntegrationRefreshSpy()
+    let controller = ReminderAuthorizationController(
+      notificationCenter: center,
+      reminderRefresh: refreshes.signal
+    )
+    let model = HabitFormModel(mode: .new)
+    model.name = "Walk"
+
+    await model.enableReminder(requestAuthorization: controller.requestIfNeeded)
+
+    #expect(model.reminderTime == ReminderTime(hour: 9, minute: 0))
+    #expect(model.canSave)
+    #expect(center.requestedAuthorizationOptions == [[.alert, .sound]])
+    #expect(center.requestAuthorizationCallCount == 1)
+    #expect(refreshes.count == 1)
+
+    model.setReminderEnabled(false)
+    await model.enableReminder(requestAuthorization: controller.requestIfNeeded)
+
+    #expect(model.reminderTime == ReminderTime(hour: 9, minute: 0))
+    #expect(model.canSave)
+    #expect(center.requestAuthorizationCallCount == 1)
+    #expect(refreshes.count == 1)
+  }
+
   @Test("determined authorization never requests permission or reconciliation")
   func determinedAuthorizationDoesNotPrompt() async {
     for status in [
