@@ -1,7 +1,7 @@
 id: F-zbcv8j
 key: device-readiness/local-reminders
 title: Local Reminders
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: design/03-user-experience.md

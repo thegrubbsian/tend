@@ -1,0 +1,14 @@
+id: EV-1tudel
+type: sync.feature
+at: 2026-08-09T02:43:53.33151Z
+owner: jc
+command: sync feature F-skoqxt
+targets:
+    - F-skoqxt
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.yml

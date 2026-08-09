@@ -1,0 +1,14 @@
+id: EV-gotejj
+type: sync.epic
+at: 2026-08-09T02:43:53.723006Z
+owner: jc
+command: sync epic E-ul4fy3
+targets:
+    - E-ul4fy3
+before:
+    status: ready
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/app-experience/epic.yml

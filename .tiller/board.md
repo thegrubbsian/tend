@@ -7,9 +7,8 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic app-experience (E-ul4fy3): ready, active
 - epic device-readiness (E-z3y156): ready
-- feature app-experience/today-dashboard (F-skoqxt): active, awaiting check
+- feature device-readiness/local-reminders (F-zbcv8j): specced
 - feature device-readiness/owner-device-release (F-3vz7ho): ready
 - task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
 

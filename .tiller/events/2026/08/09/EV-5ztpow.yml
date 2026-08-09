@@ -1,0 +1,13 @@
+id: EV-5ztpow
+type: check.feature
+at: 2026-08-09T02:43:18.231582Z
+owner: jc
+command: check feature F-skoqxt
+targets:
+    - F-skoqxt
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.yml

@@ -1,7 +1,7 @@
 id: F-skoqxt
 key: app-experience/today-dashboard
 title: Today Dashboard
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -24,3 +24,90 @@ accepted_against:
         kind: git_commit
         value: git:5c9c7b3
         observed_at: 2026-08-04T14:27:34.269604Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:f4dfda4f830e024ce427144b3c436820086c89b7
+        path: .tiller/epics/app-experience/features/today-dashboard/feature.md
+        observed_at: 2026-08-09T02:43:53.306529Z
+    eval:
+        kind: git_blob
+        value: git:ce1dbcd7f1be4f3ed64d44278964851bb1d681ea
+        path: .tiller/epics/app-experience/features/today-dashboard/feature.eval.md
+        observed_at: 2026-08-09T02:43:53.306529Z
+    commit:
+        kind: git_commit
+        value: git:ed6128d
+        observed_at: 2026-08-09T02:43:53.093428Z
+    surfaces: []
+done_basis: rollup
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T02:34:13.594979Z
+        against:
+            kind: git_commit
+            value: git:ed6128d
+            observed_at: 2026-08-09T02:34:13.59397Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-ed6128d-out-2e71531854e1df73110494349178e520b66586e3ebfb04643218f01259b5662b.txt
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-09T02:34:13.594979Z
+        against:
+            kind: git_commit
+            value: git:ed6128d
+            observed_at: 2026-08-09T02:34:13.59397Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-ed6128d-out-cac649f918ed58c615cfd3b7e67ed08a1dd4e2432ec54f46da1d565768d6c61e.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-ed6128d-out-bcdd0c8659b3b3dce0cfef573251e1d611ea7a4783730f7d46503cb4d6b89e97.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-ed6128d-out-514f251b5cadadc25031bd3583555b04cf1d0961f6c05b9b408724a5d2bb6298.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-ed6128d-out-b5053dcefd29130d0ba2560a7fa9e94d6d8d7172625f22aa0255e9d3706e37b0.txt
+            C5:
+                status: needs_attestation
+            C6:
+                status: needs_attestation
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T02:34:13.594979Z
+        against:
+            kind: git_commit
+            value: git:ed6128d
+            observed_at: 2026-08-09T02:34:13.59397Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-ed6128d-out-d92a47289f6a4ad4023a0ad995d9e344ce72e85dea17457a8e2736cdfaa26724.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:ed6128d
+        observed_at: 2026-08-09T02:43:53.093428Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-ed6128d-out-cac649f918ed58c615cfd3b7e67ed08a1dd4e2432ec54f46da1d565768d6c61e.txt

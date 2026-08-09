@@ -1,0 +1,9 @@
+id: T-hpts9u
+key: device-readiness/local-reminders/reminder-app-integration
+title: Connect permission, mutations, and notification routing
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-oeg8ua

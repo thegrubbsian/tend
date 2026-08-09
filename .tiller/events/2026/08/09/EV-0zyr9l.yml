@@ -1,0 +1,14 @@
+id: EV-0zyr9l
+type: add.task
+at: 2026-08-09T02:46:23.243542Z
+owner: jc
+command: add task device-readiness/local-reminders/reminder-app-integration
+targets:
+    - T-hpts9u
+after:
+    feature: F-zbcv8j
+    key: device-readiness/local-reminders/reminder-app-integration
+    status: proposed
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.md
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

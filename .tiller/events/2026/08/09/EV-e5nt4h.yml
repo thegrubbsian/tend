@@ -1,0 +1,13 @@
+id: EV-e5nt4h
+type: spec.feature
+at: 2026-08-09T02:50:47.918774Z
+owner: jc
+command: spec feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml

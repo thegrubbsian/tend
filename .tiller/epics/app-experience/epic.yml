@@ -1,7 +1,19 @@
 id: E-ul4fy3
 key: app-experience
 title: App Experience
-status: ready
+status: done
 blocked: false
 owner: jc
 source: design/03-user-experience.md
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:d6de233bbc1e84d6737510061b645bcf758a399d
+        path: .tiller/epics/app-experience/epic.md
+        observed_at: 2026-08-09T02:43:53.710664Z
+    commit:
+        kind: git_commit
+        value: git:ed6128d
+        observed_at: 2026-08-09T02:43:53.093428Z
+    surfaces: []
+done_basis: rollup

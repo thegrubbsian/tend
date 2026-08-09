@@ -1,0 +1,14 @@
+id: EV-fg4iqd
+type: add.task
+at: 2026-08-09T02:46:23.071716Z
+owner: jc
+command: add task device-readiness/local-reminders/reminder-planning
+targets:
+    - T-ir12jz
+after:
+    feature: F-zbcv8j
+    key: device-readiness/local-reminders/reminder-planning
+    status: proposed
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.md
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml
