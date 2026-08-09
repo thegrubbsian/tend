@@ -33,40 +33,43 @@ struct HabitRosterView: View {
   }
 
   var body: some View {
-    TimelineView(LocalDayTimelineSchedule(calendar: localDayCalendar)) { timeline in
-      List {
-        titleRow
+    TimelineView(
+      LocalDayTimelineSchedule(calendar: localDayCalendar),
+      content: { timeline in
+        List {
+          titleRow
 
-        if let rosterErrorMessage = model.rosterErrorMessage {
-          HabitRosterLoadErrorCard(
-            message: rosterErrorMessage,
-            retry: model.retryRefresh
-          )
-          .modifier(HabitRosterListRowModifier())
-        }
+          if let rosterErrorMessage = model.rosterErrorMessage {
+            HabitRosterLoadErrorCard(
+              message: rosterErrorMessage,
+              retry: model.retryRefresh
+            )
+            .modifier(HabitRosterListRowModifier())
+          }
 
-        if model.activeRows.isEmpty, model.inactiveRows.isEmpty,
-          model.rosterErrorMessage == nil
-        {
-          emptyState
-            .modifier(HabitRosterListRowModifier(verticalInset: AlmanacMetrics.spacingLarge))
-        } else {
-          rosterSection(title: "Active", rows: model.activeRows)
-          rosterSection(title: "Inactive", rows: model.inactiveRows)
+          if model.activeRows.isEmpty, model.inactiveRows.isEmpty,
+            model.rosterErrorMessage == nil
+          {
+            emptyState
+              .modifier(HabitRosterListRowModifier(verticalInset: AlmanacMetrics.spacingLarge))
+          } else {
+            rosterSection(title: "Active", rows: model.activeRows)
+            rosterSection(title: "Inactive", rows: model.inactiveRows)
+          }
+        }
+        .listStyle(.plain)
+        .listRowSpacing(0)
+        .scrollContentBackground(.hidden)
+        .contentMargins(.horizontal, 0, for: .scrollContent)
+        .contentMargins(.top, 0, for: .scrollContent)
+        .onAppear {
+          refresh(at: timeline.date)
+        }
+        .onChange(of: timeline.date) { _, date in
+          refresh(at: date)
         }
       }
-      .listStyle(.plain)
-      .listRowSpacing(0)
-      .scrollContentBackground(.hidden)
-      .contentMargins(.horizontal, 0, for: .scrollContent)
-      .contentMargins(.top, 0, for: .scrollContent)
-      .onAppear {
-        refresh(at: timeline.date)
-      }
-      .onChange(of: timeline.date) { _, date in
-        refresh(at: date)
-      }
-    }
+    )
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
     .onChange(of: scenePhase) { _, phase in
       if phase == .active {
@@ -80,18 +83,19 @@ struct HabitRosterView: View {
       item: $presentedForm,
       onDismiss: {
         refresh(at: .now)
+      },
+      content: { form in
+        HabitFormView(
+          mode: form.mode,
+          reminderRefresh: {
+            reminders.refresh()
+          },
+          requestReminderAuthorization: {
+            await reminders.requestAuthorizationIfNeeded()
+          }
+        )
       }
-    ) { form in
-      HabitFormView(
-        mode: form.mode,
-        reminderRefresh: {
-          reminders.refresh()
-        },
-        requestReminderAuthorization: {
-          await reminders.requestAuthorizationIfNeeded()
-        }
-      )
-    }
+    )
     .sheet(item: deletionConfirmationBinding) { confirmation in
       HabitRosterDeletionSheet(
         confirmation: confirmation,
@@ -107,16 +111,17 @@ struct HabitRosterView: View {
       item: $selectedHabit,
       onDismiss: {
         refresh(at: .now)
+      },
+      content: { selection in
+        HabitDetailView(
+          habit: selection.habit,
+          context: context,
+          reminders: reminders
+        ) {
+          selectedHabit = nil
+        }
       }
-    ) { selection in
-      HabitDetailView(
-        habit: selection.habit,
-        context: context,
-        reminders: reminders
-      ) {
-        selectedHabit = nil
-      }
-    }
+    )
   }
 
   private var localDayCalendar: Calendar {
