@@ -1,0 +1,13 @@
+id: EV-ihys6t
+type: check.task
+at: 2026-08-09T04:27:58.372486Z
+owner: jc
+command: check task T-ir12jz
+targets:
+    - T-ir12jz
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml

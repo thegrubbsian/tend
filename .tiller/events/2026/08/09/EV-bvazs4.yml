@@ -1,0 +1,13 @@
+id: EV-bvazs4
+type: start.task
+at: 2026-08-09T03:48:08.652454Z
+owner: jc
+command: start task T-ir12jz
+targets:
+    - T-ir12jz
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml
