@@ -171,7 +171,7 @@ struct ReminderPlanTests {
       makeHabit(id: 2, reminderMinuteOfDay: 10 * 60, currentPeriodKey: "day:2026-01-05"),
     ]
 
-    let occurrences = makePlanner(context).plan(habits: habits, at: now)
+    let occurrences = makePlanner(context).plan(habits: habits, at: now, limit: 65)
 
     #expect(occurrences.count == 64)
     #expect(Set(occurrences.map(\.identifier)).count == 64)
@@ -273,6 +273,56 @@ struct ReminderPlanTests {
     ])
   }
 
+  @Test("leap-month occasions preserve their local components and identity")
+  func leapMonthOccasionsPreserveComponentsAndIdentity() throws {
+    let timeZone = try #require(TimeZone(secondsFromGMT: 0))
+    var gregorian = Calendar(identifier: .gregorian)
+    gregorian.timeZone = timeZone
+    let now = try #require(
+      gregorian.date(
+        from: DateComponents(
+          calendar: gregorian,
+          timeZone: timeZone,
+          year: 2025,
+          month: 6,
+          day: 20,
+          hour: 8
+        )
+      )
+    )
+    var chinese = Calendar(identifier: .chinese)
+    chinese.locale = Locale(identifier: "en_US_POSIX")
+    chinese.timeZone = timeZone
+    let occurrences = ReminderPlanner(
+      calendar: chinese,
+      timeZone: timeZone,
+      locale: Locale(identifier: "en_US_POSIX")
+    ).plan(
+      habits: [
+        makeHabit(id: 1, currentPeriodKey: "day:2025-06-20"),
+      ],
+      at: now
+    )
+    let leapOccurrence = try #require(
+      occurrences.first { $0.dateComponents.isLeapMonth == true }
+    )
+    let leapMonth = leapOccurrence.dateComponents.month
+    let leapDay = leapOccurrence.dateComponents.day
+    let regularOccurrence = try #require(
+      occurrences.first { occurrence in
+        let components = occurrence.dateComponents
+        return components.isLeapMonth != true
+          && components.month == leapMonth
+          && components.day == leapDay
+      }
+    )
+
+    #expect(occurrences.allSatisfy {
+      chinese.date(from: $0.dateComponents) == $0.fireDate
+    })
+    #expect(leapOccurrence.identifier != regularOccurrence.identifier)
+  }
+
   @Test("different time zones retain the same local components")
   func timeZonesRetainLocalComponents() throws {
     let losAngeles = try TestContext(timeZoneIdentifier: "America/Los_Angeles")
@@ -305,14 +355,6 @@ struct ReminderPlanTests {
     let context = try TestContext(timeZoneIdentifier: "America/Los_Angeles")
     let now = try context.date(2026, 1, 5, 8, 0)
     let habits = [
-      makeHabit(id: 1, target: 1, unit: "times", currentPeriodKey: "day:2026-01-05"),
-      makeHabit(
-        id: 2,
-        target: 3,
-        unit: "times",
-        currentPeriodKey: "day:2026-01-05",
-        currentTarget: 3
-      ),
       makeHabit(
         id: 3,
         target: 8_000,
@@ -321,10 +363,19 @@ struct ReminderPlanTests {
         currentTarget: 8_000,
         currentUnit: "steps"
       ),
+      makeHabit(id: 1, target: 1, unit: "times", currentPeriodKey: "day:2026-01-05"),
+      makeHabit(
+        id: 2,
+        target: 3,
+        unit: "times",
+        currentPeriodKey: "day:2026-01-05",
+        currentTarget: 3
+      ),
     ]
 
     let occurrences = makePlanner(context).plan(habits: habits, at: now, limit: 3)
 
+    #expect(occurrences.map(\.habitID) == [habits[1].id, habits[2].id, habits[0].id])
     #expect(occurrences.map(\.body) == [
       "1 time left today.",
       "3 times left today.",

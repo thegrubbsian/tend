@@ -32,6 +32,8 @@ nonisolated struct ReminderOccurrence: Equatable, Sendable {
 }
 
 nonisolated struct ReminderPlanner {
+  private static let maximumRequestCount = 64
+
   private let calendar: Calendar
   private let timeZone: TimeZone
   private let formatter: ReminderContentFormatter
@@ -51,9 +53,10 @@ nonisolated struct ReminderPlanner {
     limit: Int = 64
   ) -> [ReminderOccurrence] {
     guard limit > 0 else { return [] }
+    let capacity = min(limit, Self.maximumRequestCount)
 
     var reservations: [ReminderCandidate] = []
-    reservations.reserveCapacity(min(habits.count, limit))
+    reservations.reserveCapacity(min(habits.count, capacity))
     for habit in habits {
       guard
         let facts = validated(habit, at: instant),
@@ -64,12 +67,12 @@ nonisolated struct ReminderPlanner {
       reservations.append(ReminderCandidate(facts: facts, occurrence: occurrence))
     }
     reservations.sort(by: ReminderCandidate.isOrdered)
-    if limit <= reservations.count {
-      return reservations.prefix(limit).map(\.occurrence)
+    if capacity <= reservations.count {
+      return reservations.prefix(capacity).map(\.occurrence)
     }
 
     var selected = reservations.map(\.occurrence)
-    selected.reserveCapacity(limit)
+    selected.reserveCapacity(capacity)
     var candidates = reservations.compactMap { reservation -> ReminderCandidate? in
       guard
         let occurrence = nextOccurrence(
@@ -81,7 +84,7 @@ nonisolated struct ReminderPlanner {
       }
       return ReminderCandidate(facts: reservation.facts, occurrence: occurrence)
     }
-    while selected.count < limit, !candidates.isEmpty {
+    while selected.count < capacity, !candidates.isEmpty {
       guard
         let earliestIndex = candidates.indices.min(by: {
           ReminderCandidate.isOrdered(candidates[$0], candidates[$1])
@@ -227,10 +230,11 @@ nonisolated struct ReminderPlanner {
       return nil
     }
     let local = calendar.dateComponents(
-      [.year, .month, .day, .hour, .minute],
+      [.era, .year, .month, .day, .hour, .minute],
       from: fireDate
     )
     guard
+      let era = local.era,
       let year = local.year,
       let month = local.month,
       let day = local.day,
@@ -239,29 +243,28 @@ nonisolated struct ReminderPlanner {
     else {
       return nil
     }
+    let isLeapMonth = local.isLeapMonth ?? false
     let isCurrent = period.key == facts.habit.currentBucket.periodKey
     let amount = isCurrent
       ? max(facts.habit.currentBucket.target - facts.habit.currentBucket.progress, 0)
       : facts.habit.target
     let unit = isCurrent ? facts.habit.currentBucket.unit : facts.habit.unit
+    var dateComponents = local
+    dateComponents.calendar = calendar
+    dateComponents.timeZone = timeZone
+    dateComponents.isLeapMonth = isLeapMonth
     return ReminderOccurrence(
       identifier: identifier(
         habitID: facts.habit.id,
-        year: year,
-        month: month,
-        day: day
-      ),
-      habitID: facts.habit.id,
-      fireDate: fireDate,
-      dateComponents: DateComponents(
-        calendar: calendar,
-        timeZone: timeZone,
+        era: era,
         year: year,
         month: month,
         day: day,
-        hour: hour,
-        minute: minute
+        isLeapMonth: isLeapMonth
       ),
+      habitID: facts.habit.id,
+      fireDate: fireDate,
+      dateComponents: dateComponents,
       bucketPeriodKey: period.key,
       title: facts.habit.name,
       body: formatter.body(
@@ -274,16 +277,20 @@ nonisolated struct ReminderPlanner {
 
   private func identifier(
     habitID: UUID,
+    era: Int,
     year: Int,
     month: Int,
-    day: Int
+    day: Int,
+    isLeapMonth: Bool
   ) -> String {
     let localDay = String(
-      format: "%04d-%02d-%02d",
+      format: "%d-%04d-%02d-%02d-%d",
       locale: Locale(identifier: "en_US_POSIX"),
+      era,
       year,
       month,
-      day
+      day,
+      isLeapMonth ? 1 : 0
     )
     return "tend.reminder.\(habitID.uuidString.lowercased()).\(localDay)"
   }
