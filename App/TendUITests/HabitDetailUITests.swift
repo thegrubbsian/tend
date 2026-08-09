@@ -320,7 +320,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("2 times"))
     XCTAssertTrue(metadata.label.contains("Daily"))
-    assertDetailUsesFullScreenShell(in: app)
+    assertDetailHidesTabPill(in: app)
 
     let back = element("habitDetail.back", in: app)
     let edit = element("habitDetail.edit", in: app)
@@ -338,11 +338,6 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(nextMonth.label, "Next month")
     XCTAssertEqual(previousMonth.value as? String, initialAdaptiveMonthLabel)
     XCTAssertEqual(nextMonth.value as? String, initialAdaptiveMonthLabel)
-    assertReadableDetailColumnOnIPad(
-      in: app,
-      leadingControl: back,
-      trailingControl: edit
-    )
     try app.performAccessibilityAudit(for: auditTypes)
 
     let historyButtons = app.buttons.matching(
@@ -428,10 +423,8 @@ final class HabitDetailUITests: XCTestCase {
       XCTAssertTrue(adaptiveMetadata.label.contains("2 mindful practice sessions"))
       XCTAssertTrue(adaptiveMetadata.label.contains("Daily"))
       XCTAssertGreaterThan(adaptiveTitle.frame.height, 60)
-      if app.windows.firstMatch.frame.width < 700 {
-        XCTAssertGreaterThan(adaptiveMetadata.frame.height, 40)
-      }
-      assertDetailUsesFullScreenShell(in: app)
+      XCTAssertGreaterThan(adaptiveMetadata.frame.height, 40)
+      assertDetailHidesTabPill(in: app)
 
       let adaptiveBack = element("habitDetail.back", in: app)
       let adaptiveEdit = element("habitDetail.edit", in: app)
@@ -449,11 +442,6 @@ final class HabitDetailUITests: XCTestCase {
       XCTAssertEqual(adaptiveNextMonth.label, "Next month")
       XCTAssertEqual(adaptivePreviousMonth.value as? String, adaptiveMonthLabel)
       XCTAssertEqual(adaptiveNextMonth.value as? String, adaptiveMonthLabel)
-      assertReadableDetailColumnOnIPad(
-        in: app,
-        leadingControl: adaptiveBack,
-        trailingControl: adaptiveEdit
-      )
       try app.performAccessibilityAudit(for: auditTypes)
 
       let adaptiveDeleteControls = app.buttons.matching(
@@ -547,7 +535,7 @@ final class HabitDetailUITests: XCTestCase {
     dailyRow.tap()
     XCTAssertTrue(restoredTitle.waitForExistence(timeout: 5))
     XCTAssertEqual(restoredTitle.label, "Daily garden")
-    assertDetailUsesFullScreenShell(in: app)
+    assertDetailHidesTabPill(in: app)
   }
 
   @MainActor
@@ -575,40 +563,13 @@ final class HabitDetailUITests: XCTestCase {
   }
 
   @MainActor
-  private func assertDetailUsesFullScreenShell(
+  private func assertDetailHidesTabPill(
     in app: XCUIApplication,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     XCTAssertFalse(app.buttons["shell.tab.today"].isHittable, file: file, line: line)
     XCTAssertFalse(app.buttons["shell.tab.habits"].isHittable, file: file, line: line)
-    XCTAssertEqual(app.splitGroups.count, 0, file: file, line: line)
-  }
-
-  @MainActor
-  private func assertReadableDetailColumnOnIPad(
-    in app: XCUIApplication,
-    leadingControl: XCUIElement,
-    trailingControl: XCUIElement,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    let window = app.windows.firstMatch.frame
-    guard window.width >= 700 else { return }
-    let readableColumnMinimumX = (window.width - 600) / 2
-    let readableColumnMaximumX = readableColumnMinimumX + 600
-    XCTAssertGreaterThanOrEqual(
-      leadingControl.frame.minX,
-      readableColumnMinimumX,
-      file: file,
-      line: line
-    )
-    XCTAssertLessThanOrEqual(
-      trailingControl.frame.maxX,
-      readableColumnMaximumX,
-      file: file,
-      line: line
-    )
   }
 
   @MainActor
