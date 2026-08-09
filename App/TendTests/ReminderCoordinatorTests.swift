@@ -252,7 +252,7 @@ struct ReminderCoordinatorTests {
       timeZone: fixture.timeZone
     )
     let center = FakeReminderNotificationCenter(authorizationStatus: .authorized)
-    let coordinator = fixture.makeLiveCoordinator(center: center, limit: 1)
+    let coordinator = fixture.makeCoordinator(center: center, limit: 1)
 
     await coordinator.refresh()
     let today = try #require(center.addedOccurrences.first)
@@ -549,12 +549,19 @@ struct ReminderCoordinatorTests {
     let first = Task { await coordinator.refresh() }
     await center.waitUntilAuthorizationReadPauses()
     center.stubbedAuthorizationStatus = .authorized
-    let second = Task { await coordinator.refresh() }
-    await Task.yield()
-    await Task.yield()
+    let entryGate = RefreshCallerGate(expectedCount: 3)
+    let overlappingCallers = (0..<3).map { _ in
+      Task { @MainActor in
+        entryGate.enter()
+        await coordinator.refresh()
+      }
+    }
+    await entryGate.waitUntilAllEntered()
     center.resumeAuthorizationRead()
     await first.value
-    await second.value
+    for caller in overlappingCallers {
+      await caller.value
+    }
 
     #expect(center.authorizationStatusCallCount == 2)
     #expect(center.maximumConcurrentOperations == 1)
@@ -587,15 +594,19 @@ private struct Fixture {
     name: String,
     reminderMinuteOfDay: Int
   ) throws -> Habit {
-    let habit = Habit(
-      id: UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", id))!,
-      name: name,
+    let habit = try HabitManagementOperations(context: context).create(
+      fields: HabitEditableFields(
+        name: name,
+        target: 1,
+        reminderTime: ReminderTime(rawValue: reminderMinuteOfDay)
+      ),
       cadence: .daily,
-      target: 1,
-      reminderTime: ReminderTime(rawValue: reminderMinuteOfDay),
-      createdAt: now
+      at: now,
+      timeZone: timeZone
     )
-    context.insert(habit)
+    habit.id = UUID(
+      uuidString: String(format: "00000000-0000-0000-0000-%012d", id)
+    )!
     try context.save()
     return habit
   }
@@ -614,22 +625,6 @@ private struct Fixture {
       locale: locale,
       requestLimit: limit,
       currentBucketFacts: currentBucketFacts
-        ?? { habit, _, _ in self.currentFacts(for: habit) }
-    )
-  }
-
-  func makeLiveCoordinator(
-    center: FakeReminderNotificationCenter,
-    limit: Int
-  ) -> ReminderCoordinator {
-    ReminderCoordinator(
-      context: context,
-      notificationCenter: center,
-      now: { now },
-      calendar: calendar,
-      timeZone: timeZone,
-      locale: locale,
-      requestLimit: limit
     )
   }
 
@@ -772,6 +767,31 @@ private final class FakeReminderNotificationCenter: ReminderNotificationCenterCl
 
   private func endOperation() {
     activeOperationCount -= 1
+  }
+}
+
+@MainActor
+private final class RefreshCallerGate {
+  private let expectedCount: Int
+  private var enteredCount = 0
+  private var allEnteredContinuation: CheckedContinuation<Void, Never>?
+
+  init(expectedCount: Int) {
+    self.expectedCount = expectedCount
+  }
+
+  func enter() {
+    enteredCount += 1
+    guard enteredCount == expectedCount else { return }
+    allEnteredContinuation?.resume()
+    allEnteredContinuation = nil
+  }
+
+  func waitUntilAllEntered() async {
+    guard enteredCount < expectedCount else { return }
+    await withCheckedContinuation { continuation in
+      allEnteredContinuation = continuation
+    }
   }
 }
 
