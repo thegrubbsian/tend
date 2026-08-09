@@ -1,0 +1,13 @@
+id: EV-w3pz64
+type: start.task
+at: 2026-08-09T22:20:35.440215Z
+owner: jc
+command: start task T-3vfq8c
+targets:
+    - T-3vfq8c
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.yml

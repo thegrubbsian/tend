@@ -9,8 +9,8 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic device-readiness (E-z3y156): ready, active
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
-- feature device-readiness/owner-device-release (F-3vz7ho): ready
-- task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
+- feature device-readiness/owner-device-release (F-3vz7ho): active
+- task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): in_progress
 
 ### Blocked
 

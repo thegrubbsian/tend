@@ -1,7 +1,7 @@
 id: F-3vz7ho
 key: device-readiness/owner-device-release
 title: Owner Device Release
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/01-overview.md
@@ -10,6 +10,7 @@ depends_on:
     - F-zbcv8j
     - F-z8e13q
     - F-efgzky
+branch: tiller/device-readiness/owner-device-release
 accepted_against:
     spec:
         kind: git_blob
