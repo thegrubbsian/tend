@@ -19,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task device-readiness/local-reminders/notification-reconciliation (T-oeg8ua): build pass, tests pass
+- (none)
 
 ### Open questions
 

@@ -1,0 +1,14 @@
+id: EV-u7x5nr
+type: sync.task
+at: 2026-08-09T20:12:41.5253Z
+owner: jc
+command: sync task T-oeg8ua
+targets:
+    - T-oeg8ua
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/notification-reconciliation/task.yml
