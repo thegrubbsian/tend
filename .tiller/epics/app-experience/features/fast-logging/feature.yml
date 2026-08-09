@@ -119,9 +119,9 @@ gates:
     evals:
         required: true
         kind: command
-        status: pending
+        status: pass
         run_by: jc
-        run_at: 2026-08-07T04:21:34.869353Z
+        run_at: 2026-08-07T19:36:14.696542Z
         against:
             kind: sha256
             value: sha256:3c3e4bc5bad884fb27169d9129ca0e87506ac38ef34e1d39420cc2a684cbd50d
@@ -153,9 +153,9 @@ gates:
                     - kind: command_output
                       ref: artifacts/tiller/gates/eval-C5-sha256-3c3e4bc5bad8-out-9e826e90737ea64cdb1545e226f53ead3271789062a014c7966a035fd271d08e.txt
             C6:
-                status: needs_attestation
+                status: pass
             C7:
-                status: needs_attestation
+                status: pass
     tests:
         required: true
         kind: command
@@ -169,6 +169,21 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-sha256-3c3e4bc5bad8-out-76040ddda8f517bd2eab5db15ae3362c027569b69033c74c54dc7981ee652a83.txt
+attestations:
+    - id: AT-b6lzfo
+      target:
+        kind: criterion
+        id: C6
+      status: pass
+      by: jc
+      at: 2026-08-07T19:36:05.709514Z
+    - id: AT-5chvvw
+      target:
+        kind: criterion
+        id: C7
+      status: pass
+      by: jc
+      at: 2026-08-07T19:36:14.696542Z
 policy_violations:
     - gate: evals
       observed:
