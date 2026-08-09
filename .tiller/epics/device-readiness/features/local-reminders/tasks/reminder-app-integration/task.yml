@@ -1,7 +1,7 @@
 id: T-hpts9u
 key: device-readiness/local-reminders/reminder-app-integration
 title: Connect permission, mutations, and notification routing
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
