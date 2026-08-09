@@ -1,0 +1,14 @@
+id: EV-nm0w5p
+type: submit.task
+at: 2026-08-09T21:35:58.757565Z
+owner: jc
+command: submit task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: check
+after:
+    pr: 39
+    status: in_review
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml
