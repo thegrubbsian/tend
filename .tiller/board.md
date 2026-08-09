@@ -20,7 +20,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task device-readiness/local-reminders/reminder-planning (T-ir12jz): build pass, tests pass
+- (none)
 
 ### Open questions
 

@@ -1,0 +1,14 @@
+id: EV-wjixn8
+type: sync.task
+at: 2026-08-09T18:38:18.033306Z
+owner: jc
+command: sync task T-ir12jz
+targets:
+    - T-ir12jz
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml

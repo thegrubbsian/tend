@@ -1,7 +1,7 @@
 id: T-ir12jz
 key: device-readiness/local-reminders/reminder-planning
 title: Plan bounded local reminder occasions
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:5332dc2
         observed_at: 2026-08-09T03:45:34.208129Z
 pr: 37
+done_basis: ancestry
 gates:
     build:
         required: true
