@@ -1,0 +1,13 @@
+id: EV-ivk7nj
+type: check.task
+at: 2026-08-09T19:30:54.891967Z
+owner: jc
+command: check task T-oeg8ua
+targets:
+    - T-oeg8ua
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/notification-reconciliation/task.yml
