@@ -1,7 +1,7 @@
 id: T-ir12jz
 key: device-readiness/local-reminders/reminder-planning
 title: Plan bounded local reminder occasions
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc

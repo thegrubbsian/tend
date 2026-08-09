@@ -1,0 +1,13 @@
+id: EV-k7y41n
+type: start.feature
+at: 2026-08-09T03:48:02.307894Z
+owner: jc
+command: start feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml
