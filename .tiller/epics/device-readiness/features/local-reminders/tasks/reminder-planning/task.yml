@@ -1,7 +1,17 @@
 id: T-ir12jz
 key: device-readiness/local-reminders/reminder-planning
 title: Plan bounded local reminder occasions
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:f36f119abf35505eafb19ca2a97df76b5f74e281
+        path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.md
+        observed_at: 2026-08-09T03:45:34.180331Z
+    commit:
+        kind: git_commit
+        value: git:5332dc2
+        observed_at: 2026-08-09T03:45:34.208129Z

@@ -1,7 +1,7 @@
 id: F-zbcv8j
 key: device-readiness/local-reminders
 title: Local Reminders
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -9,3 +9,18 @@ change_type: create
 depends_on:
     - F-tih743
     - F-skoqxt
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:50e4fbb4360e6d5054787fae922fe17511a640db
+        path: .tiller/epics/device-readiness/features/local-reminders/feature.md
+        observed_at: 2026-08-09T03:45:34.115152Z
+    eval:
+        kind: git_blob
+        value: git:711a946ad4fc076c6f1b8c503ab761c943160bb6
+        path: .tiller/epics/device-readiness/features/local-reminders/feature.eval.md
+        observed_at: 2026-08-09T03:45:34.115152Z
+    commit:
+        kind: git_commit
+        value: git:5332dc2
+        observed_at: 2026-08-09T03:45:34.179905Z

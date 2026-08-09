@@ -1,0 +1,13 @@
+id: EV-xl4vgh
+type: approve.task
+at: 2026-08-09T03:45:34.256224Z
+owner: jc
+command: approve task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

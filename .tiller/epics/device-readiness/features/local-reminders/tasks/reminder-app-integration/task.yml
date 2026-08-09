@@ -1,9 +1,19 @@
 id: T-hpts9u
 key: device-readiness/local-reminders/reminder-app-integration
 title: Connect permission, mutations, and notification routing
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-oeg8ua
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:6d0ed304194a91d112a3755f0cc715b2e9adcd67
+        path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.md
+        observed_at: 2026-08-09T03:45:34.233215Z
+    commit:
+        kind: git_commit
+        value: git:5332dc2
+        observed_at: 2026-08-09T03:45:34.256156Z

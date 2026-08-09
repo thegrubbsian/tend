@@ -1,0 +1,13 @@
+id: EV-2h7pz3
+type: approve.task
+at: 2026-08-09T03:45:34.208194Z
+owner: jc
+command: approve task T-ir12jz
+targets:
+    - T-ir12jz
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml

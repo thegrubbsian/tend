@@ -1,0 +1,13 @@
+id: EV-6dq6a3
+type: approve.feature
+at: 2026-08-09T03:45:34.180019Z
+owner: jc
+command: approve feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml

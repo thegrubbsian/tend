@@ -1,0 +1,13 @@
+id: EV-dn0k69
+type: approve.task
+at: 2026-08-09T03:45:34.233143Z
+owner: jc
+command: approve task T-oeg8ua
+targets:
+    - T-oeg8ua
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/notification-reconciliation/task.yml
