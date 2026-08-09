@@ -1,7 +1,7 @@
 id: T-oeg8ua
 key: device-readiness/local-reminders/notification-reconciliation
 title: Reconcile reminder plans with UserNotifications
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:5332dc2
         observed_at: 2026-08-09T03:45:34.23307Z
+pr: 38
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T19:46:47.969435Z
+        against:
+            kind: git_commit
+            value: git:965843d
+            observed_at: 2026-08-09T19:46:47.969411Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-965843d-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T19:46:47.969435Z
+        against:
+            kind: git_commit
+            value: git:965843d
+            observed_at: 2026-08-09T19:46:47.969411Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-965843d-out-cefaea5ef28c56db0e01d3b54a6489d5d8fa7c3eb387b053ee4a57045ae54623.txt

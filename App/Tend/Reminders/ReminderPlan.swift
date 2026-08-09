@@ -33,6 +33,7 @@ nonisolated struct ReminderOccurrence: Equatable, Sendable {
 
 nonisolated struct ReminderPlanner {
   private static let maximumRequestCount = 64
+  static let identifierPrefix = "tend.reminder."
 
   private let calendar: Calendar
   private let timeZone: TimeZone
@@ -292,7 +293,7 @@ nonisolated struct ReminderPlanner {
       day,
       isLeapMonth ? 1 : 0
     )
-    return "tend.reminder.\(habitID.uuidString.lowercased()).\(localDay)"
+    return "\(Self.identifierPrefix)\(habitID.uuidString.lowercased()).\(localDay)"
   }
 }
 
