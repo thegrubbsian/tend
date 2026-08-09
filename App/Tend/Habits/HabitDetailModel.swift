@@ -275,6 +275,8 @@ final class HabitDetailModel {
   @ObservationIgnored private let calendar: () -> Calendar
   @ObservationIgnored private let locale: () -> Locale
   @ObservationIgnored private let boundaryScheduling: HabitDetailBoundaryScheduling
+  @ObservationIgnored private let reminderRefresh: ReminderRefreshSignal
+
   @ObservationIgnored private var boundaryCancellation: HabitDetailBoundaryCancellation?
   @ObservationIgnored private var retryRequest: MutationRequest?
   @ObservationIgnored private var environmentSample: EnvironmentSample?
@@ -293,7 +295,8 @@ final class HabitDetailModel {
       return calendar
     },
     locale: @escaping () -> Locale = { Locale.current },
-    boundaryScheduling: HabitDetailBoundaryScheduling = .live
+    boundaryScheduling: HabitDetailBoundaryScheduling = .live,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
     self.init(
       habit: habit,
@@ -302,7 +305,8 @@ final class HabitDetailModel {
       timeZone: timeZone,
       calendar: calendar,
       locale: locale,
-      boundaryScheduling: boundaryScheduling
+      boundaryScheduling: boundaryScheduling,
+      reminderRefresh: reminderRefresh
     )
   }
 
@@ -313,7 +317,8 @@ final class HabitDetailModel {
     timeZone: @escaping () -> TimeZone,
     calendar: @escaping () -> Calendar,
     locale: @escaping () -> Locale,
-    boundaryScheduling: HabitDetailBoundaryScheduling = .live
+    boundaryScheduling: HabitDetailBoundaryScheduling = .live,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
     habitID = habit.id
     habitName = habit.name
@@ -324,6 +329,7 @@ final class HabitDetailModel {
     self.calendar = calendar
     self.locale = locale
     self.boundaryScheduling = boundaryScheduling
+    self.reminderRefresh = reminderRefresh
   }
 
   func start() {
@@ -469,26 +475,33 @@ final class HabitDetailModel {
     let context = makeLoadContext()
 
     do {
+      let didMutate: Bool
       switch request {
       case .deleteEntry(let id):
-        _ = try operations.deleteEntry(
-          id,
-          habit,
-          context.instant,
-          context.timeZone
-        )
+        didMutate =
+          try operations.deleteEntry(
+            id,
+            habit,
+            context.instant,
+            context.timeZone
+          ) == .deleted
       case .archive:
         try operations.deactivate(
           habit,
           context.instant,
           context.timeZone
         )
+        didMutate = true
       case .reactivate:
         try operations.reactivate(
           habit,
           context.instant,
           context.timeZone
         )
+        didMutate = true
+      }
+      if didMutate {
+        reminderRefresh()
       }
       retryRequest = nil
       operationFailure = nil

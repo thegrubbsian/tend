@@ -15,12 +15,21 @@ struct HabitFormView: View {
   @State private var model: HabitFormModel
   @FocusState private var focusedField: HabitFormField?
   private let onSaved: () -> Void
+  private let requestReminderAuthorization: ReminderAuthorizationRequest
 
   init(
     mode: HabitFormMode,
+    reminderRefresh: @escaping ReminderRefreshSignal = {},
+    requestReminderAuthorization: @escaping ReminderAuthorizationRequest = {},
     onSaved: @escaping () -> Void = {}
   ) {
-    _model = State(initialValue: HabitFormModel(mode: mode))
+    _model = State(
+      initialValue: HabitFormModel(
+        mode: mode,
+        reminderRefresh: reminderRefresh
+      )
+    )
+    self.requestReminderAuthorization = requestReminderAuthorization
     self.onSaved = onSaved
   }
 
@@ -353,7 +362,11 @@ struct HabitFormView: View {
         .almanacSunkenSurface()
       } else {
         Button {
-          model.setReminderEnabled(true)
+          if model.setReminderEnabled(true) {
+            Task {
+              await requestReminderAuthorization()
+            }
+          }
         } label: {
           HStack {
             Text("None")

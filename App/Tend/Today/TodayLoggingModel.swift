@@ -240,6 +240,8 @@ final class TodayLoggingModel {
   @ObservationIgnored private let todayModel: TodayModel
   @ObservationIgnored private let operations: TodayLoggingOperations
   @ObservationIgnored private let sleep: Sleep
+  @ObservationIgnored private let reminderRefresh: ReminderRefreshSignal
+
   @ObservationIgnored private var expiryTask: Task<Void, Never>?
 
   init(
@@ -247,11 +249,13 @@ final class TodayLoggingModel {
     operations: TodayLoggingOperations,
     sleep: @escaping Sleep = { duration in
       try await Task.sleep(for: duration)
-    }
+    },
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
     self.todayModel = todayModel
     self.operations = operations
     self.sleep = sleep
+    self.reminderRefresh = reminderRefresh
   }
 
   convenience init(
@@ -259,12 +263,14 @@ final class TodayLoggingModel {
     todayModel: TodayModel,
     sleep: @escaping Sleep = { duration in
       try await Task.sleep(for: duration)
-    }
+    },
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
     self.init(
       todayModel: todayModel,
       operations: .live(context: context),
-      sleep: sleep
+      sleep: sleep,
+      reminderRefresh: reminderRefresh
     )
   }
 
@@ -535,6 +541,7 @@ final class TodayLoggingModel {
         return
       }
       try operations.delete(entry, habit, context)
+      reminderRefresh()
       let after = try operations.snapshot(habit, context)
       todayModel.refresh(habits: habits, context: context)
       let selectedAfter = bucket(in: after, periodKey: selectedBefore.periodKey) ?? after.current
@@ -584,6 +591,7 @@ final class TodayLoggingModel {
         return
       }
       try operations.delete(entry, habit, context)
+      reminderRefresh()
       let after = try operations.snapshot(habit, context)
       todayModel.refresh(habits: habits, context: context)
       var replacement = state
@@ -693,6 +701,7 @@ final class TodayLoggingModel {
         state = replacement
         return
       }
+      reminderRefresh()
       let after = try operations.snapshot(habit, context)
       todayModel.refresh(habits: habits, context: context)
       let selectedAfter = bucket(in: after, periodKey: selectedBefore.periodKey) ?? after.current

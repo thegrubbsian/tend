@@ -15,23 +15,43 @@ struct HabitDetailView: View {
   @State private var hasLeftActiveScene = false
 
   private let onBack: () -> Void
+  private let reminderRefresh: ReminderRefreshSignal
+  private let requestReminderAuthorization: ReminderAuthorizationRequest
   private let synchronizesEnvironment: Bool
 
   init(
     habit: Habit,
     context: ModelContext,
+    reminders: any ReminderRuntimeClient,
     onBack: @escaping () -> Void
   ) {
-    _model = State(initialValue: HabitDetailModel(habit: habit, context: context))
+    let reminderRefresh: ReminderRefreshSignal = {
+      reminders.refresh()
+    }
+    _model = State(
+      initialValue: HabitDetailModel(
+        habit: habit,
+        context: context,
+        reminderRefresh: reminderRefresh
+      )
+    )
+    self.reminderRefresh = reminderRefresh
+    requestReminderAuthorization = {
+      await reminders.requestAuthorizationIfNeeded()
+    }
     self.onBack = onBack
     synchronizesEnvironment = true
   }
 
   init(
     model: HabitDetailModel,
+    reminderRefresh: @escaping ReminderRefreshSignal = {},
+    requestReminderAuthorization: @escaping ReminderAuthorizationRequest = {},
     onBack: @escaping () -> Void
   ) {
     _model = State(initialValue: model)
+    self.reminderRefresh = reminderRefresh
+    self.requestReminderAuthorization = requestReminderAuthorization
     self.onBack = onBack
     synchronizesEnvironment = false
   }
@@ -55,7 +75,12 @@ struct HabitDetailView: View {
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
     .sheet(isPresented: editPresentation) {
       if let habit = model.habitForEditing {
-        HabitFormView(mode: .edit(habit), onSaved: model.editSaved)
+        HabitFormView(
+          mode: .edit(habit),
+          reminderRefresh: reminderRefresh,
+          requestReminderAuthorization: requestReminderAuthorization,
+          onSaved: model.editSaved
+        )
       }
     }
     .onAppear {

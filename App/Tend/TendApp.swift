@@ -2,10 +2,12 @@ import Foundation
 import SwiftData
 import SwiftUI
 import TendCore
+import UserNotifications
 
 @main
 struct TendApp: App {
   @State private var applicationModel: TendApplicationModel
+  private let notificationDelegate: ReminderNotificationDelegate
 
   init() {
     #if DEBUG
@@ -18,6 +20,9 @@ struct TendApp: App {
     #endif
     let routing = ReminderRoutingModel()
     let notificationCenter = LiveReminderNotificationCenter()
+    let notificationDelegate = ReminderNotificationDelegate(routing: routing)
+    UNUserNotificationCenter.current().delegate = notificationDelegate
+    self.notificationDelegate = notificationDelegate
     _applicationModel = State(
       initialValue: TendApplicationModel(
         makeContainer: makeContainer,
@@ -48,8 +53,11 @@ private struct TendApplicationRoot: View {
     Group {
       switch model.state {
       case .ready(let ready):
-        TendRootView()
-          .modelContainer(ready.container)
+        TendRootView(
+          reminders: ready.reminders,
+          routing: ready.reminders.routing
+        )
+        .modelContainer(ready.container)
       case .failed:
         StoreFailureView(retry: model.retry)
       }

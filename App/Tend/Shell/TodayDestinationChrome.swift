@@ -8,9 +8,14 @@ struct TodayDestinationChrome: View {
   @Environment(\.timeZone) private var timeZone
   @Query private var habits: [Habit]
   @State private var isPresentingNewHabit = false
+  private let reminders: any ReminderRuntimeClient
   private let fixedDate: Date?
 
-  init(date: Date? = nil) {
+  init(
+    reminders: any ReminderRuntimeClient,
+    date: Date? = nil
+  ) {
+    self.reminders = reminders
     #if DEBUG
       fixedDate =
         date
@@ -54,6 +59,9 @@ struct TodayDestinationChrome: View {
           fixedOperationInstant: fixedDate,
           onPlantHabit: {
             isPresentingNewHabit = true
+          },
+          reminderRefresh: {
+            reminders.refresh()
           }
         )
       }
@@ -62,7 +70,15 @@ struct TodayDestinationChrome: View {
     .accessibilityLabel("Today")
     .accessibilityIdentifier("shell.destination.today")
     .sheet(isPresented: $isPresentingNewHabit) {
-      HabitFormView(mode: .new)
+      HabitFormView(
+        mode: .new,
+        reminderRefresh: {
+          reminders.refresh()
+        },
+        requestReminderAuthorization: {
+          await reminders.requestAuthorizationIfNeeded()
+        }
+      )
     }
   }
 }

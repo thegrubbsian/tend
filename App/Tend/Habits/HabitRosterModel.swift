@@ -184,15 +184,25 @@ final class HabitRosterModel {
   private(set) var deletionConfirmation: HabitRosterDeletionConfirmation?
 
   @ObservationIgnored private let operations: HabitRosterOperations
+  @ObservationIgnored private let reminderRefresh: ReminderRefreshSignal
+
   @ObservationIgnored private var lastRefreshContext: RefreshContext?
   @ObservationIgnored private var failedMutation: MutationRequest?
 
-  init(context: ModelContext) {
+  init(
+    context: ModelContext,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
+  ) {
     operations = .live(context: context)
+    self.reminderRefresh = reminderRefresh
   }
 
-  init(operations: HabitRosterOperations) {
+  init(
+    operations: HabitRosterOperations,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
+  ) {
     self.operations = operations
+    self.reminderRefresh = reminderRefresh
   }
 
   func refresh(
@@ -441,6 +451,7 @@ final class HabitRosterModel {
     }
 
     failedMutation = nil
+    reminderRefresh()
     if request.kind == .delete {
       deletionConfirmation = nil
     }

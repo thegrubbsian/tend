@@ -1,6 +1,7 @@
 import SwiftData
 import TendCore
 import Testing
+import UserNotifications
 
 @testable import Tend
 
@@ -145,6 +146,49 @@ struct ReminderAppIntegrationTests {
     model.sceneDidBecomeActive()
     #expect(replacementRuntime.refreshCount == 3)
   }
+  @Test("notification delegate routes only strict Tend ownership to Today")
+  func notificationDelegateRoutesOnlyStrictTendOwnershipToToday() {
+    let routing = ReminderRoutingModel(selection: .habits)
+    let delegate = ReminderNotificationDelegate(routing: routing)
+    let ownedContent = UNMutableNotificationContent()
+    ownedContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
+    ownedContent.userInfo = [ReminderPendingRequest.ownershipKey: true]
+    let ownedRequest = UNNotificationRequest(
+      identifier: "\(ReminderPlanner.identifierPrefix)owned",
+      content: ownedContent,
+      trigger: nil
+    )
+
+    delegate.route(ownedRequest)
+
+    #expect(routing.selection == .today)
+
+    let foreignContent = UNMutableNotificationContent()
+    foreignContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
+    foreignContent.userInfo = [ReminderPendingRequest.ownershipKey: true]
+    routing.selection = .habits
+    delegate.route(
+      UNNotificationRequest(
+        identifier: "another.app.reminder",
+        content: foreignContent,
+        trigger: nil
+      )
+    )
+    #expect(routing.selection == .habits)
+
+    let malformedContent = UNMutableNotificationContent()
+    malformedContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
+    routing.selection = .habits
+    delegate.route(
+      UNNotificationRequest(
+        identifier: "\(ReminderPlanner.identifierPrefix)malformed",
+        content: malformedContent,
+        trigger: nil
+      )
+    )
+    #expect(routing.selection == .habits)
+  }
+
 }
 
 @MainActor
