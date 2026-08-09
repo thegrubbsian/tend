@@ -10,7 +10,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic device-readiness (E-z3y156): ready, active
 - feature device-readiness/local-reminders (F-zbcv8j): active
 - feature device-readiness/owner-device-release (F-3vz7ho): ready
-- task device-readiness/local-reminders/reminder-planning (T-ir12jz): in_progress
+- task device-readiness/local-reminders/reminder-planning (T-ir12jz): check
 - task device-readiness/local-reminders/notification-reconciliation (T-oeg8ua): ready
 - task device-readiness/local-reminders/reminder-app-integration (T-hpts9u): ready
 - task device-readiness/owner-device-release/iphone-only-cutover (T-3vfq8c): ready
