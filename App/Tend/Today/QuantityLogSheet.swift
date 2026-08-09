@@ -9,20 +9,18 @@ private enum QuantityLogSheetMetrics {
 
 struct QuantityLogSheet: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-  @Environment(\.dismiss) private var dismiss
   @FocusState private var isAmountFieldFocused: Bool
   @AccessibilityFocusState private var isProgressFocused: Bool
 
   let model: TodayLoggingModel
   let habits: [Habit]
-  let showsCloseButton: Bool
   let makeContext: () -> TodayRefreshContext
 
   var body: some View {
     ScrollView {
       if let sheet = model.state.sheet {
         VStack(alignment: .leading, spacing: AlmanacMetrics.spacingLarge) {
-          sheetHeader(sheet)
+          sheetTitle(sheet)
 
           if sheet.amountEditorMode != nil {
             amountSection(sheet)
@@ -81,30 +79,6 @@ struct QuantityLogSheet: View {
     .onChange(of: model.state.announcementToken) { _, _ in
       guard let sheet = model.state.sheet else { return }
       AccessibilityNotification.Announcement(progressText(for: sheet)).post()
-    }
-  }
-
-  @ViewBuilder
-  private func sheetHeader(_ sheet: LogSheetPresentation) -> some View {
-    if showsCloseButton {
-      HStack(alignment: .top, spacing: AlmanacMetrics.spacingMedium) {
-        sheetTitle(sheet)
-        Spacer(minLength: AlmanacMetrics.spacingMedium)
-        Button("Close") {
-          dismiss()
-        }
-        .buttonStyle(.plain)
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(AlmanacPalette.ink)
-        .frame(
-          minWidth: QuantityLogSheetMetrics.minimumTarget,
-          minHeight: QuantityLogSheetMetrics.minimumTarget
-        )
-        .contentShape(Rectangle())
-        .accessibilityIdentifier("log-sheet.close")
-      }
-    } else {
-      sheetTitle(sheet)
     }
   }
 
