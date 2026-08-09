@@ -1,7 +1,7 @@
 id: T-hpts9u
 key: device-readiness/local-reminders/reminder-app-integration
 title: Connect permission, mutations, and notification routing
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:5332dc2
         observed_at: 2026-08-09T03:45:34.256156Z
+pr: 39
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T21:35:07.939787Z
+        against:
+            kind: sha256
+            value: sha256:391f6ee697d2a048da1d12f0cd5341f4e0ba7a38135e0e0f019a5e6ead60be1b
+            observed_at: 2026-08-09T21:35:07.939779Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-391f6ee697d2-out-1e0b46e67fbdd632b71646ef7a915469f5c8c3a832625ae282866b20d20a5245.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-09T21:35:07.939787Z
+        against:
+            kind: sha256
+            value: sha256:391f6ee697d2a048da1d12f0cd5341f4e0ba7a38135e0e0f019a5e6ead60be1b
+            observed_at: 2026-08-09T21:35:07.939779Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-391f6ee697d2-out-452e35352f5c43c4afd79345629b56bc9a4ea22a7e353370d665263504959800.txt

@@ -10,14 +10,26 @@ struct HabitRosterView: View {
   @Environment(\.timeZone) private var timeZone
 
   private let context: ModelContext
+  private let reminders: any ReminderRuntimeClient
 
   @State private var model: HabitRosterModel
   @State private var presentedForm: HabitRosterForm?
   @State private var selectedHabit: HabitRosterSelection?
 
-  init(context: ModelContext) {
+  init(
+    context: ModelContext,
+    reminders: any ReminderRuntimeClient
+  ) {
     self.context = context
-    _model = State(initialValue: HabitRosterModel(context: context))
+    self.reminders = reminders
+    _model = State(
+      initialValue: HabitRosterModel(
+        context: context,
+        reminderRefresh: {
+          reminders.refresh()
+        }
+      )
+    )
   }
 
   var body: some View {
@@ -70,7 +82,15 @@ struct HabitRosterView: View {
         refresh(at: .now)
       }
     ) { form in
-      HabitFormView(mode: form.mode)
+      HabitFormView(
+        mode: form.mode,
+        reminderRefresh: {
+          reminders.refresh()
+        },
+        requestReminderAuthorization: {
+          await reminders.requestAuthorizationIfNeeded()
+        }
+      )
     }
     .sheet(item: deletionConfirmationBinding) { confirmation in
       HabitRosterDeletionSheet(
@@ -89,7 +109,11 @@ struct HabitRosterView: View {
         refresh(at: .now)
       }
     ) { selection in
-      HabitDetailView(habit: selection.habit, context: context) {
+      HabitDetailView(
+        habit: selection.habit,
+        context: context,
+        reminders: reminders
+      ) {
         selectedHabit = nil
       }
     }

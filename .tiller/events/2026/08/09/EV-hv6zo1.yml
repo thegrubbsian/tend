@@ -1,0 +1,13 @@
+id: EV-hv6zo1
+type: check.task
+at: 2026-08-09T21:35:13.44733Z
+owner: jc
+command: check task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: check
+after:
+    status: check
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

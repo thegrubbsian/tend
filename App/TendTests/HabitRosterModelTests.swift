@@ -505,6 +505,7 @@ struct HabitRosterModelTests {
         let habit = Habit(name: "Garden", cadence: .daily, target: 1)
         habit.isActive = scenario != .reactivate
         var fetchCallCount = 0
+        var reminderRefreshCount = 0
         let operations = HabitRosterOperations(
             fetchHabits: {
                 fetchCallCount += 1
@@ -524,7 +525,10 @@ struct HabitRosterModelTests {
             },
             delete: { _ in }
         )
-        let model = HabitRosterModel(operations: operations)
+        let model = HabitRosterModel(
+            operations: operations,
+            reminderRefresh: { reminderRefreshCount += 1 }
+        )
         model.refresh(
             at: instant,
             timeZone: fixture.timeZone,
@@ -561,6 +565,7 @@ struct HabitRosterModelTests {
 
         #expect(model.rosterErrorMessage == "The roots are still holding.")
         #expect(fetchCallCount == 2)
+        #expect(reminderRefreshCount == 1)
         switch scenario {
         case .archive:
             #expect(model.activeRows.isEmpty)
@@ -649,6 +654,7 @@ struct HabitRosterModelTests {
         let habit = Habit(name: "Garden", cadence: .daily, target: 1)
         var isDeleted = false
         var deleteCallCount = 0
+        var reminderRefreshCount = 0
         let operations = HabitRosterOperations(
             fetchHabits: { isDeleted ? [] : [habit] },
             computeStreak: { _, _, _ in
@@ -664,7 +670,10 @@ struct HabitRosterModelTests {
                 isDeleted = true
             }
         )
-        let model = HabitRosterModel(operations: operations)
+        let model = HabitRosterModel(
+            operations: operations,
+            reminderRefresh: { reminderRefreshCount += 1 }
+        )
         model.refresh(
             at: instant,
             timeZone: fixture.timeZone,
@@ -683,6 +692,7 @@ struct HabitRosterModelTests {
         #expect(model.activeRows.count == 1)
         #expect(model.operationError?.message == "The roots are still holding.")
         #expect(deleteCallCount == 1)
+        #expect(reminderRefreshCount == 0)
 
         model.retryOperation(
             at: instant.addingTimeInterval(60),
@@ -694,6 +704,7 @@ struct HabitRosterModelTests {
         #expect(model.activeRows.isEmpty)
         #expect(model.operationError == nil)
         #expect(deleteCallCount == 2)
+        #expect(reminderRefreshCount == 1)
     }
 
     @Test("failed archive alternative retry dismisses confirmation after success")

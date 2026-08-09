@@ -285,6 +285,108 @@ struct HabitFormModelTests {
         #expect(!multipleErrorsModel.canSave)
     }
 
+    @Test("reminder permission gesture honors draft provenance exactly once")
+    func reminderPermissionGestureHonorsDraftProvenanceExactlyOnce() {
+        let newModel = HabitFormModel(mode: .new)
+
+        #expect(newModel.setReminderEnabled(true))
+        newModel.setReminderEnabled(false)
+        #expect(!newModel.setReminderEnabled(true))
+
+        let remindedHabit = Habit(
+            name: "Walk",
+            cadence: .daily,
+            target: 1,
+            reminderTime: ReminderTime(hour: 9, minute: 0)
+        )
+        let editModel = HabitFormModel(mode: .edit(remindedHabit))
+        editModel.setReminderEnabled(false)
+
+        #expect(!editModel.setReminderEnabled(true))
+        #expect(editModel.reminderTime == ReminderTime(hour: 9, minute: 0))
+        #expect(editModel.canSave)
+    }
+
+    @Test("successful create and update signal reminder refresh exactly once")
+    func successfulSavesSignalReminderRefreshExactlyOnce() throws {
+        let instant = Date(timeIntervalSince1970: 1_725_214_400)
+        let timeZone = try #require(TimeZone(identifier: "UTC"))
+        let createdHabit = Habit(name: "Walk", cadence: .daily, target: 1)
+        var createRefreshCount = 0
+        let createModel = HabitFormModel(
+            mode: .new,
+            reminderRefresh: { createRefreshCount += 1 }
+        )
+        createModel.name = "Walk"
+        let createPersistence = HabitFormPersistence(
+            create: { _, _, _, _ in createdHabit },
+            update: { _, _, _, _ in
+                Issue.record("Create must not dispatch update")
+            }
+        )
+
+        #expect(createModel.save(
+            using: createPersistence,
+            at: instant,
+            timeZone: timeZone
+        ) === createdHabit)
+        #expect(createRefreshCount == 1)
+
+        var updateRefreshCount = 0
+        let updateModel = HabitFormModel(
+            mode: .edit(createdHabit),
+            reminderRefresh: { updateRefreshCount += 1 }
+        )
+        let updatePersistence = HabitFormPersistence(
+            create: { _, _, _, _ in
+                Issue.record("Update must not dispatch create")
+                return createdHabit
+            },
+            update: { _, _, _, _ in }
+        )
+
+        #expect(updateModel.save(
+            using: updatePersistence,
+            at: instant,
+            timeZone: timeZone
+        ) === createdHabit)
+        #expect(updateRefreshCount == 1)
+    }
+
+    @Test("invalid and failed saves signal only after retry succeeds")
+    func invalidAndFailedSavesSignalOnlyAfterRetrySucceeds() {
+        var refreshCount = 0
+        var saveAttempts = 0
+        let expectedHabit = Habit(name: "Walk", cadence: .daily, target: 1)
+        let persistence = HabitFormPersistence(
+            create: { _, _, _, _ in
+                saveAttempts += 1
+                if saveAttempts == 1 {
+                    throw TestSaveFailure.expected
+                }
+                return expectedHabit
+            },
+            update: { _, _, _, _ in }
+        )
+        let model = HabitFormModel(
+            mode: .new,
+            reminderRefresh: { refreshCount += 1 }
+        )
+
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
+        #expect(saveAttempts == 0)
+        #expect(refreshCount == 0)
+
+        model.name = "Walk"
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) == nil)
+        #expect(saveAttempts == 1)
+        #expect(refreshCount == 0)
+
+        #expect(model.save(using: persistence, at: .now, timeZone: .gmt) === expectedHabit)
+        #expect(saveAttempts == 2)
+        #expect(refreshCount == 1)
+    }
+
     @Test("New Save dispatches create exactly once with the current boundary values")
     func newSaveDispatchesCreateExactlyOnce() throws {
         let instant = Date(timeIntervalSince1970: 1_725_214_400)

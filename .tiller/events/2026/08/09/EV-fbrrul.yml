@@ -1,0 +1,13 @@
+id: EV-fbrrul
+type: check.task
+at: 2026-08-09T21:08:22.561058Z
+owner: jc
+command: check task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

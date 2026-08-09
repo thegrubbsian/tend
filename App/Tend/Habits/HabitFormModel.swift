@@ -188,9 +188,22 @@ final class HabitFormModel {
     private(set) var configurationErrors: Set<HabitFormConfigurationError> = []
 
     private var interactedFields: Set<HabitFormField> = []
+    private let sourceHadReminder: Bool
+    private let reminderRefresh: ReminderRefreshSignal
+    private var didRequestReminderPermission = false
 
-    init(mode: HabitFormMode) {
+    init(
+        mode: HabitFormMode,
+        reminderRefresh: @escaping ReminderRefreshSignal = {}
+    ) {
         self.mode = mode
+        self.reminderRefresh = reminderRefresh
+        sourceHadReminder =
+            if case .edit(let habit) = mode {
+                habit.reminderMinuteOfDay != nil
+            } else {
+                false
+            }
 
         guard case .edit(let habit) = mode else {
             return
@@ -310,20 +323,44 @@ final class HabitFormModel {
         guard cadence == .weekly else {
             return
         }
-        pinnedWeekdays = PinnedWeekdays(
-            rawValue: pinnedWeekdays.rawValue ^ weekday.pinnedWeekday.rawValue
-        ) ?? .none
+        pinnedWeekdays =
+            PinnedWeekdays(
+                rawValue: pinnedWeekdays.rawValue ^ weekday.pinnedWeekday.rawValue
+            ) ?? .none
     }
 
     func isPinned(_ weekday: HabitFormWeekday) -> Bool {
         pinnedWeekdays.contains(weekday.pinnedWeekday)
     }
 
-    func setReminderEnabled(_ isEnabled: Bool) {
+    @discardableResult
+    func setReminderEnabled(_ isEnabled: Bool) -> Bool {
+        let wasEnabled = reminderTime != nil
         if isEnabled {
             reminderTime = reminderTime ?? ReminderTime(hour: 9, minute: 0)
         } else {
             reminderTime = nil
+        }
+
+        guard
+            isEnabled,
+            !wasEnabled,
+            !sourceHadReminder,
+            !didRequestReminderPermission
+        else {
+            return false
+        }
+        didRequestReminderPermission = true
+        return true
+    }
+
+    @discardableResult
+    func enableReminder(
+        requestAuthorization: @escaping ReminderAuthorizationRequest
+    ) -> Task<Void, Never>? {
+        guard setReminderEnabled(true) else { return nil }
+        return Task {
+            await requestAuthorization()
         }
     }
 
@@ -344,13 +381,16 @@ final class HabitFormModel {
         }
 
         do {
+            let savedHabit: Habit
             switch mode {
             case .new:
-                return try persistence.create(fields, cadence, instant, timeZone)
+                savedHabit = try persistence.create(fields, cadence, instant, timeZone)
             case .edit(let habit):
                 try persistence.update(habit, fields, instant, timeZone)
-                return habit
+                savedHabit = habit
             }
+            reminderRefresh()
+            return savedHabit
         } catch {
             persistenceError = persistenceMessage(for: error)
             return nil
@@ -401,8 +441,7 @@ final class HabitFormModel {
     }
 
     private func persistenceMessage(for error: Error) -> String {
-        if
-            let localizedError = error as? LocalizedError,
+    if let localizedError = error as? LocalizedError,
             let description = localizedError.errorDescription,
             !description.isEmpty
         {

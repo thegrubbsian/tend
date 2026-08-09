@@ -7,6 +7,12 @@ nonisolated enum ReminderAuthorizationStatus: Equatable, Sendable {
   case authorized
   case unavailable
 }
+nonisolated struct ReminderAuthorizationOptions: OptionSet, Equatable, Sendable {
+  let rawValue: Int
+
+  static let alert = Self(rawValue: 1 << 0)
+  static let sound = Self(rawValue: 1 << 1)
+}
 
 nonisolated struct ReminderPendingRequest: Equatable, Sendable {
   let identifier: String
@@ -53,7 +59,7 @@ nonisolated struct ReminderPendingRequest: Equatable, Sendable {
 @MainActor
 protocol ReminderNotificationCenterClient: AnyObject {
   func authorizationStatus() async throws -> ReminderAuthorizationStatus
-  func requestAuthorization() async throws -> Bool
+  func requestAuthorization(options: ReminderAuthorizationOptions) async throws -> Bool
   func tendPendingRequests() async throws -> [ReminderPendingRequest]
   func removePendingRequest(withIdentifier identifier: String) async throws
   func addOrReplace(_ occurrence: ReminderOccurrence) async throws
@@ -76,8 +82,17 @@ final class LiveReminderNotificationCenter: ReminderNotificationCenterClient {
       lockScreenSetting: settings.lockScreenSetting
     )
   }
-  func requestAuthorization() async throws -> Bool {
-    try await center.requestAuthorization(options: [.alert, .sound])
+  func requestAuthorization(
+    options: ReminderAuthorizationOptions
+  ) async throws -> Bool {
+    var userNotificationOptions: UNAuthorizationOptions = []
+    if options.contains(.alert) {
+      userNotificationOptions.insert(.alert)
+    }
+    if options.contains(.sound) {
+      userNotificationOptions.insert(.sound)
+    }
+    return try await center.requestAuthorization(options: userNotificationOptions)
   }
 
   func tendPendingRequests() async throws -> [ReminderPendingRequest] {

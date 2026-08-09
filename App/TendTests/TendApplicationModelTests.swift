@@ -19,11 +19,11 @@ struct TendApplicationModelTests {
     }
 
     #expect(factoryCallCount == 1)
-    guard case .ready(let actualContainer) = model.state else {
+    guard case .ready(let ready) = model.state else {
       Issue.record("Expected successful startup to enter the ready state")
       return
     }
-    #expect(actualContainer === expectedContainer)
+    #expect(ready.container === expectedContainer)
     #expect(model.diagnosticError == nil)
   }
 
@@ -59,11 +59,11 @@ struct TendApplicationModelTests {
     model.retry()
 
     #expect(factoryCallCount == 2)
-    guard case .ready(let actualContainer) = model.state else {
+    guard case .ready(let ready) = model.state else {
       Issue.record("Expected retry success to enter the ready state")
       return
     }
-    #expect(actualContainer === recoveredContainer)
+    #expect(ready.container === recoveredContainer)
     #expect(model.diagnosticError == nil)
   }
 
@@ -97,11 +97,11 @@ struct TendApplicationModelTests {
     }
 
     for _ in 0..<10 {
-      guard case .ready(let observedContainer) = model.state else {
+      guard case .ready(let ready) = model.state else {
         Issue.record("Expected state observation to remain ready")
         return
       }
-      #expect(observedContainer === container)
+      #expect(ready.container === container)
     }
 
     #expect(factoryCallCount == 1)
@@ -1257,11 +1257,13 @@ struct TendApplicationModelTests {
     }
 
     for _ in 0..<10 {
-      guard case .ready(let container) = model.state else {
+      guard case .ready(let ready) = model.state else {
         Issue.record("Expected seeded fixture state to remain ready")
         return
       }
-      #expect(try container.mainContext.fetchCount(FetchDescriptor<Habit>()) == 2)
+      #expect(
+        try ready.container.mainContext.fetchCount(FetchDescriptor<Habit>()) == 2
+      )
     }
     #expect(factoryCallCount == 1)
   }

@@ -1,0 +1,13 @@
+id: EV-38g9uz
+type: start.task
+at: 2026-08-09T20:13:55.463483Z
+owner: jc
+command: start task T-hpts9u
+targets:
+    - T-hpts9u
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml

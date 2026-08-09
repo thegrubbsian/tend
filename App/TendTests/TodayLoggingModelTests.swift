@@ -21,6 +21,7 @@ struct TodayLoggingModelTests {
     var progressByID = Dictionary(
       uniqueKeysWithValues: habits.map { ($0.persistentModelID, 0) })
     var appendCalls: [(Int, PersistentIdentifier, LogEntryDestination, TodayRefreshContext)] = []
+    var reminderRefreshCount = 0
     let todayModel = TodayModel(
       operations: TodayOperations { habit, _ in
         todaySnapshot(
@@ -53,9 +54,9 @@ struct TodayLoggingModelTests {
     let model = TodayLoggingModel(
       todayModel: todayModel,
       operations: operations,
-      sleep: longSleep
+      sleep: longSleep,
+      reminderRefresh: { reminderRefreshCount += 1 }
     )
-
     model.activateCurrent(habit: times, habits: habits, context: refreshContext)
 
     #expect(appendCalls.count == 1)
@@ -67,6 +68,7 @@ struct TodayLoggingModelTests {
     #expect(model.state.undo?.habitID == times.persistentModelID)
     #expect(model.state.undo?.amount == 1)
     #expect(model.state.feedback?.kind == .logged)
+    #expect(reminderRefreshCount == 1)
 
     for quantity in quantities {
       model.activateCurrent(habit: quantity, habits: habits, context: refreshContext)
@@ -100,6 +102,7 @@ struct TodayLoggingModelTests {
     )
     let habits = [daily, weekly, count]
     var appendDestinations: [LogEntryDestination] = []
+    var reminderRefreshCount = 0
     let snapshots: [PersistentIdentifier: HabitLoggingSnapshot] = [
       daily.persistentModelID: loggingSnapshot(
         habit: daily,
@@ -155,9 +158,9 @@ struct TodayLoggingModelTests {
     let model = TodayLoggingModel(
       todayModel: todayModel,
       operations: operations,
-      sleep: longSleep
+      sleep: longSleep,
+      reminderRefresh: { reminderRefreshCount += 1 }
     )
-
     model.activateCurrent(habit: daily, habits: habits, context: refreshContext)
     var sheet = try #require(model.state.sheet)
     #expect(sheet.selectedPeriodKey == "day:2026-08-05")
@@ -181,6 +184,7 @@ struct TodayLoggingModelTests {
     model.activateAtRisk(habit: count, habits: habits, context: refreshContext)
     #expect(appendDestinations == [.periodKey("day:2026-08-04")])
     #expect(model.state.sheet == nil)
+    #expect(reminderRefreshCount == 1)
   }
 
   @Test("transient card state resolves only for its persistent habit identity")
@@ -312,7 +316,10 @@ struct TodayLoggingModelTests {
   @Test("quick add custom and set total publish complete post-write state")
   func sheetMutationsPublishCompleteState() throws {
     let fixture = try LoggingFixture(target: 10, progress: 0)
-    let model = fixture.makeModel()
+    var reminderRefreshCount = 0
+    let model = fixture.makeModel(
+      reminderRefresh: { reminderRefreshCount += 1 }
+    )
     fixture.presentSheet(model)
 
     model.appendQuickAdd(
@@ -360,12 +367,16 @@ struct TodayLoggingModelTests {
     #expect(model.state.sheet?.amountEditorMode == nil)
     #expect(model.state.undo?.generation == undoGeneration)
     #expect(model.state.feedback == nil)
+    #expect(reminderRefreshCount == 3)
   }
 
   @Test("each mutation uses one context and reprojects before Today refresh or publication")
   func mutationOrderingIsAtomic() throws {
     let fixture = try LoggingFixture(target: 10, progress: 0)
-    let model = fixture.makeModel()
+    var reminderRefreshCount = 0
+    let model = fixture.makeModel(
+      reminderRefresh: { reminderRefreshCount += 1 }
+    )
     fixture.presentSheet(model)
     fixture.events.removeAll()
     fixture.receivedContexts.removeAll()
@@ -382,6 +393,7 @@ struct TodayLoggingModelTests {
     #expect(fixture.events == ["snapshot", "append", "snapshot", "today"])
     #expect(fixture.receivedContexts == Array(repeating: fixture.refreshContext, count: 4))
     #expect(model.state.sheet?.progress == 2)
+    #expect(reminderRefreshCount == 1)
     fixture.onTodayProjection = nil
 
     let acceptedUndo = try #require(model.state.undo?.generation)
@@ -396,6 +408,7 @@ struct TodayLoggingModelTests {
     #expect(model.state.sheet?.sheetError == "Fixture operation failed.")
     #expect(model.state.undo?.generation == acceptedUndo)
     #expect(model.state.feedback?.id == acceptedFeedback)
+    #expect(reminderRefreshCount == 1)
 
     fixture.failAppend = false
     fixture.failNextPostMutationSnapshot = true
@@ -409,6 +422,7 @@ struct TodayLoggingModelTests {
     #expect(model.state.sheet?.sheetError == "Fixture projection failed.")
     #expect(model.state.undo?.generation == acceptedUndo)
     #expect(model.state.feedback?.id == acceptedFeedback)
+    #expect(reminderRefreshCount == 2)
     model.refresh(habits: fixture.habits, context: fixture.refreshContext)
     #expect(model.state.sheet?.progress == 4)
     #expect(model.state.sheet?.sheetError == nil)
@@ -468,7 +482,10 @@ struct TodayLoggingModelTests {
     let timestamp = fixture.refreshContext.instant.addingTimeInterval(-60)
     let first = try fixture.addEntry(amount: 2, timestamp: timestamp)
     let second = try fixture.addEntry(amount: 3, timestamp: timestamp)
-    let model = fixture.makeModel()
+    var reminderRefreshCount = 0
+    let model = fixture.makeModel(
+      reminderRefresh: { reminderRefreshCount += 1 }
+    )
     fixture.presentSheet(model)
 
     model.deleteEntry(
@@ -483,6 +500,7 @@ struct TodayLoggingModelTests {
     #expect(model.state.feedback == nil)
     #expect(model.state.undo == nil)
     #expect(Array(fixture.events.suffix(4)) == ["snapshot", "delete", "snapshot", "today"])
+    #expect(reminderRefreshCount == 1)
 
     fixture.failDelete = true
     model.deleteEntry(
@@ -493,6 +511,7 @@ struct TodayLoggingModelTests {
     #expect(fixture.deletedEntryIDs == [first.persistentModelID])
     #expect(model.state.sheet?.entries.map(\.id) == [second.persistentModelID])
     #expect(model.state.sheet?.sheetError != nil)
+    #expect(reminderRefreshCount == 1)
 
     let deleteEvents = fixture.events.filter { $0 == "delete" }.count
     model.deleteEntry(
@@ -502,6 +521,7 @@ struct TodayLoggingModelTests {
     )
     #expect(fixture.events.filter { $0 == "delete" }.count == deleteEvents)
     #expect(model.state.sheet?.sheetError != nil)
+    #expect(reminderRefreshCount == 1)
   }
 
   @Test("explicit scope selection drives presentation and later writes")
@@ -544,7 +564,10 @@ struct TodayLoggingModelTests {
   @Test("Undo replaces, retries exact deletion, and expires without mutation")
   func undoLifecycleIsIdentitySafe() async throws {
     let replacementFixture = try LoggingFixture(target: 10, progress: 0)
-    let replacementModel = replacementFixture.makeModel()
+    var replacementRefreshCount = 0
+    let replacementModel = replacementFixture.makeModel(
+      reminderRefresh: { replacementRefreshCount += 1 }
+    )
     replacementFixture.presentSheet(replacementModel)
     replacementModel.appendQuickAdd(
       amount: 1,
@@ -571,6 +594,7 @@ struct TodayLoggingModelTests {
     #expect(replacementModel.state.feedback?.kind == .undo)
     #expect(
       Array(replacementFixture.events.suffix(4)) == ["snapshot", "delete", "snapshot", "today"])
+    #expect(replacementRefreshCount == 3)
 
     let retryFixture = try LoggingFixture(target: 10, progress: 0)
     let retryModel = retryFixture.makeModel()
@@ -1093,12 +1117,14 @@ struct TodayLoggingModelTests {
     func makeModel(
       sleep: @escaping TodayLoggingModel.Sleep = { duration in
         try await Task.sleep(for: duration + .seconds(60))
-      }
+      },
+      reminderRefresh: @escaping ReminderRefreshSignal = {}
     ) -> TodayLoggingModel {
       TodayLoggingModel(
         todayModel: todayModel,
         operations: operations,
-        sleep: sleep
+        sleep: sleep,
+        reminderRefresh: reminderRefresh
       )
     }
 

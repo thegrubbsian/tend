@@ -896,6 +896,7 @@ struct HabitDetailModelTests {
     var snapshotCalls = 0
     var deleteCalls: [UUID] = []
     var shouldFail = true
+    var reminderRefreshCount = 0
     var model: HabitDetailModel!
     let operations = HabitDetailOperations(
       snapshot: { _, _, _, _ in
@@ -916,7 +917,11 @@ struct HabitDetailModelTests {
         return .deleted
       }
     )
-    model = fixture.model(habit: habit, operations: operations)
+    model = fixture.model(
+      habit: habit,
+      operations: operations,
+      reminderRefresh: { reminderRefreshCount += 1 }
+    )
     model.start()
     let verifiedPresentation = model.presentation
 
@@ -928,6 +933,7 @@ struct HabitDetailModelTests {
     #expect(model.operationFailure?.placement == .entries)
     #expect(model.operationFailure?.retryTitle == "Try again")
     #expect(!model.isOperationInFlight)
+    #expect(reminderRefreshCount == 0)
 
     shouldFail = false
     model.retryOperation()
@@ -937,6 +943,7 @@ struct HabitDetailModelTests {
     #expect(model.presentation?.entries.isEmpty == true)
     #expect(model.operationFailure == nil)
     #expect(!model.isOperationInFlight)
+    #expect(reminderRefreshCount == 1)
   }
 
   @Test("mutation retry survives an intervening load failure and reconciliation")
@@ -1220,6 +1227,7 @@ struct HabitDetailModelTests {
     var reactivateShouldFail = true
     var nowCalls = 0
     var timeZoneCalls = 0
+    var reminderRefreshCount = 0
     var model: HabitDetailModel!
     let operations = HabitDetailOperations(
       snapshot: { _, month, _, _ in
@@ -1260,7 +1268,8 @@ struct HabitDetailModelTests {
       },
       calendar: { fixture.calendar },
       locale: { fixture.locale },
-      boundaryScheduling: .disabled
+      boundaryScheduling: .disabled,
+      reminderRefresh: { reminderRefreshCount += 1 }
     )
     model.start()
     nowCalls = 0
@@ -1278,6 +1287,7 @@ struct HabitDetailModelTests {
     #expect(model.presentation == verifiedPresentation)
     #expect(model.operationFailure?.placement == .lifecycle)
 
+    #expect(reminderRefreshCount == 0)
     archiveShouldFail = false
     model.retryOperation()
 
@@ -1285,6 +1295,7 @@ struct HabitDetailModelTests {
     #expect(snapshotCalls == 2)
     #expect(model.presentation?.isActive == false)
     #expect(model.operationFailure == nil)
+    #expect(reminderRefreshCount == 1)
 
     nowCalls = 0
     timeZoneCalls = 0
@@ -1298,6 +1309,7 @@ struct HabitDetailModelTests {
     #expect(snapshotCalls == 2)
     #expect(model.presentation?.isActive == false)
     #expect(model.operationFailure?.placement == .lifecycle)
+    #expect(reminderRefreshCount == 1)
 
     reactivateShouldFail = false
     model.retryOperation()
@@ -1306,6 +1318,7 @@ struct HabitDetailModelTests {
     #expect(snapshotCalls == 3)
     #expect(model.presentation?.isActive == true)
     #expect(model.operationFailure == nil)
+    #expect(reminderRefreshCount == 2)
   }
 
   @Test("successful mutation followed by refresh failure clears stale derived facts")
@@ -1619,7 +1632,8 @@ private struct HabitDetailFixture {
 
   func model(
     habit: Habit,
-    operations: HabitDetailOperations
+    operations: HabitDetailOperations,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) -> HabitDetailModel {
     HabitDetailModel(
       habit: habit,
@@ -1628,7 +1642,8 @@ private struct HabitDetailFixture {
       timeZone: { timeZone },
       calendar: { calendar },
       locale: { locale },
-      boundaryScheduling: .disabled
+      boundaryScheduling: .disabled,
+      reminderRefresh: reminderRefresh
     )
   }
 

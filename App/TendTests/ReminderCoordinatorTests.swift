@@ -707,7 +707,9 @@ private final class FakeReminderNotificationCenter: ReminderNotificationCenterCl
     return sampledStatus
   }
 
-  func requestAuthorization() async throws -> Bool {
+  func requestAuthorization(
+    options: ReminderAuthorizationOptions
+  ) async throws -> Bool {
     requestAuthorizationCallCount += 1
     return true
   }

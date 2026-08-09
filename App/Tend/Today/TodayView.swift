@@ -16,6 +16,21 @@ struct TodayView: View {
   let instant: Date
   let fixedOperationInstant: Date?
   let onPlantHabit: () -> Void
+  let reminderRefresh: ReminderRefreshSignal
+
+  init(
+    habits: [Habit],
+    instant: Date,
+    fixedOperationInstant: Date?,
+    onPlantHabit: @escaping () -> Void,
+    reminderRefresh: @escaping ReminderRefreshSignal = {}
+  ) {
+    self.habits = habits
+    self.instant = instant
+    self.fixedOperationInstant = fixedOperationInstant
+    self.onPlantHabit = onPlantHabit
+    self.reminderRefresh = reminderRefresh
+  }
 
   @State private var model: TodayModel?
   @State private var loggingModel: TodayLoggingModel?
@@ -258,7 +273,8 @@ struct TodayView: View {
     model = todayModel
     let createdModel = TodayLoggingModel(
       context: modelContext,
-      todayModel: todayModel
+      todayModel: todayModel,
+      reminderRefresh: reminderRefresh
     )
     loggingModel = createdModel
     return createdModel
