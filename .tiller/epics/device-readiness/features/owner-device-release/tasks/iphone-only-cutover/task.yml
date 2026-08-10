@@ -1,7 +1,7 @@
 id: T-3vfq8c
 key: device-readiness/owner-device-release/iphone-only-cutover
 title: Remove Native iPad Support
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,6 +15,7 @@ accepted_against:
         kind: git_commit
         value: git:0ad0413
         observed_at: 2026-08-06T20:40:57.448458Z
+pr: 40
 gates:
     build:
         required: true
