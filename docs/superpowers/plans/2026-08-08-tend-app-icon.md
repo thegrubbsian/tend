@@ -45,19 +45,39 @@ Expected: exit 1 because Tend currently has no app-icon set.
 Run this Pencil `execute` input against `../tend-design/tend-app-icons.pen`:
 
 ```javascript
-const productionIcon = C("tignF", "document", {
+const productionIcon = Copy("tignF", "document", {
   name: "Production Export · SPROUT & SUN",
-  x: 0,
+  x: 2100,
   y: 0
 })
-Scale(productionIcon, 6.4)
-U(productionIcon, {
-  x: 2100,
-  y: 0,
+const tree = Get(productionIcon, { depth: 6 })
+const sun = tree.children[0].id
+const cloud = tree.children[1].id
+const sprout = tree.children[2].id
+const puffL = tree.children[1].children[0].id
+const puffMain = tree.children[1].children[1].id
+const puffR = tree.children[1].children[2].id
+const cloudBase = tree.children[1].children[3].id
+Update(productionIcon, {
+  width: 1024,
+  height: 1024,
   cornerRadius: 0,
   stroke: "#00000000",
   strokeWidth: 0
 })
+Update(sun, { x: 128, y: 121.6, width: 345.6, height: 345.6 })
+Update(cloud, { x: 268.8, y: 326.4, width: 358.4, height: 166.4 })
+Update(puffL, { x: 0, y: 51.2, width: 140.8, height: 102.4 })
+Update(puffMain, { x: 76.8, y: 0, width: 166.4, height: 140.8 })
+Update(puffR, { x: 192, y: 38.4, width: 140.8, height: 108.8 })
+Update(cloudBase, {
+  x: 25.6,
+  y: 76.8,
+  width: 307.2,
+  height: 76.8,
+  cornerRadius: 38.4
+})
+Update(sprout, { x: 384, y: 371.2, width: 537.6, height: 537.6 })
 Print(productionIcon)
 Print(Get(productionIcon, {
   depth: 6,
