@@ -1,0 +1,14 @@
+id: EV-6lil2z
+type: sync.task
+at: 2026-08-10T15:17:11.51877Z
+owner: jc
+command: sync task T-3vfq8c
+targets:
+    - T-3vfq8c
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.yml
