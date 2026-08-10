@@ -1,0 +1,13 @@
+id: EV-njz4dr
+type: eval.feature
+at: 2026-08-10T01:56:38.038364Z
+owner: jc
+command: eval feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml
