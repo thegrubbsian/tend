@@ -1,7 +1,7 @@
 id: F-3vz7ho
 key: device-readiness/owner-device-release
 title: Owner Device Release
-status: ready
+status: active
 blocked: false
 owner: jc
 source: design/01-overview.md
@@ -10,6 +10,7 @@ depends_on:
     - F-zbcv8j
     - F-z8e13q
     - F-efgzky
+branch: tiller/device-readiness/owner-device-release
 accepted_against:
     spec:
         kind: git_blob
@@ -25,3 +26,34 @@ accepted_against:
         kind: git_commit
         value: git:0ad0413
         observed_at: 2026-08-06T20:40:57.426439Z
+gates:
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-10T02:24:12.683142Z
+        against:
+            kind: sha256
+            value: sha256:608c8cfbbc3c9953e4d5cf6cdbaf19b213136db5b09c28bf966cd125f0d3aedb
+            observed_at: 2026-08-10T02:03:48.716266Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-608c8cfbbc3c-out-36768a89e8faf166700f48bc8df99361609e43956dd7d2bffebde9439ea5033c.txt
+            C2:
+                status: needs_attestation
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-608c8cfbbc3c-out-cf38d49edb55348ffb7c542c3a7cd9d43276c6e51f85eedad44cf0cf65f94a2b.txt
+            C4:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C4-sha256-608c8cfbbc3c-out-84e0591aff6c4975a2a5427f8727a933e5866791382f97513a502f68637c64df.txt
+            C5:
+                status: needs_attestation

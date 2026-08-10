@@ -214,7 +214,6 @@ final class TodayDashboardUITests: XCTestCase {
 
   @MainActor
   func testDashboardReflowsAtTwoAccessibilityTextSizes() throws {
-    let device = evidenceDeviceName
     let sizes = [
       (
         category: "UICTContentSizeCategoryAccessibilityL",
@@ -236,10 +235,7 @@ final class TodayDashboardUITests: XCTestCase {
       )
       let dashboard = app.otherElements["today.dashboard"]
       XCTAssertTrue(dashboard.waitForExistence(timeout: 5))
-      guard assertEvidenceDeviceGeometry(in: app) else {
-        app.terminate()
-        return
-      }
+      assertEvidenceDeviceGeometry(in: app)
 
       let title = element("today.title", in: app)
       let summary = element("today.summary", in: app)
@@ -256,14 +252,14 @@ final class TodayDashboardUITests: XCTestCase {
 
       let topTitleY = title.frame.minY
       let topAuditedElementKeys = visibleAuditElementKeys(in: app)
-      recordScreenshot("\(device)-mixed-\(size.name)-top", of: app)
+      recordScreenshot("iphone-mixed-\(size.name)-top", of: app)
       try performAdaptiveAccessibilityAudit(in: app)
       restoreTop(title, to: topTitleY, in: app)
 
       dragToMiddle(in: app, normalizedDistance: 0.35)
       let middleTitleY = title.frame.minY
       XCTAssertLessThan(middleTitleY, topTitleY - 150)
-      recordScreenshot("\(device)-mixed-\(size.name)-middle", of: app)
+      recordScreenshot("iphone-mixed-\(size.name)-middle", of: app)
       try performAdaptiveAccessibilityAudit(
         in: app,
         previouslyAuditedElementKeys: topAuditedElementKeys
@@ -277,24 +273,20 @@ final class TodayDashboardUITests: XCTestCase {
       XCTAssertTrue(lastRow.isHittable)
       XCTAssertGreaterThanOrEqual(lastRow.frame.minY, window.frame.minY)
       XCTAssertLessThanOrEqual(lastRow.frame.maxY, tabPill.frame.minY)
-      recordScreenshot("\(device)-mixed-\(size.name)-bottom", of: app)
+      recordScreenshot("iphone-mixed-\(size.name)-bottom", of: app)
       app.terminate()
     }
   }
 
   @MainActor
   func testAcceptanceEvidenceStates() throws {
-    let device = evidenceDeviceName
     let launchArguments = acceptanceLaunchArguments
 
     do {
       let app = launch(fixture: "today-mixed", additionalArguments: launchArguments)
       let dashboard = app.otherElements["today.dashboard"]
       XCTAssertTrue(dashboard.waitForExistence(timeout: 5))
-      guard assertEvidenceDeviceGeometry(in: app) else {
-        app.terminate()
-        return
-      }
+      assertEvidenceDeviceGeometry(in: app)
       assertCenteredReadableSurface(dashboard, in: app)
       assertAccessibilityOrder(
         [
@@ -324,17 +316,13 @@ final class TodayDashboardUITests: XCTestCase {
       assertMinimumHitRegion(of: app.buttons["shell.tab.habits"])
       try app.performAccessibilityAudit(for: acceptanceAuditTypes)
 
-      if device == "ipad" {
-        recordScreenshot("ipad-mixed-full", of: app)
-      } else {
-        let title = element("today.title", in: app)
-        let topTitleY = title.frame.minY
-        recordScreenshot("iphone-mixed-top", of: app)
-        let tabPill = app.buttons["shell.tab.today"]
-        scroll(element("today.row.Water seedlings", in: app), above: tabPill, in: app)
-        XCTAssertLessThan(title.frame.minY, topTitleY - 10)
-        recordScreenshot("iphone-mixed-bottom", of: app)
-      }
+      let title = element("today.title", in: app)
+      let topTitleY = title.frame.minY
+      recordScreenshot("iphone-mixed-top", of: app)
+      let tabPill = app.buttons["shell.tab.today"]
+      scroll(element("today.row.Water seedlings", in: app), above: tabPill, in: app)
+      XCTAssertLessThan(title.frame.minY, topTitleY - 10)
+      recordScreenshot("iphone-mixed-bottom", of: app)
       app.terminate()
     }
 
@@ -345,7 +333,7 @@ final class TodayDashboardUITests: XCTestCase {
       assertCenteredReadableSurface(dashboard, in: app)
       XCTAssertTrue(element("today.all-tended", in: app).exists)
       try app.performAccessibilityAudit(for: acceptanceAuditTypes)
-      recordScreenshot("\(device)-all-tended", of: app)
+      recordScreenshot("iphone-all-tended", of: app)
       app.terminate()
     }
 
@@ -356,7 +344,7 @@ final class TodayDashboardUITests: XCTestCase {
       assertCenteredReadableSurface(inactive, in: app)
       XCTAssertTrue(app.staticTexts["No active habits."].exists)
       try app.performAccessibilityAudit(for: acceptanceAuditTypes)
-      recordScreenshot("\(device)-inactive", of: app)
+      recordScreenshot("iphone-inactive", of: app)
       app.terminate()
     }
 
@@ -373,49 +361,17 @@ final class TodayDashboardUITests: XCTestCase {
       assertMinimumHitRegion(of: retry)
       try app.performAccessibilityAudit(for: acceptanceAuditTypes)
 
-      if device == "ipad" {
-        recordScreenshot("ipad-failure-full", of: app)
-      } else {
-        let tabPill = app.buttons["shell.tab.today"]
-        XCTAssertTrue(malformed.isHittable)
-        XCTAssertTrue(retry.isHittable)
-        XCTAssertLessThanOrEqual(malformed.frame.maxY, tabPill.frame.minY)
-        recordScreenshot("iphone-failure-full", of: app)
-      }
+      let tabPill = app.buttons["shell.tab.today"]
+      XCTAssertTrue(malformed.isHittable)
+      XCTAssertTrue(retry.isHittable)
+      XCTAssertLessThanOrEqual(malformed.frame.maxY, tabPill.frame.minY)
+      recordScreenshot("iphone-failure-full", of: app)
       app.terminate()
     }
-  }
-
-  @MainActor
-  func testCenteredIPadEvidenceState() throws {
-    try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "Requires an iPad")
-    let app = launch(fixture: "today-mixed", additionalArguments: acceptanceLaunchArguments)
-    let dashboard = app.otherElements["today.dashboard"]
-    XCTAssertTrue(dashboard.waitForExistence(timeout: 5))
-
-    guard assertEvidenceDeviceGeometry(in: app) else {
-      app.terminate()
-      return
-    }
-    let window = app.windows.firstMatch
-    assertCenteredReadableSurface(dashboard, in: app)
-
-    let firstRow = element("today.row.Check in", in: app)
-    let lastRow = element("today.row.Water seedlings", in: app)
-    let tabPill = app.buttons["shell.tab.today"]
-    XCTAssertTrue(firstRow.isHittable)
-    XCTAssertTrue(lastRow.isHittable)
-    XCTAssertGreaterThanOrEqual(firstRow.frame.minX, window.frame.minX)
-    XCTAssertLessThanOrEqual(lastRow.frame.maxY, tabPill.frame.minY)
-
-    try app.performAccessibilityAudit(for: acceptanceAuditTypes)
-    recordScreenshot("ipad-mixed-centered", of: app)
-    app.terminate()
   }
 
   @MainActor
   func testFailureReflowsAtTwoAccessibilityTextSizes() throws {
-    let device = evidenceDeviceName
     let sizes = [
       (
         category: "UICTContentSizeCategoryAccessibilityL",
@@ -437,10 +393,7 @@ final class TodayDashboardUITests: XCTestCase {
       )
       let dashboard = app.otherElements["today.dashboard"]
       XCTAssertTrue(dashboard.waitForExistence(timeout: 5))
-      guard assertEvidenceDeviceGeometry(in: app) else {
-        app.terminate()
-        return
-      }
+      assertEvidenceDeviceGeometry(in: app)
 
       let malformed = element("today.row.Malformed cadence", in: app)
       let retry = app.buttons["today.retry.Malformed cadence"]
@@ -450,7 +403,7 @@ final class TodayDashboardUITests: XCTestCase {
 
       let topMalformedY = malformed.frame.minY
       let topAuditedElementKeys = visibleAuditElementKeys(in: app)
-      recordScreenshot("\(device)-failure-\(size.name)-top", of: app)
+      recordScreenshot("iphone-failure-\(size.name)-top", of: app)
       try performAdaptiveAccessibilityAudit(in: app)
       restoreTop(malformed, to: topMalformedY, in: app)
 
@@ -458,7 +411,7 @@ final class TodayDashboardUITests: XCTestCase {
       let middleMalformedY = malformed.frame.minY
       XCTAssertLessThan(middleMalformedY, topMalformedY - 100)
       let middleRetryY = retry.frame.minY
-      recordScreenshot("\(device)-failure-\(size.name)-middle", of: app)
+      recordScreenshot("iphone-failure-\(size.name)-middle", of: app)
       try performAdaptiveAccessibilityAudit(
         in: app,
         previouslyAuditedElementKeys: topAuditedElementKeys
@@ -471,14 +424,9 @@ final class TodayDashboardUITests: XCTestCase {
       XCTAssertTrue(malformed.isHittable)
       XCTAssertTrue(retry.isHittable)
       XCTAssertLessThanOrEqual(retry.frame.maxY, tabPill.frame.minY)
-      recordScreenshot("\(device)-failure-\(size.name)-bottom", of: app)
+      recordScreenshot("iphone-failure-\(size.name)-bottom", of: app)
       app.terminate()
     }
-  }
-
-  @MainActor
-  private var evidenceDeviceName: String {
-    UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone"
   }
 
   private var acceptanceLaunchArguments: [String] {
@@ -556,20 +504,16 @@ final class TodayDashboardUITests: XCTestCase {
   }
 
   @MainActor
-  private func assertEvidenceDeviceGeometry(in app: XCUIApplication) -> Bool {
+  private func assertEvidenceDeviceGeometry(in app: XCUIApplication) {
     let window = app.windows.firstMatch
     XCTAssertTrue(window.exists)
 
-    let expectedSize =
-      UIDevice.current.userInterfaceIdiom == .pad
-      ? CGSize(width: 1024, height: 1366)
-      : CGSize(width: 402, height: 874)
+    let expectedSize = CGSize(width: 402, height: 874)
     XCTAssertEqual(
       window.frame.size,
       expectedSize,
-      "Expected portrait \(expectedSize.width)×\(expectedSize.height), got \(window.frame.size)"
+      "Expected portrait 402×874, got \(window.frame.size)"
     )
-    return window.frame.size == expectedSize
   }
 
   @MainActor

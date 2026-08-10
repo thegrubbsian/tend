@@ -1,0 +1,13 @@
+id: EV-ltb034
+type: start.feature
+at: 2026-08-09T22:20:35.304324Z
+owner: jc
+command: start feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 import TendCore
+import Testing
 
 @testable import Tend
 
@@ -71,17 +71,19 @@ struct ReminderPlanTests {
     let unmetOccurrences = planner.plan(habits: [unmet], at: now, limit: 4)
     let metOccurrences = planner.plan(habits: [met], at: now, limit: 2)
 
-    #expect(unmetOccurrences.map(\.fireDate) == [
-      try context.date(2026, 1, 5, 9, 0),
-      try context.date(2026, 1, 7, 9, 0),
-      try context.date(2026, 1, 12, 9, 0),
-      try context.date(2026, 1, 14, 9, 0),
-    ])
+    #expect(
+      unmetOccurrences.map(\.fireDate) == [
+        try context.date(2026, 1, 5, 9, 0),
+        try context.date(2026, 1, 7, 9, 0),
+        try context.date(2026, 1, 12, 9, 0),
+        try context.date(2026, 1, 14, 9, 0),
+      ])
     #expect(unmetOccurrences.map(\.body) == Array(repeating: "1 time left this week.", count: 4))
-    #expect(metOccurrences.map(\.fireDate) == [
-      try context.date(2026, 1, 12, 9, 0),
-      try context.date(2026, 1, 14, 9, 0),
-    ])
+    #expect(
+      metOccurrences.map(\.fireDate) == [
+        try context.date(2026, 1, 12, 9, 0),
+        try context.date(2026, 1, 14, 9, 0),
+      ])
   }
 
   @Test("planner excludes invalid and unscheduled habit facts without dropping valid habits")
@@ -152,13 +154,14 @@ struct ReminderPlanTests {
     let fair = planner.plan(habits: habits, at: now, limit: 5)
 
     #expect(constrained.map(\.habitID) == [habits[0].id, habits[1].id])
-    #expect(fair.map(\.fireDate) == [
-      try context.date(2026, 1, 5, 9, 0),
-      try context.date(2026, 1, 5, 10, 0),
-      try context.date(2026, 1, 6, 9, 0),
-      try context.date(2026, 1, 6, 10, 0),
-      try context.date(2026, 1, 11, 7, 0),
-    ])
+    #expect(
+      fair.map(\.fireDate) == [
+        try context.date(2026, 1, 5, 9, 0),
+        try context.date(2026, 1, 5, 10, 0),
+        try context.date(2026, 1, 6, 9, 0),
+        try context.date(2026, 1, 6, 10, 0),
+        try context.date(2026, 1, 11, 7, 0),
+      ])
     #expect(planner.plan(habits: habits, at: now, limit: 0).isEmpty)
   }
 
@@ -225,10 +228,11 @@ struct ReminderPlanTests {
 
     let occurrences = makePlanner(context).plan(habits: [habit], at: now, limit: 2)
 
-    #expect(occurrences.map(\.fireDate) == [
-      try context.date(2026, 3, 8, 3, 0),
-      try context.date(2026, 3, 9, 2, 30),
-    ])
+    #expect(
+      occurrences.map(\.fireDate) == [
+        try context.date(2026, 3, 8, 3, 0),
+        try context.date(2026, 3, 9, 2, 30),
+      ])
   }
 
   @Test("fall-back folds choose the first repeated local time")
@@ -243,10 +247,11 @@ struct ReminderPlanTests {
 
     let occurrences = makePlanner(context).plan(habits: [habit], at: now, limit: 2)
 
-    #expect(occurrences.map(\.fireDate) == [
-      try context.date(2026, 11, 1, 1, 30),
-      try context.date(2026, 11, 2, 1, 30),
-    ])
+    #expect(
+      occurrences.map(\.fireDate) == [
+        try context.date(2026, 11, 1, 1, 30),
+        try context.date(2026, 11, 2, 1, 30),
+      ])
     #expect(occurrences[0].dateComponents.timeZone == context.timeZone)
   }
 
@@ -263,14 +268,16 @@ struct ReminderPlanTests {
 
     let occurrences = makePlanner(context).plan(habits: [habit], at: now, limit: 2)
 
-    #expect(occurrences.map(\.fireDate) == [
-      try context.date(2027, 1, 3, 9, 0),
-      try context.date(2027, 1, 10, 9, 0),
-    ])
-    #expect(occurrences.map(\.bucketPeriodKey) == [
-      "week:2026-12-28",
-      "week:2027-01-04",
-    ])
+    #expect(
+      occurrences.map(\.fireDate) == [
+        try context.date(2027, 1, 3, 9, 0),
+        try context.date(2027, 1, 10, 9, 0),
+      ])
+    #expect(
+      occurrences.map(\.bucketPeriodKey) == [
+        "week:2026-12-28",
+        "week:2027-01-04",
+      ])
   }
 
   @Test("leap-month occasions preserve their local components and identity")
@@ -299,7 +306,7 @@ struct ReminderPlanTests {
       locale: Locale(identifier: "en_US_POSIX")
     ).plan(
       habits: [
-        makeHabit(id: 1, currentPeriodKey: "day:2025-06-20"),
+        makeHabit(id: 1, currentPeriodKey: "day:2025-06-20")
       ],
       at: now
     )
@@ -317,9 +324,10 @@ struct ReminderPlanTests {
       }
     )
 
-    #expect(occurrences.allSatisfy {
-      chinese.date(from: $0.dateComponents) == $0.fireDate
-    })
+    #expect(
+      occurrences.allSatisfy {
+        chinese.date(from: $0.dateComponents) == $0.fireDate
+      })
     #expect(leapOccurrence.identifier != regularOccurrence.identifier)
   }
 
@@ -376,11 +384,12 @@ struct ReminderPlanTests {
     let occurrences = makePlanner(context).plan(habits: habits, at: now, limit: 3)
 
     #expect(occurrences.map(\.habitID) == [habits[1].id, habits[2].id, habits[0].id])
-    #expect(occurrences.map(\.body) == [
-      "1 time left today.",
-      "3 times left today.",
-      "8,000 steps left today.",
-    ])
+    #expect(
+      occurrences.map(\.body) == [
+        "1 time left today.",
+        "3 times left today.",
+        "8,000 steps left today.",
+      ])
   }
 
   @Test("release habits replan only met current-period occasions")

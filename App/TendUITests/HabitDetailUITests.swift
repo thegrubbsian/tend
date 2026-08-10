@@ -60,19 +60,36 @@ final class HabitDetailUITests: XCTestCase {
       _ = assertHistorySelection(state: state, in: app)
     }
 
+    let finalizedStates = ["Met", "Missed", "Inactive"]
+    var verifiedFinalizedStates = Set<String>()
+    var finalizedBucketIdentifier = ""
+    var finalizedBucketLabel = ""
+    var finalizedBucketMonthLabel = ""
+    for state in finalizedStates {
+      let bucket = historyButton(state: state, in: app)
+      guard bucket.exists else { continue }
+      let selectedBucket = assertHistorySelection(state: state, in: app)
+      verifiedFinalizedStates.insert(state)
+      if state == "Met" {
+        finalizedBucketIdentifier = selectedBucket.identifier
+        finalizedBucketLabel = selectedBucket.label
+        finalizedBucketMonthLabel = currentMonth.label
+      }
+    }
+
     let previousMonth = element("habitDetail.month.previous", in: app)
     previousMonth.tap()
     XCTAssertNotEqual(currentMonth.label, currentMonthLabel)
-
-    var finalizedBucketIdentifier = ""
-    var finalizedBucketLabel = ""
-    for state in ["Met", "Missed", "Inactive"] {
+    for state in finalizedStates where !verifiedFinalizedStates.contains(state) {
       let bucket = assertHistorySelection(state: state, in: app)
+      verifiedFinalizedStates.insert(state)
       if state == "Met" {
         finalizedBucketIdentifier = bucket.identifier
         finalizedBucketLabel = bucket.label
+        finalizedBucketMonthLabel = currentMonth.label
       }
     }
+    XCTAssertEqual(verifiedFinalizedStates, Set(finalizedStates))
     XCTAssertFalse(finalizedBucketIdentifier.isEmpty)
     XCTAssertTrue(finalizedBucketLabel.contains("Met"))
 
@@ -173,11 +190,15 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("3 visits"))
 
-    previousMonth.tap()
+    if currentMonth.label != finalizedBucketMonthLabel {
+      previousMonth.tap()
+    }
     let persistedFinalBucket = element(finalizedBucketIdentifier, in: app)
     XCTAssertTrue(persistedFinalBucket.waitForExistence(timeout: 2))
     XCTAssertEqual(persistedFinalBucket.label, finalizedBucketLabel)
-    nextMonth.tap()
+    if currentMonth.label != currentMonthLabel {
+      nextMonth.tap()
+    }
     let updatedGraceBucket = historyButton(state: "Grace", in: app)
     let updatedCurrentBucket = historyButton(state: "Open", in: app)
     XCTAssertTrue(updatedGraceBucket.label.contains("1 of 3 visits"))
@@ -291,9 +312,13 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(relaunchedCurrentBucket.waitForExistence(timeout: 2))
     XCTAssertEqual(relaunchedCurrentBucket.label, reactivatedCurrentBucketLabel)
     XCTAssertEqual(historyLabels(in: app), reactivatedHistoryLabels)
-    previousMonth.tap()
+    if currentMonth.label != finalizedBucketMonthLabel {
+      previousMonth.tap()
+    }
     XCTAssertEqual(element(finalizedBucketIdentifier, in: app).label, finalizedBucketLabel)
-    nextMonth.tap()
+    if currentMonth.label != currentMonthLabel {
+      nextMonth.tap()
+    }
     XCTAssertTrue(element("habitDetail.archive", in: app).exists)
     element("habitDetail.back", in: app).tap()
     XCTAssertTrue(element("shell.destination.habits", in: app).waitForExistence(timeout: 5))
@@ -320,7 +345,7 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("2 times"))
     XCTAssertTrue(metadata.label.contains("Daily"))
-    assertDetailUsesFullScreenShell(in: app)
+    assertDetailHidesTabPill(in: app)
 
     let back = element("habitDetail.back", in: app)
     let edit = element("habitDetail.edit", in: app)
@@ -338,11 +363,6 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(nextMonth.label, "Next month")
     XCTAssertEqual(previousMonth.value as? String, initialAdaptiveMonthLabel)
     XCTAssertEqual(nextMonth.value as? String, initialAdaptiveMonthLabel)
-    assertReadableDetailColumnOnIPad(
-      in: app,
-      leadingControl: back,
-      trailingControl: edit
-    )
     try app.performAccessibilityAudit(for: auditTypes)
 
     let historyButtons = app.buttons.matching(
@@ -428,10 +448,8 @@ final class HabitDetailUITests: XCTestCase {
       XCTAssertTrue(adaptiveMetadata.label.contains("2 mindful practice sessions"))
       XCTAssertTrue(adaptiveMetadata.label.contains("Daily"))
       XCTAssertGreaterThan(adaptiveTitle.frame.height, 60)
-      if app.windows.firstMatch.frame.width < 700 {
-        XCTAssertGreaterThan(adaptiveMetadata.frame.height, 40)
-      }
-      assertDetailUsesFullScreenShell(in: app)
+      XCTAssertGreaterThan(adaptiveMetadata.frame.height, 40)
+      assertDetailHidesTabPill(in: app)
 
       let adaptiveBack = element("habitDetail.back", in: app)
       let adaptiveEdit = element("habitDetail.edit", in: app)
@@ -449,11 +467,6 @@ final class HabitDetailUITests: XCTestCase {
       XCTAssertEqual(adaptiveNextMonth.label, "Next month")
       XCTAssertEqual(adaptivePreviousMonth.value as? String, adaptiveMonthLabel)
       XCTAssertEqual(adaptiveNextMonth.value as? String, adaptiveMonthLabel)
-      assertReadableDetailColumnOnIPad(
-        in: app,
-        leadingControl: adaptiveBack,
-        trailingControl: adaptiveEdit
-      )
       try app.performAccessibilityAudit(for: auditTypes)
 
       let adaptiveDeleteControls = app.buttons.matching(
@@ -547,7 +560,7 @@ final class HabitDetailUITests: XCTestCase {
     dailyRow.tap()
     XCTAssertTrue(restoredTitle.waitForExistence(timeout: 5))
     XCTAssertEqual(restoredTitle.label, "Daily garden")
-    assertDetailUsesFullScreenShell(in: app)
+    assertDetailHidesTabPill(in: app)
   }
 
   @MainActor
@@ -575,40 +588,13 @@ final class HabitDetailUITests: XCTestCase {
   }
 
   @MainActor
-  private func assertDetailUsesFullScreenShell(
+  private func assertDetailHidesTabPill(
     in app: XCUIApplication,
     file: StaticString = #filePath,
     line: UInt = #line
   ) {
     XCTAssertFalse(app.buttons["shell.tab.today"].isHittable, file: file, line: line)
     XCTAssertFalse(app.buttons["shell.tab.habits"].isHittable, file: file, line: line)
-    XCTAssertEqual(app.splitGroups.count, 0, file: file, line: line)
-  }
-
-  @MainActor
-  private func assertReadableDetailColumnOnIPad(
-    in app: XCUIApplication,
-    leadingControl: XCUIElement,
-    trailingControl: XCUIElement,
-    file: StaticString = #filePath,
-    line: UInt = #line
-  ) {
-    let window = app.windows.firstMatch.frame
-    guard window.width >= 700 else { return }
-    let readableColumnMinimumX = (window.width - 600) / 2
-    let readableColumnMaximumX = readableColumnMinimumX + 600
-    XCTAssertGreaterThanOrEqual(
-      leadingControl.frame.minX,
-      readableColumnMinimumX,
-      file: file,
-      line: line
-    )
-    XCTAssertLessThanOrEqual(
-      trailingControl.frame.maxX,
-      readableColumnMaximumX,
-      file: file,
-      line: line
-    )
   }
 
   @MainActor

@@ -95,12 +95,10 @@ nonisolated struct ReminderPlanner {
       }
       let earliest = candidates.remove(at: earliestIndex)
       selected.append(earliest.occurrence)
-      if
-        let following = nextOccurrence(
-          for: earliest.facts,
-          after: earliest.occurrence.fireDate
-        )
-      {
+      if let following = nextOccurrence(
+        for: earliest.facts,
+        after: earliest.occurrence.fireDate
+      ) {
         candidates.append(
           ReminderCandidate(facts: earliest.facts, occurrence: following)
         )
@@ -155,7 +153,8 @@ nonisolated struct ReminderPlanner {
         return nil
       }
       if occurrence.bucketPeriodKey == facts.habit.currentBucket.periodKey,
-         facts.habit.currentBucket.isMet {
+        facts.habit.currentBucket.isMet
+      {
         continue
       }
       return occurrence
@@ -246,7 +245,8 @@ nonisolated struct ReminderPlanner {
     }
     let isLeapMonth = local.isLeapMonth ?? false
     let isCurrent = period.key == facts.habit.currentBucket.periodKey
-    let amount = isCurrent
+    let amount =
+      isCurrent
       ? max(facts.habit.currentBucket.target - facts.habit.currentBucket.progress, 0)
       : facts.habit.target
     let unit = isCurrent ? facts.habit.currentBucket.unit : facts.habit.unit
@@ -331,9 +331,11 @@ private nonisolated struct ReminderCandidate {
     ReminderOccurrence.isOrdered(lhs.occurrence, rhs.occurrence)
   }
 }
+nonisolated
 
-private nonisolated extension ReminderOccurrence {
-  static func isOrdered(_ lhs: Self, _ rhs: Self) -> Bool {
+  extension ReminderOccurrence
+{
+  fileprivate static func isOrdered(_ lhs: Self, _ rhs: Self) -> Bool {
     if lhs.fireDate != rhs.fireDate {
       return lhs.fireDate < rhs.fireDate
     }

@@ -1,0 +1,13 @@
+id: EV-93b300
+type: eval.feature
+at: 2026-08-10T02:24:12.683589Z
+owner: jc
+command: eval feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

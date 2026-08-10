@@ -1,0 +1,13 @@
+id: EV-38biuq
+type: check.task
+at: 2026-08-10T00:20:36.581603Z
+owner: jc
+command: check task T-3vfq8c
+targets:
+    - T-3vfq8c
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.yml

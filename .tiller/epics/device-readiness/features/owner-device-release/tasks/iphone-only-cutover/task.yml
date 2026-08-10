@@ -1,7 +1,7 @@
 id: T-3vfq8c
 key: device-readiness/owner-device-release/iphone-only-cutover
 title: Remove Native iPad Support
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,31 @@ accepted_against:
         kind: git_commit
         value: git:0ad0413
         observed_at: 2026-08-06T20:40:57.448458Z
+pr: 40
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-10T02:24:22.350466Z
+        against:
+            kind: sha256
+            value: sha256:ee7b0b289db9339cf66adf7f9051b4b34e15d16e0b8eb2e508f40764936c56cb
+            observed_at: 2026-08-10T02:24:22.350461Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-ee7b0b289db9-out-c9e8423f2a9be1eab7c2f3e5c461671a462152964db5cef44a176743ce74e2e7.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-10T02:24:22.350466Z
+        against:
+            kind: sha256
+            value: sha256:ee7b0b289db9339cf66adf7f9051b4b34e15d16e0b8eb2e508f40764936c56cb
+            observed_at: 2026-08-10T02:24:22.350461Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-ee7b0b289db9-out-c11c0a9698c9065613a4c5a965676c9ed596b7f769111851057b7a1c6dfbbcc2.txt

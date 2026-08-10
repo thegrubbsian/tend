@@ -732,8 +732,8 @@ struct HabitManagementOperationsTests {
   }
 }
 
-private extension Collection {
-  var only: Element? {
+extension Collection {
+  fileprivate var only: Element? {
     count == 1 ? first : nil
   }
 }

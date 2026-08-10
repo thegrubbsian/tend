@@ -32,7 +32,7 @@ final class FastLoggingUITests: XCTestCase {
 
     let sheet = element("log-sheet", in: app)
     XCTAssertTrue(sheet.waitForExistence(timeout: 5))
-    expandSheet(sheet, in: app)
+    dragSheetToLargeDetent(sheet, in: app)
     let quickAdd = app.buttons["log-sheet.quick-add.1000"]
     makeHittable(quickAdd, direction: .up, in: app)
     quickAdd.tap()
@@ -323,7 +323,7 @@ final class FastLoggingUITests: XCTestCase {
     XCTAssertTrue(dailyGraceScope.isSelected)
     XCTAssertEqual(dailyGraceScope.value as? String, "Unfinished")
     XCTAssertEqual(element("log-sheet.progress", in: app).label, "3,000 of 8,000 steps")
-    expandSheet(sheet, in: app)
+    dragSheetToLargeDetent(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
     try performAccessibilityAudit(in: app, sheet: sheet, context: .dailyGrace)
     dismissSheet(sheet, in: app)
@@ -358,7 +358,7 @@ final class FastLoggingUITests: XCTestCase {
       in: app
     )
     recordScreenshot("quantity-daily-current-sheet", of: app)
-    expandSheet(sheet, in: app)
+    dragSheetToLargeDetent(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
     try performAccessibilityAudit(in: app, sheet: sheet, context: .dailyCurrent)
 
@@ -645,7 +645,7 @@ final class FastLoggingUITests: XCTestCase {
     )
     XCTAssertFalse(element("log-sheet.amount-editor", in: app).exists)
     recordScreenshot("quantity-weekly-grace-selected", of: app)
-    expandSheet(sheet, in: app)
+    dragSheetToLargeDetent(sheet, in: app)
     XCTAssertLessThan(sheet.frame.minY, app.frame.midY)
     try performAccessibilityAudit(in: app, sheet: sheet, context: .weeklyGrace)
 
@@ -791,7 +791,7 @@ final class FastLoggingUITests: XCTestCase {
       in: app
     )
 
-    expandSheet(sheet, in: app)
+    dragSheetToLargeDetent(sheet, in: app)
     let largeMinY = sheet.frame.minY
     XCTAssertLessThan(largeMinY, mediumMinY - 50)
     assertSheetGeometry(sheet, requiresVisibleTitle: false, in: app)
@@ -877,7 +877,7 @@ final class FastLoggingUITests: XCTestCase {
   }
 
   @MainActor
-  private func expandSheet(_ sheet: XCUIElement, in app: XCUIApplication) {
+  private func dragSheetToLargeDetent(_ sheet: XCUIElement, in app: XCUIApplication) {
     let origin = app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0))
     let start = origin.withOffset(
       CGVector(
@@ -1300,11 +1300,6 @@ final class FastLoggingUITests: XCTestCase {
     )
     app.terminate()
     app.launch()
-    XCTAssertEqual(
-      UIDevice.current.userInterfaceIdiom,
-      .phone,
-      "Fast Logging acceptance requires a compact iPhone runtime."
-    )
     XCTAssertEqual(app.frame.width, 402, accuracy: 0.5)
     XCTAssertEqual(app.frame.height, 874, accuracy: 0.5)
     return app
@@ -1458,9 +1453,6 @@ final class FastLoggingUITests: XCTestCase {
 
   @MainActor
   private func dismissSheet(_ sheet: XCUIElement, in app: XCUIApplication) {
-    let closeQuery = app.buttons.matching(identifier: "log-sheet.close")
-    XCTAssertEqual(closeQuery.count, 0)
-    XCTAssertFalse(app.buttons["log-sheet.close"].exists)
     for _ in 0..<3 where sheet.exists {
       sheet.swipeDown()
     }
