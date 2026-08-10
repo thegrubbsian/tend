@@ -5,6 +5,8 @@ final class HabitDetailUITests: XCTestCase {
     continueAfterFailure = false
   }
 
+  private let fixtureInstantArgument = "2026-08-05T19:00:00Z"
+
   @MainActor
   func testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails() {
     let storeName = "HabitDetailUITests-\(UUID().uuidString)"
@@ -777,6 +779,8 @@ final class HabitDetailUITests: XCTestCase {
       "-tend-ui-testing",
       "-tend-ui-test-store",
       storeName,
+      "-tend-ui-test-instant",
+      fixtureInstantArgument,
     ]
     if reset {
       arguments.append("-tend-ui-test-reset")

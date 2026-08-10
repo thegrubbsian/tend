@@ -14,6 +14,7 @@ struct HabitFormView: View {
 
   @State private var model: HabitFormModel
   @FocusState private var focusedField: HabitFormField?
+  private let operationInstant: Date?
   private let onSaved: () -> Void
   private let requestReminderAuthorization: ReminderAuthorizationRequest
 
@@ -21,6 +22,7 @@ struct HabitFormView: View {
     mode: HabitFormMode,
     reminderRefresh: @escaping ReminderRefreshSignal = {},
     requestReminderAuthorization: @escaping ReminderAuthorizationRequest = {},
+    operationInstant: Date? = nil,
     onSaved: @escaping () -> Void = {}
   ) {
     _model = State(
@@ -29,6 +31,7 @@ struct HabitFormView: View {
         reminderRefresh: reminderRefresh
       )
     )
+    self.operationInstant = operationInstant
     self.requestReminderAuthorization = requestReminderAuthorization
     self.onSaved = onSaved
   }
@@ -479,7 +482,11 @@ struct HabitFormView: View {
   private func save() {
     focusedField = nil
     let persistence = HabitFormPersistence.live(context: modelContext)
-    if model.save(using: persistence, at: .now, timeZone: timeZone) != nil {
+    if model.save(
+      using: persistence,
+      at: operationInstant ?? .now,
+      timeZone: timeZone
+    ) != nil {
       onSaved()
       dismiss()
     } else if let persistenceError = model.persistenceError {

@@ -11,6 +11,7 @@ struct HabitRosterView: View {
 
   private let context: ModelContext
   private let reminders: any ReminderRuntimeClient
+  private let fixedDate: Date?
 
   @State private var model: HabitRosterModel
   @State private var presentedForm: HabitRosterForm?
@@ -18,10 +19,12 @@ struct HabitRosterView: View {
 
   init(
     context: ModelContext,
-    reminders: any ReminderRuntimeClient
+    reminders: any ReminderRuntimeClient,
+    date: Date? = nil
   ) {
     self.context = context
     self.reminders = reminders
+    fixedDate = date
     _model = State(
       initialValue: HabitRosterModel(
         context: context,
@@ -63,26 +66,26 @@ struct HabitRosterView: View {
         .contentMargins(.horizontal, 0, for: .scrollContent)
         .contentMargins(.top, 0, for: .scrollContent)
         .onAppear {
-          refresh(at: timeline.date)
+          refresh(at: fixedDate ?? timeline.date)
         }
         .onChange(of: timeline.date) { _, date in
-          refresh(at: date)
+          refresh(at: fixedDate ?? date)
         }
       }
     )
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
     .onChange(of: scenePhase) { _, phase in
       if phase == .active {
-        refresh(at: .now)
+        refresh(at: fixedDate ?? .now)
       }
     }
     .onChange(of: timeZone.identifier) { _, _ in
-      refresh(at: .now)
+      refresh(at: fixedDate ?? .now)
     }
     .sheet(
       item: $presentedForm,
       onDismiss: {
-        refresh(at: .now)
+        refresh(at: fixedDate ?? .now)
       },
       content: { form in
         HabitFormView(
@@ -92,7 +95,8 @@ struct HabitRosterView: View {
           },
           requestReminderAuthorization: {
             await reminders.requestAuthorizationIfNeeded()
-          }
+          },
+          operationInstant: fixedDate
         )
       }
     )
@@ -110,13 +114,14 @@ struct HabitRosterView: View {
     .fullScreenCover(
       item: $selectedHabit,
       onDismiss: {
-        refresh(at: .now)
+        refresh(at: fixedDate ?? .now)
       },
       content: { selection in
         HabitDetailView(
           habit: selection.habit,
           context: context,
-          reminders: reminders
+          reminders: reminders,
+          operationInstant: fixedDate
         ) {
           selectedHabit = nil
         }

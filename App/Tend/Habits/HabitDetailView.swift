@@ -18,11 +18,13 @@ struct HabitDetailView: View {
   private let reminderRefresh: ReminderRefreshSignal
   private let requestReminderAuthorization: ReminderAuthorizationRequest
   private let synchronizesEnvironment: Bool
+  private let operationInstant: Date?
 
   init(
     habit: Habit,
     context: ModelContext,
     reminders: any ReminderRuntimeClient,
+    operationInstant: Date? = nil,
     onBack: @escaping () -> Void
   ) {
     let reminderRefresh: ReminderRefreshSignal = {
@@ -32,9 +34,11 @@ struct HabitDetailView: View {
       initialValue: HabitDetailModel(
         habit: habit,
         context: context,
+        now: { operationInstant ?? .now },
         reminderRefresh: reminderRefresh
       )
     )
+    self.operationInstant = operationInstant
     self.reminderRefresh = reminderRefresh
     requestReminderAuthorization = {
       await reminders.requestAuthorizationIfNeeded()
@@ -53,6 +57,7 @@ struct HabitDetailView: View {
     self.reminderRefresh = reminderRefresh
     self.requestReminderAuthorization = requestReminderAuthorization
     self.onBack = onBack
+    operationInstant = nil
     synchronizesEnvironment = false
   }
 
@@ -79,6 +84,7 @@ struct HabitDetailView: View {
           mode: .edit(habit),
           reminderRefresh: reminderRefresh,
           requestReminderAuthorization: requestReminderAuthorization,
+          operationInstant: operationInstant,
           onSaved: model.editSaved
         )
       }
