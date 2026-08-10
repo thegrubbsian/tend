@@ -5,8 +5,6 @@ final class HabitDetailUITests: XCTestCase {
     continueAfterFailure = false
   }
 
-  private let fixtureInstantArgument = "2026-08-05T19:00:00Z"
-
   @MainActor
   func testPersistedOwnerJourneyAcrossDailyWeeklyAndInactiveDetails() {
     let storeName = "HabitDetailUITests-\(UUID().uuidString)"
@@ -62,19 +60,36 @@ final class HabitDetailUITests: XCTestCase {
       _ = assertHistorySelection(state: state, in: app)
     }
 
+    let finalizedStates = ["Met", "Missed", "Inactive"]
+    var verifiedFinalizedStates = Set<String>()
+    var finalizedBucketIdentifier = ""
+    var finalizedBucketLabel = ""
+    var finalizedBucketMonthLabel = ""
+    for state in finalizedStates {
+      let bucket = historyButton(state: state, in: app)
+      guard bucket.exists else { continue }
+      let selectedBucket = assertHistorySelection(state: state, in: app)
+      verifiedFinalizedStates.insert(state)
+      if state == "Met" {
+        finalizedBucketIdentifier = selectedBucket.identifier
+        finalizedBucketLabel = selectedBucket.label
+        finalizedBucketMonthLabel = currentMonth.label
+      }
+    }
+
     let previousMonth = element("habitDetail.month.previous", in: app)
     previousMonth.tap()
     XCTAssertNotEqual(currentMonth.label, currentMonthLabel)
-
-    var finalizedBucketIdentifier = ""
-    var finalizedBucketLabel = ""
-    for state in ["Met", "Missed", "Inactive"] {
+    for state in finalizedStates where !verifiedFinalizedStates.contains(state) {
       let bucket = assertHistorySelection(state: state, in: app)
+      verifiedFinalizedStates.insert(state)
       if state == "Met" {
         finalizedBucketIdentifier = bucket.identifier
         finalizedBucketLabel = bucket.label
+        finalizedBucketMonthLabel = currentMonth.label
       }
     }
+    XCTAssertEqual(verifiedFinalizedStates, Set(finalizedStates))
     XCTAssertFalse(finalizedBucketIdentifier.isEmpty)
     XCTAssertTrue(finalizedBucketLabel.contains("Met"))
 
@@ -175,11 +190,15 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertEqual(title.label, "Daily garden")
     XCTAssertTrue(metadata.label.contains("3 visits"))
 
-    previousMonth.tap()
+    if currentMonth.label != finalizedBucketMonthLabel {
+      previousMonth.tap()
+    }
     let persistedFinalBucket = element(finalizedBucketIdentifier, in: app)
     XCTAssertTrue(persistedFinalBucket.waitForExistence(timeout: 2))
     XCTAssertEqual(persistedFinalBucket.label, finalizedBucketLabel)
-    nextMonth.tap()
+    if currentMonth.label != currentMonthLabel {
+      nextMonth.tap()
+    }
     let updatedGraceBucket = historyButton(state: "Grace", in: app)
     let updatedCurrentBucket = historyButton(state: "Open", in: app)
     XCTAssertTrue(updatedGraceBucket.label.contains("1 of 3 visits"))
@@ -293,9 +312,13 @@ final class HabitDetailUITests: XCTestCase {
     XCTAssertTrue(relaunchedCurrentBucket.waitForExistence(timeout: 2))
     XCTAssertEqual(relaunchedCurrentBucket.label, reactivatedCurrentBucketLabel)
     XCTAssertEqual(historyLabels(in: app), reactivatedHistoryLabels)
-    previousMonth.tap()
+    if currentMonth.label != finalizedBucketMonthLabel {
+      previousMonth.tap()
+    }
     XCTAssertEqual(element(finalizedBucketIdentifier, in: app).label, finalizedBucketLabel)
-    nextMonth.tap()
+    if currentMonth.label != currentMonthLabel {
+      nextMonth.tap()
+    }
     XCTAssertTrue(element("habitDetail.archive", in: app).exists)
     element("habitDetail.back", in: app).tap()
     XCTAssertTrue(element("shell.destination.habits", in: app).waitForExistence(timeout: 5))
@@ -779,8 +802,6 @@ final class HabitDetailUITests: XCTestCase {
       "-tend-ui-testing",
       "-tend-ui-test-store",
       storeName,
-      "-tend-ui-test-instant",
-      fixtureInstantArgument,
     ]
     if reset {
       arguments.append("-tend-ui-test-reset")
