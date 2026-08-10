@@ -143,7 +143,9 @@ final class HabitManagementUITests: XCTestCase {
     replaceText(in: app.textFields["Habit name"], with: "Write lasting field notes")
     replaceText(in: app.textFields["Target"], with: "4")
     replaceText(in: app.textFields["Unit"], with: "lines")
-    app.swipeDown()
+    let keyboardDone = app.buttons["Done"]
+    XCTAssertTrue(keyboardDone.waitForExistence(timeout: 2))
+    keyboardDone.tap()
     XCTAssertFalse(app.keyboards.firstMatch.exists)
     let mondayButton = app.buttons["Monday"]
     let fridayButton = app.buttons["Friday"]
