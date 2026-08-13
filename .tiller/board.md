@@ -3,6 +3,24 @@ this file is regenerated from the working tree on every sync. -->
 
 # Board
 
+## allen (Allen Marks)
+
+### Active work
+
+- (none)
+
+### Blocked
+
+- (none)
+
+### Gates in review
+
+- (none)
+
+### Open questions
+
+- (none)
+
 ## jc (JC Grubbs)
 
 ### Active work

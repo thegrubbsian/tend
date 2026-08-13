@@ -13,6 +13,7 @@ project:
 # The humans who hold work. Added by `tiller join --as <id> --name "<name>"`.
 owners:
   - { id: "jc", name: "JC Grubbs" }
+  - { id: "allen", name: "Allen Marks" }
 
 claiming:
   policy: single-active-owner
