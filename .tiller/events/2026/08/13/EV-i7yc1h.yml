@@ -1,0 +1,14 @@
+id: EV-i7yc1h
+type: amendment_opened
+at: 2026-08-13T03:06:41.891352Z
+owner: jc
+command: add amendment journal
+targets:
+    - A-y9y1p3
+after:
+    key: journal
+    source: .tiller/feedback/07-journal.md
+    status: proposed
+files:
+    - path: .tiller/amendments/A-y9y1p3-journal.md
+    - path: .tiller/amendments/A-y9y1p3-journal.yml

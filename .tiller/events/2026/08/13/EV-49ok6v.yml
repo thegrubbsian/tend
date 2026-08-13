@@ -1,0 +1,12 @@
+id: EV-49ok6v
+type: amendment_staged
+at: 2026-08-13T03:09:43.479237Z
+owner: jc
+command: amend A-y9y1p3 --add-question
+targets:
+    - A-y9y1p3
+after:
+    index: 4
+    op: add-question
+files:
+    - path: .tiller/amendments/A-y9y1p3-journal.yml

@@ -1,0 +1,14 @@
+id: EV-cxanex
+type: amendment_opened
+at: 2026-08-13T03:06:11.638583Z
+owner: jc
+command: add amendment goals
+targets:
+    - A-ty673h
+after:
+    key: goals
+    source: .tiller/feedback/06-goals.md
+    status: proposed
+files:
+    - path: .tiller/amendments/A-ty673h-goals.md
+    - path: .tiller/amendments/A-ty673h-goals.yml

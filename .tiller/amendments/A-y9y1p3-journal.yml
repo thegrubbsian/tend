@@ -1,0 +1,35 @@
+id: A-y9y1p3
+key: journal
+title: Journal design intake
+status: proposed
+triggered_by:
+    - .tiller/feedback/07-journal.md
+base_revision: git:a159909
+source:
+    path: .tiller/feedback/07-journal.md
+    revision: git:d934e3da90c04491fbd3a8564523e218d8d4da9a
+operations:
+    - op: add-epic
+      key: journal
+      title: Journal
+      source: .tiller/feedback/07-journal.md#L1-3
+    - op: add-feature
+      key: journal/journal-entry-records
+      title: Journal Entry Records
+      change_type: create
+      source: .tiller/feedback/07-journal.md#L5-20
+    - op: add-feature
+      key: journal/journal-experience
+      title: Journal Experience
+      change_type: create
+      source: .tiller/feedback/07-journal.md#L25-31
+    - op: add-feature
+      key: journal/today-journal-invitation
+      title: Today Journal Invitation
+      change_type: create
+      source: .tiller/feedback/07-journal.md#L33-35
+    - op: add-question
+      title: Should journal entries save automatically or with one explicit action?
+      blocks:
+        - journal/journal-experience
+      source: .tiller/feedback/07-journal.md#L31

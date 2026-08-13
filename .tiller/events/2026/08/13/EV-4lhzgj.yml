@@ -1,0 +1,12 @@
+id: EV-4lhzgj
+type: amendment_staged
+at: 2026-08-13T03:09:28.690729Z
+owner: jc
+command: amend A-y9y1p3 --add-epic
+targets:
+    - A-y9y1p3
+after:
+    index: 0
+    op: add-epic
+files:
+    - path: .tiller/amendments/A-y9y1p3-journal.yml

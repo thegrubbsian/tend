@@ -1,0 +1,12 @@
+id: EV-4muh52
+type: amendment_staged
+at: 2026-08-13T03:08:58.299971Z
+owner: jc
+command: amend A-ty673h --add-feature
+targets:
+    - A-ty673h
+after:
+    index: 3
+    op: add-feature
+files:
+    - path: .tiller/amendments/A-ty673h-goals.yml

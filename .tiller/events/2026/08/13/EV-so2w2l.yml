@@ -1,0 +1,12 @@
+id: EV-so2w2l
+type: amendment_staged
+at: 2026-08-13T03:09:31.435549Z
+owner: jc
+command: amend A-y9y1p3 --add-feature
+targets:
+    - A-y9y1p3
+after:
+    index: 1
+    op: add-feature
+files:
+    - path: .tiller/amendments/A-y9y1p3-journal.yml

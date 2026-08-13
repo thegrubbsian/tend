@@ -1,0 +1,35 @@
+id: A-ty673h
+key: goals
+title: Goals design intake
+status: proposed
+triggered_by:
+    - .tiller/feedback/06-goals.md
+base_revision: git:a159909
+source:
+    path: .tiller/feedback/06-goals.md
+    revision: git:b5c44bb1ee2310760de565413adcd057c0b27f04
+operations:
+    - op: add-epic
+      key: goals
+      title: Goals
+      source: .tiller/feedback/06-goals.md#L1-3
+    - op: add-feature
+      key: goals/goal-records
+      title: Goal Records and Progress
+      change_type: create
+      source: .tiller/feedback/06-goals.md#L5-29
+    - op: add-feature
+      key: goals/goal-lifecycle
+      title: Goal Lifecycle and Standing
+      change_type: create
+      source: .tiller/feedback/06-goals.md#L31-51
+    - op: add-feature
+      key: goals/goal-experience
+      title: Goals Experience
+      change_type: create
+      source: .tiller/feedback/06-goals.md#L53-65
+    - op: add-feature
+      key: goals/today-goal-surfacing
+      title: Today Goal Surfacing
+      change_type: create
+      source: .tiller/feedback/06-goals.md#L66-68
