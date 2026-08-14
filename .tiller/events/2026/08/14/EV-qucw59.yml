@@ -1,0 +1,14 @@
+id: EV-qucw59
+type: add.task
+at: 2026-08-14T22:45:45.438003Z
+owner: jc
+command: add task goals/goal-experience/goals-roster-shell
+targets:
+    - T-99bqdn
+after:
+    feature: F-xowx7x
+    key: goals/goal-experience/goals-roster-shell
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.md
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.yml

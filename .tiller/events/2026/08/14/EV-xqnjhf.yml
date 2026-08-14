@@ -1,0 +1,13 @@
+id: EV-xqnjhf
+type: spec.feature
+at: 2026-08-14T22:47:40.457163Z
+owner: jc
+command: spec feature F-xowx7x
+targets:
+    - F-xowx7x
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml

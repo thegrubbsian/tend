@@ -1,0 +1,9 @@
+id: T-02sxbb
+key: goals/goal-experience/goal-experience-acceptance
+title: Prove the complete Goals owner journey
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-99bqdn

@@ -1,0 +1,14 @@
+id: EV-m76q51
+type: add.task
+at: 2026-08-14T22:45:45.359367Z
+owner: jc
+command: add task goals/goal-experience/goal-detail
+targets:
+    - T-bvcyq8
+after:
+    feature: F-xowx7x
+    key: goals/goal-experience/goal-detail
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.md
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml
