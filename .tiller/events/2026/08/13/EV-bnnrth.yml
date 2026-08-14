@@ -1,0 +1,13 @@
+id: EV-bnnrth
+type: check.feature
+at: 2026-08-13T04:32:37.96479Z
+owner: allen
+command: check feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

@@ -1,7 +1,7 @@
 id: A-ty673h
 key: goals
 title: Goals design intake
-status: proposed
+status: approved
 triggered_by:
     - .tiller/feedback/06-goals.md
 base_revision: git:a159909

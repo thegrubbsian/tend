@@ -35,3 +35,10 @@ questions:
         value: sha256:b1b656336d5c54492098b057d3e918af28ff1f3d49237f1b7d2311f1fac82b89
         observed_at: 2026-08-01T07:59:39.250617Z
       source: design/02-domain-model.md
+    - id: Q-jyd9k4
+      statement: Should journal entries save automatically or with one explicit action?
+      owner: jc
+      blocks:
+        - F-wf19av
+      status: open
+      source: .tiller/feedback/07-journal.md#L31

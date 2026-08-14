@@ -1,7 +1,7 @@
 id: A-y9y1p3
 key: journal
 title: Journal design intake
-status: proposed
+status: approved
 triggered_by:
     - .tiller/feedback/07-journal.md
 base_revision: git:a159909

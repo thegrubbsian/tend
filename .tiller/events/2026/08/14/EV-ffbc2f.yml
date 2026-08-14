@@ -1,0 +1,15 @@
+id: EV-ffbc2f
+type: add.epic
+at: 2026-08-14T22:27:51.944043Z
+owner: jc
+command: approve amendment A-y9y1p3
+targets:
+    - E-l8goi4
+    - A-y9y1p3
+after:
+    amendment: A-y9y1p3
+    key: journal
+    status: draft
+files:
+    - path: .tiller/epics/journal/epic.md
+    - path: .tiller/epics/journal/epic.yml

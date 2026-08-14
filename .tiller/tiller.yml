@@ -10,10 +10,9 @@ project:
   kind: greenfield            # greenfield | brownfield | legacy-migration
   # requires_tiller: ">= 1.0"   # optional advisory minimum binary
 
-# The humans who hold work. Added by `tiller join --as <id> --name "<name>"`.
+# The humans who hold work. Added by `tiller owner add <id> --name "<name>"`.
 owners:
   - { id: "jc", name: "JC Grubbs" }
-  - { id: "allen", name: "Allen Marks" }
 
 claiming:
   policy: single-active-owner

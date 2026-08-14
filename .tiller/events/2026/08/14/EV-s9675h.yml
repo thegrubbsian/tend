@@ -1,0 +1,15 @@
+id: EV-s9675h
+type: add.feature
+at: 2026-08-14T22:27:51.944105Z
+owner: jc
+command: approve amendment A-y9y1p3
+targets:
+    - F-wf19av
+    - A-y9y1p3
+after:
+    amendment: A-y9y1p3
+    key: journal/journal-experience
+    status: draft
+files:
+    - path: .tiller/epics/journal/features/journal-experience/feature.md
+    - path: .tiller/epics/journal/features/journal-experience/feature.yml

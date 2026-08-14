@@ -1,7 +1,7 @@
 id: F-3vz7ho
 key: device-readiness/owner-device-release
 title: Owner Device Release
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/01-overview.md
@@ -26,34 +26,100 @@ accepted_against:
         kind: git_commit
         value: git:0ad0413
         observed_at: 2026-08-06T20:40:57.426439Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:a283f17ebb8e2cac43c0bf8eda96b3b21c19e8fb
+        path: .tiller/epics/device-readiness/features/owner-device-release/feature.md
+        observed_at: 2026-08-13T04:34:57.426978Z
+    eval:
+        kind: git_blob
+        value: git:2d700cbac77988c779b41bc4fd1f2ec001bd259c
+        path: .tiller/epics/device-readiness/features/owner-device-release/feature.eval.md
+        observed_at: 2026-08-13T04:34:57.426978Z
+    commit:
+        kind: git_commit
+        value: git:684f2b4
+        observed_at: 2026-08-13T04:34:57.426693Z
+    surfaces: []
+done_basis: rollup
 gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: allen
+        run_at: 2026-08-13T04:19:20.839337Z
+        against:
+            kind: sha256
+            value: sha256:fa2017d727038224da0de8c70ffbe39237840ad93715f7a2ee6d555051236fc1
+            observed_at: 2026-08-13T04:19:20.839136Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-fa2017d72703-out-81052b4e2eb5bd48da8bb59091743984b06c9f6cec772c1c4174b7ea05154aa9.txt
     evals:
         required: true
         kind: command
-        status: pending
-        run_by: jc
-        run_at: 2026-08-10T02:24:12.683142Z
+        status: fail
+        run_by: allen
+        run_at: 2026-08-13T04:19:20.839337Z
         against:
             kind: sha256
-            value: sha256:608c8cfbbc3c9953e4d5cf6cdbaf19b213136db5b09c28bf966cd125f0d3aedb
-            observed_at: 2026-08-10T02:03:48.716266Z
+            value: sha256:fa2017d727038224da0de8c70ffbe39237840ad93715f7a2ee6d555051236fc1
+            observed_at: 2026-08-13T04:19:20.839136Z
         criteria:
             C1:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C1-sha256-608c8cfbbc3c-out-36768a89e8faf166700f48bc8df99361609e43956dd7d2bffebde9439ea5033c.txt
+                      ref: artifacts/tiller/gates/eval-C1-sha256-fa2017d72703-out-36768a89e8faf166700f48bc8df99361609e43956dd7d2bffebde9439ea5033c.txt
             C2:
-                status: needs_attestation
-            C3:
                 status: pass
+            C3:
+                status: fail
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C3-sha256-608c8cfbbc3c-out-cf38d49edb55348ffb7c542c3a7cd9d43276c6e51f85eedad44cf0cf65f94a2b.txt
+                      ref: artifacts/tiller/gates/eval-C3-sha256-fa2017d72703-out-4cf15d1ded7b9d1140f94e2fa7c3fe5b71a67e44020c5a4eec934f319c043754.txt
             C4:
                 status: pass
                 evidence:
                     - kind: command_output
-                      ref: artifacts/tiller/gates/eval-C4-sha256-608c8cfbbc3c-out-84e0591aff6c4975a2a5427f8727a933e5866791382f97513a502f68637c64df.txt
+                      ref: artifacts/tiller/gates/eval-C4-sha256-fa2017d72703-out-1ee27598ecc0393fb1e6f9de76be0bb725fa5a5416faa3b5ff33dd188480d33a.txt
             C5:
-                status: needs_attestation
+                status: pass
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: allen
+        run_at: 2026-08-13T04:19:20.839337Z
+        against:
+            kind: sha256
+            value: sha256:fa2017d727038224da0de8c70ffbe39237840ad93715f7a2ee6d555051236fc1
+            observed_at: 2026-08-13T04:19:20.839136Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-fa2017d72703-out-81f7e7e51175f6f207925859c3dde5ba12e38c3c2f7c0a15d535f9a22daf278e.txt
+attestations:
+    - id: AT-nikbgi
+      target:
+        kind: criterion
+        id: C2
+      status: pass
+      by: allen
+      at: 2026-08-13T04:19:04.100186Z
+    - id: AT-lopqp1
+      target:
+        kind: criterion
+        id: C5
+      status: pass
+      by: allen
+      at: 2026-08-13T04:19:12.007111Z
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:684f2b4
+        observed_at: 2026-08-13T04:34:57.426693Z
+      status: fail
+      evidence_ref: artifacts/tiller/gates/eval-C1-sha256-fa2017d72703-out-36768a89e8faf166700f48bc8df99361609e43956dd7d2bffebde9439ea5033c.txt

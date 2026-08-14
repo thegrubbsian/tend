@@ -3,31 +3,12 @@ this file is regenerated from the working tree on every sync. -->
 
 # Board
 
-## allen (Allen Marks)
-
-### Active work
-
-- (none)
-
-### Blocked
-
-- (none)
-
-### Gates in review
-
-- (none)
-
-### Open questions
-
-- (none)
-
 ## jc (JC Grubbs)
 
 ### Active work
 
 - epic device-readiness (E-z3y156): ready, active
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
-- feature device-readiness/owner-device-release (F-3vz7ho): active, awaiting check
 
 ### Blocked
 
@@ -39,4 +20,4 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Open questions
 
-- (none)
+- Q-jyd9k4: "Should journal entries save automatically or with one explicit action?"

@@ -1,0 +1,8 @@
+id: F-rsayqb
+key: journal/journal-entry-records
+title: Journal Entry Records
+status: draft
+blocked: false
+owner: jc
+source: .tiller/feedback/07-journal.md#L5-20
+change_type: create

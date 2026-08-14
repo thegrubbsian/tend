@@ -1,0 +1,15 @@
+id: EV-crvo5z
+type: add.feature
+at: 2026-08-14T18:44:47.109293Z
+owner: jc
+command: approve amendment A-ty673h
+targets:
+    - F-e149jw
+    - A-ty673h
+after:
+    amendment: A-ty673h
+    key: goals/goal-records
+    status: draft
+files:
+    - path: .tiller/epics/goals/features/goal-records/feature.md
+    - path: .tiller/epics/goals/features/goal-records/feature.yml

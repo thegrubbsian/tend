@@ -1,0 +1,8 @@
+id: F-0rn0hs
+key: journal/today-journal-invitation
+title: Today Journal Invitation
+status: draft
+blocked: false
+owner: jc
+source: .tiller/feedback/07-journal.md#L33-35
+change_type: create

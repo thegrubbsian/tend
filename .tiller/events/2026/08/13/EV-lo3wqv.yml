@@ -1,0 +1,13 @@
+id: EV-lo3wqv
+type: attest.feature
+at: 2026-08-13T04:19:12.007293Z
+owner: allen
+command: attest feature F-3vz7ho
+targets:
+    - F-3vz7ho
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml

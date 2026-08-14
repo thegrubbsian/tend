@@ -1,0 +1,15 @@
+id: EV-ma4qu9
+type: add.epic
+at: 2026-08-14T18:44:47.109254Z
+owner: jc
+command: approve amendment A-ty673h
+targets:
+    - E-h2qea7
+    - A-ty673h
+after:
+    amendment: A-ty673h
+    key: goals
+    status: draft
+files:
+    - path: .tiller/epics/goals/epic.md
+    - path: .tiller/epics/goals/epic.yml

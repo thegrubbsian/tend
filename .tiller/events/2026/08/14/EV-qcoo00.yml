@@ -1,0 +1,15 @@
+id: EV-qcoo00
+type: amendment_approved
+at: 2026-08-14T22:27:51.944505Z
+owner: jc
+command: approve amendment A-y9y1p3
+targets:
+    - A-y9y1p3
+before:
+    status: proposed
+after:
+    amendment: A-y9y1p3
+    operations: 5
+    status: approved
+files:
+    - path: .tiller/amendments/A-y9y1p3-journal.yml

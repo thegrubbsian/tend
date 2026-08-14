@@ -1,0 +1,15 @@
+id: EV-hzmuvj
+type: add.feature
+at: 2026-08-14T22:27:51.944128Z
+owner: jc
+command: approve amendment A-y9y1p3
+targets:
+    - F-0rn0hs
+    - A-y9y1p3
+after:
+    amendment: A-y9y1p3
+    key: journal/today-journal-invitation
+    status: draft
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.md
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.yml

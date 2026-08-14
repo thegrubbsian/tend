@@ -1,0 +1,15 @@
+id: EV-1lny11
+type: amendment_approved
+at: 2026-08-14T18:44:47.109463Z
+owner: jc
+command: approve amendment A-ty673h
+targets:
+    - A-ty673h
+before:
+    status: proposed
+after:
+    amendment: A-ty673h
+    operations: 5
+    status: approved
+files:
+    - path: .tiller/amendments/A-ty673h-goals.yml

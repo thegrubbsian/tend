@@ -1,0 +1,15 @@
+id: EV-8huv9y
+type: add.feature
+at: 2026-08-14T18:44:47.109349Z
+owner: jc
+command: approve amendment A-ty673h
+targets:
+    - F-e8yd2r
+    - A-ty673h
+after:
+    amendment: A-ty673h
+    key: goals/today-goal-surfacing
+    status: draft
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.md
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml

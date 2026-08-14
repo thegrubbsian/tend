@@ -1,0 +1,15 @@
+id: EV-a5lg45
+type: add.question
+at: 2026-08-14T22:27:51.944309Z
+owner: jc
+command: approve amendment A-y9y1p3
+targets:
+    - Q-jyd9k4
+    - A-y9y1p3
+after:
+    amendment: A-y9y1p3
+    blocks:
+        - F-wf19av
+    status: open
+files:
+    - path: .tiller/decisions/open-questions.yml
