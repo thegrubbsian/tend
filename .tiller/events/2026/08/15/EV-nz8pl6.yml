@@ -1,0 +1,13 @@
+id: EV-nz8pl6
+type: start.task
+at: 2026-08-15T20:12:29.335133Z
+owner: jc
+command: start task T-6g59mr
+targets:
+    - T-6g59mr
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

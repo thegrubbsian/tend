@@ -1,11 +1,12 @@
 id: F-e149jw
 key: goals/goal-records
 title: Goal Records and Progress
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L5-29
 change_type: create
+branch: tiller/goals/goal-records
 accepted_against:
     spec:
         kind: git_blob
