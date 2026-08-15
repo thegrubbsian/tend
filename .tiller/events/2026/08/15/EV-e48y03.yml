@@ -1,0 +1,14 @@
+id: EV-e48y03
+type: add.task
+at: 2026-08-15T02:04:26.858619Z
+owner: jc
+command: add task goals/goal-lifecycle/goal-lifecycle-schema
+targets:
+    - T-i30n7j
+after:
+    feature: F-5aficd
+    key: goals/goal-lifecycle/goal-lifecycle-schema
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.md
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.yml

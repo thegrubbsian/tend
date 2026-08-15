@@ -1,0 +1,9 @@
+id: T-4gpnsw
+key: goals/goal-lifecycle/goal-management-operations
+title: Update and delete goals atomically
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-c72xj8

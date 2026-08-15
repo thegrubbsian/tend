@@ -1,0 +1,9 @@
+id: T-c72xj8
+key: goals/goal-lifecycle/goal-standing-computation
+title: Compute deadline pace and standing
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-i30n7j

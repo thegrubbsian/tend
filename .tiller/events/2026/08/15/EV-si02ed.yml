@@ -1,0 +1,13 @@
+id: EV-si02ed
+type: spec.feature
+at: 2026-08-15T02:06:34.238548Z
+owner: jc
+command: spec feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml

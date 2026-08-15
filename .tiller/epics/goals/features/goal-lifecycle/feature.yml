@@ -1,8 +1,10 @@
 id: F-5aficd
 key: goals/goal-lifecycle
 title: Goal Lifecycle and Standing
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L31-51
 change_type: create
+depends_on:
+    - F-e149jw

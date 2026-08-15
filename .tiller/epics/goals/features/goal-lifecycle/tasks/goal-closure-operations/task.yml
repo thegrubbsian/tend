@@ -1,0 +1,9 @@
+id: T-0gtd91
+key: goals/goal-lifecycle/goal-closure-operations
+title: Close and reopen goals deliberately
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-4gpnsw
