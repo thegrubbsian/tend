@@ -1,0 +1,13 @@
+id: EV-bwmfar
+type: approve.feature
+at: 2026-08-15T02:17:16.484919Z
+owner: jc
+command: approve feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml

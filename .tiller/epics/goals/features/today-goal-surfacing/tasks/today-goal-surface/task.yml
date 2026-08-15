@@ -1,0 +1,9 @@
+id: T-kqh537
+key: goals/today-goal-surfacing/today-goal-surface
+title: Render and verify the Today Goals section
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-g3o7wd

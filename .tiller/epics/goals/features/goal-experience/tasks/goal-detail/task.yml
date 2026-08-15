@@ -1,9 +1,19 @@
 id: T-bvcyq8
 key: goals/goal-experience/goal-detail
 title: Build Goal Detail and progress actions
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-ozqgzt
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:0432af658f33021d68bba33bc535e96df506d38c
+        path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.md
+        observed_at: 2026-08-15T02:17:24.767451Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:24.794399Z

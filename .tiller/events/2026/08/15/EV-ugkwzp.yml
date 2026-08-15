@@ -1,0 +1,13 @@
+id: EV-ugkwzp
+type: approve.task
+at: 2026-08-15T02:17:16.559855Z
+owner: jc
+command: approve task T-4gpnsw
+targets:
+    - T-4gpnsw
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.yml

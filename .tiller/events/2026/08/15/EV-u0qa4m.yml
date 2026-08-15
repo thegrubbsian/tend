@@ -1,0 +1,13 @@
+id: EV-u0qa4m
+type: approve.task
+at: 2026-08-15T02:17:16.583209Z
+owner: jc
+command: approve task T-0gtd91
+targets:
+    - T-0gtd91
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml

@@ -1,7 +1,17 @@
 id: T-ozqgzt
 key: goals/goal-experience/goal-form
 title: Build the validated New and Edit goal form
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:3b662fa56aef09be7504f493c6526327e762b835
+        path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.md
+        observed_at: 2026-08-15T02:17:24.738343Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:24.767276Z

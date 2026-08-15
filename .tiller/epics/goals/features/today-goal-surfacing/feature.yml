@@ -1,8 +1,12 @@
 id: F-e8yd2r
 key: goals/today-goal-surfacing
 title: Today Goal Surfacing
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L66-68
 change_type: create
+depends_on:
+    - F-5aficd
+    - F-skoqxt
+    - F-xowx7x

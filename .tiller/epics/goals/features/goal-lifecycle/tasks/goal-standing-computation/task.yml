@@ -1,9 +1,19 @@
 id: T-c72xj8
 key: goals/goal-lifecycle/goal-standing-computation
 title: Compute deadline pace and standing
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-i30n7j
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:9438e506e714e2541c34eaa8d4dff247394b5982
+        path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.md
+        observed_at: 2026-08-15T02:17:16.511101Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:16.535797Z

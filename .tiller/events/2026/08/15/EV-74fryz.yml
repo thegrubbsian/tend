@@ -1,0 +1,14 @@
+id: EV-74fryz
+type: add.task
+at: 2026-08-15T02:32:32.164724Z
+owner: jc
+command: add task goals/today-goal-surfacing/today-goal-surface
+targets:
+    - T-kqh537
+after:
+    feature: F-e8yd2r
+    key: goals/today-goal-surfacing/today-goal-surface
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.md
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml

@@ -1,0 +1,13 @@
+id: EV-qt9nn5
+type: approve.feature
+at: 2026-08-15T02:17:24.738234Z
+owner: jc
+command: approve feature F-xowx7x
+targets:
+    - F-xowx7x
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml
