@@ -1,0 +1,14 @@
+id: EV-fybg37
+type: add.task
+at: 2026-08-15T02:24:32.021182Z
+owner: jc
+command: add task goals/goal-records/goal-persistence
+targets:
+    - T-6g59mr
+after:
+    feature: F-e149jw
+    key: goals/goal-records/goal-persistence
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.md
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

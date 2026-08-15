@@ -1,0 +1,14 @@
+id: EV-hhvxd6
+type: add.task
+at: 2026-08-15T02:24:32.204549Z
+owner: jc
+command: add task goals/goal-records/goal-progress-operations
+targets:
+    - T-s3qtlr
+after:
+    feature: F-e149jw
+    key: goals/goal-records/goal-progress-operations
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.md
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml

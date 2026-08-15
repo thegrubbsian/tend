@@ -1,0 +1,14 @@
+id: EV-bfjhxk
+type: add.task
+at: 2026-08-15T02:24:32.287057Z
+owner: jc
+command: add task goals/goal-records/goal-progress-computation
+targets:
+    - T-r4fp3n
+after:
+    feature: F-e149jw
+    key: goals/goal-records/goal-progress-computation
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.md
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml

@@ -1,0 +1,9 @@
+id: T-3vd0jv
+key: goals/goal-records/goal-creation
+title: Create validated goals atomically
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-6g59mr

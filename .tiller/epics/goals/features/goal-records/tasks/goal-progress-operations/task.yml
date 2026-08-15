@@ -1,0 +1,9 @@
+id: T-s3qtlr
+key: goals/goal-records/goal-progress-operations
+title: Append and delete recent goal progress
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-3vd0jv

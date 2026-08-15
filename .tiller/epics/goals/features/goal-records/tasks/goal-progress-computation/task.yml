@@ -1,0 +1,9 @@
+id: T-r4fp3n
+key: goals/goal-records/goal-progress-computation
+title: Compute truthful goal progress
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-s3qtlr
