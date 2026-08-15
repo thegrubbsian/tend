@@ -230,19 +230,28 @@ struct BucketEntryModelTests {
     #expect(try context.fetch(FetchDescriptor<LogEntry>()).isEmpty)
   }
 
-  @Test("version one contains exactly the four persistence models")
-  func versionOneContainsExactlyTheFourPersistenceModels() {
-    let actual = Set(TendSchemaV1.models.map(ObjectIdentifier.init))
-    let expected = Set([
+  @Test("version two adds only goal models and preserves version one")
+  func versionTwoAddsOnlyGoalModelsAndPreservesVersionOne() {
+    let versionOneModels = Set(TendSchemaV1.models.map(ObjectIdentifier.init))
+    let expectedVersionOneModels = Set([
       ObjectIdentifier(Habit.self),
       ObjectIdentifier(HabitActivityPeriod.self),
       ObjectIdentifier(HabitBucket.self),
       ObjectIdentifier(LogEntry.self),
     ])
+    let versionTwoModels = Set(TendSchemaV2.models.map(ObjectIdentifier.init))
+    let expectedVersionTwoModels = expectedVersionOneModels.union([
+      ObjectIdentifier(Goal.self),
+      ObjectIdentifier(GoalEntry.self),
+      ObjectIdentifier(GoalReading.self),
+    ])
+
     #expect(TendSchemaV1.versionIdentifier == Schema.Version(1, 0, 0))
-    #expect(actual == expected)
-    #expect(TendMigrationPlan.schemas.count == 1)
-    #expect(TendMigrationPlan.stages.isEmpty)
+    #expect(versionOneModels == expectedVersionOneModels)
+    #expect(TendSchemaV2.versionIdentifier == Schema.Version(2, 0, 0))
+    #expect(versionTwoModels == expectedVersionTwoModels)
+    #expect(TendMigrationPlan.schemas.count == 2)
+    #expect(TendMigrationPlan.stages.count == 1)
   }
 
   private func makeContainer() throws -> ModelContainer {

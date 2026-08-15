@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 public enum TendModelContainer {
-  static let schema = Schema(versionedSchema: TendSchemaV1.self)
+  static let schema = Schema(versionedSchema: TendSchemaV2.self)
 
   static let productionConfiguration = ModelConfiguration(
     "Tend",
