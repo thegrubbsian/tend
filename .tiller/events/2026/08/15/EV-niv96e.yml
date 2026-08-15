@@ -1,0 +1,13 @@
+id: EV-niv96e
+type: check.task
+at: 2026-08-15T20:49:02.61876Z
+owner: jc
+command: check task T-6g59mr
+targets:
+    - T-6g59mr
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

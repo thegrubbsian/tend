@@ -14,7 +14,7 @@ this file is regenerated from the working tree on every sync. -->
 - feature goals/goal-lifecycle (F-5aficd): ready
 - feature goals/goal-experience (F-xowx7x): ready
 - feature goals/today-goal-surfacing (F-e8yd2r): ready
-- task goals/goal-records/goal-persistence (T-6g59mr): in_progress
+- task goals/goal-records/goal-persistence (T-6g59mr): check
 - task goals/goal-records/goal-creation (T-3vd0jv): ready
 - task goals/goal-records/goal-progress-operations (T-s3qtlr): ready
 - task goals/goal-records/goal-progress-computation (T-r4fp3n): ready

@@ -1,7 +1,7 @@
 id: T-6g59mr
 key: goals/goal-records/goal-persistence
 title: Add goal persistence and date values
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,30 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:49.043075Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-15T20:49:00.08249Z
+        against:
+            kind: git_commit
+            value: git:ea5a3a1
+            observed_at: 2026-08-15T20:49:00.082486Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-ea5a3a1-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-15T20:49:00.08249Z
+        against:
+            kind: git_commit
+            value: git:ea5a3a1
+            observed_at: 2026-08-15T20:49:00.082486Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-ea5a3a1-out-32a66506fd58d743fbc3aea2f586362c8e1f67eafa1fb1742f6b6ddf766493eb.txt
