@@ -1,7 +1,7 @@
 id: E-h2qea7
 key: goals
 title: Goals
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L1-3

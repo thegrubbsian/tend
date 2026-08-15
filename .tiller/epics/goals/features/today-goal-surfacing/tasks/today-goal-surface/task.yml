@@ -1,9 +1,19 @@
 id: T-kqh537
 key: goals/today-goal-surfacing/today-goal-surface
 title: Render and verify the Today Goals section
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-g3o7wd
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:cdd49252f9575cfc2ba72250844d0c28b9de583e
+        path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.md
+        observed_at: 2026-08-15T16:26:58.455784Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:58.479716Z

@@ -1,8 +1,23 @@
 id: F-e149jw
 key: goals/goal-records
 title: Goal Records and Progress
-status: specced
+status: ready
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L5-29
 change_type: create
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:4efe585c404b084e7dbdfb4aaf7d648983fd923b
+        path: .tiller/epics/goals/features/goal-records/feature.md
+        observed_at: 2026-08-15T16:26:48.9662Z
+    eval:
+        kind: git_blob
+        value: git:e09a3f680a3b8c25f10c9d356b619d41b4cc1de7
+        path: .tiller/epics/goals/features/goal-records/feature.eval.md
+        observed_at: 2026-08-15T16:26:48.9662Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:49.01704Z

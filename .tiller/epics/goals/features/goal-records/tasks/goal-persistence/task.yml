@@ -1,7 +1,17 @@
 id: T-6g59mr
 key: goals/goal-records/goal-persistence
 title: Add goal persistence and date values
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:d6668271f7bbe168aae8d2f192d8c138eeb6e889
+        path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.md
+        observed_at: 2026-08-15T16:26:49.017524Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:49.043075Z

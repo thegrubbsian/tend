@@ -1,9 +1,19 @@
 id: T-3vd0jv
 key: goals/goal-records/goal-creation
 title: Create validated goals atomically
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-6g59mr
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:54a43199a0e19b9163041346f916bea61774ea6e
+        path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.md
+        observed_at: 2026-08-15T16:26:49.043238Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:49.066511Z

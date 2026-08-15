@@ -1,7 +1,17 @@
 id: T-g3o7wd
 key: goals/today-goal-surfacing/today-goal-presentation
 title: Project needful goals into Today
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:8798446efc3775d4cc467c14a74740f8d394f944
+        path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.md
+        observed_at: 2026-08-15T16:26:58.429539Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:58.455632Z

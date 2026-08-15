@@ -8,11 +8,16 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic device-readiness (E-z3y156): ready, active
+- epic goals (E-h2qea7): ready
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
-- feature goals/goal-records (F-e149jw): specced
+- feature goals/goal-records (F-e149jw): ready
 - feature goals/goal-lifecycle (F-5aficd): ready
 - feature goals/goal-experience (F-xowx7x): ready
-- feature goals/today-goal-surfacing (F-e8yd2r): specced
+- feature goals/today-goal-surfacing (F-e8yd2r): ready
+- task goals/goal-records/goal-persistence (T-6g59mr): ready
+- task goals/goal-records/goal-creation (T-3vd0jv): ready
+- task goals/goal-records/goal-progress-operations (T-s3qtlr): ready
+- task goals/goal-records/goal-progress-computation (T-r4fp3n): ready
 - task goals/goal-lifecycle/goal-lifecycle-schema (T-i30n7j): ready
 - task goals/goal-lifecycle/goal-standing-computation (T-c72xj8): ready
 - task goals/goal-lifecycle/goal-management-operations (T-4gpnsw): ready
@@ -21,6 +26,8 @@ this file is regenerated from the working tree on every sync. -->
 - task goals/goal-experience/goal-detail (T-bvcyq8): ready
 - task goals/goal-experience/goals-roster-shell (T-99bqdn): ready
 - task goals/goal-experience/goal-experience-acceptance (T-02sxbb): ready
+- task goals/today-goal-surfacing/today-goal-presentation (T-g3o7wd): ready
+- task goals/today-goal-surfacing/today-goal-surface (T-kqh537): ready
 
 ### Blocked
 

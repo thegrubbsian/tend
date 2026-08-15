@@ -1,0 +1,13 @@
+id: EV-b1ee5n
+type: approve.task
+at: 2026-08-15T16:26:49.08949Z
+owner: jc
+command: approve task T-s3qtlr
+targets:
+    - T-s3qtlr
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml
