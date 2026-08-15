@@ -84,6 +84,41 @@ struct GoalPersistenceTests {
     #expect(try nonLeapFebruary.next().rawValue == "2023-03-01")
   }
 
+  @Test("goal dates use proleptic Gregorian leap-year rules")
+  func goalDatesUseProlepticGregorianLeapYearRules() throws {
+    #expect(GoalDate(rawValue: "1500-02-29") == nil)
+    #expect(GoalDate(rawValue: "1600-02-29") != nil)
+
+    let march1500 = try #require(GoalDate(rawValue: "1500-03-01"))
+    let march1600 = try #require(GoalDate(rawValue: "1600-03-01"))
+    #expect(try march1500.previous().rawValue == "1500-02-28")
+    #expect(try march1600.previous().rawValue == "1600-02-29")
+  }
+
+  @Test("goal dates remain continuous across the historical Gregorian cutover")
+  func goalDatesRemainContinuousAcrossHistoricalCutover() throws {
+    let utc = try #require(TimeZone(identifier: "UTC"))
+    let dates = try (4...15).map { day in
+      try #require(GoalDate(rawValue: String(format: "1582-10-%02d", day)))
+    }
+
+    for index in dates.indices.dropLast() {
+      #expect(try dates[index].next() == dates[index + 1])
+      #expect(try dates[index + 1].previous() == dates[index])
+      let start = try dates[index].start(in: utc)
+      let nextStart = try dates[index + 1].start(in: utc)
+      #expect(nextStart.timeIntervalSince(start) == 24 * 60 * 60)
+    }
+    #expect(
+      try dates[0].start(in: utc)
+        == Date(timeIntervalSince1970: -12_220_243_200)
+    )
+    #expect(
+      try dates[dates.count - 1].start(in: utc)
+        == Date(timeIntervalSince1970: -12_219_292_800)
+    )
+  }
+
   @Test("goal date resolution uses an explicit time zone without changing its key")
   func goalDateResolutionUsesExplicitTimeZone() throws {
     let goalDate = try #require(GoalDate(rawValue: "2024-07-04"))
@@ -268,8 +303,14 @@ struct GoalPersistenceTests {
     defer { try? FileManager.default.removeItem(at: location.directory) }
 
     try createVersionOneFixture(at: location.store)
-    let migrated = try TendModelContainer.fileBacked(at: location.store)
-    let context = ModelContext(migrated)
+    do {
+      let migrating = try TendModelContainer.fileBacked(at: location.store)
+      let migratingContext = ModelContext(migrating)
+      #expect(try migratingContext.fetchCount(FetchDescriptor<Habit>()) == 1)
+    }
+
+    let reopened = try TendModelContainer.fileBacked(at: location.store)
+    let context = ModelContext(reopened)
 
     let habits = try context.fetch(FetchDescriptor<Habit>())
     let periods = try context.fetch(FetchDescriptor<HabitActivityPeriod>())

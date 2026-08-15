@@ -63,37 +63,69 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
   }
 
   public func start(in timeZone: TimeZone) throws -> Date {
-    let calendar = Self.calendar(timeZone: timeZone)
-    var components = DateComponents()
-    components.calendar = calendar
-    components.timeZone = timeZone
-    components.era = 1
-    components.year = year
-    components.month = month
-    components.day = day
-
-    guard let candidate = calendar.date(from: components) else {
-      throw GoalDateError.calendarCalculationFailed
+    let targetDay = Self.dayIndex(year: year, month: month, day: day)
+    let naiveMidnight = Date(
+      timeIntervalSince1970: TimeInterval(targetDay) * Self.secondsPerDay
+    )
+    var earliestStart = Self.startCandidate(
+      targetDay: targetDay,
+      naiveMidnight: naiveMidnight,
+      probeOffset: -3 * Self.secondsPerDay,
+      timeZone: timeZone
+    )
+    if let candidate = Self.startCandidate(
+      targetDay: targetDay,
+      naiveMidnight: naiveMidnight,
+      probeOffset: 0,
+      timeZone: timeZone
+    ) {
+      earliestStart = earliestStart.map { min($0, candidate) } ?? candidate
     }
-    let start = calendar.startOfDay(for: candidate)
-    let resolved = calendar.dateComponents([.era, .year, .month, .day], from: start)
-    guard
-      resolved.era == 1,
-      resolved.year == year,
-      resolved.month == month,
-      resolved.day == day
-    else {
+    if let candidate = Self.startCandidate(
+      targetDay: targetDay,
+      naiveMidnight: naiveMidnight,
+      probeOffset: 3 * Self.secondsPerDay,
+      timeZone: timeZone
+    ) {
+      earliestStart = earliestStart.map { min($0, candidate) } ?? candidate
+    }
+
+    guard let earliestStart else {
       throw GoalDateError.unrepresentableDate
     }
-    return start
+    return earliestStart
   }
 
   public func previous() throws -> Self {
-    try adding(days: -1)
+    if day > 1 {
+      return try adjacent(year: year, month: month, day: day - 1)
+    }
+    if month > 1 {
+      let previousMonth = month - 1
+      return try adjacent(
+        year: year,
+        month: previousMonth,
+        day: Self.daysInMonth(year: year, month: previousMonth)!
+      )
+    }
+    guard year > 1 else {
+      throw GoalDateError.unrepresentableDate
+    }
+    return try adjacent(year: year - 1, month: 12, day: 31)
   }
 
   public func next() throws -> Self {
-    try adding(days: 1)
+    let finalDay = Self.daysInMonth(year: year, month: month)!
+    if day < finalDay {
+      return try adjacent(year: year, month: month, day: day + 1)
+    }
+    if month < 12 {
+      return try adjacent(year: year, month: month + 1, day: 1)
+    }
+    guard year < 9_999 else {
+      throw GoalDateError.unrepresentableDate
+    }
+    return try adjacent(year: year + 1, month: 1, day: 1)
   }
 
   public func encode(to encoder: any Encoder) throws {
@@ -114,22 +146,9 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
     }
   }
 
-  private func adding(days: Int) throws -> Self {
-    let timeZone = TimeZone(secondsFromGMT: 0)!
-    let calendar = Self.calendar(timeZone: timeZone)
-    let start = try start(in: timeZone)
-    guard let result = calendar.date(byAdding: .day, value: days, to: start) else {
+  private func adjacent(year: Int, month: Int, day: Int) throws -> Self {
+    guard let date = Self(year: year, month: month, day: day) else {
       throw GoalDateError.calendarCalculationFailed
-    }
-    let components = calendar.dateComponents([.era, .year, .month, .day], from: result)
-    guard
-      components.era == 1,
-      let year = components.year,
-      let month = components.month,
-      let day = components.day,
-      let date = Self(year: year, month: month, day: day)
-    else {
-      throw GoalDateError.unrepresentableDate
     }
     return date
   }
@@ -172,32 +191,67 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
   }
 
   private static func isValid(year: Int, month: Int, day: Int) -> Bool {
-    guard (1...9_999).contains(year) else {
+    guard
+      (1...9_999).contains(year),
+      let finalDay = daysInMonth(year: year, month: month)
+    else {
       return false
     }
-    let timeZone = TimeZone(secondsFromGMT: 0)!
-    let calendar = calendar(timeZone: timeZone)
-    var components = DateComponents()
-    components.calendar = calendar
-    components.timeZone = timeZone
-    components.era = 1
-    components.year = year
-    components.month = month
-    components.day = day
-    guard let date = calendar.date(from: components) else {
-      return false
-    }
-    let resolved = calendar.dateComponents([.era, .year, .month, .day], from: date)
-    return resolved.era == 1
-      && resolved.year == year
-      && resolved.month == month
-      && resolved.day == day
+    return (1...finalDay).contains(day)
   }
 
-  private static func calendar(timeZone: TimeZone) -> Calendar {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.locale = Locale(identifier: "en_US_POSIX")
-    calendar.timeZone = timeZone
-    return calendar
+  private static func daysInMonth(year: Int, month: Int) -> Int? {
+    switch month {
+    case 1, 3, 5, 7, 8, 10, 12:
+      31
+    case 4, 6, 9, 11:
+      30
+    case 2:
+      isLeapYear(year) ? 29 : 28
+    default:
+      nil
+    }
   }
+
+  private static func isLeapYear(_ year: Int) -> Bool {
+    year.isMultiple(of: 4)
+      && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+  }
+
+  private static let secondsPerDay: TimeInterval = 24 * 60 * 60
+
+  private static func dayIndex(year: Int, month: Int, day: Int) -> Int {
+    let adjustedYear = year - (month <= 2 ? 1 : 0)
+    let era = adjustedYear / 400
+    let yearOfEra = adjustedYear - era * 400
+    let adjustedMonth = month + (month > 2 ? -3 : 9)
+    let dayOfYear = (153 * adjustedMonth + 2) / 5 + day - 1
+    let dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear
+    return era * 146_097 + dayOfEra - 719_468
+  }
+
+  private static func startCandidate(
+    targetDay: Int,
+    naiveMidnight: Date,
+    probeOffset: TimeInterval,
+    timeZone: TimeZone
+  ) -> Date? {
+    let probe = naiveMidnight.addingTimeInterval(probeOffset)
+    let timeZoneOffset = timeZone.secondsFromGMT(for: probe)
+    let candidate = naiveMidnight.addingTimeInterval(-TimeInterval(timeZoneOffset))
+    guard
+      localDayIndex(at: candidate, in: timeZone) == targetDay,
+      localDayIndex(at: candidate.addingTimeInterval(-1), in: timeZone) != targetDay
+    else {
+      return nil
+    }
+    return candidate
+  }
+
+  private static func localDayIndex(at instant: Date, in timeZone: TimeZone) -> Int {
+    let localSeconds = instant.timeIntervalSince1970
+      + TimeInterval(timeZone.secondsFromGMT(for: instant))
+    return Int((localSeconds / secondsPerDay).rounded(.down))
+  }
+
 }
