@@ -1,0 +1,14 @@
+id: EV-2zc91j
+type: sync.feature
+at: 2026-08-16T23:08:58.910202Z
+owner: jc
+command: sync feature F-e149jw
+targets:
+    - F-e149jw
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-records/feature.yml

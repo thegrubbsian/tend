@@ -1,0 +1,13 @@
+id: EV-tsqple
+type: check.feature
+at: 2026-08-16T23:08:51.817966Z
+owner: jc
+command: check feature F-e149jw
+targets:
+    - F-e149jw
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-records/feature.yml

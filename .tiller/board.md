@@ -8,9 +8,8 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic device-readiness (E-z3y156): ready, active
-- epic goals (E-h2qea7): ready, active
+- epic goals (E-h2qea7): ready
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
-- feature goals/goal-records (F-e149jw): active, awaiting check
 - feature goals/goal-lifecycle (F-5aficd): ready
 - feature goals/goal-experience (F-xowx7x): ready
 - feature goals/today-goal-surfacing (F-e8yd2r): ready
