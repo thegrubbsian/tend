@@ -52,7 +52,9 @@ struct GoalProgressOperationsTests {
     #expect([first, second, third].map(\.appendedAt) == [appendedAt, appendedAt, appendedAt])
     #expect([first, second, third].map(\.appendSequence) == [0, 1, 2])
     #expect(Set([first.id, second.id, third.id]).count == 3)
-    #expect(Set(goal.entries?.map(\.persistentModelID) ?? []) == Set([first, second, third].map(\.persistentModelID)))
+    #expect(
+      Set(goal.entries?.map(\.persistentModelID) ?? [])
+        == Set([first, second, third].map(\.persistentModelID)))
     #expect(goal.readings?.isEmpty == true)
     #expect([first, second, third].allSatisfy { $0.goal === goal })
     #expect(try context.fetch(FetchDescriptor<GoalEntry>()).count == 3)
@@ -97,9 +99,10 @@ struct GoalProgressOperationsTests {
 
     #expect([minimum, maximum, duplicate].map(\.value) == [Int.min, Int.max, Int.min])
     #expect([minimum, maximum, duplicate].map(\.appendSequence) == [0, 1, 2])
-    #expect([minimum, maximum, duplicate].map(\.assignedDateKey) == [
-      "2024-01-02", "2024-01-01", "2024-01-02",
-    ])
+    #expect(
+      [minimum, maximum, duplicate].map(\.assignedDateKey) == [
+        "2024-01-02", "2024-01-01", "2024-01-02",
+      ])
     #expect(goal.entries?.isEmpty == true)
     #expect(goal.readings?.count == 3)
     #expect(!context.hasChanges)
@@ -108,11 +111,23 @@ struct GoalProgressOperationsTests {
   @Test("destination dates follow the explicit zone across DST, midnight, and zone changes")
   func destinationsUseExplicitLocalGoalDates() throws {
     let cases = [
-      (instant: "2024-03-10T10:30:00Z", zone: "America/Los_Angeles", today: "2024-03-10", yesterday: "2024-03-09"),
-      (instant: "2024-11-03T09:30:00Z", zone: "America/Los_Angeles", today: "2024-11-03", yesterday: "2024-11-02"),
+      (
+        instant: "2024-03-10T10:30:00Z", zone: "America/Los_Angeles", today: "2024-03-10",
+        yesterday: "2024-03-09"
+      ),
+      (
+        instant: "2024-11-03T09:30:00Z", zone: "America/Los_Angeles", today: "2024-11-03",
+        yesterday: "2024-11-02"
+      ),
       (instant: "2024-07-05T00:00:00Z", zone: "UTC", today: "2024-07-05", yesterday: "2024-07-04"),
-      (instant: "2024-07-04T23:30:00Z", zone: "America/Los_Angeles", today: "2024-07-04", yesterday: "2024-07-03"),
-      (instant: "2024-07-04T23:30:00Z", zone: "Asia/Tokyo", today: "2024-07-05", yesterday: "2024-07-04"),
+      (
+        instant: "2024-07-04T23:30:00Z", zone: "America/Los_Angeles", today: "2024-07-04",
+        yesterday: "2024-07-03"
+      ),
+      (
+        instant: "2024-07-04T23:30:00Z", zone: "Asia/Tokyo", today: "2024-07-05",
+        yesterday: "2024-07-04"
+      ),
     ]
 
     for value in cases {
@@ -240,14 +255,18 @@ struct GoalProgressOperationsTests {
       ({ $0.unit = " padded " }, .invalidGoalConfiguration),
       ({ $0.kindRawValue = "count" }, .invalidGoalConfiguration),
       ({ $0.baseline = 0 }, .invalidGoalConfiguration),
-      ({ goal in
-        goal.kindRawValue = GoalKind.measure.rawValue
-        goal.baseline = nil
-      }, .invalidGoalConfiguration),
-      ({ goal in
-        goal.kindRawValue = GoalKind.measure.rawValue
-        goal.baseline = goal.target
-      }, .invalidGoalConfiguration),
+      (
+        { goal in
+          goal.kindRawValue = GoalKind.measure.rawValue
+          goal.baseline = nil
+        }, .invalidGoalConfiguration
+      ),
+      (
+        { goal in
+          goal.kindRawValue = GoalKind.measure.rawValue
+          goal.baseline = goal.target
+        }, .invalidGoalConfiguration
+      ),
       ({ $0.deadlineKey = "tomorrow" }, .invalidDeadline("tomorrow")),
     ]
 
@@ -503,7 +522,9 @@ struct GoalProgressOperationsTests {
     #expect(inserted?.goal == nil)
     #expect(goal.entries?.map(\.persistentModelID) == priorIDs)
     #expect(goal.entries?.map(\.appendSequence) == priorSequences)
-    #expect(Set(try context.fetch(FetchDescriptor<GoalEntry>()).map(\.persistentModelID)) == Set(priorIDs))
+    #expect(
+      Set(try context.fetch(FetchDescriptor<GoalEntry>()).map(\.persistentModelID)) == Set(priorIDs)
+    )
     #expect(context.insertedModelsArray.map(\.persistentModelID) == [unrelated.persistentModelID])
     #expect(context.deletedModelsArray.isEmpty)
     #expect(context.hasChanges)
@@ -545,11 +566,14 @@ struct GoalProgressOperationsTests {
         timeZone: timeZone("UTC")
       )
 
-      #expect(Set(goal.entries?.map(\.persistentModelID) ?? []) == Set(expected.map(\.persistentModelID)))
+      #expect(
+        Set(goal.entries?.map(\.persistentModelID) ?? []) == Set(expected.map(\.persistentModelID)))
       #expect(Set(goal.entries?.map(\.appendSequence) ?? []) == Set(expected.map(\.appendSequence)))
       #expect(removed.modelContext == nil)
       #expect(removed.goal == nil)
-      #expect(Set(try context.fetch(FetchDescriptor<GoalEntry>()).map(\.persistentModelID)) == Set(expected.map(\.persistentModelID)))
+      #expect(
+        Set(try context.fetch(FetchDescriptor<GoalEntry>()).map(\.persistentModelID))
+          == Set(expected.map(\.persistentModelID)))
       #expect(saveCount == 1)
       #expect(!context.hasChanges)
     }
@@ -581,9 +605,18 @@ struct GoalProgressOperationsTests {
   @Test("delete eligibility uses assigned GoalDate at exact local day boundaries")
   func deleteEligibilityUsesAssignedDateNotAppendTimestamp() throws {
     let cases = [
-      (zone: "UTC", assigned: "2024-07-04", allowedAt: "2024-07-05T00:00:00Z", rejectedAt: "2024-07-06T00:00:00Z"),
-      (zone: "America/Los_Angeles", assigned: "2024-03-09", allowedAt: "2024-03-11T06:59:59Z", rejectedAt: "2024-03-11T07:00:00Z"),
-      (zone: "America/Los_Angeles", assigned: "2024-11-02", allowedAt: "2024-11-04T07:59:59Z", rejectedAt: "2024-11-04T08:00:00Z"),
+      (
+        zone: "UTC", assigned: "2024-07-04", allowedAt: "2024-07-05T00:00:00Z",
+        rejectedAt: "2024-07-06T00:00:00Z"
+      ),
+      (
+        zone: "America/Los_Angeles", assigned: "2024-03-09", allowedAt: "2024-03-11T06:59:59Z",
+        rejectedAt: "2024-03-11T07:00:00Z"
+      ),
+      (
+        zone: "America/Los_Angeles", assigned: "2024-11-02", allowedAt: "2024-11-04T07:59:59Z",
+        rejectedAt: "2024-11-04T08:00:00Z"
+      ),
     ]
 
     for value in cases {
@@ -832,9 +865,10 @@ struct GoalProgressOperationsTests {
     #expect(verifiedEntries.count == 3)
     #expect(Set(verifiedEntries.map(\.id)) == originalUUIDs)
     #expect(verifiedEntries.map(\.amount) == [1, 2, 3])
-    #expect(verifiedEntries.map(\.assignedDateKey) == [
-      "2024-01-01", "2024-01-01", "2024-01-01",
-    ])
+    #expect(
+      verifiedEntries.map(\.assignedDateKey) == [
+        "2024-01-01", "2024-01-01", "2024-01-01",
+      ])
     #expect(verifiedEntries.map(\.appendSequence) == [2, 7, 11])
     let verifiedDeleted = try #require(verifiedEntries.first { $0.id == originalFacts.id })
     #expect(verifiedDeleted.amount == originalFacts.amount)

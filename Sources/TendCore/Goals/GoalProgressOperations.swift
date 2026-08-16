@@ -271,7 +271,8 @@ public final class GoalProgressOperations {
       break
     }
 
-    let relevantSequences = kind == .accumulate
+    let relevantSequences =
+      kind == .accumulate
       ? entries.map(\.appendSequence)
       : readings.map(\.appendSequence)
     try validateSequences(relevantSequences)
@@ -493,4 +494,3 @@ private struct ReadingFacts {
     reading.appendSequence = appendSequence
   }
 }
-
