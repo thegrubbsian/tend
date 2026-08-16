@@ -63,14 +63,15 @@ struct GoalProgressComputationTests {
       let snapshot = try GoalProgressComputation(context: context).snapshot(for: goal)
 
       #expect(
-        snapshot == .accumulate(
-          AccumulateGoalProgress(
-            total: value.total,
-            target: value.target,
-            unit: "pages",
-            normalizedProgress: value.normalized
+        snapshot
+          == .accumulate(
+            AccumulateGoalProgress(
+              total: value.total,
+              target: value.target,
+              unit: "pages",
+              normalizedProgress: value.normalized
+            )
           )
-        )
       )
     }
   }
@@ -101,14 +102,15 @@ struct GoalProgressComputationTests {
 
     #expect(first == second)
     #expect(
-      second == .accumulate(
-        AccumulateGoalProgress(
-          total: 7,
-          target: 4,
-          unit: "pages",
-          normalizedProgress: 1.75
+      second
+        == .accumulate(
+          AccumulateGoalProgress(
+            total: 7,
+            target: 4,
+            unit: "pages",
+            normalizedProgress: 1.75
+          )
         )
-      )
     )
   }
 
@@ -163,36 +165,38 @@ struct GoalProgressComputationTests {
     let snapshot = try GoalProgressComputation(context: context).snapshot(for: goal)
 
     #expect(
-      snapshot == .measure(
-        MeasureGoalProgress(
-          baseline: 10,
-          target: 20,
-          currentValue: 10,
-          effectiveReadingID: nil,
-          completedDistance: 0,
-          totalDistance: 10,
-          unit: "kg",
-          normalizedProgress: 0
+      snapshot
+        == .measure(
+          MeasureGoalProgress(
+            baseline: 10,
+            target: 20,
+            currentValue: 10,
+            effectiveReadingID: nil,
+            completedDistance: 0,
+            totalDistance: 10,
+            unit: "kg",
+            normalizedProgress: 0
+          )
         )
-      )
     )
   }
 
   @Test("measure preserves current while clamping increasing and decreasing progress")
   func measureClampsDirectionalDistanceButNotCurrent() throws {
-    let cases: [(
-      baseline: Int, target: Int, current: Int, completed: Int, total: Int, normalized: Double
-    )] = [
-      (10, 20, 15, 5, 10, 0.5),
-      (10, 20, 5, 0, 10, 0),
-      (10, 20, 20, 10, 10, 1),
-      (10, 20, 30, 10, 10, 1),
-      (20, 10, 15, 5, 10, 0.5),
-      (20, 10, 25, 0, 10, 0),
-      (20, 10, 5, 10, 10, 1),
-      (-10, 10, 0, 10, 20, 0.5),
-      (10, 20, -5, 0, 10, 0),
-    ]
+    let cases:
+      [(
+        baseline: Int, target: Int, current: Int, completed: Int, total: Int, normalized: Double
+      )] = [
+        (10, 20, 15, 5, 10, 0.5),
+        (10, 20, 5, 0, 10, 0),
+        (10, 20, 20, 10, 10, 1),
+        (10, 20, 30, 10, 10, 1),
+        (20, 10, 15, 5, 10, 0.5),
+        (20, 10, 25, 0, 10, 0),
+        (20, 10, 5, 10, 10, 1),
+        (-10, 10, 0, 10, 20, 0.5),
+        (10, 20, -5, 0, 10, 0),
+      ]
 
     for (index, value) in cases.enumerated() {
       let context = try makeContext()
@@ -216,18 +220,19 @@ struct GoalProgressComputationTests {
       let snapshot = try GoalProgressComputation(context: context).snapshot(for: goal)
 
       #expect(
-        snapshot == .measure(
-          MeasureGoalProgress(
-            baseline: value.baseline,
-            target: value.target,
-            currentValue: value.current,
-            effectiveReadingID: readingID,
-            completedDistance: value.completed,
-            totalDistance: value.total,
-            unit: "kg",
-            normalizedProgress: value.normalized
+        snapshot
+          == .measure(
+            MeasureGoalProgress(
+              baseline: value.baseline,
+              target: value.target,
+              currentValue: value.current,
+              effectiveReadingID: readingID,
+              completedDistance: value.completed,
+              totalDistance: value.total,
+              unit: "kg",
+              normalizedProgress: value.normalized
+            )
           )
-        )
       )
     }
   }
@@ -469,7 +474,6 @@ struct GoalProgressComputationTests {
     #expect(goal.entries?.isEmpty == true)
   }
 
-
   @Test("detached, deleted, malformed, and nonpositive children are rejected")
   func invalidChildFactsAreRejected() throws {
     do {
@@ -703,13 +707,13 @@ struct GoalProgressComputationTests {
   }
 }
 
-private extension GoalProgressSnapshot {
-  var accumulateValue: AccumulateGoalProgress? {
+extension GoalProgressSnapshot {
+  fileprivate var accumulateValue: AccumulateGoalProgress? {
     guard case .accumulate(let value) = self else { return nil }
     return value
   }
 
-  var measureValue: MeasureGoalProgress? {
+  fileprivate var measureValue: MeasureGoalProgress? {
     guard case .measure(let value) = self else { return nil }
     return value
   }

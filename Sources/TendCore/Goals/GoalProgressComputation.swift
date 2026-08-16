@@ -132,7 +132,8 @@ public final class GoalProgressComputation {
       throw GoalProgressComputationError.missingMeasureBaseline
     }
     let isIncreasing = goal.target > baseline
-    let span = isIncreasing
+    let span =
+      isIncreasing
       ? goal.target.subtractingReportingOverflow(baseline)
       : baseline.subtractingReportingOverflow(goal.target)
     guard !span.overflow else {
@@ -153,7 +154,8 @@ public final class GoalProgressComputation {
       )
     }
 
-    let traveled = isIncreasing
+    let traveled =
+      isIncreasing
       ? effectiveReading.value.subtractingReportingOverflow(baseline)
       : baseline.subtractingReportingOverflow(effectiveReading.value)
     guard !traveled.overflow else {
@@ -246,7 +248,8 @@ public final class GoalProgressComputation {
       break
     }
 
-    let relevantSequences = kind == .accumulate
+    let relevantSequences =
+      kind == .accumulate
       ? entries.map(\.appendSequence)
       : readings.map(\.appendSequence)
     try validateSequences(relevantSequences)
