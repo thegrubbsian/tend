@@ -301,14 +301,16 @@ struct GoalCreationOperationsTests {
     #expect(try context.fetch(FetchDescriptor<GoalReading>()).isEmpty)
     #expect(context.hasChanges)
     #expect(try context.fetch(FetchDescriptor<Habit>()).map(\.id) == [unrelatedHabit.id])
-    #expect(context.insertedModelsArray.map(\.persistentModelID) == [unrelatedHabit.persistentModelID])
+    #expect(
+      context.insertedModelsArray.map(\.persistentModelID) == [unrelatedHabit.persistentModelID])
     #expect(context.changedModelsArray.isEmpty)
     #expect(context.deletedModelsArray.isEmpty)
 
     try context.save()
     let verificationContext = ModelContext(context.container)
     #expect(try verificationContext.fetch(FetchDescriptor<Goal>()).isEmpty)
-    #expect(try verificationContext.fetch(FetchDescriptor<Habit>()).map(\.id) == [unrelatedHabit.id])
+    #expect(
+      try verificationContext.fetch(FetchDescriptor<Habit>()).map(\.id) == [unrelatedHabit.id])
   }
 
   @Test("created goals survive reopening a file-backed container")
