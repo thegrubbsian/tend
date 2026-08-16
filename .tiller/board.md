@@ -14,7 +14,6 @@ this file is regenerated from the working tree on every sync. -->
 - feature goals/goal-lifecycle (F-5aficd): ready
 - feature goals/goal-experience (F-xowx7x): ready
 - feature goals/today-goal-surfacing (F-e8yd2r): ready
-- task goals/goal-records/goal-progress-operations (T-s3qtlr): check
 - task goals/goal-records/goal-progress-computation (T-r4fp3n): ready
 - task goals/goal-lifecycle/goal-lifecycle-schema (T-i30n7j): ready
 - task goals/goal-lifecycle/goal-standing-computation (T-c72xj8): ready
@@ -33,7 +32,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task goals/goal-records/goal-progress-operations (T-s3qtlr): build pass, tests pass
 
 ### Open questions
 

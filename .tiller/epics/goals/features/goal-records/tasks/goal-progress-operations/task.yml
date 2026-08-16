@@ -1,7 +1,7 @@
 id: T-s3qtlr
 key: goals/goal-records/goal-progress-operations
 title: Append and delete recent goal progress
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:49.08944Z
+pr: 43
 gates:
     build:
         required: true
