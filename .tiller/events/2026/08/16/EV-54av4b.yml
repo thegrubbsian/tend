@@ -1,0 +1,14 @@
+id: EV-54av4b
+type: submit.task
+at: 2026-08-16T18:48:31.131633Z
+owner: jc
+command: submit task T-r4fp3n
+targets:
+    - T-r4fp3n
+before:
+    status: check
+after:
+    pr: 44
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml
