@@ -1,13 +1,14 @@
 id: F-5aficd
 key: goals/goal-lifecycle
 title: Goal Lifecycle and Standing
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L31-51
 change_type: create
 depends_on:
     - F-e149jw
+branch: tiller/goals/goal-lifecycle
 accepted_against:
     spec:
         kind: git_blob
