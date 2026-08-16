@@ -230,8 +230,8 @@ struct BucketEntryModelTests {
     #expect(try context.fetch(FetchDescriptor<LogEntry>()).isEmpty)
   }
 
-  @Test("version two adds only goal models and preserves version one")
-  func versionTwoAddsOnlyGoalModelsAndPreservesVersionOne() {
+  @Test("versioned schemas preserve historical goals and advance current goals")
+  func versionedSchemasPreserveHistoricalGoalsAndAdvanceCurrentGoals() {
     let versionOneModels = Set(TendSchemaV1.models.map(ObjectIdentifier.init))
     let expectedVersionOneModels = Set([
       ObjectIdentifier(Habit.self),
@@ -241,6 +241,12 @@ struct BucketEntryModelTests {
     ])
     let versionTwoModels = Set(TendSchemaV2.models.map(ObjectIdentifier.init))
     let expectedVersionTwoModels = expectedVersionOneModels.union([
+      ObjectIdentifier(TendSchemaV2.Goal.self),
+      ObjectIdentifier(TendSchemaV2.GoalEntry.self),
+      ObjectIdentifier(TendSchemaV2.GoalReading.self),
+    ])
+    let versionThreeModels = Set(TendSchemaV3.models.map(ObjectIdentifier.init))
+    let expectedVersionThreeModels = expectedVersionOneModels.union([
       ObjectIdentifier(Goal.self),
       ObjectIdentifier(GoalEntry.self),
       ObjectIdentifier(GoalReading.self),
@@ -250,8 +256,10 @@ struct BucketEntryModelTests {
     #expect(versionOneModels == expectedVersionOneModels)
     #expect(TendSchemaV2.versionIdentifier == Schema.Version(2, 0, 0))
     #expect(versionTwoModels == expectedVersionTwoModels)
-    #expect(TendMigrationPlan.schemas.count == 2)
-    #expect(TendMigrationPlan.stages.count == 1)
+    #expect(TendSchemaV3.versionIdentifier == Schema.Version(3, 0, 0))
+    #expect(versionThreeModels == expectedVersionThreeModels)
+    #expect(TendMigrationPlan.schemas.count == 3)
+    #expect(TendMigrationPlan.stages.count == 2)
   }
 
   private func makeContainer() throws -> ModelContainer {
