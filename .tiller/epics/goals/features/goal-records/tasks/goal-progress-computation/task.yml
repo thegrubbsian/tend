@@ -1,7 +1,7 @@
 id: T-r4fp3n
 key: goals/goal-records/goal-progress-computation
 title: Compute truthful goal progress
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:49.113279Z
 pr: 44
+done_basis: ancestry
 gates:
     build:
         required: true

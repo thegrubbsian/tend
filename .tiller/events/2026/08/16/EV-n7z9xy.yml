@@ -1,0 +1,14 @@
+id: EV-n7z9xy
+type: sync.task
+at: 2026-08-16T23:08:22.646925Z
+owner: jc
+command: sync task T-r4fp3n
+targets:
+    - T-r4fp3n
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml
