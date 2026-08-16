@@ -1,0 +1,14 @@
+id: EV-flh57l
+type: submit.task
+at: 2026-08-16T18:18:31.454253Z
+owner: jc
+command: submit task T-s3qtlr
+targets:
+    - T-s3qtlr
+before:
+    status: check
+after:
+    pr: 43
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml

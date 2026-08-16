@@ -1,0 +1,13 @@
+id: EV-3af7n0
+type: check.task
+at: 2026-08-16T18:18:09.421759Z
+owner: jc
+command: check task T-s3qtlr
+targets:
+    - T-s3qtlr
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml

@@ -1,0 +1,13 @@
+id: EV-nkjinf
+type: start.task
+at: 2026-08-16T17:48:09.181537Z
+owner: jc
+command: start task T-s3qtlr
+targets:
+    - T-s3qtlr
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml
