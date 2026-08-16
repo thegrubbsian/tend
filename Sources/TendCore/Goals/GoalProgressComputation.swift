@@ -2,20 +2,18 @@ import Foundation
 import SwiftData
 
 public struct AccumulateGoalProgress: Equatable, Sendable {
-  public let kind: GoalKind
+  public let kind: GoalKind = .accumulate
   public let total: Int
   public let target: Int
   public let unit: String
   public let normalizedProgress: Double
 
   public init(
-    kind: GoalKind,
     total: Int,
     target: Int,
     unit: String,
     normalizedProgress: Double
   ) {
-    self.kind = kind
     self.total = total
     self.target = target
     self.unit = unit
@@ -24,7 +22,7 @@ public struct AccumulateGoalProgress: Equatable, Sendable {
 }
 
 public struct MeasureGoalProgress: Equatable, Sendable {
-  public let kind: GoalKind
+  public let kind: GoalKind = .measure
   public let baseline: Int
   public let target: Int
   public let currentValue: Int
@@ -35,7 +33,6 @@ public struct MeasureGoalProgress: Equatable, Sendable {
   public let normalizedProgress: Double
 
   public init(
-    kind: GoalKind,
     baseline: Int,
     target: Int,
     currentValue: Int,
@@ -45,7 +42,6 @@ public struct MeasureGoalProgress: Equatable, Sendable {
     unit: String,
     normalizedProgress: Double
   ) {
-    self.kind = kind
     self.baseline = baseline
     self.target = target
     self.currentValue = currentValue
@@ -121,7 +117,6 @@ public final class GoalProgressComputation {
 
     let normalizedProgress = Double(total) / Double(goal.target)
     return AccumulateGoalProgress(
-      kind: .accumulate,
       total: total,
       target: goal.target,
       unit: goal.unit,
@@ -147,7 +142,6 @@ public final class GoalProgressComputation {
 
     guard let effectiveReading else {
       return MeasureGoalProgress(
-        kind: .measure,
         baseline: baseline,
         target: goal.target,
         currentValue: baseline,
@@ -169,7 +163,6 @@ public final class GoalProgressComputation {
     let normalizedProgress = Double(completedDistance) / Double(totalDistance)
 
     return MeasureGoalProgress(
-      kind: .measure,
       baseline: baseline,
       target: goal.target,
       currentValue: effectiveReading.value,

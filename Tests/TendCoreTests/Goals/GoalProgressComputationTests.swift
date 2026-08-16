@@ -7,6 +7,29 @@ import Testing
 @MainActor
 @Suite("Goal progress computation")
 struct GoalProgressComputationTests {
+  @Test("kind-specific payload initializers fix their Goal kind")
+  func payloadInitializersFixTheirKinds() {
+    let accumulate = AccumulateGoalProgress(
+      total: 2,
+      target: 4,
+      unit: "pages",
+      normalizedProgress: 0.5
+    )
+    let measure = MeasureGoalProgress(
+      baseline: 10,
+      target: 20,
+      currentValue: 15,
+      effectiveReadingID: nil,
+      completedDistance: 5,
+      totalDistance: 10,
+      unit: "kg",
+      normalizedProgress: 0.5
+    )
+
+    #expect(accumulate.kind == .accumulate)
+    #expect(measure.kind == .measure)
+  }
+
   @Test("accumulate sums empty, one, many, exact, over-target, and old history")
   func accumulateSumsCompleteHistory() throws {
     let cases: [(amounts: [Int], target: Int, total: Int, normalized: Double)] = [
@@ -42,7 +65,6 @@ struct GoalProgressComputationTests {
       #expect(
         snapshot == .accumulate(
           AccumulateGoalProgress(
-            kind: .accumulate,
             total: value.total,
             target: value.target,
             unit: "pages",
@@ -81,7 +103,6 @@ struct GoalProgressComputationTests {
     #expect(
       second == .accumulate(
         AccumulateGoalProgress(
-          kind: .accumulate,
           total: 7,
           target: 4,
           unit: "pages",
@@ -144,7 +165,6 @@ struct GoalProgressComputationTests {
     #expect(
       snapshot == .measure(
         MeasureGoalProgress(
-          kind: .measure,
           baseline: 10,
           target: 20,
           currentValue: 10,
@@ -198,7 +218,6 @@ struct GoalProgressComputationTests {
       #expect(
         snapshot == .measure(
           MeasureGoalProgress(
-            kind: .measure,
             baseline: value.baseline,
             target: value.target,
             currentValue: value.current,
