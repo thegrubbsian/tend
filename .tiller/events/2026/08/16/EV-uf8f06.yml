@@ -1,0 +1,13 @@
+id: EV-uf8f06
+type: check.task
+at: 2026-08-16T16:26:33.975012Z
+owner: jc
+command: check task T-3vd0jv
+targets:
+    - T-3vd0jv
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.yml
