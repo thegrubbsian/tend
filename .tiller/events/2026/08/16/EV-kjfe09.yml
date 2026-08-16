@@ -1,0 +1,14 @@
+id: EV-kjfe09
+type: sync.task
+at: 2026-08-16T16:08:27.291353Z
+owner: jc
+command: sync task T-6g59mr
+targets:
+    - T-6g59mr
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

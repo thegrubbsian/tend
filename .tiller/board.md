@@ -34,7 +34,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-records/goal-persistence (T-6g59mr): build pass, tests pass
+- (none)
 
 ### Open questions
 
