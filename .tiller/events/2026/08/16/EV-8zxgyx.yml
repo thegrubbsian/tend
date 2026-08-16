@@ -1,0 +1,13 @@
+id: EV-8zxgyx
+type: check.task
+at: 2026-08-16T18:47:41.609867Z
+owner: jc
+command: check task T-r4fp3n
+targets:
+    - T-r4fp3n
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml

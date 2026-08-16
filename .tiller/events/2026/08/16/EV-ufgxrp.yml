@@ -1,0 +1,13 @@
+id: EV-ufgxrp
+type: start.task
+at: 2026-08-16T18:21:25.309773Z
+owner: jc
+command: start task T-r4fp3n
+targets:
+    - T-r4fp3n
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml
