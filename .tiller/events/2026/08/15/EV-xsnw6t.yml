@@ -1,0 +1,14 @@
+id: EV-xsnw6t
+type: add.task
+at: 2026-08-15T02:24:32.119076Z
+owner: jc
+command: add task goals/goal-records/goal-creation
+targets:
+    - T-3vd0jv
+after:
+    feature: F-e149jw
+    key: goals/goal-records/goal-creation
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.md
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.yml

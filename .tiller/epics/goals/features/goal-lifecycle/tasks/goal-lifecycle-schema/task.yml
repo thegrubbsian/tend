@@ -1,0 +1,17 @@
+id: T-i30n7j
+key: goals/goal-lifecycle/goal-lifecycle-schema
+title: Add durable goal closure state
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:87d51f90777f717528619516f55014d2b0ee6fb7
+        path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.md
+        observed_at: 2026-08-15T02:17:16.485202Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:16.510981Z

@@ -1,0 +1,14 @@
+id: EV-sgqzss
+type: add.task
+at: 2026-08-15T02:04:27.111424Z
+owner: jc
+command: add task goals/goal-lifecycle/goal-closure-operations
+targets:
+    - T-0gtd91
+after:
+    feature: F-5aficd
+    key: goals/goal-lifecycle/goal-closure-operations
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.md
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml

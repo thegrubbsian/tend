@@ -1,0 +1,13 @@
+id: EV-6atdkp
+type: approve.feature
+at: 2026-08-15T16:26:58.429451Z
+owner: jc
+command: approve feature F-e8yd2r
+targets:
+    - F-e8yd2r
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml

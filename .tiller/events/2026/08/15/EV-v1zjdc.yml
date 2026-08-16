@@ -1,0 +1,13 @@
+id: EV-v1zjdc
+type: approve.epic
+at: 2026-08-15T20:09:37.552612Z
+owner: jc
+command: approve epic E-h2qea7
+targets:
+    - E-h2qea7
+before:
+    status: draft
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/epic.yml

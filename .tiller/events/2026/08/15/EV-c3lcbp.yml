@@ -1,0 +1,13 @@
+id: EV-c3lcbp
+type: approve.task
+at: 2026-08-15T02:17:24.767367Z
+owner: jc
+command: approve task T-ozqgzt
+targets:
+    - T-ozqgzt
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.yml

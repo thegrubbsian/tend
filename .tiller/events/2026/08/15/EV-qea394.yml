@@ -1,0 +1,13 @@
+id: EV-qea394
+type: spec.feature
+at: 2026-08-15T02:34:16.826027Z
+owner: jc
+command: spec feature F-e8yd2r
+targets:
+    - F-e8yd2r
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml

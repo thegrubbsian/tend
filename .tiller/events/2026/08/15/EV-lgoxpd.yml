@@ -1,0 +1,14 @@
+id: EV-lgoxpd
+type: add.task
+at: 2026-08-15T02:32:32.066821Z
+owner: jc
+command: add task goals/today-goal-surfacing/today-goal-presentation
+targets:
+    - T-g3o7wd
+after:
+    feature: F-e8yd2r
+    key: goals/today-goal-surfacing/today-goal-presentation
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.md
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.yml

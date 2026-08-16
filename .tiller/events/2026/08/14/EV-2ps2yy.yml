@@ -1,0 +1,14 @@
+id: EV-2ps2yy
+type: add.task
+at: 2026-08-14T22:45:45.253955Z
+owner: jc
+command: add task goals/goal-experience/goal-form
+targets:
+    - T-ozqgzt
+after:
+    feature: F-xowx7x
+    key: goals/goal-experience/goal-form
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.md
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.yml

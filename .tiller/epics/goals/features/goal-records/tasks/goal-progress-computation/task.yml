@@ -1,0 +1,19 @@
+id: T-r4fp3n
+key: goals/goal-records/goal-progress-computation
+title: Compute truthful goal progress
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-s3qtlr
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:bf80b6a4bc2d60e4b6ebc682a6b3b4399183f401
+        path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.md
+        observed_at: 2026-08-15T16:26:49.08955Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:49.113279Z

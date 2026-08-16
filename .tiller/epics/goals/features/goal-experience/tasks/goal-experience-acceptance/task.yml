@@ -1,0 +1,19 @@
+id: T-02sxbb
+key: goals/goal-experience/goal-experience-acceptance
+title: Prove the complete Goals owner journey
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-99bqdn
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:a69b5512a9b8d7b448b489b4e52429882951e735
+        path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.md
+        observed_at: 2026-08-15T02:17:24.819573Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:24.844294Z

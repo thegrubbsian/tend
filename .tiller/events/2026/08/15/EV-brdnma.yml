@@ -1,0 +1,13 @@
+id: EV-brdnma
+type: approve.feature
+at: 2026-08-15T16:26:49.017421Z
+owner: jc
+command: approve feature F-e149jw
+targets:
+    - F-e149jw
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-records/feature.yml

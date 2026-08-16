@@ -1,0 +1,14 @@
+id: EV-cct20e
+type: add.task
+at: 2026-08-15T02:04:26.94233Z
+owner: jc
+command: add task goals/goal-lifecycle/goal-standing-computation
+targets:
+    - T-c72xj8
+after:
+    feature: F-5aficd
+    key: goals/goal-lifecycle/goal-standing-computation
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.md
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml

@@ -1,0 +1,19 @@
+id: T-4gpnsw
+key: goals/goal-lifecycle/goal-management-operations
+title: Update and delete goals atomically
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-c72xj8
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:779e16b022b1d9219c894f8ee8e13f1f0f2ae897
+        path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.md
+        observed_at: 2026-08-15T02:17:16.535914Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:16.559766Z

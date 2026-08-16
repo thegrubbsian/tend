@@ -1,8 +1,27 @@
 id: F-e8yd2r
 key: goals/today-goal-surfacing
 title: Today Goal Surfacing
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L66-68
 change_type: create
+depends_on:
+    - F-5aficd
+    - F-skoqxt
+    - F-xowx7x
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:4b63806e43b6e13052c7c77b3299363bf0704413
+        path: .tiller/epics/goals/features/today-goal-surfacing/feature.md
+        observed_at: 2026-08-15T16:26:58.374249Z
+    eval:
+        kind: git_blob
+        value: git:d8c6e349cf31612a0de5e3ece7872d964399d908
+        path: .tiller/epics/goals/features/today-goal-surfacing/feature.eval.md
+        observed_at: 2026-08-15T16:26:58.374249Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:58.429312Z

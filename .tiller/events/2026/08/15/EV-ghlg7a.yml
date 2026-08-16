@@ -1,0 +1,13 @@
+id: EV-ghlg7a
+type: approve.task
+at: 2026-08-15T16:26:49.043163Z
+owner: jc
+command: approve task T-6g59mr
+targets:
+    - T-6g59mr
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

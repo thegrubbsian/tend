@@ -1,0 +1,14 @@
+id: EV-zobt9n
+type: submit.task
+at: 2026-08-15T20:49:34.973392Z
+owner: jc
+command: submit task T-6g59mr
+targets:
+    - T-6g59mr
+before:
+    status: check
+after:
+    pr: 41
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml

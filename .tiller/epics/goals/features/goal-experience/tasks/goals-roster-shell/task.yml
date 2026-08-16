@@ -1,0 +1,19 @@
+id: T-99bqdn
+key: goals/goal-experience/goals-roster-shell
+title: Integrate the Goals roster and shell destination
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-bvcyq8
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:03d7629ccf581f815ff2b83ed81a001f20a4f413
+        path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.md
+        observed_at: 2026-08-15T02:17:24.794545Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:24.819413Z

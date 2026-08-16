@@ -1,8 +1,25 @@
 id: F-5aficd
 key: goals/goal-lifecycle
 title: Goal Lifecycle and Standing
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L31-51
 change_type: create
+depends_on:
+    - F-e149jw
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:9c9ba827896d0c27bf167b8fd9430e7457359ca0
+        path: .tiller/epics/goals/features/goal-lifecycle/feature.md
+        observed_at: 2026-08-15T02:17:16.429415Z
+    eval:
+        kind: git_blob
+        value: git:4316172477cfe061b0bc480af0d4637299c7ed89
+        path: .tiller/epics/goals/features/goal-lifecycle/feature.eval.md
+        observed_at: 2026-08-15T02:17:16.429415Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:16.484812Z

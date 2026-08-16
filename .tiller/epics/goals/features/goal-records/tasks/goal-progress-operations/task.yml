@@ -1,0 +1,19 @@
+id: T-s3qtlr
+key: goals/goal-records/goal-progress-operations
+title: Append and delete recent goal progress
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-3vd0jv
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:adbde9f87bd84370cba7ce67a911587a2d23156e
+        path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.md
+        observed_at: 2026-08-15T16:26:49.066621Z
+    commit:
+        kind: git_commit
+        value: git:250c4f3
+        observed_at: 2026-08-15T16:26:49.08944Z

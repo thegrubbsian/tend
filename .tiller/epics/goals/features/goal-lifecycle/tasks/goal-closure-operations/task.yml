@@ -1,0 +1,19 @@
+id: T-0gtd91
+key: goals/goal-lifecycle/goal-closure-operations
+title: Close and reopen goals deliberately
+status: ready
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-4gpnsw
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:03eace063fa032cb75d6104898626b72ded574ef
+        path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.md
+        observed_at: 2026-08-15T02:17:16.559925Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:16.583158Z

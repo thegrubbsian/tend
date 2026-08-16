@@ -1,8 +1,25 @@
 id: F-xowx7x
 key: goals/goal-experience
 title: Goals Experience
-status: draft
+status: ready
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L53-65
 change_type: create
+depends_on:
+    - F-5aficd
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:f12be40f449e59ddee866922ca743a29a32a9294
+        path: .tiller/epics/goals/features/goal-experience/feature.md
+        observed_at: 2026-08-15T02:17:24.684598Z
+    eval:
+        kind: git_blob
+        value: git:9f2167be22e790c0978822ab1819b5e466c9783b
+        path: .tiller/epics/goals/features/goal-experience/feature.eval.md
+        observed_at: 2026-08-15T02:17:24.684598Z
+    commit:
+        kind: git_commit
+        value: git:cf1df1a
+        observed_at: 2026-08-15T02:17:24.738114Z

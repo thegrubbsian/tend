@@ -1,0 +1,14 @@
+id: EV-g3pjl9
+type: add.task
+at: 2026-08-14T22:45:45.51615Z
+owner: jc
+command: add task goals/goal-experience/goal-experience-acceptance
+targets:
+    - T-02sxbb
+after:
+    feature: F-xowx7x
+    key: goals/goal-experience/goal-experience-acceptance
+    status: proposed
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.md
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.yml

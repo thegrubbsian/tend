@@ -1,0 +1,13 @@
+id: EV-n5ky9r
+type: spec.feature
+at: 2026-08-15T02:26:21.484572Z
+owner: jc
+command: spec feature F-e149jw
+targets:
+    - F-e149jw
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/goals/features/goal-records/feature.yml
