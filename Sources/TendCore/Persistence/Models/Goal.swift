@@ -11,12 +11,24 @@ public final class Goal {
   public var baseline: Int?
   public var deadlineKey: String?
   public var createdAt: Date = Date()
+  public var closureRawValue: String? = nil
 
   @Relationship(deleteRule: .cascade, inverse: \GoalEntry.goal)
   public var entries: [GoalEntry]? = []
 
   @Relationship(deleteRule: .cascade, inverse: \GoalReading.goal)
   public var readings: [GoalReading]? = []
+  public var checkedClosure: GoalClosure? {
+    get throws {
+      guard let closureRawValue else {
+        return nil
+      }
+      guard let closure = GoalClosure(rawValue: closureRawValue) else {
+        throw GoalClosureError.unsupportedRawValue(closureRawValue)
+      }
+      return closure
+    }
+  }
 
   public init(
     id: UUID = UUID(),
