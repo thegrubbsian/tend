@@ -1,0 +1,13 @@
+id: EV-3jlngg
+type: start.task
+at: 2026-08-16T16:08:35.624759Z
+owner: jc
+command: start task T-3vd0jv
+targets:
+    - T-3vd0jv
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.yml

@@ -1,7 +1,7 @@
 id: T-3vd0jv
 key: goals/goal-records/goal-creation
 title: Create validated goals atomically
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:49.066511Z
+pr: 42
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T16:26:30.433941Z
+        against:
+            kind: sha256
+            value: sha256:315ac5817bf2637073fc24a9d69d1c1fc2281f2550f122642b4b19525ca8495b
+            observed_at: 2026-08-16T16:26:30.433938Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-315ac5817bf2-out-81052b4e2eb5bd48da8bb59091743984b06c9f6cec772c1c4174b7ea05154aa9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T16:26:30.433941Z
+        against:
+            kind: sha256
+            value: sha256:315ac5817bf2637073fc24a9d69d1c1fc2281f2550f122642b4b19525ca8495b
+            observed_at: 2026-08-16T16:26:30.433938Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-315ac5817bf2-out-3a58cbd12f4e1a3025c10038c46abb14c9db1a84b4728e607d77ee8529f7d23e.txt
