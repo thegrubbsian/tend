@@ -33,7 +33,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-records/goal-creation (T-3vd0jv): build pass, tests pass
+- (none)
 
 ### Open questions
 

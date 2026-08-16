@@ -1,0 +1,14 @@
+id: EV-hg5pbz
+type: sync.task
+at: 2026-08-16T17:47:34.787847Z
+owner: jc
+command: sync task T-3vd0jv
+targets:
+    - T-3vd0jv
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.yml
