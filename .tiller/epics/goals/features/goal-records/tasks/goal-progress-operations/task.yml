@@ -1,7 +1,7 @@
 id: T-s3qtlr
 key: goals/goal-records/goal-progress-operations
 title: Append and delete recent goal progress
-status: ready
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:49.08944Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T18:18:05.775887Z
+        against:
+            kind: sha256
+            value: sha256:bc91f95cfed3304bcb3a4b1753b8cdaf1042b3e6b395d613ee3ba5b87094ce4d
+            observed_at: 2026-08-16T18:18:05.775883Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-bc91f95cfed3-out-787f7959c9c5d8d83850b1f23702b8e20c60ab955cfdec617fb207d1549c2cd1.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T18:18:05.775887Z
+        against:
+            kind: sha256
+            value: sha256:bc91f95cfed3304bcb3a4b1753b8cdaf1042b3e6b395d613ee3ba5b87094ce4d
+            observed_at: 2026-08-16T18:18:05.775883Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-bc91f95cfed3-out-bcf7b26c661ee7f243942eaf044c0348b1f0fd0fbd9cb0fca5c06ea5f70c7ebc.txt
