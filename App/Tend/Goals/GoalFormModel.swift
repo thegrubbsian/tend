@@ -254,11 +254,11 @@ final class GoalFormModel {
   private func validationError(for field: GoalFormField) -> GoalFormValidationError? {
     switch field {
     case .name:
-      normalized(name).isEmpty ? .emptyName : nil
+      normalized(name).isEmpty ? GoalFormValidationError.emptyName : nil
     case .target:
-      parseTarget(targetText) == nil ? .invalidTarget : nil
+      parseTarget(targetText) == nil ? GoalFormValidationError.invalidTarget : nil
     case .unit:
-      normalized(unit).isEmpty ? .emptyUnit : nil
+      normalized(unit).isEmpty ? GoalFormValidationError.emptyUnit : nil
     case .baseline:
       guard kind == .measure else {
         return nil
