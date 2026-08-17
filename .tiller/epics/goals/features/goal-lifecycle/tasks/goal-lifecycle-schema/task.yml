@@ -1,7 +1,7 @@
 id: T-i30n7j
 key: goals/goal-lifecycle/goal-lifecycle-schema
 title: Add durable goal closure state
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.510981Z
 pr: 45
+done_basis: ancestry
 gates:
     build:
         required: true

@@ -29,7 +29,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-lifecycle/goal-lifecycle-schema (T-i30n7j): build pass, tests pass
+- (none)
 
 ### Open questions
 

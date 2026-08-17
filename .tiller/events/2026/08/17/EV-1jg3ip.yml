@@ -1,0 +1,14 @@
+id: EV-1jg3ip
+type: sync.task
+at: 2026-08-17T02:13:24.004343Z
+owner: jc
+command: sync task T-i30n7j
+targets:
+    - T-i30n7j
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.yml
