@@ -1,7 +1,7 @@
 id: T-0gtd91
 key: goals/goal-lifecycle/goal-closure-operations
 title: Close and reopen goals deliberately
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.583158Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T04:10:11.897319Z
+        against:
+            kind: sha256
+            value: sha256:f1d22185c835e56c484b873cec2f9a40f338b26a1247b693e6be6cc5e7e6a8e3
+            observed_at: 2026-08-17T04:10:11.897316Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-f1d22185c835-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T04:10:11.897319Z
+        against:
+            kind: sha256
+            value: sha256:f1d22185c835e56c484b873cec2f9a40f338b26a1247b693e6be6cc5e7e6a8e3
+            observed_at: 2026-08-17T04:10:11.897316Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-f1d22185c835-out-55bb3fe37483d0e8156c9ad1c2b4687fe8375be3ccb34490d7aa6f784ce5d095.txt
