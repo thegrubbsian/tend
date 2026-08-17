@@ -1,7 +1,7 @@
 id: T-c72xj8
 key: goals/goal-lifecycle/goal-standing-computation
 title: Compute deadline pace and standing
-status: ready
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.535797Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T02:56:43.340256Z
+        against:
+            kind: sha256
+            value: sha256:0d357965ee7933f30ad2b361c7cc6c9b56c2557e964564aad7e91305c67425c7
+            observed_at: 2026-08-17T02:56:43.340252Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-0d357965ee79-out-b0ce08d7cd752754ec56f3a027fb7bb843bd41753256e68fc29c13fdf76c50d4.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T02:56:43.340256Z
+        against:
+            kind: sha256
+            value: sha256:0d357965ee7933f30ad2b361c7cc6c9b56c2557e964564aad7e91305c67425c7
+            observed_at: 2026-08-17T02:56:43.340252Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-0d357965ee79-out-59e0fc9cfc21455f175e71cbb94c3cfdf9c6ed46366531b8a1b2bdd44d84a1eb.txt

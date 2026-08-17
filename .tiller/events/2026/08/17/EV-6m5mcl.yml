@@ -1,0 +1,13 @@
+id: EV-6m5mcl
+type: check.task
+at: 2026-08-17T02:56:45.87097Z
+owner: jc
+command: check task T-c72xj8
+targets:
+    - T-c72xj8
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml

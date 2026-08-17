@@ -1,0 +1,13 @@
+id: EV-eu4qzu
+type: start.task
+at: 2026-08-17T02:14:35.894861Z
+owner: jc
+command: start task T-c72xj8
+targets:
+    - T-c72xj8
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml
