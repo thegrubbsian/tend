@@ -1,0 +1,13 @@
+id: EV-4l30wl
+type: start.feature
+at: 2026-08-17T18:34:24.967796Z
+owner: jc
+command: start feature F-xowx7x
+targets:
+    - F-xowx7x
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml

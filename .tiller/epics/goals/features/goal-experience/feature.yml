@@ -1,13 +1,14 @@
 id: F-xowx7x
 key: goals/goal-experience
 title: Goals Experience
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L53-65
 change_type: create
 depends_on:
     - F-5aficd
+branch: tiller/goals/goal-experience
 accepted_against:
     spec:
         kind: git_blob
