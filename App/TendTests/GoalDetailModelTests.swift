@@ -327,6 +327,53 @@ struct GoalDetailModelTests {
     #expect(model.presentation?.history.map(\.id) == [.entry(ineligibleID)])
   }
 
+  @Test("rejected history deletion is a retryable mutation failure, not a silent reload")
+  func rejectsUnresolvedHistoryDeletion() throws {
+    let fixture = try GoalDetailFixture()
+    let entryID = GoalEntryIdentity(rawValue: UUID())
+    let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let history: [GoalDetailHistoryItem] = [
+      .entry(
+        .init(
+          id: entryID,
+          assignedDate: today,
+          amount: 2,
+          appendedAt: fixture.instant,
+          appendSequence: 1,
+          isDeleteEligible: true
+        ))
+    ]
+    let initial = fixture.accumulateSnapshot(total: 2, history: history)
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(initial)],
+      deleteResults: [.success(.rejected), .success(.rejected)]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    model.start()
+    let lastGood = model.presentation
+    model.requestHistoryDeletion(.entry(entryID))
+
+    model.confirmPendingAction()
+
+    #expect(model.presentation == lastGood)
+    #expect(model.confirmation == .deleteHistory(.entry(entryID)))
+    #expect(model.operationFailure?.placement == .history)
+    #expect(model.operationFailure?.canCancel == true)
+    #expect(model.loadFailure == nil)
+    #expect(recorder.snapshotInvocations.count == 1)
+
+    model.retryOperation()
+    #expect(recorder.deleteInvocations == [.entry(entryID), .entry(entryID)])
+    #expect(recorder.snapshotInvocations.count == 1)
+    #expect(model.operationFailure?.placement == .history)
+    #expect(model.confirmation == .deleteHistory(.entry(entryID)))
+
+    model.cancelOperationFailure()
+    #expect(model.operationFailure == nil)
+    #expect(model.confirmation == nil)
+    #expect(model.presentation == lastGood)
+  }
+
   @Test("Edit cancel preserves facts and Edit save refreshes from the query")
   func refreshesAfterEditSave() throws {
     let fixture = try GoalDetailFixture()

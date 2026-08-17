@@ -533,12 +533,16 @@ final class GoalDetailModel {
       }
       return true
     case .deleteHistory(let id):
-      return try operations.deleteHistory(
+      let result = try operations.deleteHistory(
         id,
         goal,
         envelope.context.instant,
         envelope.context.timeZone
-      ) == .deleted
+      )
+      guard result == .deleted else {
+        throw MutationDispatchError.rejectedHistoryIdentity
+      }
+      return true
     case .close(let closure):
       try operations.close(goal, closure)
       return true
@@ -797,6 +801,10 @@ extension GoalDetailModel {
     case mutation(MutationEnvelope)
     case reload(CommittedMutation)
   }
+
+  fileprivate enum MutationDispatchError: Error {
+    case rejectedHistoryIdentity
+  }
 }
 
 private struct GoalDetailPresentationBuilder {
@@ -1012,3 +1020,4 @@ private struct GoalDetailPresentationBuilder {
     case inconsistentHistory
   }
 }
+
