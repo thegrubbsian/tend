@@ -193,14 +193,16 @@ struct GoalManagementOperationsTests {
     let standing = GoalStandingComputation()
 
     let beforeAccumulate = try progress.snapshot(for: accumulate)
-    #expect(beforeAccumulate == .accumulate(
-      AccumulateGoalProgress(
-        total: 3,
-        target: 10,
-        unit: "unit",
-        normalizedProgress: 0.3
-      )
-    ))
+    #expect(
+      beforeAccumulate
+        == .accumulate(
+          AccumulateGoalProgress(
+            total: 3,
+            target: 10,
+            unit: "unit",
+            normalizedProgress: 0.3
+          )
+        ))
 
     try GoalManagementOperations(context: context).update(
       accumulate,
@@ -215,14 +217,16 @@ struct GoalManagementOperationsTests {
     )
 
     let afterAccumulate = try progress.snapshot(for: accumulate)
-    #expect(afterAccumulate == .accumulate(
-      AccumulateGoalProgress(
-        total: 3,
-        target: 6,
-        unit: "sessions",
-        normalizedProgress: 0.5
-      )
-    ))
+    #expect(
+      afterAccumulate
+        == .accumulate(
+          AccumulateGoalProgress(
+            total: 3,
+            target: 6,
+            unit: "sessions",
+            normalizedProgress: 0.5
+          )
+        ))
     #expect(
       try standing.snapshot(
         for: accumulate,
@@ -246,18 +250,20 @@ struct GoalManagementOperationsTests {
     let effectiveReadingID = try #require(
       measure.readings?.max { $0.appendSequence < $1.appendSequence }?.id
     )
-    #expect(try progress.snapshot(for: measure) == .measure(
-      MeasureGoalProgress(
-        baseline: 100,
-        target: 80,
-        currentValue: 90,
-        effectiveReadingID: effectiveReadingID,
-        completedDistance: 10,
-        totalDistance: 20,
-        unit: "unit",
-        normalizedProgress: 0.5
-      )
-    ))
+    #expect(
+      try progress.snapshot(for: measure)
+        == .measure(
+          MeasureGoalProgress(
+            baseline: 100,
+            target: 80,
+            currentValue: 90,
+            effectiveReadingID: effectiveReadingID,
+            completedDistance: 10,
+            totalDistance: 20,
+            unit: "unit",
+            normalizedProgress: 0.5
+          )
+        ))
 
     try GoalManagementOperations(context: context).update(
       measure,
@@ -271,18 +277,20 @@ struct GoalManagementOperationsTests {
       timeZone: zone
     )
 
-    #expect(try progress.snapshot(for: measure) == .measure(
-      MeasureGoalProgress(
-        baseline: 80,
-        target: 120,
-        currentValue: 90,
-        effectiveReadingID: effectiveReadingID,
-        completedDistance: 10,
-        totalDistance: 40,
-        unit: "points",
-        normalizedProgress: 0.25
-      )
-    ))
+    #expect(
+      try progress.snapshot(for: measure)
+        == .measure(
+          MeasureGoalProgress(
+            baseline: 80,
+            target: 120,
+            currentValue: 90,
+            effectiveReadingID: effectiveReadingID,
+            completedDistance: 10,
+            totalDistance: 40,
+            unit: "points",
+            normalizedProgress: 0.25
+          )
+        ))
     expectPersistedHistory(measure, equals: measureHistory)
   }
 
@@ -599,7 +607,9 @@ struct GoalManagementOperationsTests {
     expectHistory(goal, equals: priorHistory)
     #expect(unrelatedChanged.name == "Caller changed")
     #expect(unrelatedInserted.modelContext === context)
-    #expect(context.insertedModelsArray.map(\.persistentModelID).contains(unrelatedInserted.persistentModelID))
+    #expect(
+      context.insertedModelsArray.map(\.persistentModelID).contains(
+        unrelatedInserted.persistentModelID))
     #expect(context.deletedModelsArray.map(\.persistentModelID).contains(pendingDeletedID))
     #expect(context.hasChanges)
     let recoveredGoal = goalFacts(of: goal)
@@ -719,7 +729,8 @@ struct GoalManagementOperationsTests {
     let reopened = try TendModelContainer.fileBacked(at: location.store)
     let verification = ModelContext(reopened)
     #expect(
-      Set(try verification.fetch(FetchDescriptor<Goal>()).map(\.id)).isDisjoint(with: deletedGoalIDs)
+      Set(try verification.fetch(FetchDescriptor<Goal>()).map(\.id)).isDisjoint(
+        with: deletedGoalIDs)
     )
     #expect(
       Set(try verification.fetch(FetchDescriptor<GoalEntry>()).map(\.id))
@@ -733,7 +744,9 @@ struct GoalManagementOperationsTests {
     #expect(try verification.fetch(FetchDescriptor<Habit>()).contains { $0.id == keptHabitID })
   }
 
-  @Test("delete save failure restores exact aggregate identity, facts, inverses, order, and caller work")
+  @Test(
+    "delete save failure restores exact aggregate identity, facts, inverses, order, and caller work"
+  )
   func deleteSaveFailureRestoresExactlyAndLocally() throws {
     for kind in GoalKind.allCases {
       let context = try makeContext()
@@ -790,8 +803,11 @@ struct GoalManagementOperationsTests {
         #expect(reading.goal === goal)
       }
       #expect(unrelatedChanged.name == "Caller changed")
-      #expect(context.insertedModelsArray.map(\.persistentModelID).contains(unrelatedInserted.persistentModelID))
-      #expect(context.deletedModelsArray.map(\.persistentModelID).contains(unrelatedDeletedIdentifier))
+      #expect(
+        context.insertedModelsArray.map(\.persistentModelID).contains(
+          unrelatedInserted.persistentModelID))
+      #expect(
+        context.deletedModelsArray.map(\.persistentModelID).contains(unrelatedDeletedIdentifier))
       #expect(!context.deletedModelsArray.map(\.persistentModelID).contains(originalGoalIdentifier))
       #expect(context.hasChanges)
 
@@ -803,7 +819,8 @@ struct GoalManagementOperationsTests {
       expectGoal(verifiedGoal, equals: priorGoal)
       expectPersistedHistory(verifiedGoal, equals: priorHistory)
       #expect(
-        try verification.fetch(FetchDescriptor<Habit>()).first { $0.id == unrelatedChanged.id }?.name
+        try verification.fetch(FetchDescriptor<Habit>()).first { $0.id == unrelatedChanged.id }?
+          .name
           == "Caller changed"
       )
       #expect(
@@ -932,25 +949,27 @@ struct GoalManagementOperationsTests {
 
   private func expectHistory(_ goal: Goal, equals facts: HistoryFacts) {
     #expect((goal.entries ?? []).map(\.persistentModelID) == facts.entryIdentifiers)
-    #expect((goal.entries ?? []).map {
-      EntryFacts(
-        id: $0.id,
-        amount: $0.amount,
-        assignedDateKey: $0.assignedDateKey,
-        appendedAt: $0.appendedAt,
-        appendSequence: $0.appendSequence
-      )
-    } == facts.entries)
+    #expect(
+      (goal.entries ?? []).map {
+        EntryFacts(
+          id: $0.id,
+          amount: $0.amount,
+          assignedDateKey: $0.assignedDateKey,
+          appendedAt: $0.appendedAt,
+          appendSequence: $0.appendSequence
+        )
+      } == facts.entries)
     #expect((goal.readings ?? []).map(\.persistentModelID) == facts.readingIdentifiers)
-    #expect((goal.readings ?? []).map {
-      ReadingFacts(
-        id: $0.id,
-        value: $0.value,
-        assignedDateKey: $0.assignedDateKey,
-        appendedAt: $0.appendedAt,
-        appendSequence: $0.appendSequence
-      )
-    } == facts.readings)
+    #expect(
+      (goal.readings ?? []).map {
+        ReadingFacts(
+          id: $0.id,
+          value: $0.value,
+          assignedDateKey: $0.assignedDateKey,
+          appendedAt: $0.appendedAt,
+          appendSequence: $0.appendSequence
+        )
+      } == facts.readings)
   }
 
   private func expectPersistedHistory(_ goal: Goal, equals facts: HistoryFacts) {
@@ -970,26 +989,28 @@ struct GoalManagementOperationsTests {
     }
     let entries = (goal.entries ?? []).sorted { $0.appendSequence < $1.appendSequence }
     let expectedEntries = facts.entries.sorted { $0.appendSequence < $1.appendSequence }
-    #expect(entries.map {
-      EntryFacts(
-        id: $0.id,
-        amount: $0.amount,
-        assignedDateKey: $0.assignedDateKey,
-        appendedAt: $0.appendedAt,
-        appendSequence: $0.appendSequence
-      )
-    } == expectedEntries)
+    #expect(
+      entries.map {
+        EntryFacts(
+          id: $0.id,
+          amount: $0.amount,
+          assignedDateKey: $0.assignedDateKey,
+          appendedAt: $0.appendedAt,
+          appendSequence: $0.appendSequence
+        )
+      } == expectedEntries)
     let readings = (goal.readings ?? []).sorted { $0.appendSequence < $1.appendSequence }
     let expectedReadings = facts.readings.sorted { $0.appendSequence < $1.appendSequence }
-    #expect(readings.map {
-      ReadingFacts(
-        id: $0.id,
-        value: $0.value,
-        assignedDateKey: $0.assignedDateKey,
-        appendedAt: $0.appendedAt,
-        appendSequence: $0.appendSequence
-      )
-    } == expectedReadings)
+    #expect(
+      readings.map {
+        ReadingFacts(
+          id: $0.id,
+          value: $0.value,
+          assignedDateKey: $0.assignedDateKey,
+          appendedAt: $0.appendedAt,
+          appendSequence: $0.appendSequence
+        )
+      } == expectedReadings)
   }
 
   private func expectManagementError(
@@ -1029,7 +1050,8 @@ struct GoalManagementOperationsTests {
 
   private func makeTemporaryStoreLocation() throws -> (directory: URL, store: URL) {
     let directory = FileManager.default.temporaryDirectory
-      .appendingPathComponent("GoalManagementOperationsTests-\(UUID().uuidString)", isDirectory: true)
+      .appendingPathComponent(
+        "GoalManagementOperationsTests-\(UUID().uuidString)", isDirectory: true)
     try FileManager.default.createDirectory(
       at: directory,
       withIntermediateDirectories: false
