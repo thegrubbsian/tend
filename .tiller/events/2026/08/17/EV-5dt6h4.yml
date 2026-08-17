@@ -1,0 +1,14 @@
+id: EV-5dt6h4
+type: submit.task
+at: 2026-08-17T03:35:38.938032Z
+owner: jc
+command: submit task T-4gpnsw
+targets:
+    - T-4gpnsw
+before:
+    status: check
+after:
+    pr: 47
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.yml
