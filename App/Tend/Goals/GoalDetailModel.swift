@@ -865,7 +865,10 @@ private struct GoalDetailPresentationBuilder {
     }
 
     let progress = try progressFact(snapshot)
-    let standing = try standingFact(snapshot)
+    let standing = try standingFact(
+      snapshot,
+      normalizedProgress: normalizedProgress(in: progress)
+    )
     let history = try snapshot.history.map { try historyFact($0, metadata: snapshot.metadata) }
     let appendDestinations = snapshot.availableAppendDestinations.map {
       GoalDetailAppendDestination(destination: $0, title: destinationTitle($0))
@@ -934,18 +937,59 @@ private struct GoalDetailPresentationBuilder {
   }
 
   private func standingFact(
-    _ snapshot: GoalDetailSnapshot
+    _ snapshot: GoalDetailSnapshot,
+    normalizedProgress: Double
   ) throws -> GoalStandingSnapshot? {
     switch (snapshot.metadata.closure, snapshot.standing) {
     case (nil, .some(let standing)):
-      guard standing.expectedNormalizedProgress?.isFinite != false else {
-        throw ProjectionError.inconsistentStanding
+      let actual = standing.actualNormalizedProgress
+      guard
+        actual.isFinite,
+        actual >= 0,
+        actual == normalizedProgress
+      else { throw ProjectionError.inconsistentStanding }
+
+      guard snapshot.metadata.deadline != nil else {
+        guard
+          standing.standing == .onPace,
+          standing.expectedNormalizedProgress == nil,
+          standing.deadlineBoundary == nil
+        else { throw ProjectionError.inconsistentStanding }
+        return standing
+      }
+
+      guard
+        let expected = standing.expectedNormalizedProgress,
+        expected.isFinite,
+        (0...1).contains(expected),
+        let boundary = standing.deadlineBoundary,
+        boundary.timeIntervalSinceReferenceDate.isFinite
+      else { throw ProjectionError.inconsistentStanding }
+
+      if instant < boundary {
+        let expectedStanding: GoalStanding =
+          actual >= expected ? .onPace : .behind
+        guard standing.standing == expectedStanding else {
+          throw ProjectionError.inconsistentStanding
+        }
+      } else {
+        guard standing.standing == .pastDue, expected == 1 else {
+          throw ProjectionError.inconsistentStanding
+        }
       }
       return standing
     case (.some, nil):
       return nil
     case (nil, nil), (.some, .some):
       throw ProjectionError.inconsistentStanding
+    }
+  }
+
+  private func normalizedProgress(in progress: GoalDetailProgressFact) -> Double {
+    switch progress {
+    case .accumulate(_, _, _, let normalizedProgress),
+      .measure(_, _, _, _, _, _, _, let normalizedProgress):
+      normalizedProgress
     }
   }
 

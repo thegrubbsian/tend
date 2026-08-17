@@ -115,32 +115,43 @@ struct GoalDetailModelTests {
   @Test("deadline, standing, and closure wording map only query facts to valid actions")
   func presentsStandingAndClosureStates() throws {
     let fixture = try GoalDetailFixture()
-    let deadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
-    let cases: [(GoalStanding, String)] = [
-      (.onPace, "On pace"),
-      (.behind, "Behind"),
-      (.pastDue, "Past due"),
+    let futureDeadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
+    let pastDeadline = try #require(GoalDate(year: 2026, month: 1, day: 14))
+    let futureBoundary = try futureDeadline.next().start(in: fixture.timeZone)
+    let elapsedBoundary = try pastDeadline.next().start(in: fixture.timeZone)
+    let cases: [
+      (
+        standing: GoalStanding,
+        total: Int,
+        expected: Double,
+        deadline: GoalDate,
+        boundary: Date,
+        deadlineText: String,
+        standingText: String
+      )
+    ] = [
+      (.onPace, 6, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026", "On pace"),
+      (.behind, 4, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026", "Behind"),
+      (.pastDue, 4, 1, pastDeadline, elapsedBoundary, "1 day past due · Due Jan 14, 2026", "Past due"),
     ]
 
-    for (standing, expectedText) in cases {
+    for item in cases {
       let snapshot = fixture.accumulateSnapshot(
-        deadline: deadline,
+        total: item.total,
+        deadline: item.deadline,
         standing: GoalStandingSnapshot(
-          standing: standing,
-          actualNormalizedProgress: 0.4,
-          expectedNormalizedProgress: standing == .pastDue ? 1 : 0.5,
-          deadlineBoundary: fixture.instant,
+          standing: item.standing,
+          actualNormalizedProgress: Double(item.total) / 10,
+          expectedNormalizedProgress: item.expected,
+          deadlineBoundary: item.boundary,
           nextTimeRefresh: nil
         )
       )
       let model = fixture.loadedModel(snapshot: snapshot)
-      #expect(model.presentation?.deadlineText == "5 days remaining · Due Jan 20, 2026")
-      #expect(model.presentation?.standing == standing)
-      #expect(
-        model.presentation?.expectedNormalizedProgress
-          == (standing == .pastDue ? 1 : 0.5)
-      )
-      #expect(model.presentation?.standingText == expectedText)
+      #expect(model.presentation?.deadlineText == item.deadlineText)
+      #expect(model.presentation?.standing == item.standing)
+      #expect(model.presentation?.expectedNormalizedProgress == item.expected)
+      #expect(model.presentation?.standingText == item.standingText)
     }
 
     let harvested = fixture.loadedModel(
@@ -173,16 +184,18 @@ struct GoalDetailModelTests {
       (try #require(GoalDate(year: 2026, month: 1, day: 13)), "2 days past due · Due Jan 13, 2026"),
     ]
 
+    let today = cases[0].0
     for (deadline, expected) in cases {
-      let standing: GoalStanding = deadline < cases[0].0 ? .pastDue : .onPace
+      let boundary = try deadline.next().start(in: fixture.timeZone)
+      let isPastDue = deadline < today
       let model = fixture.loadedModel(
         snapshot: fixture.accumulateSnapshot(
           deadline: deadline,
           standing: .init(
-            standing: standing,
+            standing: isPastDue ? .pastDue : .behind,
             actualNormalizedProgress: 0,
-            expectedNormalizedProgress: standing == .pastDue ? 1 : 0.5,
-            deadlineBoundary: fixture.instant,
+            expectedNormalizedProgress: isPastDue ? 1 : 0.5,
+            deadlineBoundary: boundary,
             nextTimeRefresh: nil
           )
         )
@@ -818,38 +831,168 @@ struct GoalDetailModelTests {
     #expect(model.loadFailure != nil)
   }
 
-  @Test("projection rejects missing open standing, closed standing, and nonfinite expectations")
+  @Test("projection rejects contradictory standing payloads")
   func rejectsMalformedStandingContracts() throws {
     let fixture = try GoalDetailFixture()
-    let standing = GoalStandingSnapshot(
-      standing: .onPace,
-      actualNormalizedProgress: 0,
-      expectedNormalizedProgress: 0.5,
-      deadlineBoundary: nil,
-      nextTimeRefresh: nil
-    )
-    let malformed = [
+    let deadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
+    let futureBoundary = fixture.instant.addingTimeInterval(1)
+    let elapsedBoundary = fixture.instant
+
+    func standing(
+      _ value: GoalStanding,
+      actual: Double,
+      expected: Double?,
+      boundary: Date?
+    ) -> GoalStandingSnapshot {
+      GoalStandingSnapshot(
+        standing: value,
+        actualNormalizedProgress: actual,
+        expectedNormalizedProgress: expected,
+        deadlineBoundary: boundary,
+        nextTimeRefresh: nil
+      )
+    }
+
+    let malformed: [GoalDetailSnapshot] = [
       fixture.accumulateSnapshot(omitsStanding: true),
       fixture.accumulateSnapshot(
         closure: .harvested,
-        standing: standing,
+        standing: standing(.onPace, actual: 0, expected: nil, boundary: nil),
         destinations: []
       ),
       fixture.accumulateSnapshot(
-        standing: GoalStandingSnapshot(
-          standing: .behind,
-          actualNormalizedProgress: 0,
-          expectedNormalizedProgress: .infinity,
-          deadlineBoundary: nil,
-          nextTimeRefresh: nil
+        standing: standing(.onPace, actual: .nan, expected: nil, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        standing: standing(.onPace, actual: -0.1, expected: nil, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        standing: standing(.onPace, actual: 0.1, expected: nil, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        standing: standing(.behind, actual: 0, expected: nil, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        standing: standing(.onPace, actual: 0, expected: 0, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        standing: standing(
+          .onPace,
+          actual: 0,
+          expected: nil,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .onPace,
+          actual: 0,
+          expected: nil,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .behind,
+          actual: 0,
+          expected: .infinity,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .onPace,
+          actual: 0,
+          expected: -0.1,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .behind,
+          actual: 0,
+          expected: 1.1,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(.onPace, actual: 0, expected: 0, boundary: nil)
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .onPace,
+          actual: 0,
+          expected: 0.5,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        total: 5,
+        deadline: deadline,
+        standing: standing(
+          .behind,
+          actual: 0.5,
+          expected: 0.5,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .pastDue,
+          actual: 0,
+          expected: 1,
+          boundary: futureBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .pastDue,
+          actual: 0,
+          expected: 1,
+          boundary: Date(timeIntervalSinceReferenceDate: .infinity)
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .onPace,
+          actual: 0,
+          expected: 1,
+          boundary: elapsedBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .behind,
+          actual: 0,
+          expected: 1,
+          boundary: elapsedBoundary
+        )
+      ),
+      fixture.accumulateSnapshot(
+        deadline: deadline,
+        standing: standing(
+          .pastDue,
+          actual: 0,
+          expected: 0.9,
+          boundary: elapsedBoundary
         )
       ),
     ]
 
-    for snapshot in malformed {
+    for (index, snapshot) in malformed.enumerated() {
       let model = fixture.loadedModel(snapshot: snapshot)
-      #expect(model.presentation == nil)
-      #expect(model.loadFailure != nil)
+      #expect(model.presentation == nil, "Accepted malformed standing case \(index)")
+      #expect(model.loadFailure != nil, "Did not fail malformed standing case \(index)")
     }
   }
 
