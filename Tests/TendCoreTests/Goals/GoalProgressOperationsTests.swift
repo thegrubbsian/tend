@@ -878,6 +878,261 @@ struct GoalProgressOperationsTests {
     #expect(try verification.fetch(FetchDescriptor<Habit>()).map(\.id) == [unrelated.id])
   }
 
+  @Test("recognized closure rejects all four progress mutation paths before mutation or save")
+  func closedGoalsRejectEveryMutationPath() throws {
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithEntries(in: context, sequences: [2])
+      goal.closureRawValue = GoalClosure.harvested.rawValue
+      try context.save()
+      let entryIDs = goal.entries?.map(\.persistentModelID)
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.closedGoal(.harvested)) {
+        _ = try operations.append(
+          amount: 3,
+          to: goal,
+          destination: .today,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(goal.entries?.map(\.persistentModelID) == entryIDs)
+      #expect(try context.fetch(FetchDescriptor<GoalEntry>()).count == 1)
+      #expect(context.insertedModelsArray.isEmpty)
+      #expect(saveCount == 0)
+    }
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithEntries(in: context, sequences: [2])
+      let entry = try #require(goal.entries?.first)
+      goal.closureRawValue = GoalClosure.letGo.rawValue
+      try context.save()
+      let entryIDs = goal.entries?.map(\.persistentModelID)
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.closedGoal(.letGo)) {
+        try operations.delete(
+          entry,
+          from: goal,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(goal.entries?.map(\.persistentModelID) == entryIDs)
+      #expect(entry.goal === goal)
+      #expect(!entry.isDeleted)
+      #expect(context.deletedModelsArray.isEmpty)
+      #expect(saveCount == 0)
+    }
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithReadings(in: context, sequences: [2])
+      goal.closureRawValue = GoalClosure.letGo.rawValue
+      try context.save()
+      let readingIDs = goal.readings?.map(\.persistentModelID)
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.closedGoal(.letGo)) {
+        _ = try operations.append(
+          value: 90,
+          to: goal,
+          destination: .today,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(goal.readings?.map(\.persistentModelID) == readingIDs)
+      #expect(try context.fetch(FetchDescriptor<GoalReading>()).count == 1)
+      #expect(context.insertedModelsArray.isEmpty)
+      #expect(saveCount == 0)
+    }
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithReadings(in: context, sequences: [2])
+      let reading = try #require(goal.readings?.first)
+      goal.closureRawValue = GoalClosure.harvested.rawValue
+      try context.save()
+      let readingIDs = goal.readings?.map(\.persistentModelID)
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.closedGoal(.harvested)) {
+        try operations.delete(
+          reading,
+          from: goal,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(goal.readings?.map(\.persistentModelID) == readingIDs)
+      #expect(reading.goal === goal)
+      #expect(!reading.isDeleted)
+      #expect(context.deletedModelsArray.isEmpty)
+      #expect(saveCount == 0)
+    }
+  }
+
+  @Test("corrupt closure rejects all four progress mutation paths before graph validation")
+  func corruptClosureRejectsEveryMutationPath() throws {
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithEntries(in: context, sequences: [2])
+      goal.closureRawValue = "future-disposition"
+      goal.name = ""
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.invalidClosure("future-disposition")) {
+        _ = try operations.append(
+          amount: 3,
+          to: goal,
+          destination: .today,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+      let entry = try #require(goal.entries?.first)
+      try expectProgressError(.invalidClosure("future-disposition")) {
+        try operations.delete(
+          entry,
+          from: goal,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(entry.goal === goal)
+      #expect(!entry.isDeleted)
+      #expect(goal.entries?.count == 1)
+      #expect(saveCount == 0)
+    }
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithReadings(in: context, sequences: [2])
+      goal.closureRawValue = "future-disposition"
+      goal.name = ""
+      var saveCount = 0
+      let operations = GoalProgressOperations(context: context) { saveCount += 1 }
+
+      try expectProgressError(.invalidClosure("future-disposition")) {
+        _ = try operations.append(
+          value: 90,
+          to: goal,
+          destination: .today,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+      let reading = try #require(goal.readings?.first)
+      try expectProgressError(.invalidClosure("future-disposition")) {
+        try operations.delete(
+          reading,
+          from: goal,
+          at: instant("2024-01-02T12:00:00Z"),
+          timeZone: timeZone("UTC")
+        )
+      }
+
+      #expect(reading.goal === goal)
+      #expect(!reading.isDeleted)
+      #expect(goal.readings?.count == 1)
+      #expect(saveCount == 0)
+    }
+  }
+
+  @Test("reopening restores unchanged Today and Yesterday append and delete eligibility")
+  func reopenedGoalsResumeEveryMutationPath() throws {
+    var lifecycleSaveCount = 0
+    var progressSaveCount = 0
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithEntries(in: context, sequences: [2])
+      let existing = try #require(goal.entries?.first)
+      goal.closureRawValue = GoalClosure.harvested.rawValue
+      try context.save()
+      let lifecycle = GoalLifecycleOperations(context: context) {
+        lifecycleSaveCount += 1
+        try context.save()
+      }
+      let progress = GoalProgressOperations(context: context) {
+        progressSaveCount += 1
+        try context.save()
+      }
+
+      try lifecycle.reopen(goal)
+      let appended = try progress.append(
+        amount: 3,
+        to: goal,
+        destination: .today,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      try progress.delete(
+        existing,
+        from: goal,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+
+      #expect(goal.closureRawValue == nil)
+      #expect(appended.assignedDateKey == "2024-01-02")
+      #expect(appended.goal === goal)
+      #expect(goal.entries?.map(\.persistentModelID) == [appended.persistentModelID])
+    }
+
+    do {
+      let context = try makeContext()
+      let goal = try persistedGoalWithReadings(in: context, sequences: [2])
+      let existing = try #require(goal.readings?.first)
+      goal.closureRawValue = GoalClosure.letGo.rawValue
+      try context.save()
+      let lifecycle = GoalLifecycleOperations(context: context) {
+        lifecycleSaveCount += 1
+        try context.save()
+      }
+      let progress = GoalProgressOperations(context: context) {
+        progressSaveCount += 1
+        try context.save()
+      }
+
+      try lifecycle.reopen(goal)
+      let appended = try progress.append(
+        value: 90,
+        to: goal,
+        destination: .yesterday,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+      try progress.delete(
+        existing,
+        from: goal,
+        at: instant("2024-01-02T12:00:00Z"),
+        timeZone: timeZone("UTC")
+      )
+
+      #expect(goal.closureRawValue == nil)
+      #expect(appended.assignedDateKey == "2024-01-01")
+      #expect(appended.goal === goal)
+      #expect(goal.readings?.map(\.persistentModelID) == [appended.persistentModelID])
+    }
+
+    #expect(lifecycleSaveCount == 2)
+    #expect(progressSaveCount == 4)
+  }
+
   private func persistedGoal(
     in context: ModelContext,
     kind: GoalKind,
