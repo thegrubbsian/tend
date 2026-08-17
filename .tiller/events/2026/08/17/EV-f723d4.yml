@@ -1,0 +1,13 @@
+id: EV-f723d4
+type: check.task
+at: 2026-08-17T19:38:47.50939Z
+owner: jc
+command: check task T-ozqgzt
+targets:
+    - T-ozqgzt
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.yml

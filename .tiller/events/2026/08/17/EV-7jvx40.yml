@@ -1,0 +1,13 @@
+id: EV-7jvx40
+type: start.task
+at: 2026-08-17T18:34:29.499879Z
+owner: jc
+command: start task T-ozqgzt
+targets:
+    - T-ozqgzt
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.yml
