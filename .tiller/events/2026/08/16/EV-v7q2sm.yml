@@ -1,0 +1,13 @@
+id: EV-v7q2sm
+type: check.task
+at: 2026-08-16T23:44:30.06712Z
+owner: jc
+command: check task T-i30n7j
+targets:
+    - T-i30n7j
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.yml

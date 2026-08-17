@@ -1,0 +1,13 @@
+id: EV-6sc9um
+type: start.feature
+at: 2026-08-16T23:09:55.945695Z
+owner: jc
+command: start feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml

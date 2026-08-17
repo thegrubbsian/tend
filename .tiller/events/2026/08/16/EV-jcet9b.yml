@@ -1,0 +1,13 @@
+id: EV-jcet9b
+type: start.task
+at: 2026-08-16T23:09:58.996051Z
+owner: jc
+command: start task T-i30n7j
+targets:
+    - T-i30n7j
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.yml

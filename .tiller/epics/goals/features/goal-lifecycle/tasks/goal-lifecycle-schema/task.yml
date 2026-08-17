@@ -1,7 +1,7 @@
 id: T-i30n7j
 key: goals/goal-lifecycle/goal-lifecycle-schema
 title: Add durable goal closure state
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,31 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.510981Z
+pr: 45
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T23:44:27.155429Z
+        against:
+            kind: git_commit
+            value: git:26477e6
+            observed_at: 2026-08-16T23:44:27.155422Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-26477e6-out-19b6950713e94f91de8d9d9cc793dbd0a49136fa2bbf4bd023a250793748d0b9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-16T23:44:27.155429Z
+        against:
+            kind: git_commit
+            value: git:26477e6
+            observed_at: 2026-08-16T23:44:27.155422Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-26477e6-out-29cbba2be9782c7eb1eed6255d6484432c2812be2d086f7b207538a552010228.txt
