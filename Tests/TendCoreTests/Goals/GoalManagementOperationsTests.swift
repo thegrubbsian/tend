@@ -393,6 +393,64 @@ struct GoalManagementOperationsTests {
     #expect(!context.hasChanges)
   }
 
+  @Test("an unsupported persisted closure fails before update mutation or save")
+  func unsupportedClosureIsRejectedByUpdate() throws {
+    let context = try makeContext()
+    let goal = try persistedGoal(in: context, kind: .accumulate, childCount: 2)
+    goal.closureRawValue = "completed"
+    try context.save()
+    let before = goalFacts(of: goal)
+    let history = historyFacts(of: goal)
+    var saveCount = 0
+    let operations = GoalManagementOperations(context: context) { saveCount += 1 }
+
+    try expectManagementError(.invalidClosure("completed")) {
+      try operations.update(
+        goal,
+        fields: GoalEditableFields(name: "Valid", target: 20),
+        calendar: calendar(in: timeZone("UTC")),
+        timeZone: timeZone("UTC")
+      )
+    }
+
+    expectGoal(goal, equals: before)
+    expectHistory(goal, equals: history)
+    #expect(saveCount == 0)
+    #expect(!context.hasChanges)
+  }
+
+  @Test("unsupported persisted kind or closure fails before delete mutation or save")
+  func unsupportedEnumsAreRejectedByDelete() throws {
+    let cases: [(mutate: (Goal) -> Void, error: GoalManagementOperationError)] = [
+      ({ $0.kindRawValue = "future-kind" }, .invalidGoalKind("future-kind")),
+      ({ $0.closureRawValue = "completed" }, .invalidClosure("completed")),
+    ]
+
+    for value in cases {
+      let context = try makeContext()
+      let goal = try persistedGoal(in: context, kind: .measure, childCount: 3)
+      value.mutate(goal)
+      try context.save()
+      let before = goalFacts(of: goal)
+      let history = historyFacts(of: goal)
+      let originalIdentifier = goal.persistentModelID
+      var saveCount = 0
+      let operations = GoalManagementOperations(context: context) { saveCount += 1 }
+
+      try expectManagementError(value.error) {
+        try operations.delete(goal)
+      }
+
+      #expect(goal.modelContext === context)
+      #expect(!goal.isDeleted)
+      #expect(goal.persistentModelID == originalIdentifier)
+      expectGoal(goal, equals: before)
+      expectHistory(goal, equals: history)
+      #expect(saveCount == 0)
+      #expect(!context.hasChanges)
+    }
+  }
+
   @Test("deadline updates use the supplied calendar and following local-day boundary")
   func updateDeadlineUsesFollowingLocalDayBoundary() throws {
     let cases = [

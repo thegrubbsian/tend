@@ -31,6 +31,7 @@ public enum GoalManagementOperationError: Error, Equatable, Sendable {
   case missingMeasureBaseline
   case measureBaselineEqualsTarget(Int)
   case invalidGoalKind(String)
+  case invalidClosure(String)
   case invalidDeadlineBoundary(GoalDateError)
   case deadlineNotAfterCreation(GoalDate)
   case detachedGoal
@@ -63,7 +64,7 @@ public final class GoalManagementOperations {
     timeZone: TimeZone
   ) throws {
     try requirePersisted(goal)
-    let kind = try kind(of: goal)
+    let kind = try validatedEnums(of: goal)
     let fields = try validated(
       fields,
       for: kind,
@@ -163,6 +164,7 @@ public final class GoalManagementOperations {
 
   private func validatedGraph(for goal: Goal) throws -> GoalManagementGraph {
     try requirePersisted(goal)
+    _ = try validatedEnums(of: goal)
     guard let entries = goal.entries else {
       throw GoalManagementOperationError.missingEntries
     }
@@ -250,9 +252,14 @@ public final class GoalManagementOperations {
     throw GoalManagementOperationError.detachedGoal
   }
 
-  private func kind(of goal: Goal) throws -> GoalKind {
+  private func validatedEnums(of goal: Goal) throws -> GoalKind {
     guard let kind = GoalKind(rawValue: goal.kindRawValue) else {
       throw GoalManagementOperationError.invalidGoalKind(goal.kindRawValue)
+    }
+    do {
+      _ = try goal.checkedClosure
+    } catch GoalClosureError.unsupportedRawValue(let rawValue) {
+      throw GoalManagementOperationError.invalidClosure(rawValue)
     }
     return kind
   }
