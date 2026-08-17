@@ -56,7 +56,10 @@ struct GoalDetailModelTests {
     )
     #expect(presentation.progressText == "14 of 10 miles")
     #expect(presentation.deadlineText == "No deadline")
-    #expect(presentation.standingText == nil)
+    #expect(presentation.standing == .onPace)
+    #expect(presentation.expectedNormalizedProgress == nil)
+    #expect(presentation.standingText == "On pace")
+    #expect(presentation.closure == nil)
     #expect(presentation.closureText == nil)
     #expect(
       presentation.actions == [.edit, .addProgress, .harvest, .letGo, .deleteGoal]
@@ -125,27 +128,67 @@ struct GoalDetailModelTests {
         standing: GoalStandingSnapshot(
           standing: standing,
           actualNormalizedProgress: 0.4,
-          expectedNormalizedProgress: standing == .pastDue ? nil : 0.5,
+          expectedNormalizedProgress: standing == .pastDue ? 1 : 0.5,
           deadlineBoundary: fixture.instant,
           nextTimeRefresh: nil
         )
       )
       let model = fixture.loadedModel(snapshot: snapshot)
-      #expect(model.presentation?.deadlineText == "Due Jan 20, 2026")
+      #expect(model.presentation?.deadlineText == "5 days remaining · Due Jan 20, 2026")
+      #expect(model.presentation?.standing == standing)
+      #expect(
+        model.presentation?.expectedNormalizedProgress
+          == (standing == .pastDue ? 1 : 0.5)
+      )
       #expect(model.presentation?.standingText == expectedText)
     }
 
     let harvested = fixture.loadedModel(
       snapshot: fixture.accumulateSnapshot(closure: .harvested, destinations: [])
     )
+    #expect(harvested.presentation?.closure == .harvested)
+    #expect(harvested.presentation?.standing == nil)
+    #expect(harvested.presentation?.expectedNormalizedProgress == nil)
     #expect(harvested.presentation?.closureText == "Harvested")
-    #expect(harvested.presentation?.actions == [.reopen, .deleteGoal])
+    #expect(harvested.presentation?.actions == [.edit, .reopen, .deleteGoal])
 
     let letGo = fixture.loadedModel(
       snapshot: fixture.accumulateSnapshot(closure: .letGo, destinations: [])
     )
+    #expect(letGo.presentation?.closure == .letGo)
+    #expect(letGo.presentation?.standing == nil)
+    #expect(letGo.presentation?.expectedNormalizedProgress == nil)
     #expect(letGo.presentation?.closureText == "Let go")
-    #expect(letGo.presentation?.actions == [.reopen, .deleteGoal])
+    #expect(letGo.presentation?.actions == [.edit, .reopen, .deleteGoal])
+  }
+
+  @Test("deadline wording includes localized civil-day distance and formatted due date")
+  func presentsDeadlineCivilDayContext() throws {
+    let fixture = try GoalDetailFixture()
+    let cases: [(GoalDate, String)] = [
+      (try #require(GoalDate(year: 2026, month: 1, day: 15)), "Due today · Jan 15, 2026"),
+      (try #require(GoalDate(year: 2026, month: 1, day: 16)), "1 day remaining · Due Jan 16, 2026"),
+      (try #require(GoalDate(year: 2026, month: 1, day: 17)), "2 days remaining · Due Jan 17, 2026"),
+      (try #require(GoalDate(year: 2026, month: 1, day: 14)), "1 day past due · Due Jan 14, 2026"),
+      (try #require(GoalDate(year: 2026, month: 1, day: 13)), "2 days past due · Due Jan 13, 2026"),
+    ]
+
+    for (deadline, expected) in cases {
+      let standing: GoalStanding = deadline < cases[0].0 ? .pastDue : .onPace
+      let model = fixture.loadedModel(
+        snapshot: fixture.accumulateSnapshot(
+          deadline: deadline,
+          standing: .init(
+            standing: standing,
+            actualNormalizedProgress: 0,
+            expectedNormalizedProgress: standing == .pastDue ? 1 : 0.5,
+            deadlineBoundary: fixture.instant,
+            nextTimeRefresh: nil
+          )
+        )
+      )
+      #expect(model.presentation?.deadlineText == expected)
+    }
   }
 
   @Test("history preserves query order, local day wording, and same-day effective reading")
@@ -299,6 +342,34 @@ struct GoalDetailModelTests {
       model.entryText = invalid
       #expect(!model.canSaveEntry, "Unexpectedly accepted \(invalid)")
     }
+  }
+
+  @Test("nonempty invalid entry drafts expose kind-specific inline validation")
+  func presentsEntryValidationMessages() throws {
+    let fixture = try GoalDetailFixture()
+    let accumulate = fixture.loadedModel(
+      snapshot: fixture.accumulateSnapshot(destinations: [.today])
+    )
+    accumulate.presentEntrySheet()
+    #expect(accumulate.entryValidationMessage == nil)
+    accumulate.entryText = "0"
+    #expect(accumulate.entryValidationMessage == "Enter a positive whole number.")
+    accumulate.entryText = "01"
+    #expect(accumulate.entryValidationMessage == "Enter a positive whole number.")
+    accumulate.entryText = "2"
+    #expect(accumulate.entryValidationMessage == nil)
+
+    let measure = fixture.loadedModel(
+      snapshot: fixture.measureSnapshot(destinations: [.today])
+    )
+    measure.presentEntrySheet()
+    #expect(measure.entryValidationMessage == nil)
+    measure.entryText = "+1"
+    #expect(measure.entryValidationMessage == "Enter a whole number.")
+    measure.entryText = "-0"
+    #expect(measure.entryValidationMessage == "Enter a whole number.")
+    measure.entryText = "-1"
+    #expect(measure.entryValidationMessage == nil)
   }
 
   @Test("history deletion requires query eligibility and dispatches the exact typed identity")
@@ -747,6 +818,41 @@ struct GoalDetailModelTests {
     #expect(model.loadFailure != nil)
   }
 
+  @Test("projection rejects missing open standing, closed standing, and nonfinite expectations")
+  func rejectsMalformedStandingContracts() throws {
+    let fixture = try GoalDetailFixture()
+    let standing = GoalStandingSnapshot(
+      standing: .onPace,
+      actualNormalizedProgress: 0,
+      expectedNormalizedProgress: 0.5,
+      deadlineBoundary: nil,
+      nextTimeRefresh: nil
+    )
+    let malformed = [
+      fixture.accumulateSnapshot(omitsStanding: true),
+      fixture.accumulateSnapshot(
+        closure: .harvested,
+        standing: standing,
+        destinations: []
+      ),
+      fixture.accumulateSnapshot(
+        standing: GoalStandingSnapshot(
+          standing: .behind,
+          actualNormalizedProgress: 0,
+          expectedNormalizedProgress: .infinity,
+          deadlineBoundary: nil,
+          nextTimeRefresh: nil
+        )
+      ),
+    ]
+
+    for snapshot in malformed {
+      let model = fixture.loadedModel(snapshot: snapshot)
+      #expect(model.presentation == nil)
+      #expect(model.loadFailure != nil)
+    }
+  }
+
   @Test("selected identity is captured once while every presentation fact comes from the query")
   func keepsStableSelectedIdentity() throws {
     let fixture = try GoalDetailFixture()
@@ -1014,10 +1120,18 @@ private final class GoalDetailFixture {
     deadline: GoalDate? = nil,
     closure: GoalClosure? = nil,
     standing: GoalStandingSnapshot? = nil,
+    omitsStanding: Bool = false,
     destinations: [GoalProgressDestination] = [.today],
     history: [GoalDetailHistoryItem] = []
   ) -> GoalDetailSnapshot {
-    GoalDetailSnapshot(
+    let normalizedProgress = Double(total) / Double(target)
+    let resolvedStanding = standingSnapshot(
+      closure: closure,
+      standing: standing,
+      omitsStanding: omitsStanding,
+      actualNormalizedProgress: normalizedProgress
+    )
+    return GoalDetailSnapshot(
       metadata: GoalDetailMetadata(
         id: id ?? goal.id,
         name: name,
@@ -1034,9 +1148,9 @@ private final class GoalDetailFixture {
           total: total,
           target: target,
           unit: unit,
-          normalizedProgress: Double(total) / Double(target)
+          normalizedProgress: normalizedProgress
         )),
-      standing: standing,
+      standing: resolvedStanding,
       availableAppendDestinations: destinations,
       history: history
     )
@@ -1048,11 +1162,20 @@ private final class GoalDetailFixture {
     current: Int = 15,
     unit: String = "kg",
     closure: GoalClosure? = nil,
+    standing: GoalStandingSnapshot? = nil,
+    omitsStanding: Bool = false,
     destinations: [GoalProgressDestination] = [.today],
     history: [GoalDetailHistoryItem] = []
   ) -> GoalDetailSnapshot {
     let totalDistance = abs(target - baseline)
     let completedDistance = target >= baseline ? current - baseline : baseline - current
+    let normalizedProgress = Double(completedDistance) / Double(totalDistance)
+    let resolvedStanding = standingSnapshot(
+      closure: closure,
+      standing: standing,
+      omitsStanding: omitsStanding,
+      actualNormalizedProgress: normalizedProgress
+    )
     return GoalDetailSnapshot(
       metadata: GoalDetailMetadata(
         id: goal.id,
@@ -1074,12 +1197,34 @@ private final class GoalDetailFixture {
           completedDistance: completedDistance,
           totalDistance: totalDistance,
           unit: unit,
-          normalizedProgress: Double(completedDistance) / Double(totalDistance)
+          normalizedProgress: normalizedProgress
         )),
-      standing: nil,
+      standing: resolvedStanding,
       availableAppendDestinations: destinations,
       history: history
     )
+  }
+
+  private func standingSnapshot(
+    closure: GoalClosure?,
+    standing: GoalStandingSnapshot?,
+    omitsStanding: Bool,
+    actualNormalizedProgress: Double
+  ) -> GoalStandingSnapshot? {
+    if closure != nil {
+      return standing
+    }
+    if omitsStanding {
+      return nil
+    }
+    return standing
+      ?? GoalStandingSnapshot(
+        standing: .onPace,
+        actualNormalizedProgress: actualNormalizedProgress,
+        expectedNormalizedProgress: nil,
+        deadlineBoundary: nil,
+        nextTimeRefresh: nil
+      )
   }
 
   private static func date(_ value: String) throws -> Date {

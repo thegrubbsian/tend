@@ -68,7 +68,10 @@ struct GoalDetailPresentation: Equatable, Sendable {
   let progress: GoalDetailProgressFact
   let progressText: String
   let deadlineText: String
+  let standing: GoalStanding?
+  let expectedNormalizedProgress: Double?
   let standingText: String?
+  let closure: GoalClosure?
   let closureText: String?
   let appendDestinations: [GoalDetailAppendDestination]
   let history: [GoalDetailHistoryFact]
@@ -283,6 +286,26 @@ final class GoalDetailModel {
     else { return false }
 
     return parsedEntry(for: presentation.kind) != nil
+  }
+
+  var entryValidationMessage: String? {
+    guard
+      isPresentingEntrySheet,
+      !entryText.isEmpty,
+      let kind = presentation?.kind,
+      parsedEntry(for: kind) == nil
+    else { return nil }
+
+    let currentLocale = Locale(identifier: locale().identifier)
+    switch kind {
+    case .accumulate:
+      return String(
+        localized: "Enter a positive whole number.",
+        locale: currentLocale
+      )
+    case .measure:
+      return String(localized: "Enter a whole number.", locale: currentLocale)
+    }
   }
 
   var goalForEditing: Goal? {
@@ -842,6 +865,7 @@ private struct GoalDetailPresentationBuilder {
     }
 
     let progress = try progressFact(snapshot)
+    let standing = try standingFact(snapshot)
     let history = try snapshot.history.map { try historyFact($0, metadata: snapshot.metadata) }
     let appendDestinations = snapshot.availableAppendDestinations.map {
       GoalDetailAppendDestination(destination: $0, title: destinationTitle($0))
@@ -852,7 +876,7 @@ private struct GoalDetailPresentationBuilder {
         + (appendDestinations.isEmpty ? [] : [.addProgress])
         + [.harvest, .letGo, .deleteGoal]
     } else {
-      actions = [.reopen, .deleteGoal]
+      actions = [.edit, .reopen, .deleteGoal]
     }
 
     return GoalDetailPresentation(
@@ -862,7 +886,10 @@ private struct GoalDetailPresentationBuilder {
       progress: progress,
       progressText: progressText(progress),
       deadlineText: deadlineText(snapshot.metadata.deadline),
-      standingText: standingText(snapshot.standing?.standing),
+      standing: standing?.standing,
+      expectedNormalizedProgress: standing?.expectedNormalizedProgress,
+      standingText: standingText(standing?.standing),
+      closure: snapshot.metadata.closure,
       closureText: closureText(snapshot.metadata.closure),
       appendDestinations: appendDestinations,
       history: history,
@@ -903,6 +930,22 @@ private struct GoalDetailPresentationBuilder {
       )
     default:
       throw ProjectionError.inconsistentProgress
+    }
+  }
+
+  private func standingFact(
+    _ snapshot: GoalDetailSnapshot
+  ) throws -> GoalStandingSnapshot? {
+    switch (snapshot.metadata.closure, snapshot.standing) {
+    case (nil, .some(let standing)):
+      guard standing.expectedNormalizedProgress?.isFinite != false else {
+        throw ProjectionError.inconsistentStanding
+      }
+      return standing
+    case (.some, nil):
+      return nil
+    case (nil, nil), (.some, .some):
+      throw ProjectionError.inconsistentStanding
     }
   }
 
@@ -949,10 +992,54 @@ private struct GoalDetailPresentationBuilder {
     guard let deadline else {
       return String(localized: "No deadline", locale: locale)
     }
+    let formattedDeadline = formatted(deadline)
+    guard
+      let today = localGoalDate(instant),
+      let todayStart = try? today.start(in: timeZone),
+      let deadlineStart = try? deadline.start(in: timeZone),
+      let dayDistance = calendar.dateComponents(
+        [.day],
+        from: todayStart,
+        to: deadlineStart
+      ).day
+    else {
+      return String(
+        format: String(localized: "Due %@", locale: locale),
+        locale: locale,
+        formattedDeadline
+      )
+    }
+
+    let context: String
+    switch dayDistance {
+    case 0:
+      context = String(localized: "Due today", locale: locale)
+    case 1:
+      context = String(localized: "1 day remaining", locale: locale)
+    case 2...:
+      context = String(
+        format: String(localized: "%lld days remaining", locale: locale),
+        locale: locale,
+        Int64(dayDistance)
+      )
+    case -1:
+      context = String(localized: "1 day past due", locale: locale)
+    default:
+      context = String(
+        format: String(localized: "%lld days past due", locale: locale),
+        locale: locale,
+        Int64(-dayDistance)
+      )
+    }
+    let format =
+      dayDistance == 0
+      ? String(localized: "%@ · %@", locale: locale)
+      : String(localized: "%@ · Due %@", locale: locale)
     return String(
-      format: String(localized: "Due %@", locale: locale),
+      format: format,
       locale: locale,
-      formatted(deadline)
+      context,
+      formattedDeadline
     )
   }
 
@@ -1018,6 +1105,7 @@ private struct GoalDetailPresentationBuilder {
     case unexpectedGoal(UUID)
     case inconsistentProgress
     case inconsistentHistory
+    case inconsistentStanding
   }
 }
 
