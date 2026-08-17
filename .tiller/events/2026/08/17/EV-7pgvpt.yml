@@ -1,0 +1,13 @@
+id: EV-7pgvpt
+type: check.task
+at: 2026-08-17T03:34:56.121278Z
+owner: jc
+command: check task T-4gpnsw
+targets:
+    - T-4gpnsw
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.yml
