@@ -28,7 +28,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-lifecycle/goal-standing-computation (T-c72xj8): build pass, tests pass
+- (none)
 
 ### Open questions
 

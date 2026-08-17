@@ -1,0 +1,14 @@
+id: EV-jce43v
+type: sync.task
+at: 2026-08-17T03:04:32.163437Z
+owner: jc
+command: sync task T-c72xj8
+targets:
+    - T-c72xj8
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml
