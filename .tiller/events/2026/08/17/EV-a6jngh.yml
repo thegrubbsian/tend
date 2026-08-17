@@ -1,0 +1,14 @@
+id: EV-a6jngh
+type: sync.task
+at: 2026-08-17T18:33:13.025796Z
+owner: jc
+command: sync task T-0gtd91
+targets:
+    - T-0gtd91
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml

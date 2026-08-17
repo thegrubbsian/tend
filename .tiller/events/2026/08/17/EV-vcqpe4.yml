@@ -1,0 +1,14 @@
+id: EV-vcqpe4
+type: sync.feature
+at: 2026-08-17T18:33:13.100199Z
+owner: jc
+command: sync feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml
