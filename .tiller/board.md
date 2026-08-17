@@ -13,7 +13,7 @@ this file is regenerated from the working tree on every sync. -->
 - feature goals/goal-lifecycle (F-5aficd): active
 - feature goals/goal-experience (F-xowx7x): ready
 - feature goals/today-goal-surfacing (F-e8yd2r): ready
-- task goals/goal-lifecycle/goal-management-operations (T-4gpnsw): ready
+- task goals/goal-lifecycle/goal-management-operations (T-4gpnsw): check
 - task goals/goal-lifecycle/goal-closure-operations (T-0gtd91): ready
 - task goals/goal-experience/goal-form (T-ozqgzt): ready
 - task goals/goal-experience/goal-detail (T-bvcyq8): ready

@@ -1,0 +1,13 @@
+id: EV-p9s4s8
+type: start.task
+at: 2026-08-17T03:05:14.806183Z
+owner: jc
+command: start task T-4gpnsw
+targets:
+    - T-4gpnsw
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.yml

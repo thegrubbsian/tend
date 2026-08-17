@@ -1,7 +1,7 @@
 id: T-4gpnsw
 key: goals/goal-lifecycle/goal-management-operations
 title: Update and delete goals atomically
-status: ready
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.559766Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T03:34:53.563701Z
+        against:
+            kind: sha256
+            value: sha256:097a4e765a35142693ceb44340d1ee40381b3843dc3089e78f88dc119d6886eb
+            observed_at: 2026-08-17T03:34:53.563697Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-097a4e765a35-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-17T03:34:53.563701Z
+        against:
+            kind: sha256
+            value: sha256:097a4e765a35142693ceb44340d1ee40381b3843dc3089e78f88dc119d6886eb
+            observed_at: 2026-08-17T03:34:53.563697Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-097a4e765a35-out-a72665335e9f57821234d709f1bdb45a73f618dba6eb5da35d446b613d0111af.txt
