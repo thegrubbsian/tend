@@ -1,0 +1,13 @@
+id: EV-r0qnji
+type: check.feature
+at: 2026-08-17T04:10:50.182213Z
+owner: jc
+command: check feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml
