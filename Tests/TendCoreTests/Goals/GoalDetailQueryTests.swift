@@ -7,7 +7,9 @@ import Testing
 @MainActor
 @Suite("Goal detail query")
 struct GoalDetailQueryTests {
-  @Test("accumulate detail preserves over-achievement and orders entry history by civil date then sequence")
+  @Test(
+    "accumulate detail preserves over-achievement and orders entry history by civil date then sequence"
+  )
   func accumulateDetailIsCompleteAndOrdered() throws {
     let context = try makeContext()
     let goalID = UUID()
@@ -113,7 +115,9 @@ struct GoalDetailQueryTests {
         ])
   }
 
-  @Test("increasing measure marks the latest date and sequence effective, not relationship or timestamp order")
+  @Test(
+    "increasing measure marks the latest date and sequence effective, not relationship or timestamp order"
+  )
   func increasingMeasureMarksEffectiveReading() throws {
     let context = try makeContext()
     let firstID = UUID()
@@ -289,7 +293,9 @@ struct GoalDetailQueryTests {
       let snapshot = try query(context, goal, at: "2024-01-02T12:00:00Z")
 
       #expect(snapshot.metadata.closure == closure)
-      #expect(snapshot.progress == .accumulate(.init(total: 1, target: 10, unit: "pages", normalizedProgress: 0.1)))
+      #expect(
+        snapshot.progress
+          == .accumulate(.init(total: 1, target: 10, unit: "pages", normalizedProgress: 0.1)))
       #expect(snapshot.standing == nil)
       #expect(snapshot.availableAppendDestinations.isEmpty)
       guard case .entry(let entry) = try #require(snapshot.history.first) else {

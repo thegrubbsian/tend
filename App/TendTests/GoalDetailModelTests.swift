@@ -13,7 +13,9 @@ struct GoalDetailModelTests {
     let fixture = try GoalDetailFixture()
     let good = fixture.accumulateSnapshot(name: "Walk", total: 14, target: 10)
     let recorder = GoalDetailOperationsRecorder(
-      snapshots: [.failure(TestGoalDetailFailure.load), .success(good), .failure(TestGoalDetailFailure.load)]
+      snapshots: [
+        .failure(TestGoalDetailFailure.load), .success(good), .failure(TestGoalDetailFailure.load),
+      ]
     )
     let model = fixture.model(operations: recorder.operations)
 
@@ -37,7 +39,8 @@ struct GoalDetailModelTests {
     #expect(!model.canMutate)
   }
 
-  @Test("over-achieved accumulation presents query progress without clamping and exposes open actions")
+  @Test(
+    "over-achieved accumulation presents query progress without clamping and exposes open actions")
   func presentsOverAchievedAccumulateGoal() throws {
     let fixture = try GoalDetailFixture()
     let snapshot = fixture.accumulateSnapshot(
@@ -119,8 +122,8 @@ struct GoalDetailModelTests {
     let pastDeadline = try #require(GoalDate(year: 2026, month: 1, day: 14))
     let futureBoundary = try futureDeadline.next().start(in: fixture.timeZone)
     let elapsedBoundary = try pastDeadline.next().start(in: fixture.timeZone)
-    let cases: [
-      (
+    let cases:
+      [(
         standing: GoalStanding,
         total: Int,
         expected: Double,
@@ -128,12 +131,20 @@ struct GoalDetailModelTests {
         boundary: Date,
         deadlineText: String,
         standingText: String
-      )
-    ] = [
-      (.onPace, 6, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026", "On pace"),
-      (.behind, 4, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026", "Behind"),
-      (.pastDue, 4, 1, pastDeadline, elapsedBoundary, "1 day past due · Due Jan 14, 2026", "Past due"),
-    ]
+      )] = [
+        (
+          .onPace, 6, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026",
+          "On pace"
+        ),
+        (
+          .behind, 4, 0.5, futureDeadline, futureBoundary, "5 days remaining · Due Jan 20, 2026",
+          "Behind"
+        ),
+        (
+          .pastDue, 4, 1, pastDeadline, elapsedBoundary, "1 day past due · Due Jan 14, 2026",
+          "Past due"
+        ),
+      ]
 
     for item in cases {
       let snapshot = fixture.accumulateSnapshot(
@@ -179,7 +190,9 @@ struct GoalDetailModelTests {
     let cases: [(GoalDate, String)] = [
       (try #require(GoalDate(year: 2026, month: 1, day: 15)), "Due today · Jan 15, 2026"),
       (try #require(GoalDate(year: 2026, month: 1, day: 16)), "1 day remaining · Due Jan 16, 2026"),
-      (try #require(GoalDate(year: 2026, month: 1, day: 17)), "2 days remaining · Due Jan 17, 2026"),
+      (
+        try #require(GoalDate(year: 2026, month: 1, day: 17)), "2 days remaining · Due Jan 17, 2026"
+      ),
       (try #require(GoalDate(year: 2026, month: 1, day: 14)), "1 day past due · Due Jan 14, 2026"),
       (try #require(GoalDate(year: 2026, month: 1, day: 13)), "2 days past due · Due Jan 13, 2026"),
     ]
@@ -392,8 +405,14 @@ struct GoalDetailModelTests {
     let ineligibleID = GoalEntryIdentity(rawValue: UUID())
     let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
     let history: [GoalDetailHistoryItem] = [
-      .entry(.init(id: eligibleID, assignedDate: today, amount: 2, appendedAt: fixture.instant, appendSequence: 2, isDeleteEligible: true)),
-      .entry(.init(id: ineligibleID, assignedDate: today, amount: 1, appendedAt: fixture.instant, appendSequence: 1, isDeleteEligible: false)),
+      .entry(
+        .init(
+          id: eligibleID, assignedDate: today, amount: 2, appendedAt: fixture.instant,
+          appendSequence: 2, isDeleteEligible: true)),
+      .entry(
+        .init(
+          id: ineligibleID, assignedDate: today, amount: 1, appendedAt: fixture.instant,
+          appendSequence: 1, isDeleteEligible: false)),
     ]
     let initial = fixture.accumulateSnapshot(total: 3, history: history)
     let refreshed = fixture.accumulateSnapshot(total: 1, history: Array(history.dropFirst()))
@@ -527,7 +546,9 @@ struct GoalDetailModelTests {
     #expect(model.confirmation == nil)
   }
 
-  @Test("failed append preserves presentation and draft, retries the exact request, and can be cancelled")
+  @Test(
+    "failed append preserves presentation and draft, retries the exact request, and can be cancelled"
+  )
   func retriesAndCancelsFailedAppendWithoutOptimisticDrift() throws {
     let fixture = try GoalDetailFixture()
     let initial = fixture.accumulateSnapshot(total: 1, destinations: [.today])
@@ -629,7 +650,9 @@ struct GoalDetailModelTests {
     #expect(cancelModel.presentation?.closureText == nil)
   }
 
-  @Test("committed mutation reload failure locks mutations and retries reload without duplicating persistence")
+  @Test(
+    "committed mutation reload failure locks mutations and retries reload without duplicating persistence"
+  )
   func recoversCommittedMutationWithReloadOnlyRetry() throws {
     let fixture = try GoalDetailFixture()
     let initial = fixture.accumulateSnapshot(total: 1, destinations: [.today])
@@ -1046,7 +1069,9 @@ struct GoalDetailModelTests {
     #expect(recorder.snapshotInvocations.only?.goal === fixture.goal)
   }
 
-  @Test("live history deletion delegates exactly-one-owned children and rejects every other cardinality")
+  @Test(
+    "live history deletion delegates exactly-one-owned children and rejects every other cardinality"
+  )
   func liveDeletionResolvesExactlyOneOwnedChild() throws {
     let fixture = try GoalDetailFixture()
     let container = try TendModelContainer.inMemory()
@@ -1129,10 +1154,13 @@ struct GoalDetailModelTests {
     )
     #expect(deletedReadings.isEmpty)
 
-
     let ambiguousID = UUID()
-    let first = GoalEntry(id: ambiguousID, amount: 1, assignedDate: date, appendedAt: fixture.instant, appendSequence: 1, goal: goal)
-    let second = GoalEntry(id: ambiguousID, amount: 2, assignedDate: date, appendedAt: fixture.instant, appendSequence: 2, goal: goal)
+    let first = GoalEntry(
+      id: ambiguousID, amount: 1, assignedDate: date, appendedAt: fixture.instant,
+      appendSequence: 1, goal: goal)
+    let second = GoalEntry(
+      id: ambiguousID, amount: 2, assignedDate: date, appendedAt: fixture.instant,
+      appendSequence: 2, goal: goal)
     context.insert(first)
     context.insert(second)
     try context.save()
@@ -1200,16 +1228,23 @@ private final class GoalDetailOperationsRecorder {
   var operations: GoalDetailOperations {
     GoalDetailOperations(
       snapshot: { [unowned self] goal, instant, calendar, timeZone in
-        snapshotInvocations.append(.init(goal: goal, instant: instant, calendar: calendar, timeZone: timeZone))
+        snapshotInvocations.append(
+          .init(goal: goal, instant: instant, calendar: calendar, timeZone: timeZone))
         guard !snapshots.isEmpty else { throw TestGoalDetailFailure.load }
         return try snapshots.removeFirst().get()
       },
       appendAmount: { [unowned self] value, _, destination, instant, timeZone in
-        appendInvocations.append(.init(kind: .accumulate, value: value, destination: destination, instant: instant, timeZone: timeZone))
+        appendInvocations.append(
+          .init(
+            kind: .accumulate, value: value, destination: destination, instant: instant,
+            timeZone: timeZone))
         try next(&appendResults, fallback: ()).get()
       },
       appendValue: { [unowned self] value, _, destination, instant, timeZone in
-        appendInvocations.append(.init(kind: .measure, value: value, destination: destination, instant: instant, timeZone: timeZone))
+        appendInvocations.append(
+          .init(
+            kind: .measure, value: value, destination: destination, instant: instant,
+            timeZone: timeZone))
         try next(&appendResults, fallback: ()).get()
       },
       deleteHistory: { [unowned self] id, _, _, _ in
@@ -1421,6 +1456,6 @@ private enum TestGoalDetailFailure: LocalizedError {
   }
 }
 
-private extension Collection {
-  var only: Element? { count == 1 ? first : nil }
+extension Collection {
+  fileprivate var only: Element? { count == 1 ? first : nil }
 }

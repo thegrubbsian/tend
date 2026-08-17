@@ -366,7 +366,6 @@ public final class GoalProgressOperations {
     }
   }
 
-
   private func parsedDate(_ key: String) throws -> GoalDate {
     guard let date = GoalDate(rawValue: key) else {
       throw GoalProgressOperationError.invalidAssignedDate(key)

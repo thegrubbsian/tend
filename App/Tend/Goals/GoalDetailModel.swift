@@ -632,7 +632,8 @@ final class GoalDetailModel {
     }
   }
 
-  private func replacementPresentation(using context: LoadContext) throws -> GoalDetailPresentation {
+  private func replacementPresentation(using context: LoadContext) throws -> GoalDetailPresentation
+  {
     let snapshot = try operations.snapshot(
       goal,
       context.instant,
@@ -877,7 +878,8 @@ private struct GoalDetailPresentationBuilder {
     }
     let actions: [GoalDetailAction]
     if snapshot.metadata.closure == nil {
-      actions = [.edit]
+      actions =
+        [.edit]
         + (appendDestinations.isEmpty ? [] : [.addProgress])
         + [.harvest, .letGo, .deleteGoal]
     } else {
@@ -1172,4 +1174,3 @@ private struct GoalDetailPresentationBuilder {
     case inconsistentStanding
   }
 }
-

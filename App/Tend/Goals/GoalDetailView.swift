@@ -654,14 +654,17 @@ struct GoalDetailView: View {
     let name = presentation?.name ?? "this goal"
     switch confirmation {
     case .harvest:
-      return "This closes “\(name)” as harvested and keeps its progress history. You can reopen it later."
+      return
+        "This closes “\(name)” as harvested and keeps its progress history. You can reopen it later."
     case .letGo:
-      return "This closes “\(name)” as let go and keeps its progress history. You can reopen it later."
+      return
+        "This closes “\(name)” as let go and keeps its progress history. You can reopen it later."
     case .reopen:
       return "This reopens “\(name)” and makes progress entry available again."
     case .deleteGoal:
       let noun = presentation?.kind == .measure ? "reading" : "entry"
-      return "This permanently deletes “\(name)” and removes all of its \(noun) history. This cannot be undone."
+      return
+        "This permanently deletes “\(name)” and removes all of its \(noun) history. This cannot be undone."
     case .deleteHistory(let id):
       return historyDeletionMessage(id)
     }
@@ -669,14 +672,17 @@ struct GoalDetailView: View {
 
   private func historyDeletionMessage(_ id: GoalDetailHistoryID) -> String {
     guard let fact = model.presentation?.history.first(where: { $0.id == id }) else {
-      return "This permanently removes the history item and may change the goal's progress. This cannot be undone."
+      return
+        "This permanently removes the history item and may change the goal's progress. This cannot be undone."
     }
 
     switch id {
     case .entry:
-      return "This permanently removes the \(fact.valueText) entry for \(fact.dateText) and recalculates the goal's progress. This cannot be undone."
+      return
+        "This permanently removes the \(fact.valueText) entry for \(fact.dateText) and recalculates the goal's progress. This cannot be undone."
     case .reading:
-      return "This permanently removes the \(fact.valueText) reading for \(fact.dateText). Progress will be recalculated from the remaining readings. This cannot be undone."
+      return
+        "This permanently removes the \(fact.valueText) reading for \(fact.dateText). Progress will be recalculated from the remaining readings. This cannot be undone."
     }
   }
 

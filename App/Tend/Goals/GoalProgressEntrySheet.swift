@@ -63,11 +63,11 @@ struct GoalProgressEntrySheet: View {
       ToolbarItemGroup(placement: .keyboard) {
         Spacer()
         Button("Done", action: completeEntryEditing)
-        .frame(
-          minWidth: GoalProgressEntrySheetMetrics.minimumTarget,
-          minHeight: GoalProgressEntrySheetMetrics.minimumTarget
-        )
-        .accessibilityIdentifier("goalProgressEntry.keyboardDone")
+          .frame(
+            minWidth: GoalProgressEntrySheetMetrics.minimumTarget,
+            minHeight: GoalProgressEntrySheetMetrics.minimumTarget
+          )
+          .accessibilityIdentifier("goalProgressEntry.keyboardDone")
       }
     }
   }
@@ -127,7 +127,8 @@ struct GoalProgressEntrySheet: View {
       .foregroundStyle(model.canSaveEntry ? AlmanacPalette.moss : AlmanacPalette.inkFaint)
       .disabled(!model.canSaveEntry)
       .accessibilityLabel(
-        model.isOperationInFlight ? copy(for: presentation).savingLabel : copy(for: presentation).saveLabel
+        model.isOperationInFlight
+          ? copy(for: presentation).savingLabel : copy(for: presentation).saveLabel
       )
       .accessibilityHint(copy(for: presentation).saveHint)
       .accessibilityIdentifier("goalProgressEntry.save")
