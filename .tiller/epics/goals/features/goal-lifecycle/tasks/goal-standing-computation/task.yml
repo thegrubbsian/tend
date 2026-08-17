@@ -1,7 +1,7 @@
 id: T-c72xj8
 key: goals/goal-lifecycle/goal-standing-computation
 title: Compute deadline pace and standing
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.535797Z
+pr: 46
 gates:
     build:
         required: true

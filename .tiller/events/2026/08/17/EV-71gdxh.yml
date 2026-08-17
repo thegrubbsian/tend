@@ -1,0 +1,14 @@
+id: EV-71gdxh
+type: submit.task
+at: 2026-08-17T02:57:12.497643Z
+owner: jc
+command: submit task T-c72xj8
+targets:
+    - T-c72xj8
+before:
+    status: check
+after:
+    pr: 46
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml
