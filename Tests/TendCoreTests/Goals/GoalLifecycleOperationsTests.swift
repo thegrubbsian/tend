@@ -10,14 +10,30 @@ struct GoalLifecycleOperationsTests {
   @Test("closing is explicit across both kinds, dispositions, standings, and progress levels")
   func closeChangesOnlyClosureAcrossEveryGoalState() throws {
     let cases: [LifecycleCase] = [
-      .init(kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0, expectedStanding: .onPace),
-      .init(kind: .accumulate, progressValues: [2], deadline: "2024-07-04", closure: .letGo, expectedProgress: 0.2, expectedStanding: .behind),
-      .init(kind: .accumulate, progressValues: [10], deadline: "2024-07-04", closure: .harvested, expectedProgress: 1, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
-      .init(kind: .accumulate, progressValues: [12], deadline: "2024-07-03", closure: .letGo, expectedProgress: 1.2, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
-      .init(kind: .measure, progressValues: [], closure: .letGo, expectedProgress: 0, expectedStanding: .onPace),
-      .init(kind: .measure, progressValues: [95], deadline: "2024-07-04", closure: .harvested, expectedProgress: 0.25, expectedStanding: .behind),
-      .init(kind: .measure, progressValues: [80], deadline: "2024-07-04", closure: .letGo, expectedProgress: 1, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
-      .init(kind: .measure, progressValues: [70], deadline: "2024-07-03", closure: .harvested, expectedProgress: 1, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
+      .init(
+        kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0,
+        expectedStanding: .onPace),
+      .init(
+        kind: .accumulate, progressValues: [2], deadline: "2024-07-04", closure: .letGo,
+        expectedProgress: 0.2, expectedStanding: .behind),
+      .init(
+        kind: .accumulate, progressValues: [10], deadline: "2024-07-04", closure: .harvested,
+        expectedProgress: 1, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
+      .init(
+        kind: .accumulate, progressValues: [12], deadline: "2024-07-03", closure: .letGo,
+        expectedProgress: 1.2, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
+      .init(
+        kind: .measure, progressValues: [], closure: .letGo, expectedProgress: 0,
+        expectedStanding: .onPace),
+      .init(
+        kind: .measure, progressValues: [95], deadline: "2024-07-04", closure: .harvested,
+        expectedProgress: 0.25, expectedStanding: .behind),
+      .init(
+        kind: .measure, progressValues: [80], deadline: "2024-07-04", closure: .letGo,
+        expectedProgress: 1, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
+      .init(
+        kind: .measure, progressValues: [70], deadline: "2024-07-03", closure: .harvested,
+        expectedProgress: 1, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
     ]
 
     for testCase in cases {
@@ -50,17 +66,30 @@ struct GoalLifecycleOperationsTests {
   @Test("reopening both dispositions changes only closure and recomputes every open standing")
   func reopenChangesOnlyClosureAndRestoresDerivedStanding() throws {
     let cases: [LifecycleCase] = [
-      .init(kind: .accumulate, progressValues: [6], closure: .harvested, expectedProgress: 0.6, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
-      .init(kind: .accumulate, progressValues: [2], deadline: "2024-07-04", closure: .letGo, expectedProgress: 0.2, expectedStanding: .behind),
-      .init(kind: .accumulate, progressValues: [12], deadline: "2024-07-03", closure: .harvested, expectedProgress: 1.2, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
-      .init(kind: .measure, progressValues: [80], closure: .letGo, expectedProgress: 1, expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
-      .init(kind: .measure, progressValues: [95], deadline: "2024-07-04", closure: .harvested, expectedProgress: 0.25, expectedStanding: .behind),
-      .init(kind: .measure, progressValues: [70], deadline: "2024-07-03", closure: .letGo, expectedProgress: 1, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
+      .init(
+        kind: .accumulate, progressValues: [6], closure: .harvested, expectedProgress: 0.6,
+        expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
+      .init(
+        kind: .accumulate, progressValues: [2], deadline: "2024-07-04", closure: .letGo,
+        expectedProgress: 0.2, expectedStanding: .behind),
+      .init(
+        kind: .accumulate, progressValues: [12], deadline: "2024-07-03", closure: .harvested,
+        expectedProgress: 1.2, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
+      .init(
+        kind: .measure, progressValues: [80], closure: .letGo, expectedProgress: 1,
+        expectedStanding: .onPace, evaluation: "2024-07-02T00:00:00Z"),
+      .init(
+        kind: .measure, progressValues: [95], deadline: "2024-07-04", closure: .harvested,
+        expectedProgress: 0.25, expectedStanding: .behind),
+      .init(
+        kind: .measure, progressValues: [70], deadline: "2024-07-03", closure: .letGo,
+        expectedProgress: 1, expectedStanding: .pastDue, evaluation: "2024-07-05T00:00:00Z"),
     ]
 
     for testCase in cases {
       let context = try makeContext()
-      let goal = try persistedGoal(in: context, testCase: testCase, initialClosure: testCase.closure)
+      let goal = try persistedGoal(
+        in: context, testCase: testCase, initialClosure: testCase.closure)
       let facts = goalFacts(of: goal)
       let history = historyFacts(of: goal)
       let progress = try GoalProgressComputation(context: context).snapshot(for: goal)
@@ -133,21 +162,29 @@ struct GoalLifecycleOperationsTests {
     let context = try makeContext()
     let open = try persistedGoal(
       in: context,
-      testCase: .init(kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0, expectedStanding: .onPace)
+      testCase: .init(
+        kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0,
+        expectedStanding: .onPace)
     )
     let harvested = try persistedGoal(
       in: context,
-      testCase: .init(kind: .measure, progressValues: [], closure: .harvested, expectedProgress: 0, expectedStanding: .onPace),
+      testCase: .init(
+        kind: .measure, progressValues: [], closure: .harvested, expectedProgress: 0,
+        expectedStanding: .onPace),
       initialClosure: .harvested
     )
     let letGo = try persistedGoal(
       in: context,
-      testCase: .init(kind: .accumulate, progressValues: [], closure: .letGo, expectedProgress: 0, expectedStanding: .onPace),
+      testCase: .init(
+        kind: .accumulate, progressValues: [], closure: .letGo, expectedProgress: 0,
+        expectedStanding: .onPace),
       initialClosure: .letGo
     )
     let corrupt = try persistedGoal(
       in: context,
-      testCase: .init(kind: .measure, progressValues: [], closure: .harvested, expectedProgress: 0, expectedStanding: .onPace)
+      testCase: .init(
+        kind: .measure, progressValues: [], closure: .harvested, expectedProgress: 0,
+        expectedStanding: .onPace)
     )
     corrupt.closureRawValue = "future-disposition"
     var saveCount = 0
@@ -193,7 +230,9 @@ struct GoalLifecycleOperationsTests {
 
     let deleted = try persistedGoal(
       in: context,
-      testCase: .init(kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0, expectedStanding: .onPace)
+      testCase: .init(
+        kind: .accumulate, progressValues: [], closure: .harvested, expectedProgress: 0,
+        expectedStanding: .onPace)
     )
     context.delete(deleted)
     try expectOwnershipError(.deletedGoal, goal: deleted, operations: operations)
@@ -202,7 +241,9 @@ struct GoalLifecycleOperationsTests {
     let foreignContext = try makeContext()
     let foreign = try persistedGoal(
       in: foreignContext,
-      testCase: .init(kind: .measure, progressValues: [], closure: .letGo, expectedProgress: 0, expectedStanding: .onPace),
+      testCase: .init(
+        kind: .measure, progressValues: [], closure: .letGo, expectedProgress: 0,
+        expectedStanding: .onPace),
       initialClosure: .letGo
     )
     try expectOwnershipError(.foreignGoal, goal: foreign, operations: operations)
@@ -210,7 +251,8 @@ struct GoalLifecycleOperationsTests {
     #expect(saveCount == 0)
   }
 
-  @Test("save failures restore only closure and preserve unrelated pending insert, change, and delete")
+  @Test(
+    "save failures restore only closure and preserve unrelated pending insert, change, and delete")
   func saveFailureRecoveryIsOperationLocal() throws {
     let recoveryCases: [(initial: GoalClosure?, requested: GoalClosure?)] = [
       (nil, .letGo),
@@ -268,7 +310,8 @@ struct GoalLifecycleOperationsTests {
       expectGoal(goal, equals: priorFacts)
       expectHistory(goal, equals: priorHistory)
       #expect(changed.name == "Caller changed habit")
-      #expect(context.insertedModelsArray.map(\.persistentModelID).contains(inserted.persistentModelID))
+      #expect(
+        context.insertedModelsArray.map(\.persistentModelID).contains(inserted.persistentModelID))
       #expect(context.deletedModelsArray.map(\.persistentModelID).contains(deletedIdentifier))
       #expect(context.hasChanges)
 
@@ -329,7 +372,9 @@ struct GoalLifecycleOperationsTests {
         let progress = try GoalProgressComputation(context: context).snapshot(for: goal)
         #expect(normalizedProgress(of: progress) == 1.2)
         #expect(goal.closureRawValue == nil)
-        #expect(try standingSnapshot(for: goal, progress: progress, at: "2024-07-05T00:00:00Z")?.standing == .pastDue)
+        #expect(
+          try standingSnapshot(for: goal, progress: progress, at: "2024-07-05T00:00:00Z")?.standing
+            == .pastDue)
         #expect(goal.closureRawValue == nil)
         try progressOperations.delete(exact, from: goal, at: evaluation, timeZone: zone)
         #expect(goal.closureRawValue == nil)
@@ -354,7 +399,9 @@ struct GoalLifecycleOperationsTests {
         let progress = try GoalProgressComputation(context: context).snapshot(for: goal)
         #expect(normalizedProgress(of: progress) == 1)
         #expect(goal.closureRawValue == nil)
-        #expect(try standingSnapshot(for: goal, progress: progress, at: "2024-07-05T00:00:00Z")?.standing == .pastDue)
+        #expect(
+          try standingSnapshot(for: goal, progress: progress, at: "2024-07-05T00:00:00Z")?.standing
+            == .pastDue)
         #expect(goal.closureRawValue == nil)
         try progressOperations.delete(exact, from: goal, at: evaluation, timeZone: zone)
         #expect(goal.closureRawValue == nil)
