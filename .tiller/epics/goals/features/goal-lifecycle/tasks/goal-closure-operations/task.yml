@@ -1,7 +1,7 @@
 id: T-0gtd91
 key: goals/goal-lifecycle/goal-closure-operations
 title: Close and reopen goals deliberately
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:16.583158Z
+pr: 48
 gates:
     build:
         required: true

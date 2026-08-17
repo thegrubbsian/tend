@@ -1,0 +1,14 @@
+id: EV-hrgju8
+type: submit.task
+at: 2026-08-17T04:11:17.152104Z
+owner: jc
+command: submit task T-0gtd91
+targets:
+    - T-0gtd91
+before:
+    status: check
+after:
+    pr: 48
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml
