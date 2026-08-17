@@ -340,6 +340,44 @@ struct GoalFormModelTests {
     }
   }
 
+  @Test("deadline adapter reads Gregorian civil dates with a non-Gregorian calendar")
+  func deadlineAdapterReadsGregorianDateWithNonGregorianCalendar() throws {
+    let timeZone = try #require(TimeZone(identifier: "Asia/Riyadh"))
+    let callerCalendar = Calendar(identifier: .islamicUmmAlQura)
+    let instant = try utcDate(year: 2024, month: 3, day: 10, hour: 21, minute: 30)
+    let expected = try #require(GoalDate(year: 2024, month: 3, day: 11))
+
+    #expect(
+      GoalFormDeadlineAdapter.goalDate(
+        from: instant,
+        calendar: callerCalendar,
+        timeZone: timeZone
+      ) == expected)
+  }
+
+  @Test("deadline adapter writes Gregorian civil dates with a non-Gregorian calendar")
+  func deadlineAdapterWritesGregorianDateWithNonGregorianCalendar() throws {
+    let timeZone = try #require(TimeZone(identifier: "Asia/Riyadh"))
+    let callerCalendar = Calendar(identifier: .islamicUmmAlQura)
+    let expected = try #require(GoalDate(year: 2024, month: 3, day: 11))
+
+    let pickerDate = GoalFormDeadlineAdapter.date(
+      for: expected,
+      calendar: callerCalendar,
+      timeZone: timeZone
+    )
+    var gregorianCalendar = Calendar(identifier: .gregorian)
+    gregorianCalendar.timeZone = timeZone
+    let components = gregorianCalendar.dateComponents(
+      [.year, .month, .day],
+      from: pickerDate
+    )
+
+    #expect(components.year == 2024)
+    #expect(components.month == 3)
+    #expect(components.day == 11)
+  }
+
   @Test("Edit snapshots persisted values once and never permits a kind change")
   func editSnapshotsValuesAndLocksKind() throws {
     let deadline = try #require(GoalDate(year: 2026, month: 8, day: 31))
@@ -374,6 +412,66 @@ struct GoalFormModelTests {
     #expect(model.unit == "kilometers")
     #expect(model.baselineText == "2")
     #expect(model.deadline == deadline)
+  }
+
+  @Test("Edit rejects an unsupported stored kind without coercing or writing")
+  func editRejectsUnsupportedStoredKind() {
+    let goal = Goal(
+      name: "Walk",
+      kind: .accumulate,
+      target: 4,
+      unit: "laps",
+      baseline: nil
+    )
+    goal.kindRawValue = "future-kind"
+    let recorder = GoalFormPersistenceRecorder(createdGoal: goal)
+    let model = GoalFormModel(mode: .edit(goal))
+
+    #expect(
+      model.configurationErrorMessage
+        == "This goal has an unsupported stored kind and can’t be edited.")
+    #expect(!model.canSave)
+
+    let savedGoal = save(model, with: recorder)
+
+    #expect(savedGoal == nil)
+    #expect(recorder.totalInvocationCount == 0)
+    #expect(goal.name == "Walk")
+    #expect(goal.kindRawValue == "future-kind")
+    #expect(goal.target == 4)
+    #expect(goal.unit == "laps")
+    #expect(goal.baseline == nil)
+    #expect(goal.deadlineKey == nil)
+  }
+
+  @Test("Edit rejects a malformed stored deadline without dropping or writing it")
+  func editRejectsMalformedStoredDeadline() {
+    let goal = Goal(
+      name: "Read",
+      kind: .accumulate,
+      target: 3,
+      unit: "books",
+      baseline: nil
+    )
+    goal.deadlineKey = "2026-02-30"
+    let recorder = GoalFormPersistenceRecorder(createdGoal: goal)
+    let model = GoalFormModel(mode: .edit(goal))
+
+    #expect(
+      model.configurationErrorMessage
+        == "This goal has an invalid stored deadline and can’t be edited.")
+    #expect(!model.canSave)
+
+    let savedGoal = save(model, with: recorder)
+
+    #expect(savedGoal == nil)
+    #expect(recorder.totalInvocationCount == 0)
+    #expect(goal.name == "Read")
+    #expect(goal.kindRawValue == GoalKind.accumulate.rawValue)
+    #expect(goal.target == 3)
+    #expect(goal.unit == "books")
+    #expect(goal.baseline == nil)
+    #expect(goal.deadlineKey == "2026-02-30")
   }
 
   @Test("Edit Save updates the original closed goal exactly once without changing kind")
