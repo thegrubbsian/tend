@@ -247,7 +247,7 @@ public final class GoalDetailQuery {
         goal.entries ?? [],
         localDays: localDays,
         mutationsAllowed: mutationsAllowed
-      ).map(GoalDetailHistoryItem.entry)
+      )
     case .measure:
       let effectiveID: UUID?
       if case .measure(let snapshot) = progress {
@@ -260,7 +260,7 @@ public final class GoalDetailQuery {
         effectiveID: effectiveID,
         localDays: localDays,
         mutationsAllowed: mutationsAllowed
-      ).map(GoalDetailHistoryItem.reading)
+      )
     }
   }
 
@@ -268,10 +268,10 @@ public final class GoalDetailQuery {
     _ entries: [GoalEntry],
     localDays: GoalProgressLocalDayWindow,
     mutationsAllowed: Bool
-  ) throws -> [GoalDetailEntry] {
+  ) throws -> [GoalDetailHistoryItem] {
     var observed = Set<GoalEntryIdentity>()
     observed.reserveCapacity(entries.count)
-    var result = [GoalDetailEntry]()
+    var result = [GoalDetailHistoryItem]()
     result.reserveCapacity(entries.count)
 
     for entry in entries {
@@ -287,14 +287,15 @@ public final class GoalDetailQuery {
       }
       try validateChronology(assignedDate, localDays: localDays)
       result.append(
-        GoalDetailEntry(
-          id: id,
-          assignedDate: assignedDate,
-          amount: entry.amount,
-          appendedAt: entry.appendedAt,
-          appendSequence: entry.appendSequence,
-          isDeleteEligible: mutationsAllowed && localDays.isDeleteEligible(assignedDate)
-        ))
+        .entry(
+          GoalDetailEntry(
+            id: id,
+            assignedDate: assignedDate,
+            amount: entry.amount,
+            appendedAt: entry.appendedAt,
+            appendSequence: entry.appendSequence,
+            isDeleteEligible: mutationsAllowed && localDays.isDeleteEligible(assignedDate)
+          )))
     }
 
     result.sort(by: historyPrecedes)
@@ -306,10 +307,10 @@ public final class GoalDetailQuery {
     effectiveID: UUID?,
     localDays: GoalProgressLocalDayWindow,
     mutationsAllowed: Bool
-  ) throws -> [GoalDetailReading] {
+  ) throws -> [GoalDetailHistoryItem] {
     var observed = Set<GoalReadingIdentity>()
     observed.reserveCapacity(readings.count)
-    var result = [GoalDetailReading]()
+    var result = [GoalDetailHistoryItem]()
     result.reserveCapacity(readings.count)
 
     for reading in readings {
@@ -325,15 +326,16 @@ public final class GoalDetailQuery {
       }
       try validateChronology(assignedDate, localDays: localDays)
       result.append(
-        GoalDetailReading(
-          id: id,
-          assignedDate: assignedDate,
-          value: reading.value,
-          appendedAt: reading.appendedAt,
-          appendSequence: reading.appendSequence,
-          isDeleteEligible: mutationsAllowed && localDays.isDeleteEligible(assignedDate),
-          isEffective: reading.id == effectiveID
-        ))
+        .reading(
+          GoalDetailReading(
+            id: id,
+            assignedDate: assignedDate,
+            value: reading.value,
+            appendedAt: reading.appendedAt,
+            appendSequence: reading.appendSequence,
+            isDeleteEligible: mutationsAllowed && localDays.isDeleteEligible(assignedDate),
+            isEffective: reading.id == effectiveID
+          )))
     }
 
     result.sort(by: historyPrecedes)
@@ -352,17 +354,41 @@ public final class GoalDetailQuery {
     }
   }
 
-  private func historyPrecedes(_ lhs: GoalDetailEntry, _ rhs: GoalDetailEntry) -> Bool {
-    if lhs.assignedDate != rhs.assignedDate {
-      return lhs.assignedDate > rhs.assignedDate
+  private func historyPrecedes(
+    _ lhs: GoalDetailHistoryItem,
+    _ rhs: GoalDetailHistoryItem
+  ) -> Bool {
+    switch (lhs, rhs) {
+    case (.entry(let lhs), .entry(let rhs)):
+      return historyPrecedes(
+        lhsDate: lhs.assignedDate,
+        lhsSequence: lhs.appendSequence,
+        rhsDate: rhs.assignedDate,
+        rhsSequence: rhs.appendSequence
+      )
+    case (.reading(let lhs), .reading(let rhs)):
+      return historyPrecedes(
+        lhsDate: lhs.assignedDate,
+        lhsSequence: lhs.appendSequence,
+        rhsDate: rhs.assignedDate,
+        rhsSequence: rhs.appendSequence
+      )
+    case (.entry, .reading):
+      return true
+    case (.reading, .entry):
+      return false
     }
-    return lhs.appendSequence > rhs.appendSequence
   }
 
-  private func historyPrecedes(_ lhs: GoalDetailReading, _ rhs: GoalDetailReading) -> Bool {
-    if lhs.assignedDate != rhs.assignedDate {
-      return lhs.assignedDate > rhs.assignedDate
+  private func historyPrecedes(
+    lhsDate: GoalDate,
+    lhsSequence: Int,
+    rhsDate: GoalDate,
+    rhsSequence: Int
+  ) -> Bool {
+    if lhsDate != rhsDate {
+      return lhsDate > rhsDate
     }
-    return lhs.appendSequence > rhs.appendSequence
+    return lhsSequence > rhsSequence
   }
 }

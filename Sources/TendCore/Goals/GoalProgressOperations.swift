@@ -579,10 +579,7 @@ struct GoalProgressLocalDayWindow {
   }
 
   func isDeleteEligible(_ date: GoalDate) -> Bool {
-    if date == today {
-      return true
-    }
-    return date == (try? editableDays.today.previous())
+    (try? editableDays.contains(date)) ?? false
   }
 }
 

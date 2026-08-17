@@ -315,6 +315,67 @@ struct GoalDetailQueryTests {
     #expect(nextDay.availableAppendDestinations == [.today, .yesterday])
   }
 
+  @Test("year-one delete eligibility matches mutation authorization failure")
+  func minimumCivilDayIsNotDeleteEligible() throws {
+    let context = try makeContext()
+    let zone = try timeZone("UTC")
+    let minimumDay = try goalDate("0001-01-01")
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = zone
+    var components = DateComponents()
+    components.era = 1
+    components.year = 1
+    components.month = 1
+    components.day = 1
+    let evaluation = try #require(calendar.date(from: components))
+    let goal = Goal(
+      name: "Read",
+      kind: .accumulate,
+      target: 10,
+      unit: "pages",
+      createdAt: evaluation
+    )
+    goal.entries = [
+      GoalEntry(
+        amount: 1,
+        assignedDate: minimumDay,
+        appendedAt: evaluation,
+        appendSequence: 0
+      )
+    ]
+    context.insert(goal)
+    try context.save()
+    let entry = try #require(goal.entries?.first)
+
+    let snapshot = try GoalDetailQuery(context: context).snapshot(
+      for: goal,
+      at: evaluation,
+      calendar: calendar,
+      timeZone: zone
+    )
+
+    guard case .entry(let history) = try #require(snapshot.history.first) else {
+      Issue.record("Expected entry history")
+      return
+    }
+    #expect(!history.isDeleteEligible)
+
+    do {
+      try GoalProgressOperations(context: context).delete(
+        entry,
+        from: goal,
+        at: evaluation,
+        timeZone: zone
+      )
+      Issue.record("Expected the minimum civil day to have no representable Yesterday")
+    } catch let error as GoalDateError {
+      #expect(error == .unrepresentableDate)
+    }
+    #expect(goal.entries?.first === entry)
+    #expect(!context.hasChanges)
+  }
+
   @Test("local Gregorian days drive eligibility across midnight, DST, zones, and caller calendars")
   func eligibilityUsesExplicitLocalGregorianDays() throws {
     do {
