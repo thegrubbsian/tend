@@ -36,6 +36,20 @@ enum GoalFormValidationError: Error, Equatable {
   }
 }
 
+private enum GoalFormConfigurationError: CaseIterable, Hashable {
+  case unsupportedKind
+  case invalidDeadline
+
+  var message: String {
+    switch self {
+    case .unsupportedKind:
+      "This goal has an unsupported stored kind and can’t be edited."
+    case .invalidDeadline:
+      "This goal has an invalid stored deadline and can’t be edited."
+    }
+  }
+}
+
 @MainActor
 struct GoalFormPersistence {
   typealias Create = (
@@ -79,12 +93,12 @@ struct GoalFormPersistence {
 enum GoalFormDeadlineAdapter {
   static func goalDate(
     from date: Date,
-    calendar: Calendar,
+    calendar _: Calendar,
     timeZone: TimeZone
   ) -> GoalDate? {
-    var localCalendar = calendar
-    localCalendar.timeZone = timeZone
-    let components = localCalendar.dateComponents([.year, .month, .day], from: date)
+    var gregorianCalendar = Calendar(identifier: .gregorian)
+    gregorianCalendar.timeZone = timeZone
+    let components = gregorianCalendar.dateComponents([.year, .month, .day], from: date)
     guard
       let year = components.year,
       let month = components.month,
@@ -97,19 +111,19 @@ enum GoalFormDeadlineAdapter {
 
   static func date(
     for goalDate: GoalDate,
-    calendar: Calendar,
+    calendar _: Calendar,
     timeZone: TimeZone
   ) -> Date {
-    var localCalendar = calendar
-    localCalendar.timeZone = timeZone
+    var gregorianCalendar = Calendar(identifier: .gregorian)
+    gregorianCalendar.timeZone = timeZone
     let components = DateComponents(
       year: goalDate.year,
       month: goalDate.month,
       day: goalDate.day,
       hour: 12
     )
-    guard let date = localCalendar.date(from: components) else {
-      preconditionFailure("The supplied calendar cannot represent this goal date.")
+    guard let date = gregorianCalendar.date(from: components) else {
+      preconditionFailure("The Gregorian calendar cannot represent this goal date.")
     }
     return date
   }
@@ -131,6 +145,7 @@ final class GoalFormModel {
   private(set) var persistenceError: String?
 
   private var interactedFields: Set<GoalFormField> = []
+  private var configurationErrors: Set<GoalFormConfigurationError> = []
 
   init(mode: GoalFormMode) {
     self.mode = mode
@@ -140,11 +155,21 @@ final class GoalFormModel {
     }
 
     name = goal.name
-    kind = GoalKind(rawValue: goal.kindRawValue) ?? .accumulate
+    if let storedKind = GoalKind(rawValue: goal.kindRawValue) {
+      kind = storedKind
+    } else {
+      configurationErrors.insert(.unsupportedKind)
+    }
     targetText = String(goal.target)
     unit = goal.unit
     baselineText = goal.baseline.map(String.init) ?? ""
-    deadline = goal.deadlineKey.flatMap(GoalDate.init(rawValue:))
+    if let deadlineKey = goal.deadlineKey {
+      if let storedDeadline = GoalDate(rawValue: deadlineKey) {
+        deadline = storedDeadline
+      } else {
+        configurationErrors.insert(.invalidDeadline)
+      }
+    }
     interactedFields.formUnion([.name, .target, .unit, .baseline])
   }
 
@@ -156,8 +181,15 @@ final class GoalFormModel {
     }
   }
 
+  var configurationErrorMessage: String? {
+    let messages = GoalFormConfigurationError.allCases
+      .filter(configurationErrors.contains)
+      .map(\.message)
+    return messages.isEmpty ? nil : messages.joined(separator: " ")
+  }
+
   var canSave: Bool {
-    !isSaving && firstValidationError() == nil
+    configurationErrors.isEmpty && !isSaving && firstValidationError() == nil
   }
 
   func markInteracted(with field: GoalFormField) {
@@ -188,6 +220,10 @@ final class GoalFormModel {
     timeZone: TimeZone
   ) -> Goal? {
     guard !isSaving else {
+      return nil
+    }
+
+    guard configurationErrors.isEmpty else {
       return nil
     }
 
