@@ -1,0 +1,13 @@
+id: EV-iff16w
+type: check.task
+at: 2026-08-17T04:10:14.715028Z
+owner: jc
+command: check task T-0gtd91
+targets:
+    - T-0gtd91
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml

@@ -10,6 +10,8 @@ public enum GoalProgressOperationError: Error, Equatable, Sendable {
   case invalidAmount(Int)
   case detachedGoal
   case foreignGoal
+  case closedGoal(GoalClosure)
+  case invalidClosure(String)
   case detachedEntry
   case foreignEntry
   case detachedReading
@@ -207,6 +209,7 @@ public final class GoalProgressOperations {
     requiredKind: GoalKind
   ) throws -> GoalGraph {
     try requirePersisted(goal)
+    try requireOpen(goal)
     let kind = try validatedConfiguration(goal)
     guard kind == requiredKind else {
       throw GoalProgressOperationError.wrongGoalKind(
@@ -277,6 +280,18 @@ public final class GoalProgressOperations {
       : readings.map(\.appendSequence)
     try validateSequences(relevantSequences)
     return GoalGraph(entries: entries, readings: readings)
+  }
+
+  private func requireOpen(_ goal: Goal) throws {
+    let closure: GoalClosure?
+    do {
+      closure = try goal.checkedClosure
+    } catch GoalClosureError.unsupportedRawValue(let rawValue) {
+      throw GoalProgressOperationError.invalidClosure(rawValue)
+    }
+    if let closure {
+      throw GoalProgressOperationError.closedGoal(closure)
+    }
   }
 
   private func validatedConfiguration(_ goal: Goal) throws -> GoalKind {

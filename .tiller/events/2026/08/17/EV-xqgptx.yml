@@ -1,0 +1,13 @@
+id: EV-xqgptx
+type: start.task
+at: 2026-08-17T03:47:48.256146Z
+owner: jc
+command: start task T-0gtd91
+targets:
+    - T-0gtd91
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml
