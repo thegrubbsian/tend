@@ -151,6 +151,33 @@ struct GoalStandingComputationTests {
     #expect((try #require(fallSnapshot.expectedNormalizedProgress)) == 24.0 / 49.0)
   }
 
+  @Test("deadline resolution stays proleptic Gregorian across the 1582 civil cutover")
+  func deadlineResolutionUsesGoalDateCalendarSemantics() throws {
+    let deadline = try goalDate("1582-10-04")
+    let expectedBoundary = Date(timeIntervalSince1970: -12_220_156_800)
+    let goal = Goal(
+      name: "Read",
+      kind: .accumulate,
+      target: 10,
+      unit: "pages",
+      deadline: deadline,
+      createdAt: expectedBoundary.addingTimeInterval(-12 * 60 * 60)
+    )
+
+    let snapshot = try #require(
+      try standing(
+        goal,
+        normalizedProgress: 1,
+        at: expectedBoundary,
+        calendar: utcCalendar,
+        timeZone: utc
+      )
+    )
+
+    #expect(snapshot.deadlineBoundary == expectedBoundary)
+    #expect(snapshot.standing == .pastDue)
+  }
+
   @Test("a deadline on the creation day remains valid through that local day")
   func creationDayDeadlineUsesFollowingLocalDay() throws {
     let newYork = try #require(TimeZone(identifier: "America/New_York"))

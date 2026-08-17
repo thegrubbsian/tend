@@ -173,7 +173,7 @@ public struct GoalStandingComputation: Sendable {
 
   private func validatedDeadlineBoundary(
     of goal: Goal,
-    calendar: Calendar,
+    calendar _: Calendar,
     timeZone: TimeZone
   ) throws -> Date? {
     guard let deadlineKey = goal.deadlineKey else {
@@ -183,22 +183,11 @@ public struct GoalStandingComputation: Sendable {
       throw GoalStandingComputationError.invalidDeadline(deadlineKey)
     }
 
-    let followingDay: GoalDate
+    let boundary: Date
     do {
-      followingDay = try deadline.next()
+      boundary = try deadline.next().start(in: timeZone)
     } catch let error as GoalDateError {
       throw GoalStandingComputationError.invalidDeadlineBoundary(error)
-    }
-
-    var localCalendar = calendar
-    localCalendar.timeZone = timeZone
-    var components = DateComponents()
-    components.timeZone = timeZone
-    components.year = followingDay.year
-    components.month = followingDay.month
-    components.day = followingDay.day
-    guard let boundary = localCalendar.date(from: components) else {
-      throw GoalStandingComputationError.invalidDeadlineBoundary(.calendarCalculationFailed)
     }
     guard boundary.timeIntervalSinceReferenceDate.isFinite else {
       throw GoalStandingComputationError.invalidDeadlineBoundary(.calendarCalculationFailed)
