@@ -401,6 +401,74 @@ struct GoalDetailModelTests {
     #expect(measure.entryValidationMessage == nil)
   }
 
+  @Test("entry-sheet cancel consumes exactly one refresh deferred behind the draft")
+  func refreshesAfterEntrySheetCancel() throws {
+    let fixture = try GoalDetailFixture()
+    let initial = fixture.accumulateSnapshot(name: "Walk")
+    let refreshed = fixture.accumulateSnapshot(name: "Walk outside")
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(initial), .success(refreshed)]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    model.start()
+
+    model.presentEntrySheet()
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
+
+    model.cancelEntrySheet()
+    model.cancelEntrySheet()
+
+    #expect(!model.isPresentingEntrySheet)
+    #expect(model.presentation?.name == "Walk outside")
+    #expect(recorder.snapshotInvocations.count == 2)
+  }
+
+  @Test("confirmation cancel consumes exactly one refresh deferred behind the alert")
+  func refreshesAfterConfirmationCancel() throws {
+    let fixture = try GoalDetailFixture()
+    let initial = fixture.accumulateSnapshot(name: "Walk")
+    let refreshed = fixture.accumulateSnapshot(name: "Walk outside")
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(initial), .success(refreshed)]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    model.start()
+
+    model.requestConfirmation(.harvest)
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
+
+    model.cancelConfirmation()
+    model.cancelConfirmation()
+
+    #expect(model.confirmation == nil)
+    #expect(model.presentation?.name == "Walk outside")
+    #expect(recorder.snapshotInvocations.count == 2)
+  }
+
+  @Test("refresh requested during a snapshot runs one follow-up query after the first result")
+  func preservesReentrantRefresh() throws {
+    let fixture = try GoalDetailFixture()
+    let initial = fixture.accumulateSnapshot(name: "Walk")
+    let refreshed = fixture.accumulateSnapshot(name: "Walk outside")
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(initial), .success(refreshed)]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    var shouldRefresh = true
+    recorder.onSnapshot = { [weak model] in
+      guard shouldRefresh else { return }
+      shouldRefresh = false
+      model?.refresh()
+    }
+
+    model.start()
+
+    #expect(model.presentation?.name == "Walk outside")
+    #expect(recorder.snapshotInvocations.count == 2)
+  }
+
   @Test("history deletion requires query eligibility and dispatches the exact typed identity")
   func authorizesHistoryDeletion() throws {
     let fixture = try GoalDetailFixture()
@@ -685,8 +753,11 @@ struct GoalDetailModelTests {
     model.start()
     let lastGood = model.presentation
     model.presentEntrySheet()
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
     model.entryText = "2"
     model.saveEntry()
+    #expect(recorder.snapshotInvocations.count == 2)
 
     #expect(recorder.appendInvocations.count == 1)
     #expect(model.presentation == lastGood)
@@ -1225,6 +1296,7 @@ private final class GoalDetailOperationsRecorder {
   var deleteInvocations: [GoalDetailHistoryID] = []
   var lifecycleInvocations: [LifecycleInvocation] = []
   var deleteGoalInvocations = 0
+  var onSnapshot: (() -> Void)?
 
   private var snapshots: [Result<GoalDetailSnapshot, TestGoalDetailFailure>]
   private var appendResults: [Result<Void, TestGoalDetailFailure>]
@@ -1252,6 +1324,7 @@ private final class GoalDetailOperationsRecorder {
         snapshotInvocations.append(
           .init(goal: goal, instant: instant, calendar: calendar, timeZone: timeZone))
         guard !snapshots.isEmpty else { throw TestGoalDetailFailure.load }
+        onSnapshot?()
         return try snapshots.removeFirst().get()
       },
       appendAmount: { [unowned self] value, _, destination, instant, timeZone in

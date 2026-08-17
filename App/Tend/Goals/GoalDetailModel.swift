@@ -373,7 +373,6 @@ final class GoalDetailModel {
       hasDeferredRefresh = true
       return
     }
-    hasDeferredRefresh = false
     load(using: makeContext())
   }
 
@@ -522,7 +521,13 @@ final class GoalDetailModel {
     guard isAuthorized(envelope.request) else { return }
 
     isOperationInFlight = true
-    defer { isOperationInFlight = false }
+    var didReplacePresentation = false
+    defer {
+      isOperationInFlight = false
+      if didReplacePresentation {
+        consumeDeferredRefresh()
+      }
+    }
 
     do {
       let didCommit = try dispatch(envelope)
@@ -537,12 +542,12 @@ final class GoalDetailModel {
       }
 
       if didCommit {
-        reloadCommitted(
+        didReplacePresentation = reloadCommitted(
           CommittedMutation(request: envelope.request, context: envelope.context),
           alreadyInFlight: true
         )
       } else {
-        load(using: envelope.context, alreadyInFlight: true)
+        didReplacePresentation = load(using: envelope.context, alreadyInFlight: true)
       }
     } catch {
       retryState = .mutation(envelope)
@@ -595,52 +600,73 @@ final class GoalDetailModel {
     }
   }
 
+  @discardableResult
   private func reloadCommitted(
     _ committed: CommittedMutation,
     alreadyInFlight: Bool = false
-  ) {
-    guard !isOperationInFlight || alreadyInFlight else { return }
-    if !alreadyInFlight {
+  ) -> Bool {
+    guard !isOperationInFlight || alreadyInFlight else { return false }
+    let ownsOperationFlight = !alreadyInFlight
+    if ownsOperationFlight {
       isOperationInFlight = true
     }
+    let deferredBeforeQuery = hasDeferredRefresh
+    hasDeferredRefresh = false
+    var didReplacePresentation = false
     defer {
-      if !alreadyInFlight {
+      if ownsOperationFlight {
         isOperationInFlight = false
+        if didReplacePresentation {
+          consumeDeferredRefresh()
+        }
       }
     }
 
     do {
       let replacement = try replacementPresentation(using: committed.context)
       presentation = replacement
-      hasDeferredRefresh = false
       loadFailure = nil
       retryState = nil
       operationFailure = nil
       clearInteraction(for: committed.request)
+      didReplacePresentation = true
+      return true
     } catch {
+      hasDeferredRefresh = deferredBeforeQuery || hasDeferredRefresh
       retryState = .reload(committed)
       operationFailure = reloadFailure(locale: committed.context.locale)
+      return false
     }
   }
 
-  private func load(using context: LoadContext, alreadyInFlight: Bool = false) {
-    guard !isOperationInFlight || alreadyInFlight else { return }
-    if !alreadyInFlight {
+  @discardableResult
+  private func load(using context: LoadContext, alreadyInFlight: Bool = false) -> Bool {
+    guard !isOperationInFlight || alreadyInFlight else { return false }
+    let ownsOperationFlight = !alreadyInFlight
+    if ownsOperationFlight {
       isOperationInFlight = true
     }
+    let deferredBeforeQuery = hasDeferredRefresh
+    hasDeferredRefresh = false
+    var didReplacePresentation = false
     defer {
-      if !alreadyInFlight {
+      if ownsOperationFlight {
         isOperationInFlight = false
+        if didReplacePresentation {
+          consumeDeferredRefresh()
+        }
       }
     }
 
     do {
       let replacement = try replacementPresentation(using: context)
       presentation = replacement
-      hasDeferredRefresh = false
       reconcileInteractions(with: replacement)
       loadFailure = nil
+      didReplacePresentation = true
+      return true
     } catch {
+      hasDeferredRefresh = deferredBeforeQuery || hasDeferredRefresh
       loadFailure = GoalDetailLoadFailure(
         message: String(
           localized: "This goal is unavailable right now.",
@@ -648,6 +674,7 @@ final class GoalDetailModel {
         ),
         retryTitle: String(localized: "Try again", locale: context.locale)
       )
+      return false
     }
   }
 
@@ -785,7 +812,6 @@ final class GoalDetailModel {
 
   private func consumeDeferredRefresh() {
     guard hasDeferredRefresh else { return }
-    hasDeferredRefresh = false
     refresh()
   }
 
