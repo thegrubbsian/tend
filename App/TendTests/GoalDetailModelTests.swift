@@ -996,6 +996,35 @@ struct GoalDetailModelTests {
     }
   }
 
+  @Test("future deadline rejects elapsed past-due boundary without replacing presentation")
+  func rejectsFutureDeadlineWithElapsedPastDueBoundary() throws {
+    let fixture = try GoalDetailFixture()
+    let good = fixture.accumulateSnapshot(name: "Last good")
+    let deadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
+    let contradictory = fixture.accumulateSnapshot(
+      name: "Contradictory",
+      deadline: deadline,
+      standing: GoalStandingSnapshot(
+        standing: .pastDue,
+        actualNormalizedProgress: 0,
+        expectedNormalizedProgress: 1,
+        deadlineBoundary: fixture.instant,
+        nextTimeRefresh: nil
+      )
+    )
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(good), .success(contradictory)]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    model.start()
+    let lastGood = try #require(model.presentation)
+
+    model.refresh()
+
+    #expect(model.presentation == lastGood)
+    #expect(model.loadFailure != nil)
+  }
+
   @Test("selected identity is captured once while every presentation fact comes from the query")
   func keepsStableSelectedIdentity() throws {
     let fixture = try GoalDetailFixture()

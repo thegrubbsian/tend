@@ -865,9 +865,11 @@ private struct GoalDetailPresentationBuilder {
     }
 
     let progress = try progressFact(snapshot)
+    let deadlineDayDistance = civilDayDistance(to: snapshot.metadata.deadline)
     let standing = try standingFact(
       snapshot,
-      normalizedProgress: normalizedProgress(in: progress)
+      normalizedProgress: normalizedProgress(in: progress),
+      deadlineDayDistance: deadlineDayDistance
     )
     let history = try snapshot.history.map { try historyFact($0, metadata: snapshot.metadata) }
     let appendDestinations = snapshot.availableAppendDestinations.map {
@@ -888,7 +890,10 @@ private struct GoalDetailPresentationBuilder {
       kind: snapshot.metadata.kind,
       progress: progress,
       progressText: progressText(progress),
-      deadlineText: deadlineText(snapshot.metadata.deadline),
+      deadlineText: deadlineText(
+        snapshot.metadata.deadline,
+        dayDistance: deadlineDayDistance
+      ),
       standing: standing?.standing,
       expectedNormalizedProgress: standing?.expectedNormalizedProgress,
       standingText: standingText(standing?.standing),
@@ -938,7 +943,8 @@ private struct GoalDetailPresentationBuilder {
 
   private func standingFact(
     _ snapshot: GoalDetailSnapshot,
-    normalizedProgress: Double
+    normalizedProgress: Double,
+    deadlineDayDistance: Int?
   ) throws -> GoalStandingSnapshot? {
     switch (snapshot.metadata.closure, snapshot.standing) {
     case (nil, .some(let standing)):
@@ -965,6 +971,14 @@ private struct GoalDetailPresentationBuilder {
         let boundary = standing.deadlineBoundary,
         boundary.timeIntervalSinceReferenceDate.isFinite
       else { throw ProjectionError.inconsistentStanding }
+
+      if let deadlineDayDistance {
+        let metadataDeadlineIsElapsed = deadlineDayDistance < 0
+        let suppliedBoundaryIsElapsed = instant >= boundary
+        guard metadataDeadlineIsElapsed == suppliedBoundaryIsElapsed else {
+          throw ProjectionError.inconsistentStanding
+        }
+      }
 
       if instant < boundary {
         let expectedStanding: GoalStanding =
@@ -1032,20 +1046,26 @@ private struct GoalDetailPresentationBuilder {
     }
   }
 
-  private func deadlineText(_ deadline: GoalDate?) -> String {
+  private func civilDayDistance(to deadline: GoalDate?) -> Int? {
+    guard
+      let deadline,
+      let today = localGoalDate(instant),
+      let todayStart = try? today.start(in: timeZone),
+      let deadlineStart = try? deadline.start(in: timeZone)
+    else { return nil }
+    return calendar.dateComponents(
+      [.day],
+      from: todayStart,
+      to: deadlineStart
+    ).day
+  }
+
+  private func deadlineText(_ deadline: GoalDate?, dayDistance: Int?) -> String {
     guard let deadline else {
       return String(localized: "No deadline", locale: locale)
     }
     let formattedDeadline = formatted(deadline)
-    guard
-      let today = localGoalDate(instant),
-      let todayStart = try? today.start(in: timeZone),
-      let deadlineStart = try? deadline.start(in: timeZone),
-      let dayDistance = calendar.dateComponents(
-        [.day],
-        from: todayStart,
-        to: deadlineStart
-      ).day
+    guard let dayDistance
     else {
       return String(
         format: String(localized: "Due %@", locale: locale),
