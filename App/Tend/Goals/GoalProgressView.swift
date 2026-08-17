@@ -317,6 +317,8 @@ private struct GoalProgressTrack: View {
     case trailingToLeading
   }
 
+  @Environment(\.layoutDirection) private var layoutDirection
+
   let normalizedProgress: Double
   let expectedNormalizedProgress: Double?
   let orientation: Orientation
@@ -413,15 +415,25 @@ private struct GoalProgressTrack: View {
     width: CGFloat,
     itemWidth: CGFloat
   ) -> CGFloat {
-    let availableWidth = max(width - itemWidth, 0)
-    let orientedFraction: CGFloat
+    let physicalX = directedPhysicalX(for: fraction, width: width)
+    let edgeInset = min(itemWidth / 2, width / 2)
+    return min(max(physicalX, edgeInset), width - edgeInset)
+  }
+
+  private func directedPhysicalX(
+    for fraction: CGFloat,
+    width: CGFloat
+  ) -> CGFloat {
     switch orientation {
     case .leadingToTrailing:
-      orientedFraction = fraction
+      layoutDirection == .leftToRight
+        ? width * fraction
+        : width * (1 - fraction)
     case .trailingToLeading:
-      orientedFraction = 1 - fraction
+      layoutDirection == .leftToRight
+        ? width * (1 - fraction)
+        : width * fraction
     }
-    return itemWidth / 2 + availableWidth * orientedFraction
   }
 
   private func clamped(_ fraction: Double) -> CGFloat {
