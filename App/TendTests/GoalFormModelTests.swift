@@ -812,8 +812,8 @@ private enum TestGoalSaveFailure: LocalizedError {
   }
 }
 
-extension Collection {
-  fileprivate var only: Element? {
+private extension Collection {
+  var only: Element? {
     count == 1 ? first : nil
   }
 }
