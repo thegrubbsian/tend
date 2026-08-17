@@ -279,6 +279,8 @@ struct GoalDetailModelTests {
     model.start()
 
     model.presentEntrySheet()
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
     model.entryText = "3"
     model.selectAppendDestination(.today)
     model.saveEntry()
@@ -295,6 +297,7 @@ struct GoalDetailModelTests {
     )
     #expect(!model.isPresentingEntrySheet)
     #expect(model.presentation?.progressText == "3 of 10 times")
+    #expect(recorder.snapshotInvocations.count == 2)
 
     model.presentEntrySheet()
     model.entryText = "4"
@@ -424,10 +427,13 @@ struct GoalDetailModelTests {
     #expect(model.confirmation == nil)
     model.requestHistoryDeletion(.entry(eligibleID))
     #expect(model.confirmation == .deleteHistory(.entry(eligibleID)))
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
     model.confirmPendingAction()
 
     #expect(recorder.deleteInvocations == [.entry(eligibleID)])
     #expect(model.presentation?.history.map(\.id) == [.entry(ineligibleID)])
+    #expect(recorder.snapshotInvocations.count == 2)
   }
 
   @Test("rejected history deletion is a retryable mutation failure, not a silent reload")
@@ -477,29 +483,37 @@ struct GoalDetailModelTests {
     #expect(model.presentation == lastGood)
   }
 
-  @Test("Edit cancel preserves facts and Edit save refreshes from the query")
+  @Test("Edit cancel consumes deferred refresh and Edit save does not duplicate its query")
   func refreshesAfterEditSave() throws {
     let fixture = try GoalDetailFixture()
     let initial = fixture.accumulateSnapshot(name: "Walk")
+    let externalRefresh = fixture.accumulateSnapshot(name: "Walk outside")
     let edited = fixture.accumulateSnapshot(name: "Walk farther")
-    let recorder = GoalDetailOperationsRecorder(snapshots: [.success(initial), .success(edited)])
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [.success(initial), .success(externalRefresh), .success(edited)]
+    )
     let model = fixture.model(operations: recorder.operations)
     model.start()
 
     model.presentEdit()
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
     #expect(model.goalForEditing === fixture.goal)
     model.editCancelled()
+    #expect(model.presentation?.name == "Walk outside")
+    #expect(recorder.snapshotInvocations.count == 2)
     #expect(!model.isPresentingEdit)
-    #expect(recorder.snapshotInvocations.count == 1)
 
     model.presentEdit()
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 2)
     model.editSaved()
     #expect(!model.isPresentingEdit)
     #expect(model.presentation?.name == "Walk farther")
-    #expect(recorder.snapshotInvocations.count == 2)
+    #expect(recorder.snapshotInvocations.count == 3)
   }
 
-  @Test("Harvest, Let go, and Reopen require confirmation and refresh only after persistence")
+  @Test("lifecycle mutation reload satisfies a refresh deferred behind its confirmation")
   func performsLifecycleMutations() throws {
     let fixture = try GoalDetailFixture()
     let open = fixture.accumulateSnapshot()
@@ -513,10 +527,13 @@ struct GoalDetailModelTests {
     model.start()
 
     model.requestConfirmation(.harvest)
+    model.refresh()
+    #expect(recorder.snapshotInvocations.count == 1)
     #expect(recorder.lifecycleInvocations.isEmpty)
     model.confirmPendingAction()
     #expect(recorder.lifecycleInvocations == [.close(.harvested)])
     #expect(model.presentation?.closureText == "Harvested")
+    #expect(recorder.snapshotInvocations.count == 2)
 
     model.requestConfirmation(.reopen)
     model.confirmPendingAction()
@@ -599,18 +616,22 @@ struct GoalDetailModelTests {
     #expect(!model.isPresentingEntrySheet)
 
     let cancellingRecorder = GoalDetailOperationsRecorder(
-      snapshots: [.success(initial)],
+      snapshots: [.success(initial), .success(refreshed)],
       appendResults: [.failure(TestGoalDetailFailure.append)]
     )
     let cancellingModel = fixture.model(operations: cancellingRecorder.operations)
     cancellingModel.start()
     cancellingModel.presentEntrySheet()
+    cancellingModel.refresh()
+    #expect(cancellingRecorder.snapshotInvocations.count == 1)
     cancellingModel.entryText = "2"
     cancellingModel.saveEntry()
     cancellingModel.cancelOperationFailure()
     #expect(cancellingModel.operationFailure == nil)
     #expect(!cancellingModel.isPresentingEntrySheet)
     #expect(cancellingRecorder.appendInvocations.count == 1)
+    #expect(cancellingRecorder.snapshotInvocations.count == 2)
+    #expect(cancellingModel.presentation?.progressText == "3 of 10 times")
   }
 
   @Test("failed lifecycle operation retains confirmation until retry or cancel")

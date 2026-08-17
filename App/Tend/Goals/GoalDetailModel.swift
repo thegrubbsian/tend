@@ -320,6 +320,7 @@ final class GoalDetailModel {
   @ObservationIgnored private let calendar: () -> Calendar
   @ObservationIgnored private let locale: () -> Locale
   @ObservationIgnored private var retryState: RetryState?
+  @ObservationIgnored private var hasDeferredRefresh = false
 
   convenience init(
     goal: Goal,
@@ -361,7 +362,18 @@ final class GoalDetailModel {
   }
 
   func refresh() {
-    guard !isOperationInFlight, operationFailure == nil, !isDeleted else { return }
+    guard !isDeleted else { return }
+    guard
+      !isPresentingEntrySheet,
+      !isPresentingEdit,
+      confirmation == nil,
+      !isOperationInFlight,
+      operationFailure == nil
+    else {
+      hasDeferredRefresh = true
+      return
+    }
+    hasDeferredRefresh = false
     load(using: makeContext())
   }
 
@@ -398,6 +410,7 @@ final class GoalDetailModel {
   func cancelEntrySheet() {
     guard !isOperationInFlight, operationFailure == nil else { return }
     dismissEntrySheet()
+    consumeDeferredRefresh()
   }
 
   func saveEntry() {
@@ -428,6 +441,7 @@ final class GoalDetailModel {
   func editCancelled() {
     guard !isOperationInFlight else { return }
     isPresentingEdit = false
+    consumeDeferredRefresh()
   }
 
   func editSaved() {
@@ -454,6 +468,7 @@ final class GoalDetailModel {
   func cancelConfirmation() {
     guard !isOperationInFlight, operationFailure == nil else { return }
     confirmation = nil
+    consumeDeferredRefresh()
   }
 
   func confirmPendingAction() {
@@ -494,6 +509,7 @@ final class GoalDetailModel {
     clearInteraction(for: envelope.request)
     retryState = nil
     operationFailure = nil
+    consumeDeferredRefresh()
   }
 
   private func perform(_ envelope: MutationEnvelope, isRetry: Bool = false) {
@@ -516,6 +532,7 @@ final class GoalDetailModel {
       if envelope.request == .deleteGoal {
         isDeleted = true
         confirmation = nil
+        hasDeferredRefresh = false
         return
       }
 
@@ -595,6 +612,7 @@ final class GoalDetailModel {
     do {
       let replacement = try replacementPresentation(using: committed.context)
       presentation = replacement
+      hasDeferredRefresh = false
       loadFailure = nil
       retryState = nil
       operationFailure = nil
@@ -619,6 +637,7 @@ final class GoalDetailModel {
     do {
       let replacement = try replacementPresentation(using: context)
       presentation = replacement
+      hasDeferredRefresh = false
       reconcileInteractions(with: replacement)
       loadFailure = nil
     } catch {
@@ -762,6 +781,12 @@ final class GoalDetailModel {
     isPresentingEntrySheet = false
     entryText = ""
     selectedAppendDestination = nil
+  }
+
+  private func consumeDeferredRefresh() {
+    guard hasDeferredRefresh else { return }
+    hasDeferredRefresh = false
+    refresh()
   }
 
   private func parsedEntry(for kind: GoalKind) -> Int? {

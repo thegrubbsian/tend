@@ -66,11 +66,6 @@ struct GoalDetailView: View {
       if phase == .active {
         guard hasLeftActiveScene else { return }
         hasLeftActiveScene = false
-        guard
-          !model.isPresentingEntrySheet,
-          !model.isPresentingEdit,
-          model.confirmation == nil
-        else { return }
         model.refresh()
       } else {
         hasLeftActiveScene = true

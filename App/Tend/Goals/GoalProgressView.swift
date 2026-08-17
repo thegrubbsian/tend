@@ -125,8 +125,8 @@ struct GoalProgressView: View {
         accent: progressColor
       )
 
-      if expectedNormalizedProgress != nil {
-        paceLabel
+      if let expectedNormalizedProgress {
+        paceLabel(expectedNormalizedProgress)
       }
     }
   }
@@ -236,7 +236,7 @@ struct GoalProgressView: View {
     .accessibilityElement(children: .combine)
   }
 
-  private var paceLabel: some View {
+  private func paceLabel(_ expectedNormalizedProgress: Double) -> some View {
     HStack(spacing: AlmanacMetrics.spacingSmall) {
       Capsule()
         .fill(AlmanacPalette.inkMuted)
@@ -252,6 +252,7 @@ struct GoalProgressView: View {
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("Expected pace marker")
+    .accessibilityValue(Text(expectedNormalizedProgress, format: .percent))
   }
 
   private var progressColor: Color {
