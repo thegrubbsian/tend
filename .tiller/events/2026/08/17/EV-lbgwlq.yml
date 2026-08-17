@@ -1,0 +1,13 @@
+id: EV-lbgwlq
+type: eval.feature
+at: 2026-08-17T04:10:30.985404Z
+owner: jc
+command: eval feature F-5aficd
+targets:
+    - F-5aficd
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml
