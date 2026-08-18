@@ -1490,6 +1490,7 @@ struct TendApplicationModelTests {
     let instant = try fixtureInstant(instantValue)
     let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
     let storeName = "goal-experience-fixture"
+    let sentinelName = "Practice piano hours persisted sentinel"
     let arguments = [
       "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
       storeName, TendUITestStore.resetArgument,
@@ -1742,6 +1743,11 @@ struct TendApplicationModelTests {
         ) == nil
       )
 
+      piano.name = sentinelName
+      try context.save()
+      #expect(goals.filter { $0.name == sentinelName }.count == 1)
+      #expect(goals.allSatisfy { $0.name != "Practice piano hours" })
+
       seededGoalFacts = goals.map { goal in
         [
           goal.id.uuidString,
@@ -1794,6 +1800,11 @@ struct TendApplicationModelTests {
     #expect(reopenedGoals.map(\.id.uuidString) == expectedGoalIDs)
     #expect(reopenedEntries.map(\.id.uuidString) == expectedEntryIDs)
     #expect(reopenedReadings.map(\.id.uuidString) == expectedReadingIDs)
+    #expect(
+      reopenedGoals.filter { $0.name == sentinelName }.map(\.id.uuidString)
+        == [expectedGoalIDs[0]]
+    )
+    #expect(reopenedGoals.allSatisfy { $0.name != "Practice piano hours" })
     #expect(
       reopenedGoals.map { goal in
         [
