@@ -382,7 +382,7 @@ final class TodayGoalSurfacingUITests: XCTestCase {
 
   @MainActor
   private func openGoalFromRoster(_ id: String, in app: XCUIApplication) {
-    let row = element("goals.row.\(id.lowercased())", in: app)
+    let row = element("goals.row.\(id.uppercased())", in: app)
     scrollToRosterElement(row, in: app)
     XCTAssertTrue(row.exists)
     row.tap()
