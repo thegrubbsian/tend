@@ -47,6 +47,7 @@ struct GoalDetailView: View {
       .scrollBounceBehavior(.basedOnSize)
     }
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
+    .accessibilityElement(children: .contain)
     .accessibilityIdentifier("goalDetail.screen")
     .sheet(isPresented: entrySheetPresentation) {
       GoalProgressEntrySheet(model: model)
