@@ -1,0 +1,14 @@
+id: EV-xxlari
+type: sync.task
+at: 2026-08-18T01:12:48.868191Z
+owner: jc
+command: sync task T-bvcyq8
+targets:
+    - T-bvcyq8
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml
