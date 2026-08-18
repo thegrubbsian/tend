@@ -101,7 +101,6 @@ struct TodayGoalRefreshTests {
     #expect(contexts.suffix(2) == [transitionExit, transitionExit])
   }
 
-
   @Test("publication never exposes a mixed habit and Goal generation")
   func publicationIsAtomic() throws {
     let store = try makeStore()
@@ -172,7 +171,8 @@ struct TodayGoalRefreshTests {
     let goals = [failed, sibling]
     let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
     model.refresh(habits: [], goals: goals, context: context)
-    let retainedFailure = try #require(model.goalRows.first { $0.id == failed.persistentModelID }?.failure)
+    let retainedFailure = try #require(
+      model.goalRows.first { $0.id == failed.persistentModelID }?.failure)
 
     mode = 1
     model.retry(goalID: failed.persistentModelID, habits: [], goals: goals, context: context)
@@ -213,7 +213,6 @@ struct TodayGoalRefreshTests {
   func retryRefreshesInactiveHabitInsertion() throws {
     try exerciseInactiveHabitRetry(initiallyIncludesInactiveHabit: false)
   }
-
 
   @Test("retry graph or eligibility changes trigger a full refresh")
   func retryGraphAndEligibilityChangesRefreshEverything() throws {
@@ -311,11 +310,25 @@ struct TodayGoalRefreshTests {
     let nextMidnight = try date(2026, 3, 9, 0, calendar: calendar)
     let earlier = start.addingTimeInterval(60)
 
-    #expect(entries(calendar: calendar, start: start, transition: nil, count: 3) == [start, midnight, nextMidnight])
-    #expect(entries(calendar: calendar, start: start, transition: earlier, count: 4) == [start, earlier, midnight, nextMidnight])
-    #expect(entries(calendar: calendar, start: start, transition: midnight, count: 3) == [start, midnight, nextMidnight])
-    #expect(entries(calendar: calendar, start: start, transition: start, count: 3) == [start, midnight, nextMidnight])
-    #expect(entries(calendar: calendar, start: start, transition: start.addingTimeInterval(-1), count: 3) == [start, midnight, nextMidnight])
+    #expect(
+      entries(calendar: calendar, start: start, transition: nil, count: 3) == [
+        start, midnight, nextMidnight,
+      ])
+    #expect(
+      entries(calendar: calendar, start: start, transition: earlier, count: 4) == [
+        start, earlier, midnight, nextMidnight,
+      ])
+    #expect(
+      entries(calendar: calendar, start: start, transition: midnight, count: 3) == [
+        start, midnight, nextMidnight,
+      ])
+    #expect(
+      entries(calendar: calendar, start: start, transition: start, count: 3) == [
+        start, midnight, nextMidnight,
+      ])
+    #expect(
+      entries(calendar: calendar, start: start, transition: start.addingTimeInterval(-1), count: 3)
+        == [start, midnight, nextMidnight])
     #expect(midnight.timeIntervalSince(nextMidnight) == -(23 * 60 * 60))
 
     let replacement = start.addingTimeInterval(120)
@@ -378,7 +391,9 @@ struct TodayGoalRefreshTests {
         standing: standing,
         actualNormalizedProgress: normalizedProgress,
         expectedNormalizedProgress: deadline == nil ? nil : (standing == .pastDue ? 1 : 0.5),
-        deadlineBoundary: deadline.flatMap { try? $0.next().start(in: TimeZone(secondsFromGMT: 0)!) },
+        deadlineBoundary: deadline.flatMap {
+          try? $0.next().start(in: TimeZone(secondsFromGMT: 0)!)
+        },
         nextTimeRefresh: next
       ),
       deadline: deadline

@@ -175,7 +175,8 @@ private enum TodayOperationsError: Error {
 final class TodayModel {
   @ObservationIgnored private let operations: TodayOperations
   private var generation: Generation?
-  @ObservationIgnored private var lastHabitInputs: [PersistentIdentifier: HabitInputFingerprint] = [:]
+  @ObservationIgnored private var lastHabitInputs: [PersistentIdentifier: HabitInputFingerprint] =
+    [:]
   @ObservationIgnored private var lastGoalInputs: [PersistentIdentifier: GoalInputFingerprint] = [:]
 
   var presentation: TodayPresentation? { generation?.presentation }
@@ -455,7 +456,6 @@ final class TodayModel {
     return GoalDate(year: year, month: month, day: day)
   }
 
-
   private func adding(days: Int, to date: GoalDate) throws -> GoalDate {
     var result = date
     for _ in 0..<days { result = try result.next() }
@@ -585,7 +585,9 @@ extension TodayModel {
       isActive = habit.isActive
       createdAt = habit.createdAt
       bestStreak = habit.bestStreak
-      activityPeriods = (habit.activityPeriods ?? []).map(ActivityPeriodFingerprint.init).sorted { $0.id < $1.id }
+      activityPeriods = (habit.activityPeriods ?? []).map(ActivityPeriodFingerprint.init).sorted {
+        $0.id < $1.id
+      }
       buckets = (habit.buckets ?? []).map(BucketFingerprint.init).sorted { $0.id < $1.id }
       entries = (habit.entries ?? []).map(EntryFingerprint.init).sorted { $0.id < $1.id }
     }

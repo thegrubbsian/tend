@@ -220,24 +220,35 @@ struct TodayGoalModelTests {
     let pastDue = try insertGoal(in: store, name: "Past", deadline: earlierDate)
     let behindLater = try insertGoal(in: store, name: "A", deadline: laterDate)
     let behindEarlier = try insertGoal(in: store, name: "Z", deadline: earlierDate)
-    let alphaFirst = try insertGoal(in: store, name: "alpha", deadline: laterDate, createdAt: sameCreation)
-    let alphaSecond = try insertGoal(in: store, name: "Alpha", deadline: laterDate, createdAt: sameCreation)
-    let betaEarlier = try insertGoal(in: store, name: "Beta", deadline: laterDate, createdAt: Date(timeIntervalSince1970: 1))
-    let betaLater = try insertGoal(in: store, name: "beta", deadline: laterDate, createdAt: Date(timeIntervalSince1970: 2))
+    let alphaFirst = try insertGoal(
+      in: store, name: "alpha", deadline: laterDate, createdAt: sameCreation)
+    let alphaSecond = try insertGoal(
+      in: store, name: "Alpha", deadline: laterDate, createdAt: sameCreation)
+    let betaEarlier = try insertGoal(
+      in: store, name: "Beta", deadline: laterDate, createdAt: Date(timeIntervalSince1970: 1))
+    let betaLater = try insertGoal(
+      in: store, name: "beta", deadline: laterDate, createdAt: Date(timeIntervalSince1970: 2))
     let onPace = try insertGoal(in: store, name: "On pace", deadline: earlierDate)
     let alphaByID = [alphaFirst, alphaSecond].sorted { $0.persistentModelID < $1.persistentModelID }
     let model = makeModel { goal, _ in
       if goal === unavailable { throw FixtureError.unavailable }
       let standing: GoalStanding
-      if goal === pastDue { standing = .pastDue }
-      else if goal === onPace { standing = .onPace }
-      else { standing = .behind }
+      if goal === pastDue {
+        standing = .pastDue
+      } else if goal === onPace {
+        standing = .onPace
+      } else {
+        standing = .behind
+      }
       return .open(facts(standing: standing, deadline: goalDate(goal)))
     }
 
     model.refresh(
       habits: [],
-      goals: [onPace, betaLater, alphaSecond, behindLater, unavailable, pastDue, alphaFirst, behindEarlier, betaEarlier],
+      goals: [
+        onPace, betaLater, alphaSecond, behindLater, unavailable, pastDue, alphaFirst,
+        behindEarlier, betaEarlier,
+      ],
       context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")), locale: "en_US")
     )
 
@@ -270,9 +281,14 @@ struct TodayGoalModelTests {
   func truthfulProgressFormatting() throws {
     let store = try makeStore()
     let due = try #require(GoalDate(rawValue: "2026-08-20"))
-    let accumulateGoal = try insertGoal(in: store, name: "Read", target: 6, unit: "books", deadline: due)
-    let increasing = try insertGoal(in: store, name: "Lift", kind: .measure, target: 200, unit: "lb", baseline: 100, deadline: due)
-    let decreasing = try insertGoal(in: store, name: "Lower", kind: .measure, target: 120, unit: "mmHg", baseline: 180, deadline: due)
+    let accumulateGoal = try insertGoal(
+      in: store, name: "Read", target: 6, unit: "books", deadline: due)
+    let increasing = try insertGoal(
+      in: store, name: "Lift", kind: .measure, target: 200, unit: "lb", baseline: 100, deadline: due
+    )
+    let decreasing = try insertGoal(
+      in: store, name: "Lower", kind: .measure, target: 120, unit: "mmHg", baseline: 180,
+      deadline: due)
     let model = makeModel { goal, _ in
       let progress: GoalProgressSnapshot
       if goal === accumulateGoal {
@@ -302,9 +318,17 @@ struct TodayGoalModelTests {
     #expect(rows["Read"]?.progressText == "7 of 6 books")
     #expect(rows["Read"]?.normalizedProgress == 7.0 / 6.0)
     #expect(rows["Lift"]?.progressText == "160 lb now · 60 of 100 lb")
-    #expect(rows["Lift"]?.progress == .measure(baseline: 100, target: 200, current: 160, completedDistance: 60, totalDistance: 100, direction: .increasing, unit: "lb", normalizedProgress: 0.6))
+    #expect(
+      rows["Lift"]?.progress
+        == .measure(
+          baseline: 100, target: 200, current: 160, completedDistance: 60, totalDistance: 100,
+          direction: .increasing, unit: "lb", normalizedProgress: 0.6))
     #expect(rows["Lower"]?.progressText == "145 mmHg now · 35 of 60 mmHg")
-    #expect(rows["Lower"]?.progress == .measure(baseline: 180, target: 120, current: 145, completedDistance: 35, totalDistance: 60, direction: .decreasing, unit: "mmHg", normalizedProgress: 35.0 / 60.0))
+    #expect(
+      rows["Lower"]?.progress
+        == .measure(
+          baseline: 180, target: 120, current: 145, completedDistance: 35, totalDistance: 60,
+          direction: .decreasing, unit: "mmHg", normalizedProgress: 35.0 / 60.0))
     #expect(rows["Read"]?.deadlineText == "Due Aug 20, 2026")
     #expect(rows["Read"]?.standingText == "On pace")
     #expect(
@@ -358,7 +382,8 @@ struct TodayGoalModelTests {
                 standing: .behind,
                 deadline: due,
                 progress: .accumulate(
-                  AccumulateGoalProgress(total: 1, target: 999, unit: "wrong", normalizedProgress: .nan)
+                  AccumulateGoalProgress(
+                    total: 1, target: 999, unit: "wrong", normalizedProgress: .nan)
                 )
               ))
           }
@@ -491,7 +516,9 @@ struct TodayGoalModelTests {
         standing: standing,
         actualNormalizedProgress: normalized(progress),
         expectedNormalizedProgress: deadline == nil ? nil : (standing == .pastDue ? 1 : 0.5),
-        deadlineBoundary: deadline.flatMap { try? $0.next().start(in: TimeZone(secondsFromGMT: 0)!) },
+        deadlineBoundary: deadline.flatMap {
+          try? $0.next().start(in: TimeZone(secondsFromGMT: 0)!)
+        },
         nextTimeRefresh: nextTransition
       ),
       deadline: deadline

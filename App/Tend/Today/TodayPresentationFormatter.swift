@@ -44,7 +44,8 @@ struct TodayPresentationFormatter {
     let requirementText = "\(integer(snapshot.target)) \(unit)"
     let progressText = "\(integer(snapshot.progress)) of \(integer(snapshot.target)) \(unit)"
     let streakText = streak(value: snapshot.currentStreak, cadence: snapshot.cadence)
-    let riskText = snapshot.isAtRisk ? risk(value: snapshot.currentStreak, cadence: snapshot.cadence) : nil
+    let riskText =
+      snapshot.isAtRisk ? risk(value: snapshot.currentStreak, cadence: snapshot.cadence) : nil
     let stateText = snapshot.isMet ? "Met" : "Unmet"
     let accessibilityValue = ([progressText, streakText, stateText] + [riskText].compactMap { $0 })
       .joined(separator: ", ")
@@ -107,7 +108,8 @@ struct TodayPresentationFormatter {
   ) throws -> TodayGoalRow {
     let progress = try goalProgressFact(facts.progress, goal: goal)
     let normalizedProgress = normalizedProgress(in: progress)
-    try validateStanding(facts.standing, normalizedProgress: normalizedProgress, deadline: facts.deadline)
+    try validateStanding(
+      facts.standing, normalizedProgress: normalizedProgress, deadline: facts.deadline)
     try validateDeadline(facts.deadline, goal: goal)
 
     let progressText = goalProgressText(progress)
@@ -219,7 +221,8 @@ struct TodayPresentationFormatter {
       )
     case .measure(let progress):
       let totalDistance = distance(progress.baseline, progress.target).flatMap { magnitude($0) }
-      let traveled = progress.target > progress.baseline
+      let traveled =
+        progress.target > progress.baseline
         ? distance(progress.baseline, progress.currentValue)
         : distance(progress.currentValue, progress.baseline)
       let completed = min(max(traveled ?? -1, 0), totalDistance ?? -1)
@@ -381,7 +384,8 @@ struct TodayPresentationFormatter {
     if let formatterError = error as? TodayPresentationFormatterError {
       switch formatterError {
       case .invalidRequirement: return "Requirement unavailable."
-      case .invalidProgress, .invalidStreak, .inconsistentSnapshot: return "Today facts unavailable."
+      case .invalidProgress, .invalidStreak, .inconsistentSnapshot:
+        return "Today facts unavailable."
       default: return "Goal facts unavailable."
       }
     }
