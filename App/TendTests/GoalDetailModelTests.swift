@@ -447,6 +447,50 @@ struct GoalDetailModelTests {
     #expect(recorder.snapshotInvocations.count == 2)
   }
 
+  @Test(
+    "repeated exit callbacks wait for explicit retry after a deferred refresh fails",
+    arguments: GoalDetailExitTransition.allCases
+  )
+  func repeatedExitDoesNotRetryFailedDeferredRefresh(
+    _ transition: GoalDetailExitTransition
+  ) throws {
+    let fixture = try GoalDetailFixture()
+    let initial = fixture.accumulateSnapshot(name: "Walk")
+    let refreshed = fixture.accumulateSnapshot(name: "Walk outside")
+    let recorder = GoalDetailOperationsRecorder(
+      snapshots: [
+        .success(initial),
+        .failure(TestGoalDetailFailure.load),
+        .success(refreshed),
+      ]
+    )
+    let model = fixture.model(operations: recorder.operations)
+    model.start()
+
+    transition.present(in: model)
+    model.refresh()
+    transition.exit(from: model)
+
+    #expect(recorder.snapshotInvocations.count == 2)
+    #expect(model.loadFailure != nil)
+    #expect(model.presentation?.name == "Walk")
+
+    transition.exit(from: model)
+
+    #expect(recorder.snapshotInvocations.count == 2)
+    #expect(model.loadFailure != nil)
+    #expect(model.presentation?.name == "Walk")
+
+    model.retryLoad()
+
+    #expect(recorder.snapshotInvocations.count == 3)
+    #expect(model.loadFailure == nil)
+    #expect(model.presentation?.name == "Walk outside")
+
+    transition.exit(from: model)
+    #expect(recorder.snapshotInvocations.count == 3)
+  }
+
   @Test("refresh requested during a snapshot runs one follow-up query after the first result")
   func preservesReentrantRefresh() throws {
     let fixture = try GoalDetailFixture()
@@ -1266,6 +1310,36 @@ struct GoalDetailModelTests {
       FetchDescriptor<GoalEntry>(predicate: #Predicate { $0.id == ambiguousID })
     )
     #expect(matches.count == 2)
+  }
+}
+
+enum GoalDetailExitTransition: CaseIterable {
+  case entrySheet
+  case edit
+  case confirmation
+
+  @MainActor
+  func present(in model: GoalDetailModel) {
+    switch self {
+    case .entrySheet:
+      model.presentEntrySheet()
+    case .edit:
+      model.presentEdit()
+    case .confirmation:
+      model.requestConfirmation(.harvest)
+    }
+  }
+
+  @MainActor
+  func exit(from model: GoalDetailModel) {
+    switch self {
+    case .entrySheet:
+      model.cancelEntrySheet()
+    case .edit:
+      model.editCancelled()
+    case .confirmation:
+      model.cancelConfirmation()
+    }
   }
 }
 

@@ -407,7 +407,7 @@ final class GoalDetailModel {
   }
 
   func cancelEntrySheet() {
-    guard !isOperationInFlight, operationFailure == nil else { return }
+    guard isPresentingEntrySheet, !isOperationInFlight, operationFailure == nil else { return }
     dismissEntrySheet()
     consumeDeferredRefresh()
   }
@@ -438,7 +438,7 @@ final class GoalDetailModel {
   }
 
   func editCancelled() {
-    guard !isOperationInFlight else { return }
+    guard isPresentingEdit, !isOperationInFlight else { return }
     isPresentingEdit = false
     consumeDeferredRefresh()
   }
@@ -465,7 +465,7 @@ final class GoalDetailModel {
   }
 
   func cancelConfirmation() {
-    guard !isOperationInFlight, operationFailure == nil else { return }
+    guard confirmation != nil, !isOperationInFlight, operationFailure == nil else { return }
     confirmation = nil
     consumeDeferredRefresh()
   }
