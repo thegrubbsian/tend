@@ -5,6 +5,11 @@ final class GoalExperienceUITests: XCTestCase {
   private let emptyStoreName = "GoalExperienceUITests-empty"
   private let fixtureInstant = "2026-01-15T17:00:00Z"
 
+  private enum AbsentTargetSearchDirection {
+    case towardStart
+    case towardEnd
+  }
+
   override func setUp() {
     continueAfterFailure = false
   }
@@ -155,6 +160,15 @@ final class GoalExperienceUITests: XCTestCase {
     }
     assertMinimumHitRegion(of: trail)
     scrollToRosterElement(heartRate, in: app)
+    scrollRosterRowsIntoSameViewport(trail, heartRate, in: app)
+    XCTAssertTrue(
+      trail.exists && trail.isHittable,
+      "Expected Increase trail distance to remain materialized and hittable for ordering"
+    )
+    XCTAssertTrue(
+      heartRate.exists && heartRate.isHittable,
+      "Expected Lower resting heart rate to remain materialized and hittable for ordering"
+    )
     XCTAssertLessThan(
       trail.frame.minY,
       heartRate.frame.minY,
@@ -179,7 +193,7 @@ final class GoalExperienceUITests: XCTestCase {
       "goalDetail.history.row.entry.21000000-0000-0000-0000-000000000001",
       in: app
     )
-    scrollToVisible(seededTodayHistory, in: app)
+    scrollToVisible(seededTodayHistory, absentTargetSearchDirection: .towardEnd, in: app)
     XCTAssertEqual(seededTodayHistory.label, "Today, 10 hours")
     let seededTodayDelete = element(
       "goalDetail.history.delete.entry.21000000-0000-0000-0000-000000000002",
@@ -187,7 +201,7 @@ final class GoalExperienceUITests: XCTestCase {
     )
     XCTAssertTrue(seededTodayDelete.exists, "Expected today's seeded entry to be delete eligible")
     assertMinimumHitRegion(of: seededTodayDelete)
-    scrollToVisible(historicalHistory, in: app)
+    scrollToVisible(historicalHistory, absentTargetSearchDirection: .towardEnd, in: app)
     XCTAssertEqual(historicalHistory.label, "Jan 1, 2026, 95 hours")
     XCTAssertFalse(
       element(
@@ -221,14 +235,14 @@ final class GoalExperienceUITests: XCTestCase {
           label
         )
       ).firstMatch
-      scrollToVisible(historyRow, in: app)
+      scrollToVisible(historyRow, absentTargetSearchDirection: .towardEnd, in: app)
       XCTAssertEqual(historyRow.label, label, "Expected complete piano history item \(label)")
     }
 
     let yesterdayDelete = app.buttons.matching(
       NSPredicate(format: "label == %@", "Delete entry, 2 hours, Yesterday")
     ).firstMatch
-    scrollToVisible(yesterdayDelete, in: app)
+    scrollToVisible(yesterdayDelete, absentTargetSearchDirection: .towardStart, in: app)
     assertMinimumHitRegion(of: yesterdayDelete)
     yesterdayDelete.tap()
     XCTAssertTrue(app.staticTexts["Delete this entry?"].waitForExistence(timeout: 2))
@@ -249,7 +263,11 @@ final class GoalExperienceUITests: XCTestCase {
       .matching(NSPredicate(format: "label == %@", "Progress")).firstMatch
     XCTAssertEqual(progressAfterHistoryDeletion.value as? String, "108 of 100 hours")
 
-    scrollToVisible(element("goalDetail.edit", in: app), in: app)
+    scrollToVisible(
+      element("goalDetail.edit", in: app),
+      absentTargetSearchDirection: .towardStart,
+      in: app
+    )
     element("goalDetail.edit", in: app).tap()
     XCTAssertTrue(element("goalForm.sheet", in: app).waitForExistence(timeout: 2))
     XCTAssertEqual(element("goalForm.kind.locked", in: app).label, "Kind, Accumulate, locked")
@@ -272,7 +290,7 @@ final class GoalExperienceUITests: XCTestCase {
     scrollToRosterElement(essays, in: app)
     openGoal(essays, in: app)
     let harvest = element("goalDetail.harvest", in: app)
-    scrollToVisible(harvest, in: app)
+    scrollToVisible(harvest, absentTargetSearchDirection: .towardEnd, in: app)
     assertMinimumHitRegion(of: harvest)
     harvest.tap()
     XCTAssertTrue(app.staticTexts["Harvest “Read 24 essays”?"].waitForExistence(timeout: 2))
@@ -296,7 +314,7 @@ final class GoalExperienceUITests: XCTestCase {
     scrollToRosterElement(trail, in: app)
     openGoal(trail, in: app)
     let letGo = element("goalDetail.letGo", in: app)
-    scrollToVisible(letGo, in: app)
+    scrollToVisible(letGo, absentTargetSearchDirection: .towardEnd, in: app)
     assertMinimumHitRegion(of: letGo)
     letGo.tap()
     XCTAssertTrue(
@@ -330,7 +348,7 @@ final class GoalExperienceUITests: XCTestCase {
 
     openGoal(trail, in: app)
     let reopen = element("goalDetail.reopen", in: app)
-    scrollToVisible(reopen, in: app)
+    scrollToVisible(reopen, absentTargetSearchDirection: .towardEnd, in: app)
     assertMinimumHitRegion(of: reopen)
     reopen.tap()
     XCTAssertTrue(
@@ -359,7 +377,7 @@ final class GoalExperienceUITests: XCTestCase {
     scrollToRosterElement(pianoForDeletion, in: app)
     openGoal(pianoForDeletion, in: app)
     let deleteGoal = element("goalDetail.deleteGoal", in: app)
-    scrollToVisible(deleteGoal, in: app)
+    scrollToVisible(deleteGoal, absentTargetSearchDirection: .towardEnd, in: app)
     assertMinimumHitRegion(of: deleteGoal)
     deleteGoal.tap()
     XCTAssertTrue(
@@ -375,7 +393,7 @@ final class GoalExperienceUITests: XCTestCase {
     cancelDeletion.tap()
     XCTAssertTrue(element("goalDetail.title", in: app).exists, "Cancel must preserve the goal")
 
-    scrollToVisible(deleteGoal, in: app)
+    scrollToVisible(deleteGoal, absentTargetSearchDirection: .towardEnd, in: app)
     deleteGoal.tap()
     confirmPendingAction(named: "Delete Goal", in: app)
     XCTAssertTrue(
@@ -614,7 +632,7 @@ final class GoalExperienceUITests: XCTestCase {
       keyboardDone.tap()
     }
     let addDeadline = app.buttons["goalForm.deadline.add"]
-    scrollToVisible(addDeadline, in: app)
+    scrollToVisible(addDeadline, absentTargetSearchDirection: .towardEnd, in: app)
     assertMinimumHitRegion(of: addDeadline)
     addDeadline.tap()
     let deadlinePicker = element("goalForm.deadline.picker", in: app)
@@ -664,7 +682,7 @@ final class GoalExperienceUITests: XCTestCase {
     in app: XCUIApplication
   ) {
     let add = element("goalDetail.addProgress", in: app)
-    scrollToVisible(add, in: app)
+    scrollToVisible(add, absentTargetSearchDirection: .towardStart, in: app)
     assertMinimumHitRegion(of: add)
     add.tap()
     XCTAssertTrue(element("goalProgressEntry.sheet", in: app).waitForExistence(timeout: 2))
@@ -743,19 +761,67 @@ final class GoalExperienceUITests: XCTestCase {
   }
 
   @MainActor
-  private func scrollToVisible(_ target: XCUIElement, in app: XCUIApplication) {
+  private func scrollRosterRowsIntoSameViewport(
+    _ first: XCUIElement,
+    _ second: XCUIElement,
+    in app: XCUIApplication
+  ) {
+    let overlay = app.buttons["shell.tab.goals"]
+    for _ in 0..<12 {
+      guard overlay.exists else {
+        XCTFail("Expected Goals tab overlay while aligning adjacent goal rows")
+        return
+      }
+      let top = element("shell.destination.goals", in: app).frame.minY
+      let bottom = overlay.frame.minY
+      let firstIsVisible =
+        first.exists && first.isHittable
+        && first.frame.minY >= top && first.frame.maxY <= bottom
+      let secondIsVisible =
+        second.exists && second.isHittable
+        && second.frame.minY >= top && second.frame.maxY <= bottom
+      if firstIsVisible && secondIsVisible {
+        return
+      }
+      if !second.exists || second.frame.maxY > bottom {
+        app.swipeUp(velocity: .slow)
+      } else {
+        app.swipeDown(velocity: .slow)
+      }
+    }
+    XCTFail(
+      "Expected \(first.label) and \(second.label) to be fully visible together for ordering"
+    )
+  }
+
+  @MainActor
+  private func scrollToVisible(
+    _ target: XCUIElement,
+    absentTargetSearchDirection: AbsentTargetSearchDirection,
+    in app: XCUIApplication
+  ) {
     for _ in 0..<24 {
       if target.exists, target.isHittable {
         return
       }
-      if target.exists, target.frame.minY < app.windows.firstMatch.frame.minY {
-        app.swipeDown(velocity: .slow)
+      if target.exists {
+        let windowFrame = app.windows.firstMatch.frame
+        if target.frame.midY < windowFrame.midY {
+          app.swipeDown(velocity: .slow)
+        } else {
+          app.swipeUp(velocity: .slow)
+        }
       } else {
-        app.swipeUp(velocity: .slow)
+        switch absentTargetSearchDirection {
+        case .towardStart:
+          app.swipeDown(velocity: .slow)
+        case .towardEnd:
+          app.swipeUp(velocity: .slow)
+        }
       }
     }
     XCTFail(
-      "Expected \(target.identifier.isEmpty ? target.label : target.identifier) to become visible and hittable"
+      "Expected \(target.identifier.isEmpty ? target.label : target.identifier) to become visible and hittable while searching \(absentTargetSearchDirection)"
     )
   }
 
@@ -799,7 +865,7 @@ final class GoalExperienceUITests: XCTestCase {
     let visibleTop = element("shell.destination.goals", in: app).frame.minY
     let visibleBottom = app.buttons["shell.tab.goals"].frame.minY
     try app.performAccessibilityAudit(for: auditTypes) { issue in
-      guard issue.auditType == .contrast, let issueElement = issue.element else {
+      guard let issueElement = issue.element else {
         return false
       }
       let issueFrame = issueElement.frame.integral
