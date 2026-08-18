@@ -12,7 +12,6 @@ this file is regenerated from the working tree on every sync. -->
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
 - feature goals/goal-experience (F-xowx7x): active
 - feature goals/today-goal-surfacing (F-e8yd2r): ready
-- task goals/goal-experience/goal-detail (T-bvcyq8): check
 - task goals/goal-experience/goals-roster-shell (T-99bqdn): ready
 - task goals/goal-experience/goal-experience-acceptance (T-02sxbb): ready
 - task goals/today-goal-surfacing/today-goal-presentation (T-g3o7wd): ready
@@ -24,7 +23,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task goals/goal-experience/goal-detail (T-bvcyq8): build pass, tests pass
 
 ### Open questions
 
