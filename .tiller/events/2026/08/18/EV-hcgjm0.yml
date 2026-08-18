@@ -1,0 +1,13 @@
+id: EV-hcgjm0
+type: check.feature
+at: 2026-08-18T21:15:53.342373Z
+owner: jc
+command: check feature F-xowx7x
+targets:
+    - F-xowx7x
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml
