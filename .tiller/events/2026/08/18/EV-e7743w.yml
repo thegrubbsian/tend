@@ -1,0 +1,13 @@
+id: EV-e7743w
+type: check.task
+at: 2026-08-18T00:11:59.246018Z
+owner: jc
+command: check task T-bvcyq8
+targets:
+    - T-bvcyq8
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml
