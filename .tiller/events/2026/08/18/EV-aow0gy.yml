@@ -1,0 +1,13 @@
+id: EV-aow0gy
+type: start.task
+at: 2026-08-18T05:44:30.991353Z
+owner: jc
+command: start task T-02sxbb
+targets:
+    - T-02sxbb
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.yml
