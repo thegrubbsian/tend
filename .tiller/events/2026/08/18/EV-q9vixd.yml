@@ -1,0 +1,13 @@
+id: EV-q9vixd
+type: start.feature
+at: 2026-08-18T16:13:17.221499Z
+owner: jc
+command: start feature F-e8yd2r
+targets:
+    - F-e8yd2r
+before:
+    status: ready
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml
