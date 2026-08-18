@@ -330,16 +330,18 @@ public final class GoalProgressOperations {
     at instant: Date,
     timeZone: TimeZone
   ) throws -> GoalDate {
-    let today = try localDate(containing: instant, in: timeZone)
-    let assignedDate: GoalDate
-    switch destination {
-    case .today:
-      assignedDate = today
-    case .yesterday:
-      assignedDate = try today.previous()
+    let window: GoalProgressLocalDayWindow
+    do {
+      window = try GoalProgressLocalDayEligibility.window(
+        createdAt: goal.createdAt,
+        at: instant,
+        timeZone: timeZone
+      )
+    } catch {
+      throw GoalProgressOperationError.invalidGoalConfiguration
     }
-    let creationDate = try localDate(containing: goal.createdAt, in: timeZone)
-    guard assignedDate >= creationDate else {
+    let assignedDate = try window.assignedDate(for: destination)
+    guard assignedDate >= window.creationDate else {
       throw GoalProgressOperationError.destinationBeforeCreation(assignedDate)
     }
     return assignedDate
@@ -350,28 +352,18 @@ public final class GoalProgressOperations {
     at instant: Date,
     timeZone: TimeZone
   ) throws {
-    let today = try localDate(containing: instant, in: timeZone)
-    let yesterday = try today.previous()
-    guard assignedDate == today || assignedDate == yesterday else {
-      throw GoalProgressOperationError.destinationNotEditable(assignedDate)
-    }
-  }
-
-  private func localDate(containing instant: Date, in timeZone: TimeZone) throws -> GoalDate {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.locale = Locale(identifier: "en_US_POSIX")
-    calendar.timeZone = timeZone
-    let components = calendar.dateComponents([.era, .year, .month, .day], from: instant)
-    guard
-      components.era == 1,
-      let year = components.year,
-      let month = components.month,
-      let day = components.day,
-      let date = GoalDate(year: year, month: month, day: day)
-    else {
+    let editableDays: GoalProgressEditableDays
+    do {
+      editableDays = try GoalProgressLocalDayEligibility.editableDays(
+        at: instant,
+        timeZone: timeZone
+      )
+    } catch {
       throw GoalProgressOperationError.invalidGoalConfiguration
     }
-    return date
+    guard try editableDays.contains(assignedDate) else {
+      throw GoalProgressOperationError.destinationNotEditable(assignedDate)
+    }
   }
 
   private func parsedDate(_ key: String) throws -> GoalDate {
@@ -508,4 +500,88 @@ private struct ReadingFacts {
     reading.appendedAt = appendedAt
     reading.appendSequence = appendSequence
   }
+}
+
+enum GoalProgressLocalDayEligibility {
+  static func editableDays(
+    at instant: Date,
+    timeZone: TimeZone
+  ) throws -> GoalProgressEditableDays {
+    GoalProgressEditableDays(today: try localDate(containing: instant, in: timeZone))
+  }
+
+  static func window(
+    createdAt: Date,
+    at instant: Date,
+    timeZone: TimeZone
+  ) throws -> GoalProgressLocalDayWindow {
+    let editableDays = try editableDays(at: instant, timeZone: timeZone)
+    let creationDate = try localDate(containing: createdAt, in: timeZone)
+    return GoalProgressLocalDayWindow(
+      creationDate: creationDate,
+      editableDays: editableDays
+    )
+  }
+
+  private static func localDate(
+    containing instant: Date,
+    in timeZone: TimeZone
+  ) throws -> GoalDate {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = timeZone
+    let components = calendar.dateComponents([.era, .year, .month, .day], from: instant)
+    guard
+      components.era == 1,
+      let year = components.year,
+      let month = components.month,
+      let day = components.day,
+      let date = GoalDate(year: year, month: month, day: day)
+    else {
+      throw GoalProgressLocalDayEligibilityError.invalidDate
+    }
+    return date
+  }
+}
+
+struct GoalProgressEditableDays {
+  let today: GoalDate
+
+  func contains(_ date: GoalDate) throws -> Bool {
+    let yesterday = try today.previous()
+    return date == today || date == yesterday
+  }
+}
+
+struct GoalProgressLocalDayWindow {
+  let creationDate: GoalDate
+  let editableDays: GoalProgressEditableDays
+
+  var today: GoalDate {
+    editableDays.today
+  }
+
+  var availableAppendDestinations: [GoalProgressDestination] {
+    guard let yesterday = try? editableDays.today.previous(), yesterday >= creationDate else {
+      return [.today]
+    }
+    return [.today, .yesterday]
+  }
+
+  func assignedDate(for destination: GoalProgressDestination) throws -> GoalDate {
+    switch destination {
+    case .today:
+      return today
+    case .yesterday:
+      return try editableDays.today.previous()
+    }
+  }
+
+  func isDeleteEligible(_ date: GoalDate) -> Bool {
+    (try? editableDays.contains(date)) ?? false
+  }
+}
+
+private enum GoalProgressLocalDayEligibilityError: Error {
+  case invalidDate
 }

@@ -1,0 +1,14 @@
+id: EV-aofh42
+type: submit.task
+at: 2026-08-18T00:12:39.031236Z
+owner: jc
+command: submit task T-bvcyq8
+targets:
+    - T-bvcyq8
+before:
+    status: check
+after:
+    pr: 50
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml

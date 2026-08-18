@@ -1,7 +1,7 @@
 id: T-bvcyq8
 key: goals/goal-experience/goal-detail
 title: Build Goal Detail and progress actions
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:24.794399Z
+pr: 50
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T00:11:55.646658Z
+        against:
+            kind: sha256
+            value: sha256:4ee09ab2cd07ba629faacaf3622ce4a4f7f7a7b6f6fb0e911356ded703bc9251
+            observed_at: 2026-08-18T00:11:55.646652Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-4ee09ab2cd07-out-19b6950713e94f91de8d9d9cc793dbd0a49136fa2bbf4bd023a250793748d0b9.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T00:11:55.646658Z
+        against:
+            kind: sha256
+            value: sha256:4ee09ab2cd07ba629faacaf3622ce4a4f7f7a7b6f6fb0e911356ded703bc9251
+            observed_at: 2026-08-18T00:11:55.646652Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-4ee09ab2cd07-out-31811bf584fcd9a85c9a2de55f63ad554d19a09c004073c73e57afae52908b70.txt

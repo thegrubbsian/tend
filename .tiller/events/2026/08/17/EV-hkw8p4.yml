@@ -1,0 +1,13 @@
+id: EV-hkw8p4
+type: start.task
+at: 2026-08-17T19:45:43.262371Z
+owner: jc
+command: start task T-bvcyq8
+targets:
+    - T-bvcyq8
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml
