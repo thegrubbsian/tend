@@ -237,19 +237,18 @@ struct GoalRosterModelTests {
 
     fixture.refresh(model)
 
-    #expect(
-      model.openRows.map(\.goal.id)
-        == [
-          behindEarly.id,
-          behindLater.id,
-          onPaceDeadline.id,
-          onPaceAlpha.id,
-          onPaceBravoOldLow.id,
-          onPaceBravoOldHigh.id,
-          onPaceBravoNew.id,
-          onPaceNoDeadline.id,
-        ]
-    )
+    let actual: [UUID] = model.openRows.map(\.goal.id)
+    let expected: [UUID] = [
+      behindEarly.id,
+      behindLater.id,
+      onPaceDeadline.id,
+      onPaceAlpha.id,
+      onPaceBravoOldLow.id,
+      onPaceBravoOldHigh.id,
+      onPaceBravoNew.id,
+      onPaceNoDeadline.id,
+    ]
+    #expect(actual == expected)
     #expect(model.openRows[0].deadlineText == "Jan 18, 2026")
     #expect(model.openRows.last?.deadlineText == "No deadline")
   }
@@ -285,10 +284,15 @@ struct GoalRosterModelTests {
 
     fixture.refresh(model)
 
-    #expect(
-      model.pastDueRows.map(\.goal.id)
-        == [earlierDeadline.id, alpha.id, bravoOldLow.id, bravoOldHigh.id, bravoNew.id]
-    )
+    let actual: [UUID] = model.pastDueRows.map(\.goal.id)
+    let expected: [UUID] = [
+      earlierDeadline.id,
+      alpha.id,
+      bravoOldLow.id,
+      bravoOldHigh.id,
+      bravoNew.id,
+    ]
+    #expect(actual == expected)
   }
 
   @Test("closed goals use one deterministic combined order")
@@ -309,22 +313,23 @@ struct GoalRosterModelTests {
     let model = fixture.model(
       goals: { goals },
       facts: { goal in
-        let closure = try goal.checkedClosure
-        return fixture.accumulateFacts(closure: try #require(closure))
+        guard let closure = try goal.checkedClosure else {
+          throw TestGoalRosterFailure.facts
+        }
+        return fixture.accumulateFacts(closure: closure)
       }
     )
 
     fixture.refresh(model)
 
-    #expect(
-      model.closedRows.map(\.goal.id)
-        == [
-          alphaLetGo.id,
-          bravoHarvestedOldLow.id,
-          bravoLetGoOldHigh.id,
-          bravoHarvestedNew.id,
-        ]
-    )
+    let actual: [UUID] = model.closedRows.map(\.goal.id)
+    let expected: [UUID] = [
+      alphaLetGo.id,
+      bravoHarvestedOldLow.id,
+      bravoLetGoOldHigh.id,
+      bravoHarvestedNew.id,
+    ]
+    #expect(actual == expected)
     #expect(model.closedRows.map(\.stateText) == ["Let go", "Harvested", "Let go", "Harvested"])
   }
 
@@ -376,8 +381,10 @@ struct GoalRosterModelTests {
           return fetchedGoals
         },
         facts: { goal, _, _, _ in
-          let closure = try goal.checkedClosure
-          return fixture.accumulateFacts(closure: try #require(closure))
+          guard let closure = try goal.checkedClosure else {
+            throw TestGoalRosterFailure.facts
+          }
+          return fixture.accumulateFacts(closure: closure)
         }
       )
     )
@@ -404,7 +411,7 @@ struct GoalRosterModelTests {
     let goal = try fixture.insertGoal(
       name: "Finish",
       target: 10,
-      deadline: try #require(GoalDate(year: 2026, month: 1, day: 15)),
+      deadline: GoalDate(year: 2026, month: 1, day: 15),
       entryAmounts: [2]
     )
     let model = GoalRosterModel(context: fixture.context)
