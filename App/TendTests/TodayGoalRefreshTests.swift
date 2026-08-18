@@ -88,6 +88,107 @@ struct TodayGoalRefreshTests {
     #expect(!dashboard.showsAllTended)
   }
 
+  @Test("same-context habit retry preserves retained Goals")
+  func habitRetryPreservesRetainedGoals() throws {
+    let store = try makeStore()
+    let habit = try insertHabit(in: store, name: "Habit")
+    let goal = try insertGoal(in: store, name: "Goal")
+    let context = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-18"))
+    )
+    var shouldFail = true
+    var goalCalls = 0
+    let model = TodayModel(
+      operations: TodayOperations(
+        snapshot: { _, _ in
+          if shouldFail { throw FixtureError.unavailable }
+          return self.habitSnapshot(progress: 4, isMet: true)
+        },
+        goalFacts: { _, _ in
+          goalCalls += 1
+          return .open(self.facts(standing: .behind, deadline: nil))
+        }
+      )
+    )
+    model.refresh(habits: [habit], goals: [goal], context: context)
+
+    shouldFail = false
+    model.retry(
+      habitID: habit.persistentModelID,
+      habits: [habit],
+      context: context
+    )
+
+    #expect(goalCalls == 1)
+    #expect(model.goalRows.map(\.id) == [goal.persistentModelID])
+    guard case .dashboard(let dashboard)? = model.presentation else {
+      Issue.record("Expected dashboard after habit retry")
+      return
+    }
+    #expect(dashboard.tendedRows.map(\.id) == [habit.persistentModelID])
+    #expect(dashboard.goalRows.map(\.id) == [goal.persistentModelID])
+    #expect(!dashboard.showsAllTended)
+  }
+
+  @Test("changed-context habit retry reprojects every retained Goal")
+  func changedContextHabitRetryRefreshesGoals() throws {
+    let store = try makeStore()
+    let habit = try insertHabit(in: store, name: "Habit")
+    let goals = try ["First", "Second"].map {
+      try insertGoal(in: store, name: $0)
+    }
+    let initial = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-18"))
+    )
+    let changed = refreshContext(
+      instant: initial.instant.addingTimeInterval(60),
+      timeZone: "America/Los_Angeles",
+      locale: "sv_SE"
+    )
+    var shouldFail = true
+    var goalContexts: [PersistentIdentifier: [TodayRefreshContext]] = [:]
+    let model = TodayModel(
+      operations: TodayOperations(
+        snapshot: { _, _ in
+          if shouldFail { throw FixtureError.unavailable }
+          return self.habitSnapshot(progress: 4, isMet: true)
+        },
+        goalFacts: { goal, context in
+          goalContexts[goal.persistentModelID, default: []].append(context)
+          return .open(
+            self.facts(
+              standing: .behind,
+              deadline: nil,
+              normalizedProgress: context == changed ? 0.5 : 0.25
+            ))
+        }
+      )
+    )
+    model.refresh(habits: [habit], goals: goals, context: initial)
+
+    shouldFail = false
+    model.retry(
+      habitID: habit.persistentModelID,
+      habits: [habit],
+      context: changed
+    )
+
+    for goal in goals {
+      #expect(
+        goalContexts[goal.persistentModelID] == [initial, changed]
+      )
+    }
+    #expect(model.goalRows.count == 2)
+    #expect(model.goalRows.allSatisfy { $0.normalizedProgress == 0.5 })
+    guard case .dashboard(let dashboard)? = model.presentation else {
+      Issue.record("Expected dashboard after changed-context habit retry")
+      return
+    }
+    #expect(dashboard.tendedRows.map(\.id) == [habit.persistentModelID])
+    #expect(dashboard.goalRows.count == 2)
+    #expect(!dashboard.showsAllTended)
+  }
+
   @Test("scene environment day and transition refreshes use fresh contexts")
   func refreshTriggersUseFreshContextsAndEligibility() throws {
     let store = try makeStore()

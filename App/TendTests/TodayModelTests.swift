@@ -383,14 +383,15 @@ struct TodayModelTests {
         return snapshot(progress: 1, target: 1, isMet: true)
       })
     let habits = [first, failed, second]
-    model.refresh(habits: habits, context: makeRefreshContext())
+    let refreshContext = makeRefreshContext()
+    model.refresh(habits: habits, context: refreshContext)
     let initial = try requireDashboard(model)
     #expect(initial.toTendRows.first?.failure?.message == "Fixture unavailable.")
 
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
-      context: makeRefreshContext(instant: Date(timeIntervalSince1970: 2_000))
+      context: refreshContext
     )
     let repeated = try requireDashboard(model)
     #expect(repeated.toTendRows.first?.failure?.message == "Fixture unavailable.")
@@ -402,7 +403,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
-      context: makeRefreshContext(instant: Date(timeIntervalSince1970: 3_000))
+      context: refreshContext
     )
     let recovered = try requireDashboard(model)
     #expect(recovered.toTendRows.isEmpty)

@@ -258,7 +258,6 @@ final class TodayModel {
   func retry(
     habitID: PersistentIdentifier,
     habits: [Habit],
-    goals: [Goal] = [],
     context: TodayRefreshContext
   ) {
     guard case .dashboard(let current)? = presentation,
@@ -269,12 +268,13 @@ final class TodayModel {
 
     let habitInputs = uniqueHabitInputs(from: habits)
     let activeHabitInputs = habitInputs.filter { $0.habit.isActive }
-    let goalInputs = uniqueGoalInputs(from: goals)
+    let goalInputs = uniqueGoalInputs(from: retainedGoals)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
+      generationContext == context,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
       let retryInput = activeHabitInputs.first(where: { $0.id == habitID })
     else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(habits: habits, context: context)
       return
     }
 
@@ -292,7 +292,7 @@ final class TodayModel {
 
     var rows = current.toTendRows + current.tendedRows
     guard let index = rows.firstIndex(where: { $0.id == habitID }) else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(habits: habits, context: context)
       return
     }
     rows[index] = replacement
