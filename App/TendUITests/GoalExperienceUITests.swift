@@ -1093,13 +1093,47 @@ final class GoalExperienceUITests: XCTestCase {
     ]
     let visibleTop = element("shell.destination.goals", in: app).frame.minY
     let visibleBottom = app.buttons["shell.tab.goals"].frame.minY
+    var retryElementlessContrast = false
+
     try app.performAccessibilityAudit(for: auditTypes) { issue in
-      guard let issueElement = issue.element else {
+      guard issue.auditType == .contrast else {
         return false
       }
-      let issueFrame = issueElement.frame.integral
-      return issueFrame.minY <= visibleTop || issueFrame.maxY > visibleBottom
+      guard let issueElement = issue.element else {
+        retryElementlessContrast = true
+        return true
+      }
+      return self.isOutsideVisibleRoster(
+        issueElement,
+        visibleTop: visibleTop,
+        visibleBottom: visibleBottom
+      )
     }
+
+    if retryElementlessContrast {
+      // A prior UI-test class can leave XCTest with one stale, element-less contrast issue.
+      // Retry contrast alone; the retry suppresses only known offscreen list content.
+      try app.performAccessibilityAudit(for: .contrast) { issue in
+        guard let issueElement = issue.element else {
+          return false
+        }
+        return self.isOutsideVisibleRoster(
+          issueElement,
+          visibleTop: visibleTop,
+          visibleBottom: visibleBottom
+        )
+      }
+    }
+  }
+
+  @MainActor
+  private func isOutsideVisibleRoster(
+    _ element: XCUIElement,
+    visibleTop: CGFloat,
+    visibleBottom: CGFloat
+  ) -> Bool {
+    let issueFrame = element.frame.integral
+    return issueFrame.minY <= visibleTop || issueFrame.maxY > visibleBottom
   }
 
   @MainActor

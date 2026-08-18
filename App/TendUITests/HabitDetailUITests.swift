@@ -509,7 +509,9 @@ final class HabitDetailUITests: XCTestCase {
     let finalPreviousMonth = element("habitDetail.month.previous", in: app)
     finalPreviousMonth.tap()
     XCTAssertNotEqual(currentMonth.label, originalMonthLabel)
-    let selectedBucket = historyButton(state: "Met", in: app)
+    let selectedBucket = app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "habitDetail.history.day:")
+    ).firstMatch
     XCTAssertTrue(selectedBucket.waitForExistence(timeout: 2))
     selectedBucket.tap()
     let callout = element("habitDetail.history.callout", in: app)

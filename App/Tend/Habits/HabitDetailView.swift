@@ -678,38 +678,56 @@ private struct HabitDetailHistoryCallout: View {
 }
 
 private struct HabitDetailLegend: View {
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
   var body: some View {
-    HStack(spacing: AlmanacMetrics.spacingLarge) {
-      legendItem("Met") {
-        RoundedRectangle(
-          cornerRadius: AlmanacMetrics.gardenCellRadius,
-          style: .continuous
-        )
-        .fill(AlmanacPalette.moss)
-      }
-      legendItem("Missed") {
-        RoundedRectangle(
-          cornerRadius: AlmanacMetrics.gardenCellRadius,
-          style: .continuous
-        )
-        .fill(AlmanacPalette.withered)
-      }
-      legendItem("Open") {
-        Color.clear
-          .almanacRaisedSurface(radius: AlmanacMetrics.gardenCellRadius)
-          .overlay {
-            RoundedRectangle(
-              cornerRadius: AlmanacMetrics.gardenCellRadius,
-              style: .continuous
-            )
-            .strokeBorder(AlmanacPalette.clay, lineWidth: AlmanacMetrics.gardenOutlineWidth)
-          }
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
+          legendItems
+        }
+      } else {
+        HStack(spacing: AlmanacMetrics.spacingLarge) {
+          legendItems
+        }
       }
     }
-    .frame(maxWidth: .infinity)
+    .frame(
+      maxWidth: .infinity,
+      alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .center
+    )
     .accessibilityElement(children: .combine)
     .accessibilityLabel("Legend. Met, Missed, Open")
     .accessibilityIdentifier("habitDetail.legend")
+  }
+
+  @ViewBuilder
+  private var legendItems: some View {
+    legendItem("Met") {
+      RoundedRectangle(
+        cornerRadius: AlmanacMetrics.gardenCellRadius,
+        style: .continuous
+      )
+      .fill(AlmanacPalette.moss)
+    }
+    legendItem("Missed") {
+      RoundedRectangle(
+        cornerRadius: AlmanacMetrics.gardenCellRadius,
+        style: .continuous
+      )
+      .fill(AlmanacPalette.withered)
+    }
+    legendItem("Open") {
+      Color.clear
+        .almanacRaisedSurface(radius: AlmanacMetrics.gardenCellRadius)
+        .overlay {
+          RoundedRectangle(
+            cornerRadius: AlmanacMetrics.gardenCellRadius,
+            style: .continuous
+          )
+          .strokeBorder(AlmanacPalette.clay, lineWidth: AlmanacMetrics.gardenOutlineWidth)
+        }
+    }
   }
 
   private func legendItem<Swatch: View>(
@@ -725,6 +743,7 @@ private struct HabitDetailLegend: View {
         .accessibilityHidden(true)
       Text(title)
         .almanacTextStyle(.caption)
+        .fixedSize(horizontal: true, vertical: true)
     }
   }
 }
