@@ -231,7 +231,7 @@ struct TodayView: View {
     resolvedLoggingModel().refresh(
       habits: habits,
       goals: goals,
-      context: refreshContext
+      context: operationContext()
     )
   }
 
@@ -303,7 +303,7 @@ struct TodayView: View {
     model?.retry(
       habitID: row.id,
       habits: habits,
-      context: refreshContext
+      context: operationContext()
     )
   }
 
@@ -312,7 +312,7 @@ struct TodayView: View {
       goalID: row.id,
       habits: habits,
       goals: goals,
-      context: refreshContext
+      context: operationContext()
     )
   }
 }
