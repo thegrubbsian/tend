@@ -62,6 +62,13 @@
       case todayAllTended = "today-all-tended"
       case todayInactive = "today-inactive"
       case todayFailure = "today-failure"
+      case todayGoalsMixed = "today-goals-mixed"
+      case todayGoalsAllTended = "today-goals-all-tended"
+      case todayGoalsFirstLaunch = "today-goals-first-launch"
+      case todayGoalsInactive = "today-goals-inactive"
+      case todayGoalsFailure = "today-goals-failure"
+      case todayGoalsJourney = "today-goals-journey"
+      case todayGoalsEmpty = "today-goals-empty"
       case fastLoggingDaily = "fast-logging-daily"
       case fastLoggingWeekly = "fast-logging-weekly"
       case goalRoster = "goal-roster"
@@ -157,6 +164,55 @@
         case .todayFailure:
           try TodayDashboardUITestFixture.seed(
             .failure,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsMixed:
+          try TodayGoalUITestFixture.seed(
+            .mixed,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsAllTended:
+          try TodayGoalUITestFixture.seed(
+            .allTended,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsFirstLaunch:
+          try TodayGoalUITestFixture.seed(
+            .firstLaunch,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsInactive:
+          try TodayGoalUITestFixture.seed(
+            .inactive,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsFailure:
+          try TodayGoalUITestFixture.seed(
+            .failure,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsJourney:
+          try TodayGoalUITestFixture.seed(
+            .journey,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayGoalsEmpty:
+          try TodayGoalUITestFixture.seed(
+            .empty,
             context: container.mainContext,
             at: launchInstant,
             timeZone: fixtureTimeZone
@@ -303,6 +359,13 @@
         .fastLoggingWeekly,
         .goalRoster,
         .goalExperience,
+        .todayGoalsMixed,
+        .todayGoalsAllTended,
+        .todayGoalsFirstLaunch,
+        .todayGoalsInactive,
+        .todayGoalsFailure,
+        .todayGoalsJourney,
+        .todayGoalsEmpty,
       ]
 
       private static func isValid(name: String) -> Bool {
