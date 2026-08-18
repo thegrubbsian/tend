@@ -12,22 +12,27 @@ struct GoalDetailView: View {
   @State private var hasStarted = false
   @State private var hasLeftActiveScene = false
 
+  private let now: () -> Date
   private let onBack: () -> Void
 
   init(
     goal: Goal,
     context: ModelContext,
+    now: @escaping () -> Date = Date.init,
     onBack: @escaping () -> Void
   ) {
-    _model = State(initialValue: GoalDetailModel(goal: goal, context: context))
+    _model = State(initialValue: GoalDetailModel(goal: goal, context: context, now: now))
+    self.now = now
     self.onBack = onBack
   }
 
   init(
     model: GoalDetailModel,
+    now: @escaping () -> Date = Date.init,
     onBack: @escaping () -> Void
   ) {
     _model = State(initialValue: model)
+    self.now = now
     self.onBack = onBack
   }
 
@@ -50,6 +55,7 @@ struct GoalDetailView: View {
       if let goal = model.goalForEditing {
         GoalFormView(
           mode: .edit(goal),
+          now: now,
           onSaved: model.editSaved
         )
       }

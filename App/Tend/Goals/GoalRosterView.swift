@@ -11,9 +11,7 @@ struct GoalRosterView: View {
   @Environment(\.timeZone) private var timeZone
 
   private let context: ModelContext
-  #if DEBUG
-    private let fixedInstant: Date?
-  #endif
+  private let now: () -> Date
 
   @State private var model: GoalRosterModel
   @State private var presentedForm: GoalRosterForm?
@@ -23,16 +21,18 @@ struct GoalRosterView: View {
 
   init(context: ModelContext) {
     self.context = context
+    now = Date.init
     _model = State(initialValue: GoalRosterModel(context: context))
-    #if DEBUG
-      fixedInstant = nil
-    #endif
   }
 
   #if DEBUG
     init(context: ModelContext, fixedInstant: Date?) {
       self.context = context
-      self.fixedInstant = fixedInstant
+      if let fixedInstant {
+        now = { fixedInstant }
+      } else {
+        now = Date.init
+      }
       _model = State(initialValue: GoalRosterModel(context: context))
     }
   #endif
@@ -45,12 +45,10 @@ struct GoalRosterView: View {
       )
     ) { timeline in
       rosterList
-        .onAppear {
-          startOnce(at: timeline.date)
-        }
+        .onAppear(perform: startOnce)
         .onChange(of: timeline.date) { previousDate, date in
           guard hasStarted, previousDate != date else { return }
-          refresh(at: date)
+          refreshCurrentContext()
         }
     }
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
@@ -77,6 +75,7 @@ struct GoalRosterView: View {
       content: { _ in
         GoalFormView(
           mode: .new,
+          now: now,
           onSaved: refreshCurrentContext
         )
         .modelContext(context)
@@ -91,6 +90,7 @@ struct GoalRosterView: View {
         GoalDetailView(
           goal: selection.goal,
           context: context,
+          now: now,
           onBack: closeDetail
         )
         .modelContext(context)
@@ -288,32 +288,20 @@ struct GoalRosterView: View {
     return localDayCalendar
   }
 
-  private func startOnce(at instant: Date) {
+  private func startOnce() {
     guard !hasStarted else { return }
     hasStarted = true
     hasLeftActiveScene = scenePhase != .active
-    refresh(at: instant)
+    refreshCurrentContext()
   }
 
-  private func refresh(at instant: Date) {
+  private func refreshCurrentContext() {
     model.refresh(
-      at: resolvedInstant(instant),
+      at: now(),
       calendar: localDayCalendar,
       timeZone: timeZone,
       locale: locale
     )
-  }
-
-  private func resolvedInstant(_ instant: Date) -> Date {
-    #if DEBUG
-      fixedInstant ?? instant
-    #else
-      instant
-    #endif
-  }
-
-  private func refreshCurrentContext() {
-    refresh(at: .now)
   }
 
   private func presentNewGoal() {

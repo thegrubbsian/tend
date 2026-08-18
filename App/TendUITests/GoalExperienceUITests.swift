@@ -1,3 +1,4 @@
+import UIKit
 import XCTest
 
 final class GoalExperienceUITests: XCTestCase {
@@ -16,6 +17,7 @@ final class GoalExperienceUITests: XCTestCase {
 
   @MainActor
   func testPersistentGoalsOwnerJourney() throws {
+    XCUIDevice.shared.orientation = .portrait
     let app = launch(
       storeName: ownerStoreName,
       reset: true,
@@ -452,6 +454,7 @@ final class GoalExperienceUITests: XCTestCase {
 
   @MainActor
   func testEmptyNamedStoreShowsGoalsEmptyState() {
+    XCUIDevice.shared.orientation = .portrait
     let app = launch(
       storeName: emptyStoreName,
       reset: true,
@@ -481,21 +484,245 @@ final class GoalExperienceUITests: XCTestCase {
   }
 
   @MainActor
+  func testCompactPortraitRosterAndFormRemainAccessible() throws {
+    XCUIDevice.shared.orientation = .portrait
+    let app = launchAdaptiveStore(named: "compact")
+    selectGoals(in: app)
+
+    let window = app.windows.firstMatch
+    XCTAssertTrue(window.exists)
+    XCTAssertLessThan(window.frame.width, window.frame.height)
+
+    let goalsTab = app.buttons["shell.tab.goals"]
+    XCTAssertTrue(goalsTab.isSelected, "Expected Goals to retain selected state")
+    XCTAssertEqual(goalsTab.label, "Goals")
+    let oak = goalRow(id: "11000000-0000-0000-0000-000000000002", in: app)
+    scrollToRosterElement(oak, in: app)
+    assertWithinUnobscuredRosterViewport(oak, in: app)
+    XCTAssertEqual(oak.elementType, .button)
+    XCTAssertEqual(oak.label, "Grow oak seedlings")
+    XCTAssertTrue(
+      (oak.value as? String)?.contains("Behind") == true,
+      "Expected the behind state to be available as text rather than color alone"
+    )
+    try performVisibleAccessibilityAudit(in: app)
+    recordScreenshot("goal-experience-compact-roster", of: app)
+
+    scrollRosterToTop(in: app)
+    let add = app.buttons["goals.add"]
+    XCTAssertEqual(add.label, "New goal")
+    add.tap()
+
+    let sheet = element("goalForm.sheet", in: app)
+    XCTAssertTrue(sheet.waitForExistence(timeout: 5), "Expected the New goal sheet")
+    XCTAssertEqual(element("goalForm.title", in: app).label, "New goal")
+    let accumulate = app.buttons["goalForm.kind.accumulate"]
+    let measure = app.buttons["goalForm.kind.measure"]
+    XCTAssertTrue(accumulate.isSelected)
+    XCTAssertEqual(accumulate.value as? String, "Selected")
+    XCTAssertFalse(measure.isSelected)
+    XCTAssertEqual(measure.value as? String, "Not selected")
+    assertMinimumHitRegion(of: accumulate)
+    assertMinimumHitRegion(of: measure)
+    assertWithinWindow(element("goalForm.name", in: app), in: app)
+    recordScreenshot("goal-experience-form", of: app)
+
+    let cancel = app.buttons["goalForm.cancel"]
+    XCTAssertEqual(cancel.label, "Cancel")
+    assertMinimumHitRegion(of: cancel)
+    cancel.tap()
+    XCTAssertTrue(sheet.waitForNonExistence(timeout: 5))
+  }
+
+  @MainActor
+  func testLandscapeRosterKeepsContentInsideTheUnobscuredViewport() throws {
+    XCUIDevice.shared.orientation = .portrait
+    let app = launchAdaptiveStore(named: "landscape")
+    selectGoals(in: app)
+
+    XCUIDevice.shared.orientation = .landscapeLeft
+    let landscape = XCTNSPredicateExpectation(
+      predicate: NSPredicate { _, _ in
+        let frame = app.windows.firstMatch.frame
+        return frame.width > frame.height
+      },
+      object: app
+    )
+    wait(for: [landscape], timeout: 5)
+
+    let oak = goalRow(id: "11000000-0000-0000-0000-000000000002", in: app)
+    scrollToRosterElement(oak, in: app)
+    assertWithinUnobscuredRosterViewport(oak, in: app)
+    let window = app.windows.firstMatch
+    XCTAssertGreaterThanOrEqual(oak.frame.minX, window.frame.minX)
+    XCTAssertLessThanOrEqual(oak.frame.maxX, window.frame.maxX)
+    XCTAssertTrue(app.buttons["shell.tab.goals"].isSelected)
+    XCTAssertTrue((oak.value as? String)?.contains("Behind") == true)
+    try performVisibleAccessibilityAudit(in: app)
+    recordScreenshot("goal-experience-landscape", of: app)
+  }
+
+  @MainActor
+  func testRosterAndControlsReflowAtAccessibilityLargeAndXXL() {
+    XCUIDevice.shared.orientation = .portrait
+    let compactApp = launchAdaptiveStore(named: "dynamic-type-baseline")
+    selectGoals(in: compactApp)
+    let compactOak = goalRow(id: "11000000-0000-0000-0000-000000000002", in: compactApp)
+    XCTAssertTrue(compactOak.waitForExistence(timeout: 5))
+    let compactRowHeight = compactOak.frame.height
+    compactApp.terminate()
+
+    let categories = [
+      "UICTContentSizeCategoryAccessibilityL",
+      "UICTContentSizeCategoryAccessibilityXXL",
+    ]
+    for (index, category) in categories.enumerated() {
+      let app = launchAdaptiveStore(
+        named: "dynamic-type-\(index)",
+        additionalArguments: [
+          "-UIPreferredContentSizeCategoryName", category,
+        ]
+      )
+      selectGoals(in: app)
+
+      let oak = goalRow(id: "11000000-0000-0000-0000-000000000002", in: app)
+      XCTAssertTrue(oak.waitForExistence(timeout: 5))
+      XCTAssertGreaterThan(
+        oak.frame.height,
+        compactRowHeight,
+        "Expected accessibility text to grow or wrap the compact row"
+      )
+      XCTAssertTrue((oak.value as? String)?.contains("Behind") == true)
+      assertWithinUnobscuredRosterViewport(oak, in: app)
+
+      let disclosure = app.buttons["goals.closed.disclosure"]
+      scrollToRosterElement(disclosure, in: app)
+      assertWithinUnobscuredRosterViewport(disclosure, in: app)
+      XCTAssertEqual(disclosure.elementType, .button)
+      XCTAssertEqual(disclosure.label, "Closed goals")
+      XCTAssertEqual(disclosure.value as? String, "2, collapsed")
+
+      if index == categories.count - 1 {
+        recordScreenshot("goal-experience-larger-text", of: app)
+        scrollRosterToTop(in: app)
+        app.buttons["goals.add"].tap()
+        let deadline = app.buttons["goalForm.deadline.add"]
+        scrollToVisible(deadline, absentTargetSearchDirection: .towardEnd, in: app)
+        XCTAssertEqual(deadline.label, "Deadline, none")
+        assertMinimumHitRegion(of: deadline)
+        assertWithinWindow(deadline, in: app)
+        XCTAssertTrue(app.buttons["goalForm.kind.accumulate"].isSelected)
+        app.buttons["goalForm.cancel"].tap()
+        XCTAssertTrue(element("goalForm.sheet", in: app).waitForNonExistence(timeout: 5))
+      }
+      app.terminate()
+    }
+  }
+
+  @MainActor
+  func testReduceMotionTransitionsExposeDetailProgressAndLifecycleSemantics() {
+    XCUIDevice.shared.orientation = .portrait
+    let app = launchAdaptiveStore(
+      named: "reduce-motion",
+      additionalArguments: [
+        "-UIAccessibilityReduceMotionEnabled", "YES",
+      ]
+    )
+    selectGoals(in: app)
+    XCTAssertTrue(app.buttons["shell.tab.goals"].isSelected)
+
+    let oak = goalRow(id: "11000000-0000-0000-0000-000000000002", in: app)
+    scrollToRosterElement(oak, in: app)
+    openGoal(oak, in: app)
+    XCTAssertEqual(element("goalDetail.title", in: app).label, "Grow oak seedlings")
+    let detailProgress = element("goalDetail.progress", in: app).descendants(matching: .any)
+      .matching(NSPredicate(format: "label == %@", "Progress")).firstMatch
+    XCTAssertTrue(detailProgress.waitForExistence(timeout: 2))
+    XCTAssertEqual(
+      detailProgress.value as? String,
+      "150 centimeters now · 30 of 80 centimeters"
+    )
+    XCTAssertEqual(
+      element("goalDetail.metadata.deadline", in: app).value as? String,
+      "16 days remaining · Due Jan 31, 2026"
+    )
+    recordScreenshot("goal-experience-detail", of: app)
+    backToGoals(in: app)
+
+    let piano = goalRow(id: "11000000-0000-0000-0000-000000000001", in: app)
+    scrollToRosterElement(piano, in: app)
+    openGoal(piano, in: app)
+    let addProgress = element("goalDetail.addProgress", in: app)
+    scrollToVisible(addProgress, absentTargetSearchDirection: .towardStart, in: app)
+    addProgress.tap()
+    let progressSheet = element("goalProgressEntry.sheet", in: app)
+    XCTAssertTrue(progressSheet.waitForExistence(timeout: 2))
+    XCTAssertEqual(element("goalProgressEntry.title", in: app).label, "Add progress")
+    XCTAssertEqual(element("goalProgressEntry.goalName", in: app).label, "Practice piano hours")
+    let today = app.buttons["goalProgressEntry.destination.today"]
+    let yesterday = app.buttons["goalProgressEntry.destination.yesterday"]
+    XCTAssertTrue(today.isSelected)
+    XCTAssertEqual(today.value as? String, "Selected")
+    XCTAssertFalse(yesterday.isSelected)
+    XCTAssertEqual(yesterday.value as? String, "Not selected")
+    XCTAssertEqual(app.textFields["goalProgressEntry.value"].label, "Amount")
+    recordScreenshot("goal-experience-progress-entry", of: app)
+    app.buttons["goalProgressEntry.cancel"].tap()
+    XCTAssertTrue(progressSheet.waitForNonExistence(timeout: 5))
+    backToGoals(in: app)
+
+    let disclosure = app.buttons["goals.closed.disclosure"]
+    scrollToRosterElement(disclosure, in: app)
+    XCTAssertEqual(disclosure.elementType, .button)
+    XCTAssertEqual(disclosure.label, "Closed goals")
+    XCTAssertEqual(disclosure.value as? String, "2, collapsed")
+    recordScreenshot("goal-experience-closed-disclosure", of: app)
+    disclosure.tap()
+    XCTAssertEqual(disclosure.value as? String, "2, expanded")
+
+    let harvested = goalRow(id: "11000000-0000-0000-0000-000000000005", in: app)
+    scrollToRosterElement(harvested, in: app)
+    XCTAssertTrue((harvested.value as? String)?.contains("Harvested") == true)
+    openGoal(harvested, in: app)
+    XCTAssertTrue(app.staticTexts["Harvested"].waitForExistence(timeout: 2))
+    let reopen = element("goalDetail.reopen", in: app)
+    scrollToVisible(reopen, absentTargetSearchDirection: .towardEnd, in: app)
+    XCTAssertEqual(reopen.label, "Reopen")
+    XCTAssertFalse(element("goalDetail.addProgress", in: app).exists)
+    recordScreenshot("goal-experience-lifecycle-states", of: app)
+  }
+
+  @MainActor
   private func launch(
     storeName: String,
     reset: Bool,
-    fixture: String?
+    fixture: String?,
+    additionalArguments: [String] = []
   ) -> XCUIApplication {
     let app = XCUIApplication()
     app.launchEnvironment["TZ"] = "America/Los_Angeles"
-    app.launchArguments = launchArguments(
-      storeName: storeName,
-      reset: reset,
-      fixture: fixture
-    )
+    app.launchArguments =
+      launchArguments(
+        storeName: storeName,
+        reset: reset,
+        fixture: fixture
+      ) + additionalArguments
     app.terminate()
     app.launch()
     return app
+  }
+
+  @MainActor
+  private func launchAdaptiveStore(
+    named name: String,
+    additionalArguments: [String] = []
+  ) -> XCUIApplication {
+    launch(
+      storeName: "GoalExperienceUITests-\(name)-\(UUID().uuidString)",
+      reset: true,
+      fixture: "goal-experience",
+      additionalArguments: additionalArguments
+    )
   }
 
   private func launchArguments(
@@ -871,6 +1098,44 @@ final class GoalExperienceUITests: XCTestCase {
       let issueFrame = issueElement.frame.integral
       return issueFrame.minY <= visibleTop || issueFrame.maxY > visibleBottom
     }
+  }
+
+  @MainActor
+  private func assertWithinUnobscuredRosterViewport(
+    _ target: XCUIElement,
+    in app: XCUIApplication
+  ) {
+    XCTAssertTrue(target.exists, "Expected \(target.identifier) in the roster")
+    let visibleTop = element("shell.destination.goals", in: app).frame.minY
+    let visibleBottom = app.buttons["shell.tab.goals"].frame.minY
+    XCTAssertGreaterThanOrEqual(
+      target.frame.minY,
+      visibleTop,
+      "Expected \(target.identifier) below the destination's unobscured top"
+    )
+    XCTAssertLessThanOrEqual(
+      target.frame.maxY,
+      visibleBottom,
+      "Expected \(target.identifier) above the floating Goals tab"
+    )
+  }
+
+  @MainActor
+  private func assertWithinWindow(_ target: XCUIElement, in app: XCUIApplication) {
+    XCTAssertTrue(target.exists, "Expected \(target.identifier) in the presented surface")
+    let window = app.windows.firstMatch.frame
+    XCTAssertGreaterThanOrEqual(target.frame.minX, window.minX)
+    XCTAssertLessThanOrEqual(target.frame.maxX, window.maxX)
+    XCTAssertGreaterThanOrEqual(target.frame.minY, window.minY)
+    XCTAssertLessThanOrEqual(target.frame.maxY, window.maxY)
+  }
+
+  @MainActor
+  private func recordScreenshot(_ name: String, of app: XCUIApplication) {
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = name
+    attachment.lifetime = .keepAlways
+    add(attachment)
   }
 
   @MainActor
