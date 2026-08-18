@@ -465,7 +465,8 @@ struct TodayModelTests {
         return snapshot(progress: 1, target: 1, isMet: true)
       })
     let habits = [first, failed, second]
-    model.refresh(habits: habits, context: makeRefreshContext())
+    let refreshContext = makeRefreshContext()
+    model.refresh(habits: habits, context: refreshContext)
 
     entry.amount = 2
     try context.save()
@@ -473,7 +474,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
-      context: makeRefreshContext(instant: Date(timeIntervalSince1970: 2_000))
+      context: refreshContext
     )
 
     #expect(calls[first.persistentModelID] == 2)
@@ -547,14 +548,15 @@ struct TodayModelTests {
         return snapshot(progress: 1, target: 1, isMet: true)
       })
     let originalHabits = [first, failed, second]
-    model.refresh(habits: originalHabits, context: makeRefreshContext())
+    let refreshContext = makeRefreshContext()
+    model.refresh(habits: originalHabits, context: refreshContext)
     fails = false
     let updatedHabits = update(originalHabits, failed)
 
     model.retry(
       habitID: failed.persistentModelID,
       habits: updatedHabits,
-      context: makeRefreshContext(instant: Date(timeIntervalSince1970: 2_000))
+      context: refreshContext
     )
 
     let dashboard = try requireDashboard(model)
