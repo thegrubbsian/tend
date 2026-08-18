@@ -44,7 +44,7 @@
       case .fixtureRequiresReset:
         "A UI-test fixture requires exactly one reset flag."
       case .fixtureRequiresInstant:
-        "A Fast Logging UI-test fixture requires a fixed instant."
+        "This UI-test fixture requires a fixed instant."
       }
     }
   }
@@ -64,6 +64,7 @@
       case todayFailure = "today-failure"
       case fastLoggingDaily = "fast-logging-daily"
       case fastLoggingWeekly = "fast-logging-weekly"
+      case goalRoster = "goal-roster"
     }
 
     static func containerFactory(
@@ -173,6 +174,12 @@
             at: launchInstant,
             timeZone: fixtureTimeZone
           )
+        case .goalRoster:
+          try GoalRosterUITestFixture.seed(
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
         case nil:
           break
         }
@@ -263,7 +270,8 @@
         } else {
           instant = nil
         }
-        if fixture == .fastLoggingDaily || fixture == .fastLoggingWeekly,
+        if let fixture,
+          Self.fixturesRequiringInstant.contains(fixture),
           instant == nil
         {
           throw TendUITestStoreError.fixtureRequiresInstant
@@ -281,6 +289,12 @@
         resetArgument,
         fixtureArgument,
         instantArgument,
+      ]
+
+      private static let fixturesRequiringInstant: Set<Fixture> = [
+        .fastLoggingDaily,
+        .fastLoggingWeekly,
+        .goalRoster,
       ]
 
       private static func isValid(name: String) -> Bool {

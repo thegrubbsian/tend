@@ -11,6 +11,9 @@ struct GoalRosterView: View {
   @Environment(\.timeZone) private var timeZone
 
   private let context: ModelContext
+#if DEBUG
+  private let fixedInstant: Date?
+#endif
 
   @State private var model: GoalRosterModel
   @State private var presentedForm: GoalRosterForm?
@@ -21,7 +24,18 @@ struct GoalRosterView: View {
   init(context: ModelContext) {
     self.context = context
     _model = State(initialValue: GoalRosterModel(context: context))
+#if DEBUG
+    fixedInstant = nil
+#endif
   }
+
+#if DEBUG
+  init(context: ModelContext, fixedInstant: Date?) {
+    self.context = context
+    self.fixedInstant = fixedInstant
+    _model = State(initialValue: GoalRosterModel(context: context))
+  }
+#endif
 
   var body: some View {
     TimelineView(
@@ -282,11 +296,19 @@ struct GoalRosterView: View {
 
   private func refresh(at instant: Date) {
     model.refresh(
-      at: instant,
+      at: resolvedInstant(instant),
       calendar: localDayCalendar,
       timeZone: timeZone,
       locale: locale
     )
+  }
+
+  private func resolvedInstant(_ instant: Date) -> Date {
+#if DEBUG
+    fixedInstant ?? instant
+#else
+    instant
+#endif
   }
 
   private func refreshCurrentContext() {
