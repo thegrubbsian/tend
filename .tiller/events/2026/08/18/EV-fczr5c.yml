@@ -1,0 +1,14 @@
+id: EV-fczr5c
+type: submit.task
+at: 2026-08-18T22:45:36.454003Z
+owner: jc
+command: submit task T-kqh537
+targets:
+    - T-kqh537
+before:
+    status: check
+after:
+    pr: 54
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml
