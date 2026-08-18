@@ -116,6 +116,7 @@ struct TodayGoalModelTests {
       ("2026-10-31", "2026-11-07", "America/New_York", true),
       ("2026-01-27", "2026-02-03", "UTC", true),
       ("2026-12-25", "2027-01-01", "Pacific/Auckland", true),
+      ("9999-12-25", "9999-12-30", "UTC", true),
     ]
 
     for (todayKey, deadlineKey, zone, expected) in cases {

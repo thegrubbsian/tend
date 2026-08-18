@@ -40,6 +40,54 @@ struct TodayGoalRefreshTests {
     #expect(model.goalRows.map(\.name) == ["First"])
   }
 
+  @Test("habit-only refresh reprojects retained authoritative Goals")
+  func habitOnlyRefreshRetainsGoalsAndSuppressesAllTended() throws {
+    let store = try makeStore()
+    let habit = try insertHabit(in: store, name: "Habit")
+    let goal = try insertGoal(in: store, name: "Goal")
+    let firstContext = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-18"))
+    )
+    let secondContext = refreshContext(
+      instant: firstContext.instant.addingTimeInterval(60),
+      timeZone: "America/Los_Angeles"
+    )
+    var logged = false
+    var goalContexts: [TodayRefreshContext] = []
+    let model = TodayModel(
+      operations: TodayOperations(
+        snapshot: { _, _ in
+          self.habitSnapshot(progress: logged ? 4 : 0, isMet: logged)
+        },
+        goalFacts: { _, context in
+          goalContexts.append(context)
+          return .open(self.facts(standing: .behind, deadline: nil))
+        }
+      )
+    )
+    model.refresh(
+      habits: [habit],
+      goals: [goal],
+      context: firstContext
+    )
+
+    logged = true
+    habit.name = "Habit after logging"
+    try store.save()
+    model.refresh(habits: [habit], context: secondContext)
+
+    #expect(goalContexts == [firstContext, secondContext])
+    #expect(model.goalRows.map(\.id) == [goal.persistentModelID])
+    guard case .dashboard(let dashboard)? = model.presentation else {
+      Issue.record("Expected dashboard after habit-only refresh")
+      return
+    }
+    #expect(dashboard.goalRows.map(\.id) == [goal.persistentModelID])
+    #expect(dashboard.toTendRows.isEmpty)
+    #expect(dashboard.tendedRows.map(\.name) == ["Habit after logging"])
+    #expect(!dashboard.showsAllTended)
+  }
+
   @Test("scene environment day and transition refreshes use fresh contexts")
   func refreshTriggersUseFreshContextsAndEligibility() throws {
     let store = try makeStore()
@@ -248,6 +296,73 @@ struct TodayGoalRefreshTests {
     #expect(siblingCalls == 2)
   }
 
+  @Test("Goal retry with a changed context replaces the complete generation")
+  func goalRetryContextChangeRefreshesAllSiblingsAtomically() throws {
+    let store = try makeStore()
+    let deadline = try #require(GoalDate(rawValue: "2026-08-20"))
+    let failed = try insertGoal(in: store, name: "Failed", deadline: deadline)
+    let sibling = try insertGoal(in: store, name: "Sibling", deadline: deadline)
+    let initial = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-18"))
+    )
+    let changed = refreshContext(
+      instant: initial.instant.addingTimeInterval(10),
+      timeZone: "America/Los_Angeles",
+      locale: "sv_SE"
+    )
+    let initialTransition = initial.instant.addingTimeInterval(60)
+    var shouldFail = true
+    var siblingCalls = 0
+    var model: TodayModel!
+    model = makeModel { goal, context in
+      if goal === failed, shouldFail { throw FixtureError.unavailable }
+      if goal === sibling {
+        siblingCalls += 1
+        if siblingCalls == 2 {
+          #expect(model.goalRows.first { $0.goal === sibling }?.normalizedProgress == 0.25)
+          #expect(model.nextGoalTransition == initialTransition)
+        }
+      }
+      let refreshed = context == changed
+      return .open(
+        self.facts(
+          standing: .behind,
+          deadline: self.goalDate(goal),
+          normalizedProgress: refreshed ? 0.5 : 0.25,
+          next: refreshed ? nil : initialTransition
+        ))
+    }
+    model.refresh(
+      habits: [],
+      goals: [failed, sibling],
+      context: initial
+    )
+    let initialDeadlineText = try #require(
+      model.goalRows.first { $0.goal === sibling }?.deadlineText
+    )
+
+    shouldFail = false
+    model.retry(
+      goalID: failed.persistentModelID,
+      habits: [],
+      goals: [failed, sibling],
+      context: changed
+    )
+
+    #expect(siblingCalls == 2)
+    #expect(model.goalRows.count == 2)
+    #expect(model.goalRows.first { $0.goal === sibling }?.normalizedProgress == 0.5)
+    #expect(
+      model.goalRows.first { $0.goal === sibling }?.progressText
+        == "2 of 4 times"
+    )
+    #expect(
+      model.goalRows.first { $0.goal === sibling }?.deadlineText
+        != initialDeadlineText
+    )
+    #expect(model.nextGoalTransition == nil)
+  }
+
   @Test("all open goals contribute only valid future earliest transitions")
   func earliestTransitionIncludesCurrentlyIneligibleGoals() throws {
     let store = try makeStore()
@@ -400,10 +515,13 @@ struct TodayGoalRefreshTests {
     )
   }
 
-  private func habitSnapshot(progress: Int) -> HabitTodaySnapshot {
+  private func habitSnapshot(
+    progress: Int,
+    isMet: Bool = false
+  ) -> HabitTodaySnapshot {
     HabitTodaySnapshot(
       periodKey: "day:2026-08-18", progress: progress, target: 4, unit: "times",
-      cadence: .daily, currentStreak: 0, isAtRisk: false, isMet: false
+      cadence: .daily, currentStreak: 0, isAtRisk: false, isMet: isMet
     )
   }
 

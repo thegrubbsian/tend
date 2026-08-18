@@ -178,6 +178,8 @@ final class TodayModel {
   @ObservationIgnored private var lastHabitInputs: [PersistentIdentifier: HabitInputFingerprint] =
     [:]
   @ObservationIgnored private var lastGoalInputs: [PersistentIdentifier: GoalInputFingerprint] = [:]
+  @ObservationIgnored private var retainedGoals: [Goal] = []
+  @ObservationIgnored private var generationContext: TodayRefreshContext?
 
   var presentation: TodayPresentation? { generation?.presentation }
   var goalRows: [TodayGoalRow] { generation?.goalRows ?? [] }
@@ -193,12 +195,32 @@ final class TodayModel {
 
   func refresh(
     habits: [Habit],
-    goals: [Goal] = [],
+    goals: [Goal],
+    context: TodayRefreshContext
+  ) {
+    let goalInputs = uniqueGoalInputs(from: goals)
+    retainedGoals = goalInputs.map(\.goal)
+    refresh(habits: habits, goalInputs: goalInputs, context: context)
+  }
+
+  func refresh(
+    habits: [Habit],
+    context: TodayRefreshContext
+  ) {
+    refresh(
+      habits: habits,
+      goalInputs: uniqueGoalInputs(from: retainedGoals),
+      context: context
+    )
+  }
+
+  private func refresh(
+    habits: [Habit],
+    goalInputs: [GoalInput],
     context: TodayRefreshContext
   ) {
     let habitInputs = uniqueHabitInputs(from: habits)
     let activeHabitInputs = habitInputs.filter { $0.habit.isActive }
-    let goalInputs = uniqueGoalInputs(from: goals)
     let formatter = TodayPresentationFormatter(context: context)
     let goalProjection = projectGoals(goalInputs, formatter: formatter, context: context)
 
@@ -229,6 +251,7 @@ final class TodayModel {
     )
     lastHabitInputs = habitFingerprints(for: habitInputs)
     lastGoalInputs = goalFingerprints(for: goalInputs)
+    generationContext = context
     generation = replacement
   }
 
@@ -298,6 +321,7 @@ final class TodayModel {
     let habitInputs = uniqueHabitInputs(from: habits)
     let goalInputs = uniqueGoalInputs(from: goals)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
+      generationContext == context,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
       let retryInput = goalInputs.first(where: { $0.id == goalID })
     else {
@@ -431,13 +455,17 @@ final class TodayModel {
       return true
     case .onPace:
       guard let deadline = facts.deadline,
-        let today = localGoalDate(
+        var candidate = localGoalDate(
           at: context.instant,
           timeZone: context.timeZone
-        ),
-        let seventhDay = try? adding(days: 7, to: today)
+        )
       else { return false }
-      return deadline >= today && deadline <= seventhDay
+      for offset in 0...7 {
+        if deadline == candidate { return true }
+        guard offset < 7, let next = try? candidate.next() else { return false }
+        candidate = next
+      }
+      return false
     }
   }
 
@@ -454,12 +482,6 @@ final class TodayModel {
       let day = components.day
     else { return nil }
     return GoalDate(year: year, month: month, day: day)
-  }
-
-  private func adding(days: Int, to date: GoalDate) throws -> GoalDate {
-    var result = date
-    for _ in 0..<days { result = try result.next() }
-    return result
   }
 
   private func dashboard(
