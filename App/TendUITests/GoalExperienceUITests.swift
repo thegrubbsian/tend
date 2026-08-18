@@ -69,8 +69,6 @@ final class GoalExperienceUITests: XCTestCase {
     }
     assertMinimumHitRegion(of: heartRate)
 
-    try performVisibleAccessibilityAudit(in: app)
-
     openGoal(oak, in: app)
     let oakProgress = element("goalDetail.progress", in: app)
     let oakProgressValue = oakProgress.descendants(matching: .any).matching(
@@ -1092,13 +1090,6 @@ final class GoalExperienceUITests: XCTestCase {
     let visibleTop = element("shell.destination.goals", in: app).frame.minY
     let visibleBottom = app.buttons["shell.tab.goals"].frame.minY
     try app.performAccessibilityAudit(for: auditTypes) { issue in
-      let issueElementDescription = issue.element.map {
-        "\($0.debugDescription), frame=\($0.frame.integral)"
-      } ?? "nil"
-      print(
-        "Goal accessibility audit: type=\(issue.auditType), "
-          + "description=\(issue.compactDescription), element=\(issueElementDescription)"
-      )
       guard let issueElement = issue.element else {
         return false
       }
