@@ -1,6 +1,11 @@
 import SwiftUI
 import TendCore
 
+enum GoalProgressStyle {
+  case detail
+  case roster
+}
+
 struct GoalProgressView: View {
   let progress: GoalDetailProgressFact
   let progressText: String
@@ -9,6 +14,7 @@ struct GoalProgressView: View {
   let standingText: String?
   let closure: GoalClosure?
   let closureText: String?
+  let style: GoalProgressStyle
 
   init(
     progress: GoalDetailProgressFact,
@@ -17,7 +23,8 @@ struct GoalProgressView: View {
     expectedNormalizedProgress: Double? = nil,
     standingText: String? = nil,
     closure: GoalClosure? = nil,
-    closureText: String? = nil
+    closureText: String? = nil,
+    style: GoalProgressStyle = .detail
   ) {
     self.progress = progress
     self.progressText = progressText
@@ -26,22 +33,29 @@ struct GoalProgressView: View {
     self.standingText = standingText
     self.closure = closure
     self.closureText = closureText
+    self.style = style
   }
 
+  @ViewBuilder
   var body: some View {
-    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingMedium) {
-      progressSummary
+    switch style {
+    case .detail:
+      VStack(alignment: .leading, spacing: AlmanacMetrics.spacingMedium) {
+        progressSummary
 
-      if let statusStyle {
-        statusLabel(statusStyle)
+        if let statusStyle {
+          statusLabel(statusStyle)
+        }
+
+        kindSpecificProgress
       }
-
-      kindSpecificProgress
+      .padding(AlmanacMetrics.spacingMedium)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .almanacRaisedSurface()
+      .accessibilityElement(children: .contain)
+    case .roster:
+      rosterProgress
     }
-    .padding(AlmanacMetrics.spacingMedium)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .almanacRaisedSurface()
-    .accessibilityElement(children: .contain)
   }
 
   private var progressSummary: some View {
@@ -86,6 +100,88 @@ struct GoalProgressView: View {
         normalizedProgress: normalizedProgress
       )
     }
+  }
+
+  @ViewBuilder
+  private var rosterProgress: some View {
+    Group {
+      switch progress {
+      case .accumulate(_, _, _, let normalizedProgress):
+        GoalProgressTrack(
+          normalizedProgress: normalizedProgress,
+          expectedNormalizedProgress: expectedNormalizedProgress,
+          orientation: .leadingToTrailing,
+          showsCurrentMarker: false,
+          accent: progressColor,
+          trackHeight: AlmanacMetrics.spacingMedium
+        )
+      case .measure(
+        let baseline,
+        let target,
+        _,
+        _,
+        _,
+        let direction,
+        let unit,
+        let normalizedProgress
+      ):
+        VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall / 2) {
+          GoalProgressTrack(
+            normalizedProgress: normalizedProgress,
+            expectedNormalizedProgress: expectedNormalizedProgress,
+            orientation: trackOrientation(for: direction),
+            showsCurrentMarker: true,
+            accent: progressColor,
+            trackHeight: AlmanacMetrics.spacingMedium
+          )
+
+          compactMeasureEndpoints(
+            baseline: baseline,
+            target: target,
+            direction: direction,
+            unit: unit
+          )
+        }
+      }
+    }
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel("Progress")
+    .accessibilityValue(progressText)
+  }
+
+  @ViewBuilder
+  private func compactMeasureEndpoints(
+    baseline: Int,
+    target: Int,
+    direction: GoalDetailMeasureDirection,
+    unit: String
+  ) -> some View {
+    HStack(alignment: .top, spacing: AlmanacMetrics.spacingMedium) {
+      if direction == .increasing {
+        compactEndpoint(value: baseline, alignment: .leading)
+        compactEndpoint(value: target, alignment: .trailing)
+      } else {
+        compactEndpoint(value: target, alignment: .leading)
+        compactEndpoint(value: baseline, alignment: .trailing)
+      }
+    }
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(
+      Text(
+        "Baseline \(baseline, format: .number) \(unit), target \(target, format: .number) \(unit)"
+      )
+    )
+  }
+
+  private func compactEndpoint(
+    value: Int,
+    alignment: Alignment
+  ) -> some View {
+    Text(value, format: .number)
+      .almanacTextStyle(.caption)
+      .foregroundStyle(AlmanacPalette.inkFaint)
+      .fixedSize(horizontal: false, vertical: true)
+      .frame(maxWidth: .infinity, alignment: alignment)
   }
 
   private func measureProgress(
@@ -256,7 +352,27 @@ struct GoalProgressView: View {
   }
 
   private var progressColor: Color {
-    statusStyle?.accent ?? AlmanacPalette.moss
+    switch style {
+    case .detail:
+      statusStyle?.accent ?? AlmanacPalette.moss
+    case .roster:
+      rosterProgressColor
+    }
+  }
+
+  private var rosterProgressColor: Color {
+    if closure != nil {
+      return AlmanacPalette.inkMuted
+    }
+
+    switch standing {
+    case .behind:
+      return AlmanacPalette.ochreDeep
+    case .pastDue:
+      return AlmanacPalette.withered
+    case .onPace, nil:
+      return AlmanacPalette.moss
+    }
   }
 
   private var statusStyle: GoalProgressStatusStyle? {
@@ -325,6 +441,23 @@ private struct GoalProgressTrack: View {
   let orientation: Orientation
   let showsCurrentMarker: Bool
   let accent: Color
+  let trackHeight: CGFloat
+
+  init(
+    normalizedProgress: Double,
+    expectedNormalizedProgress: Double?,
+    orientation: Orientation,
+    showsCurrentMarker: Bool,
+    accent: Color,
+    trackHeight: CGFloat = AlmanacMetrics.spacingLarge
+  ) {
+    self.normalizedProgress = normalizedProgress
+    self.expectedNormalizedProgress = expectedNormalizedProgress
+    self.orientation = orientation
+    self.showsCurrentMarker = showsCurrentMarker
+    self.accent = accent
+    self.trackHeight = trackHeight
+  }
 
   var body: some View {
     GeometryReader { geometry in
@@ -357,7 +490,7 @@ private struct GoalProgressTrack: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .frame(height: AlmanacMetrics.spacingLarge)
+    .frame(height: trackHeight)
     .accessibilityHidden(true)
   }
 
@@ -375,7 +508,7 @@ private struct GoalProgressTrack: View {
       .fill(AlmanacPalette.inkMuted)
       .frame(
         width: AlmanacMetrics.gardenOutlineWidth,
-        height: AlmanacMetrics.spacingLarge
+        height: trackHeight
       )
       .position(
         x: centerX(
