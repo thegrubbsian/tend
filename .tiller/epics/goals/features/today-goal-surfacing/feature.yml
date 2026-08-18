@@ -1,7 +1,7 @@
 id: F-e8yd2r
 key: goals/today-goal-surfacing
 title: Today Goal Surfacing
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L66-68
@@ -10,6 +10,7 @@ depends_on:
     - F-5aficd
     - F-skoqxt
     - F-xowx7x
+branch: tiller/goals/today-goal-surfacing
 accepted_against:
     spec:
         kind: git_blob

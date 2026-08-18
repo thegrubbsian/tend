@@ -1,0 +1,13 @@
+id: EV-b5mc03
+type: start.task
+at: 2026-08-18T16:13:22.903389Z
+owner: jc
+command: start task T-g3o7wd
+targets:
+    - T-g3o7wd
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.yml
