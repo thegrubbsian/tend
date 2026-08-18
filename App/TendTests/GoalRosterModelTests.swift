@@ -13,9 +13,11 @@ struct GoalRosterModelTests {
     let fixture = try GoalRosterFixture()
     var fetchedGoals: [Goal] = []
     var factsByID: [UUID: GoalRosterDomainFacts] = [:]
-    let model = fixture.model(goals: { fetchedGoals }, facts: { goal in
-      try #require(factsByID[goal.id])
-    })
+    let model = fixture.model(
+      goals: { fetchedGoals },
+      facts: { goal in
+        try #require(factsByID[goal.id])
+      })
 
     model.refresh(
       at: fixture.instant,
@@ -260,8 +262,10 @@ struct GoalRosterModelTests {
     let recent = fixture.date("2026-01-02T00:00:00Z")
     let lowID = fixture.uuid("30000000-0000-0000-0000-000000000001")
     let highID = fixture.uuid("40000000-0000-0000-0000-000000000001")
-    let earlierDeadline = try fixture.insertGoal(name: "Zulu", deadline: fixture.earlierPastDeadline)
-    let alpha = try fixture.insertGoal(name: "alpha", deadline: fixture.pastDeadline, createdAt: recent)
+    let earlierDeadline = try fixture.insertGoal(
+      name: "Zulu", deadline: fixture.earlierPastDeadline)
+    let alpha = try fixture.insertGoal(
+      name: "alpha", deadline: fixture.pastDeadline, createdAt: recent)
     let bravoOldLow = try fixture.insertGoal(
       id: lowID,
       name: "Bravo",
@@ -480,7 +484,8 @@ struct GoalRosterModelTests {
     #expect(model.isClosedExpanded)
     #expect(
       model.loadFailure
-        == GoalRosterLoadFailure(message: "Goals are unavailable right now.", retryTitle: "Try again")
+        == GoalRosterLoadFailure(
+          message: "Goals are unavailable right now.", retryTitle: "Try again")
     )
 
     model.retryRefresh()

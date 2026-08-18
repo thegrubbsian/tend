@@ -244,7 +244,7 @@ final class GoalRosterModel {
     before rhs: GoalDate?
   ) -> Bool {
     switch (lhs, rhs) {
-    case let (.some(lhs), .some(rhs)): lhs < rhs
+    case (.some(let lhs), .some(let rhs)): lhs < rhs
     case (.some, .none): true
     case (.none, .some), (.none, .none): false
     }
