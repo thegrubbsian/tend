@@ -25,7 +25,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/today-goal-surfacing/today-goal-presentation (T-g3o7wd): build pass, tests pass
+- (none)
 
 ### Open questions
 

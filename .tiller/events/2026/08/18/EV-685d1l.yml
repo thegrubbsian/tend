@@ -1,0 +1,14 @@
+id: EV-685d1l
+type: sync.task
+at: 2026-08-18T19:51:09.982035Z
+owner: jc
+command: sync task T-g3o7wd
+targets:
+    - T-g3o7wd
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.yml

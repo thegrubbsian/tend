@@ -1,7 +1,7 @@
 id: T-g3o7wd
 key: goals/today-goal-surfacing/today-goal-presentation
 title: Project needful goals into Today
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:58.455632Z
 pr: 53
+done_basis: ancestry
 gates:
     build:
         required: true
