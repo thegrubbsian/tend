@@ -50,6 +50,8 @@ struct FloatingTabPill: View {
     switch destination {
     case .today:
       AlmanacIcon.today
+    case .goals:
+      Image(systemName: "flag")
     case .habits:
       Image(systemName: "list.bullet")
     }

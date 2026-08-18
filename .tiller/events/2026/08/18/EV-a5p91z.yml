@@ -1,0 +1,13 @@
+id: EV-a5p91z
+type: start.task
+at: 2026-08-18T01:13:11.257474Z
+owner: jc
+command: start task T-99bqdn
+targets:
+    - T-99bqdn
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.yml

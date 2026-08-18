@@ -25,6 +25,9 @@ struct AlmanacShellView: View {
     case .today:
       TodayDestinationChrome(reminders: reminders)
         .accessibilityFocused($accessibilityFocus, equals: .today)
+    case .goals:
+      GoalsDestinationChrome()
+        .accessibilityFocused($accessibilityFocus, equals: .goals)
     case .habits:
       HabitsDestinationChrome(reminders: reminders)
         .accessibilityFocused($accessibilityFocus, equals: .habits)

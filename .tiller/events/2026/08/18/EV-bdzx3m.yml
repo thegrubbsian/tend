@@ -1,0 +1,14 @@
+id: EV-bdzx3m
+type: submit.task
+at: 2026-08-18T03:55:34.565519Z
+owner: jc
+command: submit task T-99bqdn
+targets:
+    - T-99bqdn
+before:
+    status: check
+after:
+    pr: 51
+    status: in_review
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.yml

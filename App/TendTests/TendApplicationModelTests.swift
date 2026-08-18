@@ -1268,6 +1268,220 @@ struct TendApplicationModelTests {
     #expect(factoryCallCount == 1)
   }
 
+  @Test("goal-roster fixture seeds six valid deterministic lifecycle and progress shapes")
+  func goalRosterFixtureSeedsExactLifecycleAndProgressFacts() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let instantValue = "2026-01-15T17:00:00Z"
+    let instant = try fixtureInstant(instantValue)
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let arguments = [
+      "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+      "goal-roster-fixture", TendUITestStore.resetArgument,
+      TendUITestStore.fixtureArgument, "goal-roster",
+      TendUITestStore.instantArgument, instantValue,
+    ]
+    try expectUITestStoreError(
+      .fixtureRequiresInstant,
+      arguments: Array(arguments.dropLast(2)),
+      supportDirectory: supportDirectory
+    )
+    let factory = try #require(
+      TendUITestStore.containerFactory(
+        arguments: arguments,
+        applicationSupportDirectory: supportDirectory,
+        fixtureTimeZone: timeZone
+      ))
+
+    #expect(TendUITestStore.fixedInstant(arguments: arguments) == instant)
+    let container = try factory()
+    let context = container.mainContext
+    let goals = try context.fetch(FetchDescriptor<Goal>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+    #expect(goals.count == 6)
+    #expect(
+      goals.map(\.id.uuidString) == [
+        "10000000-0000-0000-0000-000000000001",
+        "10000000-0000-0000-0000-000000000002",
+        "10000000-0000-0000-0000-000000000003",
+        "10000000-0000-0000-0000-000000000004",
+        "10000000-0000-0000-0000-000000000005",
+        "10000000-0000-0000-0000-000000000006",
+      ])
+    #expect(try context.fetchCount(FetchDescriptor<GoalEntry>()) == 3)
+    #expect(try context.fetchCount(FetchDescriptor<GoalReading>()) == 3)
+    let entries = try context.fetch(FetchDescriptor<GoalEntry>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+    #expect(
+      entries.map(\.id.uuidString) == [
+        "20000000-0000-0000-0000-000000000001",
+        "20000000-0000-0000-0000-000000000002",
+        "20000000-0000-0000-0000-000000000003",
+      ])
+    #expect(entries.allSatisfy { $0.assignedDateKey == "2026-01-15" })
+    #expect(entries.allSatisfy { $0.appendSequence == 0 })
+    let readings = try context.fetch(FetchDescriptor<GoalReading>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+    #expect(
+      readings.map(\.id.uuidString) == [
+        "30000000-0000-0000-0000-000000000001",
+        "30000000-0000-0000-0000-000000000002",
+        "30000000-0000-0000-0000-000000000003",
+      ])
+    #expect(readings.allSatisfy { $0.assignedDateKey == "2026-01-15" })
+    #expect(readings.allSatisfy { $0.appendSequence == 0 })
+
+    let goalsByName = Dictionary(uniqueKeysWithValues: goals.map { ($0.name, $0) })
+    let progress = GoalProgressComputation(context: context)
+    let standing = GoalStandingComputation()
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = timeZone
+
+    let accumulate = try #require(
+      goalsByName["Fund neighborhood science kits for every after-school classroom"]
+    )
+    #expect(accumulate.kindRawValue == GoalKind.accumulate.rawValue)
+    #expect(accumulate.target == 2_000_000)
+    #expect(accumulate.unit == "dollars pledged across neighborhoods")
+    #expect(accumulate.baseline == nil)
+    #expect(accumulate.deadlineKey == nil)
+    #expect(accumulate.closureRawValue == nil)
+    #expect((accumulate.entries ?? []).map(\.amount) == [1_250_000])
+    guard case .accumulate(let accumulateProgress) = try progress.snapshot(for: accumulate)
+    else {
+      Issue.record("Expected the fund goal to project accumulate progress")
+      return
+    }
+    #expect(accumulateProgress.total == 1_250_000)
+    #expect(accumulateProgress.normalizedProgress == 0.625)
+    #expect(
+      try standing.snapshot(
+        for: accumulate,
+        progress: .accumulate(accumulateProgress),
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      )?.standing == .onPace
+    )
+
+    let increasing = try #require(goalsByName["Grow oak seedlings"])
+    #expect(increasing.kindRawValue == GoalKind.measure.rawValue)
+    #expect(increasing.baseline == 120)
+    #expect(increasing.target == 200)
+    #expect(increasing.deadlineKey == "2026-01-31")
+    #expect((increasing.readings ?? []).map(\.value) == [150])
+    guard case .measure(let increasingProgress) = try progress.snapshot(for: increasing)
+    else {
+      Issue.record("Expected the seedling goal to project measure progress")
+      return
+    }
+    #expect(increasingProgress.currentValue == 150)
+    #expect(increasingProgress.completedDistance == 30)
+    #expect(increasingProgress.totalDistance == 80)
+    #expect(increasingProgress.normalizedProgress == 0.375)
+    #expect(
+      try standing.snapshot(
+        for: increasing,
+        progress: .measure(increasingProgress),
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      )?.standing == .behind
+    )
+
+    let decreasing = try #require(goalsByName["Lower resting heart rate"])
+    #expect(decreasing.kindRawValue == GoalKind.measure.rawValue)
+    #expect(decreasing.baseline == 80)
+    #expect(decreasing.target == 60)
+    #expect(decreasing.deadlineKey == "2026-01-31")
+    #expect((decreasing.readings ?? []).map(\.value) == [70])
+    guard case .measure(let decreasingProgress) = try progress.snapshot(for: decreasing)
+    else {
+      Issue.record("Expected the heart-rate goal to project measure progress")
+      return
+    }
+    #expect(decreasingProgress.currentValue == 70)
+    #expect(decreasingProgress.completedDistance == 10)
+    #expect(decreasingProgress.totalDistance == 20)
+    #expect(decreasingProgress.normalizedProgress == 0.5)
+    #expect(
+      try standing.snapshot(
+        for: decreasing,
+        progress: .measure(decreasingProgress),
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      )?.standing == .onPace
+    )
+
+    let pastDue = try #require(goalsByName["Submit winter grant application"])
+    #expect(pastDue.deadlineKey == "2026-01-14")
+    #expect((pastDue.entries ?? []).map(\.amount) == [7])
+    let pastDueProgress = try progress.snapshot(for: pastDue)
+    #expect(
+      try standing.snapshot(
+        for: pastDue,
+        progress: pastDueProgress,
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      )?.standing == .pastDue
+    )
+
+    let harvested = try #require(goalsByName["Read the field guide"])
+    #expect(try harvested.checkedClosure == .harvested)
+    #expect((harvested.entries ?? []).map(\.amount) == [12])
+    #expect(
+      try standing.snapshot(
+        for: harvested,
+        progress: progress.snapshot(for: harvested),
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      ) == nil
+    )
+
+    let letGo = try #require(goalsByName["Walk the coastal trail"])
+    #expect(try letGo.checkedClosure == .letGo)
+    #expect((letGo.readings ?? []).map(\.value) == [20])
+    #expect(
+      try standing.snapshot(
+        for: letGo,
+        progress: progress.snapshot(for: letGo),
+        at: instant,
+        calendar: calendar,
+        timeZone: timeZone
+      ) == nil
+    )
+
+    let roster = GoalRosterModel(context: context)
+    roster.refresh(
+      at: instant,
+      calendar: calendar,
+      timeZone: timeZone,
+      locale: Locale(identifier: "en_US")
+    )
+    #expect(roster.loadFailure == nil)
+    #expect(
+      roster.openRows.map(\.name) == [
+        "Grow oak seedlings",
+        "Lower resting heart rate",
+        "Fund neighborhood science kits for every after-school classroom",
+      ])
+    #expect(roster.pastDueRows.map(\.name) == ["Submit winter grant application"])
+    #expect(roster.closedRows.map(\.name) == ["Read the field guide", "Walk the coastal trail"])
+    #expect(
+      roster.openRows.map(\.progressText) == [
+        "150 centimeters now · 30 of 80 centimeters",
+        "70 beats per minute now · 10 of 20 beats per minute",
+        "1,250,000 of 2,000,000 dollars pledged across neighborhoods",
+      ])
+    #expect(roster.openRows.map(\.stateText) == ["Behind", "On pace", "On pace"])
+    #expect(roster.pastDueRows.first?.stateText == "Past due")
+    #expect(roster.closedRows.map(\.stateText) == ["Harvested", "Let go"])
+  }
+
   private func uiTestStoreFactory(
     name: String,
     reset: Bool,

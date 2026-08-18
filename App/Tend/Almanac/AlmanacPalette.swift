@@ -34,6 +34,7 @@ enum AlmanacPalette {
   static let clayDeep = color(0xA4573C)
   static let ochre = color(0xD9A441)
   static let ochreDeep = color(0x9C7414)
+  static let goalOchreDeep = color(0x865F0D)
   static let withered = color(0x8A6A52)
 
   private static func color(_ hexadecimal: UInt32) -> Color {
