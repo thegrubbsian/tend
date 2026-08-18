@@ -8,49 +8,65 @@ final class AlmanacShellUITests: XCTestCase {
   @MainActor
   func testColdLaunchShowsTodaySelectedWithoutNativeTabBar() {
     let app = launchFreshApp()
+    let shellTabs = app.buttons.matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "shell.tab.")
+    )
     let todayTab = app.buttons["shell.tab.today"]
+    let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
 
     XCTAssertTrue(
       app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
-    XCTAssertTrue(todayTab.exists)
-    XCTAssertEqual(todayTab.label, "Today")
+    XCTAssertTrue(goalsTab.waitForExistence(timeout: 5))
+    XCTAssertEqual(shellTabs.count, 3)
+    XCTAssertEqual(
+      shellTabs.allElementsBoundByIndex.map { $0.label },
+      ["Today", "Goals", "Habits"]
+    )
     XCTAssertTrue(todayTab.isSelected)
-    XCTAssertTrue(habitsTab.exists)
-    XCTAssertEqual(habitsTab.label, "Habits")
+    XCTAssertFalse(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
     XCTAssertEqual(app.tabBars.count, 0)
+    XCTAssertFalse(app.buttons["Journal"].exists)
   }
 
   @MainActor
-  func testTappingHabitsSwitchesDestinationAndSelectedState() {
+  func testTappingGoalsSwitchesDestinationAndSelectedState() {
     let app = launchFreshApp()
     let todayTab = app.buttons["shell.tab.today"]
+    let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
+    let destinations = app.descendants(matching: .any).matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "shell.destination.")
+    )
 
-    XCTAssertTrue(todayTab.waitForExistence(timeout: 5))
-    habitsTab.tap()
+    XCTAssertTrue(goalsTab.waitForExistence(timeout: 5))
+    goalsTab.tap()
 
     XCTAssertTrue(
       app.descendants(matching: .any)[
-        "shell.destination.habits"
+        "shell.destination.goals"
       ].waitForExistence(timeout: 5))
+    XCTAssertEqual(destinations.count, 1)
     XCTAssertFalse(app.descendants(matching: .any)["shell.destination.today"].exists)
+    XCTAssertFalse(app.descendants(matching: .any)["shell.destination.habits"].exists)
     XCTAssertFalse(todayTab.isSelected)
-    XCTAssertTrue(habitsTab.isSelected)
+    XCTAssertTrue(goalsTab.isSelected)
+    XCTAssertFalse(habitsTab.isSelected)
   }
 
   @MainActor
-  func testBackgroundPreservesHabitsAndRelaunchRestoresToday() {
+  func testBackgroundPreservesGoalsAndRelaunchRestoresToday() {
     let app = launchFreshApp()
     let todayTab = app.buttons["shell.tab.today"]
+    let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
 
-    XCTAssertTrue(todayTab.waitForExistence(timeout: 5))
-    habitsTab.tap()
+    XCTAssertTrue(goalsTab.waitForExistence(timeout: 5))
+    goalsTab.tap()
     XCTAssertTrue(
       app.descendants(matching: .any)[
-        "shell.destination.habits"
+        "shell.destination.goals"
       ].waitForExistence(timeout: 5))
 
     XCUIDevice.shared.press(.home)
@@ -58,16 +74,20 @@ final class AlmanacShellUITests: XCTestCase {
 
     XCTAssertTrue(
       app.descendants(matching: .any)[
-        "shell.destination.habits"
+        "shell.destination.goals"
       ].waitForExistence(timeout: 5))
-    XCTAssertTrue(habitsTab.isSelected)
+    XCTAssertFalse(todayTab.isSelected)
+    XCTAssertTrue(goalsTab.isSelected)
+    XCTAssertFalse(habitsTab.isSelected)
 
     app.terminate()
     app.launch()
 
     XCTAssertTrue(
       app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
+    XCTAssertFalse(app.descendants(matching: .any)["shell.destination.goals"].exists)
     XCTAssertTrue(todayTab.isSelected)
+    XCTAssertFalse(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
   }
 
