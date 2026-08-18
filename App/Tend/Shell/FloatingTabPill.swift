@@ -22,36 +22,39 @@ struct FloatingTabPill: View {
       selection = destination
     } label: {
       VStack(spacing: AlmanacMetrics.tabPillInset) {
-        icon(for: destination)
-          .font(.system(size: AlmanacMetrics.tabIconSize, weight: .semibold))
+        icon(for: destination, isSelected: isSelected)
+          .font(.system(size: AlmanacMetrics.tabIconSize, weight: .black))
           .frame(
             width: AlmanacMetrics.tabIconSize,
             height: AlmanacMetrics.tabIconSize
           )
+          .accessibilityHidden(true)
 
-        Text(destination.rawValue)
-          .almanacTextStyle(.tabLabel)
+        Text(destination.rawValue.uppercased())
+          .font(.caption.weight(.black))
+          .tracking(0.25)
           .lineLimit(1)
-          .fixedSize(horizontal: true, vertical: false)
+          .minimumScaleFactor(0.8)
+          .allowsTightening(true)
       }
+      .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
       .foregroundStyle(isSelected ? AlmanacPalette.paper : AlmanacPalette.inkMuted)
       .frame(maxWidth: .infinity)
       .frame(height: AlmanacMetrics.tabItemHeight)
-      .background(isSelected ? AlmanacPalette.moss : Color.clear, in: Capsule())
       .contentShape(Capsule())
     }
     .buttonStyle(.plain)
+    .background(isSelected ? AlmanacPalette.mossDeep : Color.clear, in: Capsule())
     .accessibilityLabel(destination.rawValue)
     .accessibilityIdentifier(destination.tabAccessibilityIdentifier)
     .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
-
-  private func icon(for destination: ShellDestination) -> Image {
+  private func icon(for destination: ShellDestination, isSelected: Bool) -> Image {
     switch destination {
     case .today:
       AlmanacIcon.today
     case .goals:
-      Image(systemName: "flag")
+      Image(systemName: isSelected ? "flag.fill" : "flag")
     case .habits:
       Image(systemName: "list.bullet")
     }

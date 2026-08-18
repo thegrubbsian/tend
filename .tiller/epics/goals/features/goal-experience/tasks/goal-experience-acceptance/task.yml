@@ -1,7 +1,7 @@
 id: T-02sxbb
 key: goals/goal-experience/goal-experience-acceptance
 title: Prove the complete Goals owner journey
-status: ready
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:24.844294Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T11:39:22.410336Z
+        against:
+            kind: git_commit
+            value: git:d755d80
+            observed_at: 2026-08-18T11:39:22.410318Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-d755d80-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T11:39:22.410336Z
+        against:
+            kind: git_commit
+            value: git:d755d80
+            observed_at: 2026-08-18T11:39:22.410318Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-d755d80-out-988bb96265864b7819f803050b902f9b2aa58fbf91677d3611dd18b76b816f23.txt

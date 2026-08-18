@@ -1,0 +1,13 @@
+id: EV-5q0c52
+type: check.task
+at: 2026-08-18T11:39:24.981743Z
+owner: jc
+command: check task T-02sxbb
+targets:
+    - T-02sxbb
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.yml

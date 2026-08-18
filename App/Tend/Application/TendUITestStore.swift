@@ -65,6 +65,7 @@
       case fastLoggingDaily = "fast-logging-daily"
       case fastLoggingWeekly = "fast-logging-weekly"
       case goalRoster = "goal-roster"
+      case goalExperience = "goal-experience"
     }
 
     static func containerFactory(
@@ -176,6 +177,12 @@
           )
         case .goalRoster:
           try GoalRosterUITestFixture.seed(
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .goalExperience:
+          try GoalExperienceUITestFixture.seed(
             context: container.mainContext,
             at: launchInstant,
             timeZone: fixtureTimeZone
@@ -295,6 +302,7 @@
         .fastLoggingDaily,
         .fastLoggingWeekly,
         .goalRoster,
+        .goalExperience,
       ]
 
       private static func isValid(name: String) -> Bool {

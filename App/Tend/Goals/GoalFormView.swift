@@ -20,13 +20,16 @@ struct GoalFormView: View {
   @State private var model: GoalFormModel
   @FocusState private var focusedField: GoalFormField?
 
+  private let now: () -> Date
   private let onSaved: () -> Void
 
   init(
     mode: GoalFormMode,
+    now: @escaping () -> Date = Date.init,
     onSaved: @escaping () -> Void = {}
   ) {
     _model = State(initialValue: GoalFormModel(mode: mode))
+    self.now = now
     self.onSaved = onSaved
   }
 
@@ -507,7 +510,7 @@ struct GoalFormView: View {
     let persistence = GoalFormPersistence.live(context: modelContext)
     if model.save(
       using: persistence,
-      at: .now,
+      at: now(),
       calendar: calendar,
       timeZone: timeZone
     ) != nil {
@@ -525,7 +528,7 @@ struct GoalFormView: View {
   private func addDeadline() {
     guard
       let deadline = GoalFormDeadlineAdapter.goalDate(
-        from: .now,
+        from: now(),
         calendar: calendar,
         timeZone: timeZone
       )
@@ -633,7 +636,7 @@ struct GoalFormView: View {
     Binding(
       get: {
         guard let deadline = model.deadline else {
-          return .now
+          return now()
         }
         return GoalFormDeadlineAdapter.date(
           for: deadline,

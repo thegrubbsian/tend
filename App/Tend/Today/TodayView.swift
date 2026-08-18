@@ -298,7 +298,9 @@ struct TodayFirstLaunchView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       Text(verbatim: dateEyebrow)
-        .almanacTextStyle(.label)
+        .font(.footnote.weight(.semibold))
+        .foregroundStyle(AlmanacPalette.inkMuted)
+        .fixedSize(horizontal: false, vertical: true)
 
       Text("Today")
         .almanacTextStyle(.screenTitle)
@@ -361,9 +363,11 @@ private struct TodayDashboardHeader: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
-      Text(instant, format: .dateTime.weekday(.wide).month(.wide).day()).almanacTextStyle(.label)
+      Text(instant, format: .dateTime.weekday(.wide).month(.wide).day())
+        .font(.footnote.weight(.semibold))
         .foregroundStyle(AlmanacPalette.inkMuted)
         .textCase(.uppercase)
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityAddTraits(.isHeader)
 
       heading
@@ -678,6 +682,7 @@ private struct TodayProgressRing: View {
   let row: TodayHabitRow
 
   var body: some View {
+    let isMet = row.isMet
     if reduceMotion {
       ZStack {
         ring
@@ -692,8 +697,8 @@ private struct TodayProgressRing: View {
       }
       .animation(.easeOut(duration: 0.25), value: motionState.fraction)
       .animation(.easeInOut(duration: 0.2), value: motionState.isMet)
-      .keyframeAnimator(initialValue: 1.0, trigger: row.isMet) { content, scale in
-        content.scaleEffect(row.isMet ? scale : 1)
+      .keyframeAnimator(initialValue: 1.0, trigger: isMet) { content, scale in
+        content.scaleEffect(isMet ? scale : 1)
       } keyframes: { _ in
         SpringKeyframe(1.06, duration: 0.225, spring: .smooth)
         SpringKeyframe(1, duration: 0.225, spring: .smooth)
