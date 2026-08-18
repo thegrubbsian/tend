@@ -1,7 +1,7 @@
 id: T-99bqdn
 key: goals/goal-experience/goals-roster-shell
 title: Integrate the Goals roster and shell destination
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:24.819413Z
 pr: 51
+done_basis: ancestry
 gates:
     build:
         required: true

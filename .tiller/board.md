@@ -26,7 +26,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-experience/goals-roster-shell (T-99bqdn): build pass, tests pass
+- (none)
 
 ### Open questions
 
