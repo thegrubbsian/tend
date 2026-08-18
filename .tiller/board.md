@@ -17,7 +17,6 @@ this file is regenerated from the working tree on every sync. -->
 - feature goals/goal-experience (F-xowx7x): active
 - feature goals/today-goal-surfacing (F-e8yd2r): active
 - task goals/goal-experience/goal-experience-acceptance (T-02sxbb): check
-- task goals/today-goal-surfacing/today-goal-presentation (T-g3o7wd): check
 - task goals/today-goal-surfacing/today-goal-surface (T-kqh537): ready
 
 ### Blocked
@@ -26,7 +25,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task goals/today-goal-surfacing/today-goal-presentation (T-g3o7wd): build pass, tests pass
 
 ### Open questions
 
