@@ -1482,6 +1482,356 @@ struct TendApplicationModelTests {
     #expect(roster.closedRows.map(\.stateText) == ["Harvested", "Let go"])
   }
 
+  @Test("goal-experience fixture seeds and reopens one deterministic graph")
+  func goalExperienceFixtureSeedsDeterministicPersistentGraph() throws {
+    let supportDirectory = try makeTemporarySupportDirectory()
+    defer { try? FileManager.default.removeItem(at: supportDirectory) }
+    let instantValue = "2026-01-15T17:00:00Z"
+    let instant = try fixtureInstant(instantValue)
+    let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+    let storeName = "goal-experience-fixture"
+    let arguments = [
+      "Tend", TendUITestStore.enabledArgument, TendUITestStore.nameArgument,
+      storeName, TendUITestStore.resetArgument,
+      TendUITestStore.fixtureArgument, "goal-experience",
+      TendUITestStore.instantArgument, instantValue,
+    ]
+    let expectedGoalIDs = [
+      "11000000-0000-0000-0000-000000000001",
+      "11000000-0000-0000-0000-000000000002",
+      "11000000-0000-0000-0000-000000000003",
+      "11000000-0000-0000-0000-000000000004",
+      "11000000-0000-0000-0000-000000000005",
+      "11000000-0000-0000-0000-000000000006",
+    ]
+    let expectedEntryIDs = [
+      "21000000-0000-0000-0000-000000000001",
+      "21000000-0000-0000-0000-000000000002",
+      "21000000-0000-0000-0000-000000000003",
+      "21000000-0000-0000-0000-000000000004",
+    ]
+    let expectedReadingIDs = [
+      "31000000-0000-0000-0000-000000000001",
+      "31000000-0000-0000-0000-000000000002",
+      "31000000-0000-0000-0000-000000000003",
+      "31000000-0000-0000-0000-000000000004",
+    ]
+
+    try expectUITestStoreError(
+      .fixtureRequiresInstant,
+      arguments: Array(arguments.dropLast(2)),
+      supportDirectory: supportDirectory
+    )
+    try expectUITestStoreError(
+      .missingEnabledArgument,
+      arguments: Array(arguments.dropFirst(2)),
+      supportDirectory: supportDirectory
+    )
+    #expect(TendUITestStore.fixedInstant(arguments: arguments) == instant)
+
+    let seededGoalFacts: [String]
+    let seededEntryFacts: [String]
+    let seededReadingFacts: [String]
+    do {
+      let factory = try #require(
+        TendUITestStore.containerFactory(
+          arguments: arguments,
+          applicationSupportDirectory: supportDirectory,
+          fixtureTimeZone: timeZone
+        ))
+      let container = try factory()
+      let context = container.mainContext
+      let goals = try context.fetch(FetchDescriptor<Goal>())
+        .sorted { $0.id.uuidString < $1.id.uuidString }
+      let entries = try context.fetch(FetchDescriptor<GoalEntry>())
+        .sorted { $0.id.uuidString < $1.id.uuidString }
+      let readings = try context.fetch(FetchDescriptor<GoalReading>())
+        .sorted { $0.id.uuidString < $1.id.uuidString }
+
+      #expect(goals.count == 6)
+      #expect(goals.map(\.id.uuidString) == expectedGoalIDs)
+      #expect(
+        goals.map(\.name) == [
+          "Practice piano hours",
+          "Grow oak seedlings",
+          "Lower resting heart rate",
+          "Submit winter grant application",
+          "Read the field guide",
+          "Walk the coastal trail",
+        ])
+      #expect(entries.count == 4)
+      #expect(entries.map(\.id.uuidString) == expectedEntryIDs)
+      #expect(entries.map(\.amount) == [95, 10, 7, 12])
+      #expect(
+        entries.map(\.assignedDateKey) == [
+          "2026-01-01", "2026-01-15", "2026-01-15", "2026-01-15",
+        ])
+      #expect(entries.map(\.appendSequence) == [0, 1, 0, 0])
+      #expect(
+        entries.compactMap { $0.goal?.id.uuidString } == [
+          expectedGoalIDs[0], expectedGoalIDs[0], expectedGoalIDs[3], expectedGoalIDs[4],
+        ])
+      #expect(readings.count == 4)
+      #expect(readings.map(\.id.uuidString) == expectedReadingIDs)
+      #expect(readings.map(\.value) == [140, 150, 70, 20])
+      #expect(readings.allSatisfy { $0.assignedDateKey == "2026-01-15" })
+      #expect(readings.map(\.appendSequence) == [0, 1, 0, 0])
+      #expect(
+        readings.compactMap { $0.goal?.id.uuidString } == [
+          expectedGoalIDs[1], expectedGoalIDs[1], expectedGoalIDs[2], expectedGoalIDs[5],
+        ])
+
+      let goalsByName = Dictionary(uniqueKeysWithValues: goals.map { ($0.name, $0) })
+      let progress = GoalProgressComputation(context: context)
+      let standing = GoalStandingComputation()
+      var calendar = Calendar(identifier: .gregorian)
+      calendar.locale = Locale(identifier: "en_US_POSIX")
+      calendar.timeZone = timeZone
+
+      let piano = try #require(goalsByName["Practice piano hours"])
+      #expect(piano.kindRawValue == GoalKind.accumulate.rawValue)
+      #expect(piano.target == 100)
+      #expect(piano.unit == "hours")
+      #expect(piano.baseline == nil)
+      #expect(piano.deadlineKey == nil)
+      #expect(try piano.checkedClosure == nil)
+      guard case .accumulate(let pianoProgress) = try progress.snapshot(for: piano) else {
+        Issue.record("Expected the piano goal to project accumulate progress")
+        return
+      }
+      #expect(pianoProgress.total == 105)
+      #expect(pianoProgress.normalizedProgress == 1.05)
+      #expect(
+        try standing.snapshot(
+          for: piano,
+          progress: .accumulate(pianoProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        )?.standing == .onPace
+      )
+
+      let increasing = try #require(goalsByName["Grow oak seedlings"])
+      #expect(increasing.kindRawValue == GoalKind.measure.rawValue)
+      #expect(increasing.target == 200)
+      #expect(increasing.unit == "centimeters")
+      #expect(increasing.baseline == 120)
+      #expect(increasing.deadlineKey == "2026-01-31")
+      #expect(try increasing.checkedClosure == nil)
+      let increasingReadings = (increasing.readings ?? [])
+        .sorted { $0.appendSequence < $1.appendSequence }
+      #expect(increasingReadings.map(\.value) == [140, 150])
+      #expect(increasingReadings.map(\.assignedDateKey) == ["2026-01-15", "2026-01-15"])
+      #expect(increasingReadings.map(\.appendSequence) == [0, 1])
+      guard case .measure(let increasingProgress) = try progress.snapshot(for: increasing)
+      else {
+        Issue.record("Expected the seedling goal to project measure progress")
+        return
+      }
+      #expect(increasingProgress.currentValue == 150)
+      #expect(increasingProgress.effectiveReadingID?.uuidString == expectedReadingIDs[1])
+      #expect(increasingProgress.completedDistance == 30)
+      #expect(increasingProgress.totalDistance == 80)
+      #expect(increasingProgress.normalizedProgress == 0.375)
+      #expect(
+        try standing.snapshot(
+          for: increasing,
+          progress: .measure(increasingProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        )?.standing == .behind
+      )
+
+      let decreasing = try #require(goalsByName["Lower resting heart rate"])
+      #expect(decreasing.kindRawValue == GoalKind.measure.rawValue)
+      #expect(decreasing.target == 60)
+      #expect(decreasing.unit == "beats per minute")
+      #expect(decreasing.baseline == 80)
+      #expect(decreasing.deadlineKey == "2026-01-31")
+      #expect(try decreasing.checkedClosure == nil)
+      guard case .measure(let decreasingProgress) = try progress.snapshot(for: decreasing)
+      else {
+        Issue.record("Expected the heart-rate goal to project measure progress")
+        return
+      }
+      #expect(decreasingProgress.currentValue == 70)
+      #expect(decreasingProgress.effectiveReadingID?.uuidString == expectedReadingIDs[2])
+      #expect(decreasingProgress.completedDistance == 10)
+      #expect(decreasingProgress.totalDistance == 20)
+      #expect(decreasingProgress.normalizedProgress == 0.5)
+      #expect(
+        try standing.snapshot(
+          for: decreasing,
+          progress: .measure(decreasingProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        )?.standing == .onPace
+      )
+
+      let pastDue = try #require(goalsByName["Submit winter grant application"])
+      #expect(pastDue.kindRawValue == GoalKind.accumulate.rawValue)
+      #expect(pastDue.target == 10)
+      #expect(pastDue.unit == "sections")
+      #expect(pastDue.baseline == nil)
+      #expect(pastDue.deadlineKey == "2026-01-14")
+      #expect(try pastDue.checkedClosure == nil)
+      guard case .accumulate(let pastDueProgress) = try progress.snapshot(for: pastDue) else {
+        Issue.record("Expected the grant goal to project accumulate progress")
+        return
+      }
+      #expect(pastDueProgress.total == 7)
+      #expect(
+        try standing.snapshot(
+          for: pastDue,
+          progress: .accumulate(pastDueProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        )?.standing == .pastDue
+      )
+
+      let harvested = try #require(goalsByName["Read the field guide"])
+      #expect(harvested.kindRawValue == GoalKind.accumulate.rawValue)
+      #expect(harvested.target == 12)
+      #expect(harvested.unit == "chapters")
+      #expect(harvested.baseline == nil)
+      #expect(harvested.deadlineKey == nil)
+      #expect(try harvested.checkedClosure == .harvested)
+      guard case .accumulate(let harvestedProgress) = try progress.snapshot(for: harvested)
+      else {
+        Issue.record("Expected the field-guide goal to project accumulate progress")
+        return
+      }
+      #expect(harvestedProgress.total == 12)
+      #expect(harvestedProgress.target == 12)
+      #expect(
+        try standing.snapshot(
+          for: harvested,
+          progress: .accumulate(harvestedProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        ) == nil
+      )
+
+      let letGo = try #require(goalsByName["Walk the coastal trail"])
+      #expect(letGo.kindRawValue == GoalKind.measure.rawValue)
+      #expect(letGo.target == 100)
+      #expect(letGo.unit == "miles")
+      #expect(letGo.baseline == 0)
+      #expect(letGo.deadlineKey == nil)
+      #expect(try letGo.checkedClosure == .letGo)
+      guard case .measure(let letGoProgress) = try progress.snapshot(for: letGo) else {
+        Issue.record("Expected the coastal-trail goal to project measure progress")
+        return
+      }
+      #expect(letGoProgress.currentValue == 20)
+      #expect(letGoProgress.effectiveReadingID?.uuidString == expectedReadingIDs[3])
+      #expect(letGoProgress.completedDistance == 20)
+      #expect(letGoProgress.totalDistance == 100)
+      #expect(letGoProgress.normalizedProgress == 0.2)
+      #expect(
+        try standing.snapshot(
+          for: letGo,
+          progress: .measure(letGoProgress),
+          at: instant,
+          calendar: calendar,
+          timeZone: timeZone
+        ) == nil
+      )
+
+      seededGoalFacts = goals.map { goal in
+        [
+          goal.id.uuidString,
+          goal.name,
+          goal.kindRawValue,
+          String(goal.target),
+          goal.unit,
+          goal.baseline.map { String($0) } ?? "nil",
+          goal.deadlineKey ?? "nil",
+          goal.closureRawValue ?? "nil",
+        ].joined(separator: "|")
+      }
+      seededEntryFacts = entries.map { entry in
+        [
+          entry.id.uuidString,
+          String(entry.amount),
+          entry.assignedDateKey,
+          String(entry.appendSequence),
+          entry.goal?.id.uuidString ?? "nil",
+        ].joined(separator: "|")
+      }
+      seededReadingFacts = readings.map { reading in
+        [
+          reading.id.uuidString,
+          String(reading.value),
+          reading.assignedDateKey,
+          String(reading.appendSequence),
+          reading.goal?.id.uuidString ?? "nil",
+        ].joined(separator: "|")
+      }
+    }
+
+    let reopeningFactory = try uiTestStoreFactory(
+      name: storeName,
+      reset: false,
+      supportDirectory: supportDirectory
+    )
+    let reopenedContainer = try reopeningFactory()
+    let reopenedContext = reopenedContainer.mainContext
+    let reopenedGoals = try reopenedContext.fetch(FetchDescriptor<Goal>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+    let reopenedEntries = try reopenedContext.fetch(FetchDescriptor<GoalEntry>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+    let reopenedReadings = try reopenedContext.fetch(FetchDescriptor<GoalReading>())
+      .sorted { $0.id.uuidString < $1.id.uuidString }
+
+    #expect(reopenedGoals.count == 6)
+    #expect(reopenedEntries.count == 4)
+    #expect(reopenedReadings.count == 4)
+    #expect(reopenedGoals.map(\.id.uuidString) == expectedGoalIDs)
+    #expect(reopenedEntries.map(\.id.uuidString) == expectedEntryIDs)
+    #expect(reopenedReadings.map(\.id.uuidString) == expectedReadingIDs)
+    #expect(
+      reopenedGoals.map { goal in
+        [
+          goal.id.uuidString,
+          goal.name,
+          goal.kindRawValue,
+          String(goal.target),
+          goal.unit,
+          goal.baseline.map { String($0) } ?? "nil",
+          goal.deadlineKey ?? "nil",
+          goal.closureRawValue ?? "nil",
+        ].joined(separator: "|")
+      } == seededGoalFacts
+    )
+    #expect(
+      reopenedEntries.map { entry in
+        [
+          entry.id.uuidString,
+          String(entry.amount),
+          entry.assignedDateKey,
+          String(entry.appendSequence),
+          entry.goal?.id.uuidString ?? "nil",
+        ].joined(separator: "|")
+      } == seededEntryFacts
+    )
+    #expect(
+      reopenedReadings.map { reading in
+        [
+          reading.id.uuidString,
+          String(reading.value),
+          reading.assignedDateKey,
+          String(reading.appendSequence),
+          reading.goal?.id.uuidString ?? "nil",
+        ].joined(separator: "|")
+      } == seededReadingFacts
+    )
+  }
+
   private func uiTestStoreFactory(
     name: String,
     reset: Bool,
