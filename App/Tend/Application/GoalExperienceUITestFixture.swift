@@ -254,13 +254,13 @@
           "2026-01-01", "2026-01-15", "2026-01-15", "2026-01-15",
         ],
         entries.map(\.appendSequence) == [0, 1, 0, 0],
-        entries.compactMap { $0.goal?.id.uuidString } == [
+        entries.compactMap({ $0.goal?.id.uuidString }) == [
           expectedGoalIDs[0], expectedGoalIDs[0], expectedGoalIDs[3], expectedGoalIDs[4],
         ],
         readings.map(\.value) == [140, 150, 70, 20],
-        readings.allSatisfy { $0.assignedDateKey == "2026-01-15" },
+        readings.allSatisfy({ $0.assignedDateKey == "2026-01-15" }),
         readings.map(\.appendSequence) == [0, 1, 0, 0],
-        readings.compactMap { $0.goal?.id.uuidString } == [
+        readings.compactMap({ $0.goal?.id.uuidString }) == [
           expectedGoalIDs[1], expectedGoalIDs[1], expectedGoalIDs[2], expectedGoalIDs[5],
         ]
       else {
