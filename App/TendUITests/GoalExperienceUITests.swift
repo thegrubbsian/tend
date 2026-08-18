@@ -388,7 +388,9 @@ final class GoalExperienceUITests: XCTestCase {
         "This permanently deletes “Practice piano hours” and removes all of its entry history. This cannot be undone."
       ].exists
     )
-    let cancelDeletion = app.buttons["goalDetail.confirmation.cancel"]
+    let cancelDeletion = app.buttons.matching(
+      identifier: "goalDetail.confirmation.cancel"
+    ).firstMatch
     XCTAssertTrue(cancelDeletion.exists)
     cancelDeletion.tap()
     XCTAssertTrue(element("goalDetail.title", in: app).exists, "Cancel must preserve the goal")
@@ -936,7 +938,9 @@ final class GoalExperienceUITests: XCTestCase {
 
   @MainActor
   private func confirmPendingAction(named title: String, in app: XCUIApplication) {
-    let confirm = app.buttons["goalDetail.confirmation.confirm"]
+    let confirm = app.buttons.matching(
+      identifier: "goalDetail.confirmation.confirm"
+    ).firstMatch
     XCTAssertTrue(confirm.waitForExistence(timeout: 2), "Expected confirmation action \(title)")
     XCTAssertEqual(confirm.label, title)
     confirm.tap()
