@@ -7,7 +7,10 @@ struct TodayDestinationChrome: View {
   @Environment(\.calendar) private var calendar
   @Environment(\.timeZone) private var timeZone
   @Query private var habits: [Habit]
+  @Query private var goals: [Goal]
   @State private var isPresentingNewHabit = false
+  @State private var nextGoalTransition: Date?
+  @State private var timelineDate: Date?
   private let reminders: any ReminderRuntimeClient
   private let fixedDate: Date?
 
@@ -30,9 +33,30 @@ struct TodayDestinationChrome: View {
     if let fixedDate {
       content(for: fixedDate)
     } else {
-      TimelineView(LocalDayTimelineSchedule(calendar: localCalendar)) { _ in
-        // The schedule entry invalidates at midnight; mutations still need the current instant.
-        content(for: .now)
+      ZStack {
+        if let timelineDate {
+          content(for: timelineDate)
+        } else {
+          Color.clear
+            .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
+            .accessibilityHidden(true)
+        }
+
+        // Reset only the schedule iterator so Today logging state survives transition changes.
+        TimelineView(
+          LocalDayTimelineSchedule(
+            calendar: localCalendar,
+            earlierTransition: nextGoalTransition
+          )
+        ) { timeline in
+          Color.clear
+            .task(id: timeline.date) {
+              updateTimelineDate(timeline.date)
+            }
+        }
+        .id(nextGoalTransition)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
       }
     }
   }
@@ -45,21 +69,26 @@ struct TodayDestinationChrome: View {
 
   private func content(for date: Date) -> some View {
     Group {
-      if habits.isEmpty {
+      if habits.isEmpty && goals.isEmpty {
         TodayFirstLaunchView(
           instant: date,
           onPlantHabit: {
             isPresentingNewHabit = true
           }
         )
+        .onAppear {
+          updateGoalTransition(nil)
+        }
       } else {
         TodayView(
           habits: habits,
+          goals: goals,
           instant: date,
           fixedOperationInstant: fixedDate,
           onPlantHabit: {
             isPresentingNewHabit = true
           },
+          onGoalTransitionChange: updateGoalTransition,
           reminderRefresh: {
             reminders.refresh()
           }
@@ -80,5 +109,15 @@ struct TodayDestinationChrome: View {
         }
       )
     }
+  }
+
+  private func updateGoalTransition(_ transition: Date?) {
+    guard fixedDate == nil, nextGoalTransition != transition else { return }
+    nextGoalTransition = transition
+  }
+
+  private func updateTimelineDate(_ date: Date) {
+    guard timelineDate != date else { return }
+    timelineDate = date
   }
 }

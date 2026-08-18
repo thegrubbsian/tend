@@ -427,9 +427,10 @@ final class TodayLoggingModel {
 
   func refresh(
     habits: [Habit],
+    goals: [Goal],
     context: TodayRefreshContext
   ) {
-    todayModel.refresh(habits: habits, context: context)
+    todayModel.refresh(habits: habits, goals: goals, context: context)
     var replacement = state
     var changedWithoutSheet = false
 
