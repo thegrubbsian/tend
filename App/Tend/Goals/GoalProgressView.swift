@@ -113,6 +113,7 @@ struct GoalProgressView: View {
           orientation: .leadingToTrailing,
           showsCurrentMarker: false,
           accent: progressColor,
+          isOutlined: true,
           trackHeight: AlmanacMetrics.spacingMedium
         )
       case .measure(
@@ -132,6 +133,7 @@ struct GoalProgressView: View {
             orientation: trackOrientation(for: direction),
             showsCurrentMarker: true,
             accent: progressColor,
+            isOutlined: true,
             trackHeight: AlmanacMetrics.spacingMedium
           )
 
@@ -179,7 +181,7 @@ struct GoalProgressView: View {
   ) -> some View {
     Text(value, format: .number)
       .almanacTextStyle(.caption)
-      .foregroundStyle(AlmanacPalette.inkFaint)
+      .foregroundStyle(AlmanacPalette.inkMuted)
       .fixedSize(horizontal: false, vertical: true)
       .frame(maxWidth: .infinity, alignment: alignment)
   }
@@ -367,7 +369,7 @@ struct GoalProgressView: View {
 
     switch standing {
     case .behind:
-      return AlmanacPalette.ochreDeep
+      return AlmanacPalette.goalOchreDeep
     case .pastDue:
       return AlmanacPalette.withered
     case .onPace, nil:
@@ -441,6 +443,7 @@ private struct GoalProgressTrack: View {
   let orientation: Orientation
   let showsCurrentMarker: Bool
   let accent: Color
+  let isOutlined: Bool
   let trackHeight: CGFloat
 
   init(
@@ -449,6 +452,7 @@ private struct GoalProgressTrack: View {
     orientation: Orientation,
     showsCurrentMarker: Bool,
     accent: Color,
+    isOutlined: Bool = false,
     trackHeight: CGFloat = AlmanacMetrics.spacingLarge
   ) {
     self.normalizedProgress = normalizedProgress
@@ -456,6 +460,7 @@ private struct GoalProgressTrack: View {
     self.orientation = orientation
     self.showsCurrentMarker = showsCurrentMarker
     self.accent = accent
+    self.isOutlined = isOutlined
     self.trackHeight = trackHeight
   }
 
@@ -465,8 +470,7 @@ private struct GoalProgressTrack: View {
       let progress = clamped(normalizedProgress)
 
       ZStack {
-        Capsule()
-          .fill(AlmanacPalette.paperSunken)
+        trackBackground
           .frame(height: AlmanacMetrics.spacingSmall)
 
         Capsule()
@@ -492,6 +496,20 @@ private struct GoalProgressTrack: View {
     }
     .frame(height: trackHeight)
     .accessibilityHidden(true)
+  }
+
+  @ViewBuilder
+  private var trackBackground: some View {
+    if isOutlined {
+      Capsule()
+        .strokeBorder(
+          AlmanacPalette.inkMuted,
+          lineWidth: AlmanacMetrics.gardenOutlineWidth
+        )
+    } else {
+      Capsule()
+        .fill(AlmanacPalette.paperSunken)
+    }
   }
 
   private var fillAlignment: Alignment {

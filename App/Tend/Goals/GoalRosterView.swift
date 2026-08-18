@@ -11,9 +11,9 @@ struct GoalRosterView: View {
   @Environment(\.timeZone) private var timeZone
 
   private let context: ModelContext
-#if DEBUG
-  private let fixedInstant: Date?
-#endif
+  #if DEBUG
+    private let fixedInstant: Date?
+  #endif
 
   @State private var model: GoalRosterModel
   @State private var presentedForm: GoalRosterForm?
@@ -24,18 +24,18 @@ struct GoalRosterView: View {
   init(context: ModelContext) {
     self.context = context
     _model = State(initialValue: GoalRosterModel(context: context))
-#if DEBUG
-    fixedInstant = nil
-#endif
+    #if DEBUG
+      fixedInstant = nil
+    #endif
   }
 
-#if DEBUG
-  init(context: ModelContext, fixedInstant: Date?) {
-    self.context = context
-    self.fixedInstant = fixedInstant
-    _model = State(initialValue: GoalRosterModel(context: context))
-  }
-#endif
+  #if DEBUG
+    init(context: ModelContext, fixedInstant: Date?) {
+      self.context = context
+      self.fixedInstant = fixedInstant
+      _model = State(initialValue: GoalRosterModel(context: context))
+    }
+  #endif
 
   var body: some View {
     TimelineView(
@@ -240,14 +240,14 @@ struct GoalRosterView: View {
     Button(action: model.toggleClosedDisclosure) {
       HStack(spacing: AlmanacMetrics.spacingMedium) {
         Text("CLOSED · \(model.closedRows.count)")
-          .almanacTextStyle(.label)
+          .almanacTextStyle(.emphasizedLabel)
           .fixedSize(horizontal: false, vertical: true)
 
         Spacer(minLength: 0)
 
         Image(systemName: model.isClosedExpanded ? "chevron.up" : "chevron.down")
           .font(.caption.weight(.semibold))
-          .foregroundStyle(AlmanacPalette.inkFaint)
+          .foregroundStyle(AlmanacPalette.ink)
           .accessibilityHidden(true)
       }
       .padding(.horizontal, AlmanacMetrics.spacingMedium)
@@ -262,6 +262,7 @@ struct GoalRosterView: View {
     .buttonStyle(.plain)
     .almanacSunkenSurface(radius: AlmanacMetrics.cardRadius)
     .accessibilityElement(children: .ignore)
+    .accessibilityAddTraits(.isButton)
     .accessibilityLabel("Closed goals")
     .accessibilityValue(
       "\(model.closedRows.count), \(model.isClosedExpanded ? "expanded" : "collapsed")"
@@ -304,11 +305,11 @@ struct GoalRosterView: View {
   }
 
   private func resolvedInstant(_ instant: Date) -> Date {
-#if DEBUG
-    fixedInstant ?? instant
-#else
-    instant
-#endif
+    #if DEBUG
+      fixedInstant ?? instant
+    #else
+      instant
+    #endif
   }
 
   private func refreshCurrentContext() {
@@ -484,7 +485,7 @@ private struct GoalRosterRowButton: View {
 
     switch row.standing {
     case .behind:
-      return AlmanacPalette.ochreDeep
+      return AlmanacPalette.goalOchreDeep
     case .pastDue:
       return AlmanacPalette.withered
     case .onPace, nil:
@@ -501,7 +502,7 @@ private struct GoalRosterLoadFailureCard: View {
     VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
       Text(failure.message)
         .font(.subheadline.weight(.semibold))
-        .foregroundStyle(AlmanacPalette.ochreDeep)
+        .foregroundStyle(AlmanacPalette.goalOchreDeep)
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityLabel("Goals refresh failed. \(failure.message)")
 
