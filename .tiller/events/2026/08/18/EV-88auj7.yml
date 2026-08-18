@@ -1,0 +1,13 @@
+id: EV-88auj7
+type: check.task
+at: 2026-08-18T17:43:00.095855Z
+owner: jc
+command: check task T-g3o7wd
+targets:
+    - T-g3o7wd
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.yml
