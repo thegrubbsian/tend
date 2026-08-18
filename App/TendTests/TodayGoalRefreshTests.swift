@@ -47,7 +47,16 @@ struct TodayGoalRefreshTests {
     let nearDue = try #require(GoalDate(rawValue: "2026-08-20"))
     let changing = try insertGoal(in: store, name: "Changing", deadline: distantDue)
     let near = try insertGoal(in: store, name: "Near", deadline: nearDue)
-    var actual = 0.25
+    let scene = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let environment = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-18")),
+      timeZone: "America/Los_Angeles", locale: "sv_SE"
+    )
+    let nextDay = refreshContext(
+      on: try #require(GoalDate(rawValue: "2026-08-19")),
+      timeZone: "America/Los_Angeles", locale: "sv_SE"
+    )
+    var actual = 0.75
     var contexts: [TodayRefreshContext] = []
     let model = makeModel { goal, context in
       contexts.append(context)
@@ -61,33 +70,37 @@ struct TodayGoalRefreshTests {
         self.facts(
           standing: standing,
           deadline: goalDate(goal),
-          normalizedProgress: actual
+          normalizedProgress: actual,
+          next: goal === changing ? context.instant.addingTimeInterval(60) : nil
         ))
     }
-    let scene = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
-    let environment = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18")),
-      timeZone: "America/Los_Angeles", locale: "sv_SE"
-    )
-    let nextDay = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-19")),
-      timeZone: "America/Los_Angeles", locale: "sv_SE"
-    )
-    let transition = refreshContext(
-      instant: nextDay.instant.addingTimeInterval(60),
-      timeZone: "America/Los_Angeles", locale: "sv_SE"
-    )
 
     model.refresh(habits: [], goals: [changing, near], context: scene)
+    #expect(model.goalRows.map(\.name) == ["Near"])
+    let standingTransition = try #require(model.nextGoalTransition)
+    actual = 0.25
+    let transitionEntry = refreshContext(
+      instant: standingTransition,
+      timeZone: scene.timeZone.identifier
+    )
+    model.refresh(habits: [], goals: [changing, near], context: transitionEntry)
     #expect(Set(model.goalRows.map(\.name)) == Set(["Changing", "Near"]))
+
     model.refresh(habits: [], goals: [changing, near], context: environment)
     model.refresh(habits: [], goals: [changing, near], context: nextDay)
+    #expect(Set(model.goalRows.map(\.name)) == Set(["Changing", "Near"]))
 
     actual = 0.75
-    model.refresh(habits: [], goals: [changing, near], context: transition)
+    let transitionExit = refreshContext(
+      instant: try #require(model.nextGoalTransition),
+      timeZone: nextDay.timeZone.identifier,
+      locale: "sv_SE"
+    )
+    model.refresh(habits: [], goals: [changing, near], context: transitionExit)
     #expect(model.goalRows.map(\.name) == ["Near"])
-    #expect(contexts.suffix(2) == [transition, transition])
+    #expect(contexts.suffix(2) == [transitionExit, transitionExit])
   }
+
 
   @Test("publication never exposes a mixed habit and Goal generation")
   func publicationIsAtomic() throws {
@@ -190,6 +203,17 @@ struct TodayGoalRefreshTests {
     #expect(model.goalRows.map(\.id) == [sibling.persistentModelID])
     #expect(calls[sibling.persistentModelID] == 5)
   }
+
+  @Test("failed Goal retry refreshes after removing the sole inactive habit")
+  func retryRefreshesInactiveHabitRemoval() throws {
+    try exerciseInactiveHabitRetry(initiallyIncludesInactiveHabit: true)
+  }
+
+  @Test("failed Goal retry refreshes after adding the sole inactive habit")
+  func retryRefreshesInactiveHabitInsertion() throws {
+    try exerciseInactiveHabitRetry(initiallyIncludesInactiveHabit: false)
+  }
+
 
   @Test("retry graph or eligibility changes trigger a full refresh")
   func retryGraphAndEligibilityChangesRefreshEverything() throws {
@@ -298,6 +322,22 @@ struct TodayGoalRefreshTests {
     let rebuilt = entries(calendar: calendar, start: start, transition: replacement, count: 3)
     #expect(rebuilt == [start, replacement, midnight])
     #expect(!rebuilt.contains(earlier))
+    let fallStart = try date(2026, 10, 31, 12, calendar: calendar)
+    let fallMidnight = try date(2026, 11, 1, 0, calendar: calendar)
+    let fallBackMidnight = try date(2026, 11, 2, 0, calendar: calendar)
+    let ordinaryMidnight = try date(2026, 11, 3, 0, calendar: calendar)
+    let fallEntries = entries(
+      calendar: calendar,
+      start: fallStart,
+      transition: nil,
+      count: 4
+    )
+    #expect(
+      fallEntries
+        == [fallStart, fallMidnight, fallBackMidnight, ordinaryMidnight]
+    )
+    #expect(fallBackMidnight.timeIntervalSince(fallMidnight) == 25 * 60 * 60)
+    #expect(ordinaryMidnight.timeIntervalSince(fallBackMidnight) == 24 * 60 * 60)
   }
 
   private func entries(
@@ -371,8 +411,55 @@ struct TodayGoalRefreshTests {
     return goal
   }
 
-  private func insertHabit(in context: ModelContext, name: String) throws -> Habit {
-    let habit = Habit(name: name, cadence: .daily, target: 4, unit: "times")
+  private func exerciseInactiveHabitRetry(
+    initiallyIncludesInactiveHabit: Bool
+  ) throws {
+    let store = try makeStore()
+    let failed = try insertGoal(in: store, name: "Failed")
+    let inactive = try insertHabit(in: store, name: "Inactive", isActive: false)
+    var shouldFail = true
+    let model = makeModel { _, _ in
+      if shouldFail { throw FixtureError.unavailable }
+      return .open(self.facts(standing: .behind, deadline: nil))
+    }
+    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let initialHabits = initiallyIncludesInactiveHabit ? [inactive] : []
+    let retryHabits = initiallyIncludesInactiveHabit ? [] : [inactive]
+    model.refresh(habits: initialHabits, goals: [failed], context: context)
+
+    shouldFail = false
+    model.retry(
+      goalID: failed.persistentModelID,
+      habits: retryHabits,
+      goals: [failed],
+      context: context
+    )
+
+    if initiallyIncludesInactiveHabit {
+      guard case .firstLaunch? = model.presentation else {
+        Issue.record("Expected first-launch after inactive habit removal")
+        return
+      }
+    } else {
+      guard case .inactiveOnly? = model.presentation else {
+        Issue.record("Expected inactive-only after inactive habit insertion")
+        return
+      }
+    }
+  }
+
+  private func insertHabit(
+    in context: ModelContext,
+    name: String,
+    isActive: Bool = true
+  ) throws -> Habit {
+    let habit = Habit(
+      name: name,
+      cadence: .daily,
+      target: 4,
+      unit: "times",
+      isActive: isActive
+    )
     context.insert(habit)
     try context.save()
     return habit

@@ -226,7 +226,7 @@ final class TodayModel {
       goalRows: goalProjection.rows,
       nextGoalTransition: goalProjection.nextTransition
     )
-    lastHabitInputs = habitFingerprints(for: activeHabitInputs)
+    lastHabitInputs = habitFingerprints(for: habitInputs)
     lastGoalInputs = goalFingerprints(for: goalInputs)
     generation = replacement
   }
@@ -243,11 +243,12 @@ final class TodayModel {
       })
     else { return }
 
-    let habitInputs = uniqueHabitInputs(from: habits).filter { $0.habit.isActive }
+    let habitInputs = uniqueHabitInputs(from: habits)
+    let activeHabitInputs = habitInputs.filter { $0.habit.isActive }
     let goalInputs = uniqueGoalInputs(from: goals)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
-      let retryInput = habitInputs.first(where: { $0.id == habitID })
+      let retryInput = activeHabitInputs.first(where: { $0.id == habitID })
     else {
       refresh(habits: habits, goals: goals, context: context)
       return
@@ -293,7 +294,7 @@ final class TodayModel {
     guard goalRows.contains(where: { $0.id == goalID && $0.failure != nil }) else {
       return
     }
-    let habitInputs = uniqueHabitInputs(from: habits).filter { $0.habit.isActive }
+    let habitInputs = uniqueHabitInputs(from: habits)
     let goalInputs = uniqueGoalInputs(from: goals)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
@@ -431,7 +432,6 @@ final class TodayModel {
       guard let deadline = facts.deadline,
         let today = localGoalDate(
           at: context.instant,
-          calendar: context.calendar,
           timeZone: context.timeZone
         ),
         let seventhDay = try? adding(days: 7, to: today)
@@ -442,10 +442,9 @@ final class TodayModel {
 
   private func localGoalDate(
     at instant: Date,
-    calendar: Calendar,
     timeZone: TimeZone
   ) -> GoalDate? {
-    var ownerCalendar = calendar
+    var ownerCalendar = Calendar(identifier: .gregorian)
     ownerCalendar.timeZone = timeZone
     let components = ownerCalendar.dateComponents([.year, .month, .day], from: instant)
     guard

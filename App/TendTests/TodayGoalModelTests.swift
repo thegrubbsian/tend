@@ -156,6 +156,24 @@ struct TodayGoalModelTests {
       )
     )
     #expect(model.goalRows.map(\.name) == ["Shifted"])
+    let gregorianInstant = try #require(
+      ISO8601DateFormatter().date(from: "2026-08-18T12:00:00Z")
+    )
+    for identifier in [Calendar.Identifier.buddhist, .islamicUmmAlQura] {
+      var nonGregorianCalendar = Calendar(identifier: identifier)
+      nonGregorianCalendar.timeZone = TimeZone(secondsFromGMT: 0)!
+      model.refresh(
+        habits: [],
+        goals: [shifted],
+        context: TodayRefreshContext(
+          instant: gregorianInstant,
+          timeZone: TimeZone(secondsFromGMT: 0)!,
+          calendar: nonGregorianCalendar,
+          locale: Locale(identifier: "en_US")
+        )
+      )
+      #expect(model.goalRows.map(\.name) == ["Shifted"])
+    }
     model.refresh(
       habits: [], goals: [shifted],
       context: refreshContext(instant: instant, timeZone: "America/Los_Angeles")
@@ -264,7 +282,15 @@ struct TodayGoalModelTests {
       } else {
         progress = measure(baseline: 180, target: 120, current: 145, unit: "mmHg")
       }
-      return .open(facts(standing: .behind, deadline: due, progress: progress))
+      let standing: GoalStanding
+      if goal === accumulateGoal {
+        standing = .onPace
+      } else if goal === increasing {
+        standing = .behind
+      } else {
+        standing = .pastDue
+      }
+      return .open(facts(standing: standing, deadline: due, progress: progress))
     }
 
     model.refresh(
@@ -279,9 +305,24 @@ struct TodayGoalModelTests {
     #expect(rows["Lift"]?.progress == .measure(baseline: 100, target: 200, current: 160, completedDistance: 60, totalDistance: 100, direction: .increasing, unit: "lb", normalizedProgress: 0.6))
     #expect(rows["Lower"]?.progressText == "145 mmHg now · 35 of 60 mmHg")
     #expect(rows["Lower"]?.progress == .measure(baseline: 180, target: 120, current: 145, completedDistance: 35, totalDistance: 60, direction: .decreasing, unit: "mmHg", normalizedProgress: 35.0 / 60.0))
-    #expect(rows.values.allSatisfy { $0.accessibilityValue.contains($0.progressText) })
-    #expect(rows.values.allSatisfy { $0.deadlineText.contains("Due") })
-    #expect(rows.values.allSatisfy { $0.standingText == "Behind" })
+    #expect(rows["Read"]?.deadlineText == "Due Aug 20, 2026")
+    #expect(rows["Read"]?.standingText == "On pace")
+    #expect(
+      rows["Read"]?.accessibilityValue
+        == "7 of 6 books, Due Aug 20, 2026, On pace"
+    )
+    #expect(rows["Lift"]?.deadlineText == "Due Aug 20, 2026")
+    #expect(rows["Lift"]?.standingText == "Behind")
+    #expect(
+      rows["Lift"]?.accessibilityValue
+        == "160 lb now · 60 of 100 lb, Due Aug 20, 2026, Behind"
+    )
+    #expect(rows["Lower"]?.deadlineText == "Due Aug 20, 2026")
+    #expect(rows["Lower"]?.standingText == "Past due")
+    #expect(
+      rows["Lower"]?.accessibilityValue
+        == "145 mmHg now · 35 of 60 mmHg, Due Aug 20, 2026, Past due"
+    )
   }
 
   @Test("malformed facts and relationship failures are isolated as unavailable rows")
