@@ -1,7 +1,7 @@
 id: T-99bqdn
 key: goals/goal-experience/goals-roster-shell
 title: Integrate the Goals roster and shell destination
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:24.819413Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T03:54:32.104865Z
+        against:
+            kind: sha256
+            value: sha256:4d8c390a01f494562b3713bc26ce014792f12db22e637fc1b4dedd8b244d6dad
+            observed_at: 2026-08-18T03:54:32.10485Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-4d8c390a01f4-out-c923462aa25446fd1afa0fe5a96b82e83d5215a5f3409d3e69212ee72c71a4fe.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T03:54:32.104865Z
+        against:
+            kind: sha256
+            value: sha256:4d8c390a01f494562b3713bc26ce014792f12db22e637fc1b4dedd8b244d6dad
+            observed_at: 2026-08-18T03:54:32.10485Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-4d8c390a01f4-out-c96108dfc10ce6c3fb8851b214f13b86eb06783779e99eae19c577a73bbacd77.txt

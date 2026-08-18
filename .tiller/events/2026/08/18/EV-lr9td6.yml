@@ -1,0 +1,13 @@
+id: EV-lr9td6
+type: check.task
+at: 2026-08-18T03:54:37.306144Z
+owner: jc
+command: check task T-99bqdn
+targets:
+    - T-99bqdn
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.yml
