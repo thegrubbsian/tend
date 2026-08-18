@@ -1,7 +1,7 @@
 id: T-kqh537
 key: goals/today-goal-surfacing/today-goal-surface
 title: Render and verify the Today Goals section
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:58.479716Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T22:42:39.937684Z
+        against:
+            kind: git_commit
+            value: git:6db021c
+            observed_at: 2026-08-18T22:42:39.937663Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-6db021c-out-426883c39ccaa294fe532c63fb43fb27299e891cbaed20e8b97b2d8f95ad6ad0.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-18T22:42:39.937684Z
+        against:
+            kind: git_commit
+            value: git:6db021c
+            observed_at: 2026-08-18T22:42:39.937663Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-6db021c-out-1b906105925ccd3970767d0e3953742892ccf2cea58f1b745f845b2ec763d1ad.txt

@@ -16,7 +16,7 @@ this file is regenerated from the working tree on every sync. -->
 - feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
 - feature goals/goal-experience (F-xowx7x): active
 - feature goals/today-goal-surfacing (F-e8yd2r): active
-- task goals/today-goal-surfacing/today-goal-surface (T-kqh537): in_progress
+- task goals/today-goal-surfacing/today-goal-surface (T-kqh537): check
 
 ### Blocked
 

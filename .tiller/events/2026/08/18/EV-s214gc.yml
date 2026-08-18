@@ -1,0 +1,13 @@
+id: EV-s214gc
+type: check.task
+at: 2026-08-18T22:42:43.282904Z
+owner: jc
+command: check task T-kqh537
+targets:
+    - T-kqh537
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml
