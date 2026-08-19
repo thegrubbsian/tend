@@ -1,0 +1,14 @@
+id: EV-82y4sg
+type: sync.feature
+at: 2026-08-19T05:31:40.894305Z
+owner: jc
+command: sync feature F-e8yd2r
+targets:
+    - F-e8yd2r
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml

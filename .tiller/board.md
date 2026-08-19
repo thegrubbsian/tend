@@ -11,11 +11,8 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic device-readiness (E-z3y156): ready, active
 - epic goals (E-h2qea7): ready, active
-- feature device-readiness/local-reminders (F-zbcv8j): active, awaiting check
 - feature goals/goal-experience (F-xowx7x): active
-- feature goals/today-goal-surfacing (F-e8yd2r): active
 
 ### Blocked
 
@@ -24,7 +21,6 @@ this file is regenerated from the working tree on every sync. -->
 ### Gates in review
 
 - task goals/goal-experience/goal-experience-acceptance (T-02sxbb): build pass, tests pass
-- task goals/today-goal-surfacing/today-goal-surface (T-kqh537): build pass, tests pass
 
 ### Open questions
 

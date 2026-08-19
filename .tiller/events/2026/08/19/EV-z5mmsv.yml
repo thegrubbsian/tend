@@ -1,0 +1,13 @@
+id: EV-z5mmsv
+type: check.feature
+at: 2026-08-19T01:04:18.107719Z
+owner: jc
+command: check feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml

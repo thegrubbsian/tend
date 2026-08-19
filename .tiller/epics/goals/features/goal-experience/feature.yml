@@ -41,9 +41,9 @@ gates:
     evals:
         required: true
         kind: command
-        status: pending
+        status: pass
         run_by: jc
-        run_at: 2026-08-18T20:41:39.189382Z
+        run_at: 2026-08-19T04:53:47.695798Z
         against:
             kind: git_commit
             value: git:e674933
@@ -75,9 +75,9 @@ gates:
                     - kind: command_output
                       ref: artifacts/tiller/gates/eval-C5-e674933-out-74d680850dc13da525c06ac11f5e284ce4978fe65fb123f89731f2a1d90bf279.txt
             C6:
-                status: needs_attestation
+                status: pass
             C7:
-                status: needs_attestation
+                status: pass
     tests:
         required: true
         kind: command
@@ -91,3 +91,18 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-e674933-out-802665dfb80583cd27109e459954290745b6bdebac045a0595aa965c0c533d73.txt
+attestations:
+    - id: AT-ftdean
+      target:
+        kind: criterion
+        id: C6
+      status: pass
+      by: jc
+      at: 2026-08-19T04:53:42.134228Z
+    - id: AT-elpakg
+      target:
+        kind: criterion
+        id: C7
+      status: pass
+      by: jc
+      at: 2026-08-19T04:53:47.695798Z

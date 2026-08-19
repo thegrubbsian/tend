@@ -1,7 +1,19 @@
 id: E-z3y156
 key: device-readiness
 title: Device Readiness
-status: ready
+status: done
 blocked: false
 owner: jc
 source: design/01-overview.md
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:b8485d98002543746c8270db9319af02d7c0544f
+        path: .tiller/epics/device-readiness/epic.md
+        observed_at: 2026-08-19T04:53:57.310977Z
+    commit:
+        kind: git_commit
+        value: git:248802b
+        observed_at: 2026-08-19T04:53:56.425129Z
+    surfaces: []
+done_basis: rollup

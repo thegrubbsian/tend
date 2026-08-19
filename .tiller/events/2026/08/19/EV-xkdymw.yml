@@ -1,0 +1,14 @@
+id: EV-xkdymw
+type: sync.epic
+at: 2026-08-19T04:53:57.323558Z
+owner: jc
+command: sync epic E-z3y156
+targets:
+    - E-z3y156
+before:
+    status: ready
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/epic.yml

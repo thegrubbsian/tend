@@ -1,0 +1,14 @@
+id: EV-13jyni
+type: sync.task
+at: 2026-08-19T04:59:03.164609Z
+owner: jc
+command: sync task T-kqh537
+targets:
+    - T-kqh537
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml

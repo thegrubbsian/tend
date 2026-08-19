@@ -1,7 +1,7 @@
 id: F-zbcv8j
 key: device-readiness/local-reminders
 title: Local Reminders
-status: active
+status: done
 blocked: false
 owner: jc
 source: design/03-user-experience.md
@@ -25,3 +25,93 @@ accepted_against:
         kind: git_commit
         value: git:5332dc2
         observed_at: 2026-08-09T03:45:34.179905Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:50e4fbb4360e6d5054787fae922fe17511a640db
+        path: .tiller/epics/device-readiness/features/local-reminders/feature.md
+        observed_at: 2026-08-19T04:53:57.208974Z
+    eval:
+        kind: git_blob
+        value: git:711a946ad4fc076c6f1b8c503ab761c943160bb6
+        path: .tiller/epics/device-readiness/features/local-reminders/feature.eval.md
+        observed_at: 2026-08-19T04:53:57.208974Z
+    commit:
+        kind: git_commit
+        value: git:248802b
+        observed_at: 2026-08-19T04:53:56.425129Z
+    surfaces: []
+done_basis: rollup
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T00:50:35.387924Z
+        against:
+            kind: git_commit
+            value: git:248802b
+            observed_at: 2026-08-19T00:50:35.38769Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-248802b-out-426883c39ccaa294fe532c63fb43fb27299e891cbaed20e8b97b2d8f95ad6ad0.txt
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-19T00:50:35.387924Z
+        against:
+            kind: git_commit
+            value: git:248802b
+            observed_at: 2026-08-19T00:50:35.38769Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-248802b-out-a28cd7afd073e00da0bcdb924e17370ff56c89441d426f7f817e4e1a9fd9ec5a.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-248802b-out-39a088b6243692ec6fb2cb2afa116fff41ee623ed698280ab06aae716561267f.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-248802b-out-e29caf938b30ab106d2c031206e8c9288294a13fa076923d59aae1c1ad19fc7b.txt
+            C4:
+                status: needs_attestation
+            C5:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C5-248802b-out-0c3366453323c3642320098c782915d3f1c6e526d4c745d60626a312102f7cb6.txt
+            C6:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C6-248802b-out-fcba7777ab749741c7f9ccd5c1cd6402ca20baa7d4eca19a28585930114dac54.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T00:50:35.387924Z
+        against:
+            kind: git_commit
+            value: git:248802b
+            observed_at: 2026-08-19T00:50:35.38769Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-248802b-out-52ca4fdbe06d8a8738c44f112efced9f7d87dac131ba98b3ecd955bff1006476.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:248802b
+        observed_at: 2026-08-19T04:53:56.425129Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-248802b-out-a28cd7afd073e00da0bcdb924e17370ff56c89441d426f7f817e4e1a9fd9ec5a.txt

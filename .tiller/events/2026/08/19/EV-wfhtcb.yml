@@ -1,0 +1,14 @@
+id: EV-wfhtcb
+type: sync.feature
+at: 2026-08-19T04:53:57.230751Z
+owner: jc
+command: sync feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml

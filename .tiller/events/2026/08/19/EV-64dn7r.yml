@@ -1,0 +1,13 @@
+id: EV-64dn7r
+type: check.feature
+at: 2026-08-19T05:31:29.268675Z
+owner: jc
+command: check feature F-e8yd2r
+targets:
+    - F-e8yd2r
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml

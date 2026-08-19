@@ -1,7 +1,7 @@
 id: F-e8yd2r
 key: goals/today-goal-surfacing
 title: Today Goal Surfacing
-status: active
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L66-68
@@ -26,3 +26,88 @@ accepted_against:
         kind: git_commit
         value: git:250c4f3
         observed_at: 2026-08-15T16:26:58.429312Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:4b63806e43b6e13052c7c77b3299363bf0704413
+        path: .tiller/epics/goals/features/today-goal-surfacing/feature.md
+        observed_at: 2026-08-19T05:31:40.87007Z
+    eval:
+        kind: git_blob
+        value: git:d8c6e349cf31612a0de5e3ece7872d964399d908
+        path: .tiller/epics/goals/features/today-goal-surfacing/feature.eval.md
+        observed_at: 2026-08-19T05:31:40.87007Z
+    commit:
+        kind: git_commit
+        value: git:7783b0b
+        observed_at: 2026-08-19T05:31:40.651129Z
+    surfaces: []
+done_basis: rollup
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T04:59:14.309302Z
+        against:
+            kind: sha256
+            value: sha256:48c73dab30dca4303c910bae373a5cd495074314f1e75d40434ad39e9f2485a0
+            observed_at: 2026-08-19T04:59:14.308352Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-sha256-48c73dab30dc-out-2e71531854e1df73110494349178e520b66586e3ebfb04643218f01259b5662b.txt
+    evals:
+        required: true
+        kind: command
+        status: pending
+        run_by: jc
+        run_at: 2026-08-19T04:59:14.309302Z
+        against:
+            kind: sha256
+            value: sha256:48c73dab30dca4303c910bae373a5cd495074314f1e75d40434ad39e9f2485a0
+            observed_at: 2026-08-19T04:59:14.308352Z
+        criteria:
+            C1:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C1-sha256-48c73dab30dc-out-e4c7167d9cd475aaec3c53e37599d49e198aa289b1c88db3a8150d61c3031f26.txt
+            C2:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C2-sha256-48c73dab30dc-out-5a5287f0e24c2104edf571478085f1db83c83dc0e52402d8503be41404e22bb0.txt
+            C3:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C3-sha256-48c73dab30dc-out-0bcebc708a0ef3049ab99ab7ed0eb307b9c1228dd44840adec63f14c7e7f6189.txt
+            C4:
+                status: needs_attestation
+            C5:
+                status: pass
+                evidence:
+                    - kind: command_output
+                      ref: artifacts/tiller/gates/eval-C5-sha256-48c73dab30dc-out-d84bc773ab5b05910129be64b3fe33427f93f41550c445410ff45f5c1ff541a7.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T04:59:14.309302Z
+        against:
+            kind: sha256
+            value: sha256:48c73dab30dca4303c910bae373a5cd495074314f1e75d40434ad39e9f2485a0
+            observed_at: 2026-08-19T04:59:14.308352Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-sha256-48c73dab30dc-out-858e202412cce30351edbde98a317262fe0ef7ff8f5a030502172595faddbb1d.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:7783b0b
+        observed_at: 2026-08-19T05:31:40.651129Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-sha256-48c73dab30dc-out-e4c7167d9cd475aaec3c53e37599d49e198aa289b1c88db3a8150d61c3031f26.txt
