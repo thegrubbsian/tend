@@ -1,0 +1,14 @@
+id: EV-wps6fe
+type: sync.task
+at: 2026-08-19T23:35:50.274628Z
+owner: jc
+command: sync task T-1a7ycj
+targets:
+    - T-1a7ycj
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml

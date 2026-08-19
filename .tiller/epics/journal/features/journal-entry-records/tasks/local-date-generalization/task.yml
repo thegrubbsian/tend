@@ -1,7 +1,7 @@
 id: T-1a7ycj
 key: journal/journal-entry-records/local-date-generalization
 title: Generalize the shared civil-date value type
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:e514010
         observed_at: 2026-08-19T22:51:20.777912Z
 pr: 55
+done_basis: ancestry
 gates:
     build:
         required: true
