@@ -7,39 +7,52 @@ import Testing
 @MainActor
 @Suite("Journal entry persistence")
 struct JournalEntryPersistenceTests {
-  @Test("journal values and permissive body shapes round-trip exactly")
-  func journalValuesAndBodyShapesRoundTrip() throws {
-    let container = try TendModelContainer.inMemory()
-    let context = container.mainContext
-    let createdAt = Date(timeIntervalSince1970: 1_775_000_001)
+  @Test("journal values and permissive body shapes survive reopen exactly")
+  func journalValuesAndBodyShapesSurviveReopen() throws {
+    let location = try makeTemporaryStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+    let baseCreatedAt = Date(timeIntervalSince1970: 1_775_000_001)
     let bodies = [
       "",
       "   \n\t",
       "First line\nSecond line\n第三行 🌱",
       String(repeating: "field journal 🌿\n", count: 16_384),
     ]
-    let entries = try bodies.enumerated().map { index, body in
-      JournalEntry(
-        id: uuid("a1000000-0000-0000-0000-00000000000\(index + 1)"),
-        day: try #require(LocalDate(rawValue: "2026-03-0\(index + 1)")),
-        body: body,
-        createdAt: createdAt.addingTimeInterval(TimeInterval(index)),
-        editedAt: createdAt.addingTimeInterval(TimeInterval(index + 10))
-      )
+    let ids = (1...4).map {
+      uuid("a1000000-0000-0000-0000-00000000000\($0)")
     }
-    for entry in entries {
-      context.insert(entry)
+    let dayKeys = (1...4).map { "2026-03-0\($0)" }
+    let createdAt = (0..<4).map {
+      baseCreatedAt.addingTimeInterval(TimeInterval($0))
     }
-    try context.save()
+    let editedAt = (0..<4).map {
+      baseCreatedAt.addingTimeInterval(TimeInterval($0 + 10))
+    }
 
-    let fetched = try context.fetch(FetchDescriptor<JournalEntry>()).sorted {
+    do {
+      let container = try TendModelContainer.fileBacked(at: location.store)
+      for index in bodies.indices {
+        container.mainContext.insert(
+          JournalEntry(
+            id: ids[index],
+            day: try LocalDate(validating: dayKeys[index]),
+            body: bodies[index],
+            createdAt: createdAt[index],
+            editedAt: editedAt[index]
+          ))
+      }
+      try container.mainContext.save()
+    }
+
+    let reopened = try TendModelContainer.fileBacked(at: location.store)
+    let fetched = try ModelContext(reopened).fetch(FetchDescriptor<JournalEntry>()).sorted {
       $0.dayKey < $1.dayKey
     }
-    #expect(fetched.map(\.id) == entries.map(\.id))
-    #expect(fetched.map(\.dayKey) == ["2026-03-01", "2026-03-02", "2026-03-03", "2026-03-04"])
+    #expect(fetched.map(\.id) == ids)
+    #expect(fetched.map(\.dayKey) == dayKeys)
     #expect(fetched.map(\.body) == bodies)
-    #expect(fetched.map(\.createdAt) == entries.map(\.createdAt))
-    #expect(fetched.map(\.editedAt) == entries.map(\.editedAt))
+    #expect(fetched.map(\.createdAt) == createdAt)
+    #expect(fetched.map(\.editedAt) == editedAt)
   }
 
   @Test("duplicate and malformed days remain loadable across reopen")
@@ -250,26 +263,79 @@ struct JournalEntryPersistenceTests {
     expected: VersionThreeFixture
   ) throws {
     let context = ModelContext(container)
-    let habit = try #require(
-      try context.fetch(FetchDescriptor<Habit>()).first { $0.id == expected.habitID }
-    )
-    #expect(habit.name == "Existing habit")
-    #expect(habit.bestStreak == 4)
-    #expect(try #require(habit.activityPeriods).map(\.id) == [expected.activityID])
-    #expect(try #require(habit.buckets).map(\.id) == [expected.bucketID])
-    #expect(try #require(habit.entries).map(\.id) == [expected.logID])
-    #expect(try #require(habit.buckets?.first?.entries).map(\.id) == [expected.logID])
+    let startedAt = Date(timeIntervalSince1970: 1_775_000_000)
+    let endedAt = startedAt.addingTimeInterval(86_400)
+    let habits = try context.fetch(FetchDescriptor<Habit>())
+    let activities = try context.fetch(FetchDescriptor<HabitActivityPeriod>())
+    let buckets = try context.fetch(FetchDescriptor<HabitBucket>())
+    let logs = try context.fetch(FetchDescriptor<LogEntry>())
+    let goals = try context.fetch(FetchDescriptor<Goal>())
+    let goalEntries = try context.fetch(FetchDescriptor<GoalEntry>())
+    let readings = try context.fetch(FetchDescriptor<GoalReading>())
 
-    let goal = try #require(
-      try context.fetch(FetchDescriptor<Goal>()).first { $0.id == expected.goalID }
-    )
+    let habit = try #require(habits.first { $0.id == expected.habitID })
+    #expect(habits.count == 1)
+    #expect(habit.name == "Existing habit")
+    #expect(habit.cadenceRawValue == HabitCadence.daily.rawValue)
+    #expect(habit.target == 2)
+    #expect(habit.unit == "pages")
+    #expect(habit.pinnedWeekdaysRawValue == 0)
+    #expect(habit.reminderMinuteOfDay == nil)
+    #expect(habit.isActive)
+    #expect(habit.createdAt == startedAt)
+    #expect(habit.bestStreak == 4)
+
+    let activity = try #require(activities.first { $0.id == expected.activityID })
+    #expect(activities.count == 1)
+    #expect(activity.startedAt == startedAt)
+    #expect(activity.endedAt == nil)
+    #expect(activity.habit === habit)
+    #expect(try #require(habit.activityPeriods).map(\.id) == [activity.id])
+
+    let bucket = try #require(buckets.first { $0.id == expected.bucketID })
+    #expect(buckets.count == 1)
+    #expect(bucket.periodKey == "daily:2026-04-01")
+    #expect(bucket.startAt == startedAt)
+    #expect(bucket.endAt == endedAt)
+    #expect(bucket.cadenceRawValue == HabitCadence.daily.rawValue)
+    #expect(!bucket.isExempt)
+    #expect(bucket.finalizedAt == nil)
+    #expect(bucket.verdictRawValue == nil)
+    #expect(bucket.targetSnapshot == 2)
+    #expect(bucket.unitSnapshot == "pages")
+    #expect(bucket.habit === habit)
+    #expect(try #require(habit.buckets).map(\.id) == [bucket.id])
+
+    let log = try #require(logs.first { $0.id == expected.logID })
+    #expect(logs.count == 1)
+    #expect(log.timestamp == startedAt.addingTimeInterval(60))
+    #expect(log.amount == 1)
+    #expect(log.habit === habit)
+    #expect(log.bucket === bucket)
+    #expect(try #require(habit.entries).map(\.id) == [log.id])
+    #expect(try #require(bucket.entries).map(\.id) == [log.id])
+
+    let goal = try #require(goals.first { $0.id == expected.goalID })
+    #expect(goals.count == 1)
     #expect(goal.name == "Existing goal")
+    #expect(goal.kindRawValue == GoalKind.accumulate.rawValue)
+    #expect(goal.target == 12)
+    #expect(goal.unit == "chapters")
+    #expect(goal.baseline == nil)
     #expect(goal.deadlineKey == "2026-12-31")
+    #expect(goal.createdAt == startedAt)
     #expect(goal.closureRawValue == GoalClosure.harvested.rawValue)
-    let goalEntry = try #require(goal.entries?.first)
-    #expect(goalEntry.id == expected.goalEntryID)
+    #expect(try #require(goal.readings).isEmpty)
+    #expect(readings.isEmpty)
+
+    let goalEntry = try #require(goalEntries.first { $0.id == expected.goalEntryID })
+    #expect(goalEntries.count == 1)
     #expect(goalEntry.amount == 7)
+    #expect(goalEntry.assignedDateKey == "2026-04-01")
+    #expect(goalEntry.appendedAt == startedAt.addingTimeInterval(120))
+    #expect(goalEntry.appendSequence == 3)
     #expect(goalEntry.goal === goal)
+    #expect(try #require(goal.entries).map(\.id) == [goalEntry.id])
   }
 
   private func makeTemporaryStoreLocation() throws -> (directory: URL, store: URL) {
