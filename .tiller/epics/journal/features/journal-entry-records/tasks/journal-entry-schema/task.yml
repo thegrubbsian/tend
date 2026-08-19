@@ -1,7 +1,7 @@
 id: T-6we44f
 key: journal/journal-entry-records/journal-entry-schema
 title: Add the durable Journal entry schema
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:20.804246Z
+pr: 56
 gates:
     build:
         required: true
