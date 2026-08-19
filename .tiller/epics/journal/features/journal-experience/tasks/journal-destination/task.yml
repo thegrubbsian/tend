@@ -1,0 +1,9 @@
+id: T-3hwtmu
+key: journal/journal-experience/journal-destination
+title: Assemble the complete Journal destination
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-62rnjr

@@ -1,0 +1,14 @@
+id: EV-gd56fb
+type: add.task
+at: 2026-08-19T22:33:02.140883Z
+owner: jc
+command: add task journal/journal-experience/journal-destination
+targets:
+    - T-3hwtmu
+after:
+    feature: F-wf19av
+    key: journal/journal-experience/journal-destination
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.md
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.yml

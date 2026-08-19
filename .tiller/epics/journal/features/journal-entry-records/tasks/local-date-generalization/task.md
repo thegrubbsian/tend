@@ -20,12 +20,13 @@ deprecated spelling, wrapper, or second parser.
 - Goal creation, management, progress, standing, detail, and persistence APIs
   under `Sources/TendCore`
 - App Goal presentation and deterministic UI fixtures under `App/Tend`
-- Goal and persistence tests under `App/TendTests`
+- Goal and persistence tests under `Tests/TendCoreTests` and `App/TendTests`
 
 ## Tests
 
-Rename `GoalDateTests` to `LocalDateTests` and keep every existing parsing,
-ordering, boundary, Codable, DST, extreme-offset, and malformed-value case.
+Extract the existing GoalDate parsing, ordering, adjacent-day, Codable, DST,
+extreme-offset, and malformed-value cases from `GoalPersistenceTests` into a
+focused `Tests/TendCoreTests/Calendar/LocalDateTests.swift`.
 Run the focused LocalDate, Goal creation, Goal progress, Goal detail, Goal
 standing, and persistence suites. The red step is the removed old symbol;
 the green step proves every caller uses the shared name without changing

@@ -13,6 +13,7 @@ this file is regenerated from the working tree on every sync. -->
 
 - epic journal (E-l8goi4): ready
 - feature journal/journal-entry-records (F-rsayqb): specced
+- feature journal/journal-experience (F-wf19av): specced
 - feature journal/today-journal-invitation (F-0rn0hs): specced
 
 ### Blocked
@@ -25,4 +26,4 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Open questions
 
-- Q-jyd9k4: "Should journal entries save automatically or with one explicit action?"
+- (none)

@@ -35,11 +35,14 @@ Advance the SwiftData store through the next versioned schema with a
 - an immutable creation timestamp; and
 - an edited timestamp maintained by the mutation API.
 
-The day key is unique. The migration carries every existing Habit, Goal,
-history, reminder-adjacent, and closure record forward unchanged. A Journal
-entry has no relationship to a Habit, bucket, log entry, Goal, reminder, streak,
-or verdict. The first line is presentation data derived from the body, never a
-persisted title.
+The model remains permissive for migration and CloudKit-compatible graph
+loading: it adds no unique constraint or deny rule. `JournalEntryOperations`
+enforces at most one entry per day, and queries report corrupt duplicates
+truthfully. The migration carries every existing Habit, Goal, history,
+reminder-adjacent, and closure record forward unchanged. A Journal entry has no
+relationship to a Habit, bucket, log entry, Goal, reminder, streak, or verdict.
+The first line is presentation data derived from the body, never a persisted
+title.
 
 ### Lifecycle operations
 

@@ -1,0 +1,9 @@
+id: T-hb747f
+key: journal/journal-experience/journal-automatic-editor
+title: Build the automatic Journal editor
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-a5ad8n

@@ -1,0 +1,9 @@
+id: T-a5ad8n
+key: journal/journal-experience/journal-overview-projection
+title: Project the Journal overview
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-3t6eal

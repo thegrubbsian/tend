@@ -1,0 +1,9 @@
+id: T-62rnjr
+key: journal/journal-experience/journal-day-garden
+title: Render each entry's live Habit garden
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-hb747f

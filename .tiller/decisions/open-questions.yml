@@ -40,5 +40,10 @@ questions:
       owner: jc
       blocks:
         - F-wf19av
-      status: open
+      status: answered
+      answer: Journal entries save automatically while typing. Opening a blank editor creates no entry. The first debounced body containing non-whitespace text creates the entry; after creation, later debounced edits, including an empty body, update content without deleting its historical existence. Pending text flushes before navigation or backgrounding, and a failed save retains the editor text with a visible retry state.
+      answer_revision:
+        kind: git_commit
+        value: git:5b2ddc8
+        observed_at: 2026-08-19T22:30:41.058384Z
       source: .tiller/feedback/07-journal.md#L31

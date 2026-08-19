@@ -1,7 +1,7 @@
 id: F-wf19av
 key: journal/journal-experience
 title: Journal Experience
-status: draft
+status: specced
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L25-31

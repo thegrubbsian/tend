@@ -23,8 +23,8 @@ habit logging, reminders, streaks, Goal progress, or notifications.
 
 - `Sources/TendCore/Journal/JournalEntryOperations.swift`
 - A small Journal write-window helper beside the operations when needed
-- Existing persistence/context test doubles reused by `App/TendTests`
-- `App/TendTests/JournalEntryOperationsTests.swift`
+- Existing persistence/context test doubles under `Tests/TendCoreTests`
+- `Tests/TendCoreTests/Journal/JournalEntryOperationsTests.swift`
 
 ## Tests
 

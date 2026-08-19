@@ -16,8 +16,8 @@ presentation feature.
 ## Surfaces
 
 - `Sources/TendCore/Journal/JournalEntryQuery.swift`
-- Focused query fixtures in `App/TendTests`
-- `App/TendTests/JournalEntryQueryTests.swift`
+- Focused query fixtures under `Tests/TendCoreTests`
+- `Tests/TendCoreTests/Journal/JournalEntryQueryTests.swift`
 
 ## Tests
 

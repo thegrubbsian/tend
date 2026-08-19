@@ -1,0 +1,14 @@
+id: EV-f8btrm
+type: add.task
+at: 2026-08-19T22:33:01.902879Z
+owner: jc
+command: add task journal/journal-experience/journal-overview-projection
+targets:
+    - T-a5ad8n
+after:
+    feature: F-wf19av
+    key: journal/journal-experience/journal-overview-projection
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-overview-projection/task.md
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-overview-projection/task.yml

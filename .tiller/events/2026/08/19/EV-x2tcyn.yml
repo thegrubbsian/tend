@@ -1,0 +1,14 @@
+id: EV-x2tcyn
+type: add.task
+at: 2026-08-19T22:33:02.060876Z
+owner: jc
+command: add task journal/journal-experience/journal-day-garden
+targets:
+    - T-62rnjr
+after:
+    feature: F-wf19av
+    key: journal/journal-experience/journal-day-garden
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.md
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml

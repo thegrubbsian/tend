@@ -1,0 +1,14 @@
+id: EV-85mq8c
+type: add.task
+at: 2026-08-19T22:33:01.983873Z
+owner: jc
+command: add task journal/journal-experience/journal-automatic-editor
+targets:
+    - T-hb747f
+after:
+    feature: F-wf19av
+    key: journal/journal-experience/journal-automatic-editor
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.md
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml

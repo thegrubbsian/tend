@@ -1,0 +1,14 @@
+id: EV-52azp6
+type: add.task
+at: 2026-08-19T22:33:01.808015Z
+owner: jc
+command: add task journal/journal-experience/journal-routing
+targets:
+    - T-3t6eal
+after:
+    feature: F-wf19av
+    key: journal/journal-experience/journal-routing
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.md
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
