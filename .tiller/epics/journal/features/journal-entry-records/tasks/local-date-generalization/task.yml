@@ -1,7 +1,7 @@
 id: T-1a7ycj
 key: journal/journal-entry-records/local-date-generalization
 title: Generalize the shared civil-date value type
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,30 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:20.777912Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T23:11:43.567314Z
+        against:
+            kind: git_commit
+            value: git:da9c9c7
+            observed_at: 2026-08-19T23:11:43.567297Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-da9c9c7-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-19T23:11:43.567314Z
+        against:
+            kind: git_commit
+            value: git:da9c9c7
+            observed_at: 2026-08-19T23:11:43.567297Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-da9c9c7-out-3452b0341661713c14768e137638566dc52fe0534cc59680b20ba910fa151964.txt

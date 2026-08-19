@@ -15,7 +15,7 @@ this file is regenerated from the working tree on every sync. -->
 - feature journal/journal-entry-records (F-rsayqb): active
 - feature journal/journal-experience (F-wf19av): ready
 - feature journal/today-journal-invitation (F-0rn0hs): ready
-- task journal/journal-entry-records/local-date-generalization (T-1a7ycj): in_progress
+- task journal/journal-entry-records/local-date-generalization (T-1a7ycj): check
 - task journal/journal-entry-records/journal-entry-schema (T-6we44f): ready
 - task journal/journal-entry-records/journal-entry-operations (T-vo9ia2): ready
 - task journal/journal-entry-records/journal-entry-query (T-4i270c): ready
