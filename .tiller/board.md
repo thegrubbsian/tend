@@ -11,8 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic goals (E-h2qea7): ready, active
-- feature goals/goal-experience (F-xowx7x): active
+- (none)
 
 ### Blocked
 
@@ -20,7 +19,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task goals/goal-experience/goal-experience-acceptance (T-02sxbb): build pass, tests pass
+- (none)
 
 ### Open questions
 

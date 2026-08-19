@@ -1,7 +1,19 @@
 id: E-h2qea7
 key: goals
 title: Goals
-status: ready
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L1-3
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:c57f002b478d7f5e61f6ebe0651a14fc37a59a71
+        path: .tiller/epics/goals/epic.md
+        observed_at: 2026-08-19T17:01:04.146258Z
+    commit:
+        kind: git_commit
+        value: git:4dcc6d0
+        observed_at: 2026-08-19T17:01:03.510744Z
+    surfaces: []
+done_basis: rollup

@@ -1,7 +1,7 @@
 id: F-xowx7x
 key: goals/goal-experience
 title: Goals Experience
-status: active
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/06-goals.md#L53-65
@@ -24,6 +24,23 @@ accepted_against:
         kind: git_commit
         value: git:cf1df1a
         observed_at: 2026-08-15T02:17:24.738114Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:f12be40f449e59ddee866922ca743a29a32a9294
+        path: .tiller/epics/goals/features/goal-experience/feature.md
+        observed_at: 2026-08-19T17:01:04.001475Z
+    eval:
+        kind: git_blob
+        value: git:9f2167be22e790c0978822ab1819b5e466c9783b
+        path: .tiller/epics/goals/features/goal-experience/feature.eval.md
+        observed_at: 2026-08-19T17:01:04.001475Z
+    commit:
+        kind: git_commit
+        value: git:4dcc6d0
+        observed_at: 2026-08-19T17:01:03.510744Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true

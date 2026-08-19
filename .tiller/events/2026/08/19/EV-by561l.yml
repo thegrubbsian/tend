@@ -1,0 +1,14 @@
+id: EV-by561l
+type: sync.task
+at: 2026-08-19T17:01:03.949154Z
+owner: jc
+command: sync task T-02sxbb
+targets:
+    - T-02sxbb
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.yml

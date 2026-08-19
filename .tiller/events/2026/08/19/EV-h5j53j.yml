@@ -1,0 +1,14 @@
+id: EV-h5j53j
+type: sync.feature
+at: 2026-08-19T17:01:04.023462Z
+owner: jc
+command: sync feature F-xowx7x
+targets:
+    - F-xowx7x
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml

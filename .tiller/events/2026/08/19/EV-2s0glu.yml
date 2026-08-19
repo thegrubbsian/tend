@@ -1,0 +1,14 @@
+id: EV-2s0glu
+type: sync.epic
+at: 2026-08-19T17:01:04.155332Z
+owner: jc
+command: sync epic E-h2qea7
+targets:
+    - E-h2qea7
+before:
+    status: ready
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/goals/epic.yml
