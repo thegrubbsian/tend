@@ -12,22 +12,28 @@ struct TodayView: View {
   @Environment(\.timeZone) private var timeZone
 
   let habits: [Habit]
+  let goals: [Goal]
   let instant: Date
   let fixedOperationInstant: Date?
   let onPlantHabit: () -> Void
+  let onGoalTransitionChange: (Date?) -> Void
   let reminderRefresh: ReminderRefreshSignal
 
   init(
     habits: [Habit],
+    goals: [Goal],
     instant: Date,
     fixedOperationInstant: Date?,
     onPlantHabit: @escaping () -> Void,
+    onGoalTransitionChange: @escaping (Date?) -> Void,
     reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
     self.habits = habits
+    self.goals = goals
     self.instant = instant
     self.fixedOperationInstant = fixedOperationInstant
     self.onPlantHabit = onPlantHabit
+    self.onGoalTransitionChange = onGoalTransitionChange
     self.reminderRefresh = reminderRefresh
   }
 
@@ -53,6 +59,9 @@ struct TodayView: View {
         return
       }
       refresh()
+    }
+    .onChange(of: model?.nextGoalTransition) { _, transition in
+      onGoalTransitionChange(transition)
     }
     .sheet(
       isPresented: Binding(
@@ -107,6 +116,7 @@ struct TodayView: View {
   private var refreshStamp: TodayViewRefreshStamp {
     TodayViewRefreshStamp(
       habits: habits,
+      goals: goals,
       context: refreshContext
     )
   }
@@ -117,7 +127,9 @@ struct TodayView: View {
     case .firstLaunch:
       TodayFirstLaunchView(
         instant: instant,
-        onPlantHabit: onPlantHabit
+        onPlantHabit: onPlantHabit,
+        goalRows: model?.goalRows ?? [],
+        retryGoal: retry
       )
     case .inactiveOnly:
       scrollSurface(identifier: "today.inactive") {
@@ -127,6 +139,10 @@ struct TodayView: View {
           fractionText: nil,
           message: "No active habits."
         )
+
+        if let goalRows = model?.goalRows, !goalRows.isEmpty {
+          TodayGoalsSection(rows: goalRows, retry: retry)
+        }
       }
     case .dashboard(let dashboard):
       scrollSurface(identifier: "today.dashboard") {
@@ -170,6 +186,10 @@ struct TodayView: View {
             performUndo: undo
           )
         }
+
+        if !dashboard.goalRows.isEmpty {
+          TodayGoalsSection(rows: dashboard.goalRows, retry: retry)
+        }
       }
     }
   }
@@ -210,7 +230,8 @@ struct TodayView: View {
   private func refresh() {
     resolvedLoggingModel().refresh(
       habits: habits,
-      context: refreshContext
+      goals: goals,
+      context: operationContext()
     )
   }
 
@@ -282,7 +303,16 @@ struct TodayView: View {
     model?.retry(
       habitID: row.id,
       habits: habits,
-      context: refreshContext
+      context: operationContext()
+    )
+  }
+
+  private func retry(_ row: TodayGoalRow) {
+    model?.retry(
+      goalID: row.id,
+      habits: habits,
+      goals: goals,
+      context: operationContext()
     )
   }
 }
@@ -294,6 +324,20 @@ struct TodayFirstLaunchView: View {
 
   let instant: Date
   let onPlantHabit: () -> Void
+  let goalRows: [TodayGoalRow]
+  let retryGoal: (TodayGoalRow) -> Void
+
+  init(
+    instant: Date,
+    onPlantHabit: @escaping () -> Void,
+    goalRows: [TodayGoalRow] = [],
+    retryGoal: @escaping (TodayGoalRow) -> Void = { _ in }
+  ) {
+    self.instant = instant
+    self.onPlantHabit = onPlantHabit
+    self.goalRows = goalRows
+    self.retryGoal = retryGoal
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -307,10 +351,16 @@ struct TodayFirstLaunchView: View {
         .padding(.top, 6)
 
       ScrollView {
-        introduction
-          .padding(.top, AlmanacMetrics.spacingExtraLarge)
-          .padding(.bottom, AlmanacMetrics.tabPillHeight)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: AlmanacMetrics.spacingLarge) {
+          introduction
+
+          if !goalRows.isEmpty {
+            TodayGoalsSection(rows: goalRows, retry: retryGoal)
+          }
+        }
+        .padding(.top, AlmanacMetrics.spacingExtraLarge)
+        .padding(.bottom, AlmanacMetrics.tabPillHeight)
+        .frame(maxWidth: .infinity, alignment: .leading)
       }
       .frame(maxWidth: .infinity)
     }
@@ -460,6 +510,211 @@ private struct TodayDashboardSection: View {
         }
       }
     }
+  }
+}
+
+private struct TodayGoalsSection: View {
+  let rows: [TodayGoalRow]
+  let retry: (TodayGoalRow) -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
+      Text("GOALS").almanacTextStyle(.label)
+        .foregroundStyle(AlmanacPalette.inkMuted)
+        .accessibilityIdentifier("today.section.goals")
+        .accessibilityAddTraits(.isHeader)
+
+      VStack(spacing: AlmanacMetrics.spacingSmall) {
+        ForEach(rows) { row in
+          TodayGoalCard(
+            row: row,
+            retry: {
+              retry(row)
+            }
+          )
+        }
+      }
+    }
+  }
+}
+
+private struct TodayGoalCard: View {
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+  let row: TodayGoalRow
+  let retry: () -> Void
+
+  @ViewBuilder
+  var body: some View {
+    if let facts = row.facts, let progress = row.progress {
+      availableCard(facts: facts, progress: progress)
+    } else {
+      unavailableCard
+    }
+  }
+
+  private func availableCard(
+    facts: TodayGoalFacts,
+    progress: GoalDetailProgressFact
+  ) -> some View {
+    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
+      summary(accent: accent(for: facts.standing.standing))
+
+      GoalProgressView(
+        progress: progress,
+        progressText: row.progressText,
+        standing: facts.standing.standing,
+        expectedNormalizedProgress: row.expectedNormalizedProgress,
+        standingText: row.standingText,
+        style: .roster
+      )
+      .accessibilityHidden(true)
+
+      metadata(accent: accent(for: facts.standing.standing))
+    }
+    .padding(AlmanacMetrics.spacingMedium)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .almanacRaisedSurface()
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(row.accessibilityLabel)
+    .accessibilityValue(row.accessibilityValue)
+    .accessibilityIdentifier(identifier)
+  }
+
+  private var unavailableCard: some View {
+    VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall) {
+      VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall / 2) {
+        Text(row.name)
+          .font(.body.weight(.semibold))
+          .foregroundStyle(AlmanacPalette.ink)
+          .fixedSize(horizontal: false, vertical: true)
+
+        Text(row.progressText)
+          .almanacTextStyle(.secondary)
+          .foregroundStyle(AlmanacPalette.inkMuted)
+          .fixedSize(horizontal: false, vertical: true)
+
+        Text(row.deadlineText)
+          .almanacTextStyle(.caption)
+          .foregroundStyle(AlmanacPalette.inkMuted)
+          .fixedSize(horizontal: false, vertical: true)
+
+        Text(row.standingText)
+          .almanacTextStyle(.caption)
+          .foregroundStyle(AlmanacPalette.inkMuted)
+          .fixedSize(horizontal: false, vertical: true)
+
+        if let failure = row.failure {
+          Text(failure.message)
+            .almanacTextStyle(.secondary)
+            .foregroundStyle(AlmanacPalette.goalOchreDeep)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+      }
+      .accessibilityHidden(true)
+
+      if let failure = row.failure {
+        Button(failure.retryTitle, action: retry)
+          .buttonStyle(.plain)
+          .font(.body.weight(.semibold))
+          .foregroundStyle(AlmanacPalette.moss)
+          .frame(
+            minWidth: AlmanacMetrics.minimumTarget,
+            minHeight: AlmanacMetrics.minimumTarget
+          )
+          .contentShape(Rectangle())
+          .accessibilityHint("Retries this goal.")
+          .accessibilityIdentifier(
+            "today.goal.retry.\(row.goal.id.uuidString.lowercased())"
+          )
+      }
+    }
+    .padding(AlmanacMetrics.spacingMedium)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .almanacSunkenSurface()
+    .accessibilityElement(children: .contain)
+    .accessibilityLabel(row.accessibilityLabel)
+    .accessibilityValue(row.accessibilityValue)
+    .accessibilityIdentifier(identifier)
+  }
+
+  @ViewBuilder
+  private func summary(accent: Color) -> some View {
+    if dynamicTypeSize.isAccessibilitySize {
+      VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall / 2) {
+        name
+        progressText(accent: accent)
+      }
+    } else {
+      HStack(alignment: .firstTextBaseline, spacing: AlmanacMetrics.spacingMedium) {
+        name
+          .frame(maxWidth: .infinity, alignment: .leading)
+        progressText(accent: accent)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+      }
+    }
+  }
+
+  private var name: some View {
+    Text(row.name)
+      .font(.body.weight(.semibold))
+      .foregroundStyle(AlmanacPalette.ink)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private func progressText(accent: Color) -> some View {
+    Text(row.progressText)
+      .almanacTextStyle(.meaningfulNumeral(.subheadline))
+      .foregroundStyle(accent)
+      .multilineTextAlignment(dynamicTypeSize.isAccessibilitySize ? .leading : .trailing)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  @ViewBuilder
+  private func metadata(accent: Color) -> some View {
+    if dynamicTypeSize.isAccessibilitySize {
+      VStack(alignment: .leading, spacing: AlmanacMetrics.spacingSmall / 2) {
+        deadline
+        standing(accent: accent)
+      }
+    } else {
+      HStack(alignment: .firstTextBaseline, spacing: AlmanacMetrics.spacingMedium) {
+        deadline
+          .frame(maxWidth: .infinity, alignment: .leading)
+        standing(accent: accent)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+      }
+    }
+  }
+
+  private var deadline: some View {
+    Text(row.deadlineText)
+      .almanacTextStyle(.caption)
+      .multilineTextAlignment(.leading)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private func standing(accent: Color) -> some View {
+    Text(row.standingText)
+      .font(.caption.weight(.semibold))
+      .foregroundStyle(accent)
+      .multilineTextAlignment(dynamicTypeSize.isAccessibilitySize ? .leading : .trailing)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private func accent(for standing: GoalStanding) -> Color {
+    switch standing {
+    case .onPace:
+      AlmanacPalette.moss
+    case .behind:
+      AlmanacPalette.goalOchreDeep
+    case .pastDue:
+      AlmanacPalette.withered
+    }
+  }
+
+  private var identifier: String {
+    "today.goal.\(row.goal.id.uuidString.lowercased())"
   }
 }
 
@@ -768,8 +1023,9 @@ private struct TodayViewRefreshStamp: Equatable {
   let calendarIdentifier: String
   let localeIdentifier: String
   let habits: [HabitStamp]
+  let goals: [GoalStamp]
 
-  init(habits: [Habit], context: TodayRefreshContext) {
+  init(habits: [Habit], goals: [Goal], context: TodayRefreshContext) {
     instant = context.instant
     timeZoneIdentifier = context.timeZone.identifier
     calendarIdentifier = String(describing: context.calendar.identifier)
@@ -777,6 +1033,10 @@ private struct TodayViewRefreshStamp: Equatable {
     self.habits =
       habits
       .map(HabitStamp.init)
+      .sorted { $0.persistentID < $1.persistentID }
+    self.goals =
+      goals
+      .map(GoalStamp.init)
       .sorted { $0.persistentID < $1.persistentID }
   }
 
@@ -871,6 +1131,86 @@ private struct TodayViewRefreshStamp: Equatable {
       timestamp = entry.timestamp
       amount = entry.amount
       bucketID = entry.bucket?.id
+    }
+  }
+
+  struct GoalStamp: Equatable {
+    let persistentID: PersistentIdentifier
+    let publicID: UUID
+    let name: String
+    let kindRawValue: String
+    let target: Int
+    let unit: String
+    let baseline: Int?
+    let deadlineKey: String?
+    let createdAt: Date
+    let closureRawValue: String?
+    let entriesRelationshipPresent: Bool
+    let readingsRelationshipPresent: Bool
+    let entries: [GoalEntryStamp]
+    let readings: [GoalReadingStamp]
+
+    init(_ goal: Goal) {
+      persistentID = goal.persistentModelID
+      publicID = goal.id
+      name = goal.name
+      kindRawValue = goal.kindRawValue
+      target = goal.target
+      unit = goal.unit
+      baseline = goal.baseline
+      deadlineKey = goal.deadlineKey
+      createdAt = goal.createdAt
+      closureRawValue = goal.closureRawValue
+      let goalEntries = goal.entries
+      let goalReadings = goal.readings
+      entriesRelationshipPresent = goalEntries != nil
+      readingsRelationshipPresent = goalReadings != nil
+      entries = (goalEntries ?? [])
+        .map(GoalEntryStamp.init)
+        .sorted { $0.persistentID < $1.persistentID }
+      readings = (goalReadings ?? [])
+        .map(GoalReadingStamp.init)
+        .sorted { $0.persistentID < $1.persistentID }
+    }
+  }
+
+  struct GoalEntryStamp: Equatable {
+    let persistentID: PersistentIdentifier
+    let publicID: UUID
+    let amount: Int
+    let assignedDateKey: String
+    let appendedAt: Date
+    let appendSequence: Int
+    let goalID: PersistentIdentifier?
+
+    init(_ entry: GoalEntry) {
+      persistentID = entry.persistentModelID
+      publicID = entry.id
+      amount = entry.amount
+      assignedDateKey = entry.assignedDateKey
+      appendedAt = entry.appendedAt
+      appendSequence = entry.appendSequence
+      goalID = entry.goal?.persistentModelID
+    }
+  }
+
+  struct GoalReadingStamp: Equatable {
+    let persistentID: PersistentIdentifier
+    let publicID: UUID
+    let value: Int
+    let assignedDateKey: String
+    let appendedAt: Date
+    let appendSequence: Int
+    let goalID: PersistentIdentifier?
+
+    init(_ reading: GoalReading) {
+      persistentID = reading.persistentModelID
+      publicID = reading.id
+      value = reading.value
+      assignedDateKey = reading.assignedDateKey
+      appendedAt = reading.appendedAt
+      appendSequence = reading.appendSequence
+      goalID = reading.goal?.persistentModelID
     }
   }
 }

@@ -1,0 +1,13 @@
+id: EV-2136b0
+type: start.task
+at: 2026-08-18T21:17:01.616429Z
+owner: jc
+command: start task T-kqh537
+targets:
+    - T-kqh537
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml
