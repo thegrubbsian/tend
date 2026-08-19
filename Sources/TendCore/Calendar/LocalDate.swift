@@ -1,13 +1,13 @@
 import Foundation
 
-public enum GoalDateError: Error, Equatable, Sendable {
+public enum LocalDateError: Error, Equatable, Sendable {
   case malformedKey(String)
   case invalidDate(String)
   case unrepresentableDate
   case calendarCalculationFailed
 }
 
-public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendable {
+public struct LocalDate: RawRepresentable, Equatable, Comparable, Codable, Sendable {
   public let year: Int
   public let month: Int
   public let day: Int
@@ -30,12 +30,14 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
 
   public init(validating rawValue: String) throws {
     let components = try Self.parse(rawValue)
-    guard Self.isValid(
-      year: components.year,
-      month: components.month,
-      day: components.day
-    ) else {
-      throw GoalDateError.invalidDate(rawValue)
+    guard
+      Self.isValid(
+        year: components.year,
+        month: components.month,
+        day: components.day
+      )
+    else {
+      throw LocalDateError.invalidDate(rawValue)
     }
     year = components.year
     month = components.month
@@ -91,7 +93,7 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
     }
 
     guard let earliestStart else {
-      throw GoalDateError.unrepresentableDate
+      throw LocalDateError.unrepresentableDate
     }
     return earliestStart
   }
@@ -109,7 +111,7 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
       )
     }
     guard year > 1 else {
-      throw GoalDateError.unrepresentableDate
+      throw LocalDateError.unrepresentableDate
     }
     return try adjacent(year: year - 1, month: 12, day: 31)
   }
@@ -123,7 +125,7 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
       return try adjacent(year: year, month: month + 1, day: 1)
     }
     guard year < 9_999 else {
-      throw GoalDateError.unrepresentableDate
+      throw LocalDateError.unrepresentableDate
     }
     return try adjacent(year: year + 1, month: 1, day: 1)
   }
@@ -141,14 +143,14 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
     } catch {
       throw DecodingError.dataCorruptedError(
         in: container,
-        debugDescription: "Invalid GoalDate key: \(key)"
+        debugDescription: "Invalid LocalDate key: \(key)"
       )
     }
   }
 
   private func adjacent(year: Int, month: Int, day: Int) throws -> Self {
     guard let date = Self(year: year, month: month, day: day) else {
-      throw GoalDateError.calendarCalculationFailed
+      throw LocalDateError.calendarCalculationFailed
     }
     return date
   }
@@ -156,7 +158,7 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
   private static func parse(_ key: String) throws -> (year: Int, month: Int, day: Int) {
     let bytes = key.utf8
     guard bytes.count == 10 else {
-      throw GoalDateError.malformedKey(key)
+      throw LocalDateError.malformedKey(key)
     }
 
     func byte(at offset: Int) -> UInt8 {
@@ -169,10 +171,10 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
       let value = byte(at: offset)
       if offset == 4 || offset == 7 {
         guard value == hyphen else {
-          throw GoalDateError.malformedKey(key)
+          throw LocalDateError.malformedKey(key)
         }
       } else if !(zero...nine).contains(value) {
-        throw GoalDateError.malformedKey(key)
+        throw LocalDateError.malformedKey(key)
       }
     }
 
@@ -249,7 +251,8 @@ public struct GoalDate: RawRepresentable, Equatable, Comparable, Codable, Sendab
   }
 
   private static func localDayIndex(at instant: Date, in timeZone: TimeZone) -> Int {
-    let localSeconds = instant.timeIntervalSince1970
+    let localSeconds =
+      instant.timeIntervalSince1970
       + TimeInterval(timeZone.secondsFromGMT(for: instant))
     return Int((localSeconds / secondsPerDay).rounded(.down))
   }

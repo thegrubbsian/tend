@@ -41,7 +41,7 @@ public enum GoalStandingComputationError: Error, Equatable, Sendable {
   case invalidEvaluationInstant
   case evaluationBeforeCreation
   case invalidDeadline(String)
-  case invalidDeadlineBoundary(GoalDateError)
+  case invalidDeadlineBoundary(LocalDateError)
   case deadlineNotAfterCreation
   case progressKindMismatch(expected: GoalKind, actual: GoalKind)
   case nonFiniteNormalizedProgress
@@ -179,14 +179,14 @@ public struct GoalStandingComputation: Sendable {
     guard let deadlineKey = goal.deadlineKey else {
       return nil
     }
-    guard let deadline = GoalDate(rawValue: deadlineKey) else {
+    guard let deadline = LocalDate(rawValue: deadlineKey) else {
       throw GoalStandingComputationError.invalidDeadline(deadlineKey)
     }
 
     let followingDayStart: Date
     do {
       followingDayStart = try deadline.next().start(in: timeZone)
-    } catch let error as GoalDateError {
+    } catch let error as LocalDateError {
       throw GoalStandingComputationError.invalidDeadlineBoundary(error)
     }
     var localCalendar = calendar

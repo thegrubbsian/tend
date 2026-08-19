@@ -375,7 +375,7 @@ struct GoalDetailQueryTests {
         timeZone: zone
       )
       Issue.record("Expected the minimum civil day to have no representable Yesterday")
-    } catch let error as GoalDateError {
+    } catch let error as LocalDateError {
       #expect(error == .unrepresentableDate)
     }
     #expect(goal.entries?.first === entry)
@@ -617,7 +617,7 @@ struct GoalDetailQueryTests {
   private func persistedGoal(
     in context: ModelContext,
     name: String = "Read",
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     createdAt: Date = Date(timeIntervalSince1970: 1_704_067_200)
   ) throws -> Goal {
     let goal = Goal(
@@ -682,7 +682,7 @@ struct GoalDetailQueryTests {
     try #require(TimeZone(identifier: identifier))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 }

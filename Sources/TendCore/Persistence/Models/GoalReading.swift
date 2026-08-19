@@ -13,7 +13,7 @@ public final class GoalReading {
   public init(
     id: UUID = UUID(),
     value: Int,
-    assignedDate: GoalDate,
+    assignedDate: LocalDate,
     appendedAt: Date,
     appendSequence: Int,
     goal: Goal? = nil

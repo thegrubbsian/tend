@@ -48,7 +48,7 @@ public enum TendSchemaV2: VersionedSchema {
       target: Int,
       unit: String = "times",
       baseline: Int? = nil,
-      deadline: GoalDate? = nil,
+      deadline: LocalDate? = nil,
       createdAt: Date = Date()
     ) {
       self.id = id
@@ -74,7 +74,7 @@ public enum TendSchemaV2: VersionedSchema {
     public init(
       id: UUID = UUID(),
       amount: Int,
-      assignedDate: GoalDate,
+      assignedDate: LocalDate,
       appendedAt: Date,
       appendSequence: Int,
       goal: Goal? = nil
@@ -100,7 +100,7 @@ public enum TendSchemaV2: VersionedSchema {
     public init(
       id: UUID = UUID(),
       value: Int,
-      assignedDate: GoalDate,
+      assignedDate: LocalDate,
       appendedAt: Date,
       appendSequence: Int,
       goal: Goal? = nil

@@ -240,8 +240,8 @@ final class GoalRosterModel {
   }
 
   private func optionalDeadlineIsOrdered(
-    _ lhs: GoalDate?,
-    before rhs: GoalDate?
+    _ lhs: LocalDate?,
+    before rhs: LocalDate?
   ) -> Bool {
     switch (lhs, rhs) {
     case (.some(let lhs), .some(let rhs)): lhs < rhs
@@ -279,7 +279,7 @@ final class GoalRosterModel {
 
 private struct GoalRosterRowCandidate {
   let row: GoalRosterRow
-  let deadline: GoalDate?
+  let deadline: LocalDate?
 }
 
 private struct GoalRosterRowBuilder {
@@ -353,15 +353,15 @@ private struct GoalRosterRowBuilder {
     }
   }
 
-  private func deadline(for goal: Goal) throws -> GoalDate? {
+  private func deadline(for goal: Goal) throws -> LocalDate? {
     guard let deadlineKey = goal.deadlineKey else { return nil }
-    guard let deadline = GoalDate(rawValue: deadlineKey) else {
+    guard let deadline = LocalDate(rawValue: deadlineKey) else {
       throw ProjectionError.invalidDeadline
     }
     return deadline
   }
 
-  private func deadlineText(_ deadline: GoalDate?) throws -> String {
+  private func deadlineText(_ deadline: LocalDate?) throws -> String {
     guard let deadline else {
       return String(localized: "No deadline", locale: locale)
     }

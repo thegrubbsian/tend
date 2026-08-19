@@ -7,7 +7,7 @@ public struct GoalCreationFields: Equatable, Sendable {
   public let target: Int
   public let unit: String
   public let baseline: Int?
-  public let deadline: GoalDate?
+  public let deadline: LocalDate?
 
   public init(
     name: String,
@@ -15,7 +15,7 @@ public struct GoalCreationFields: Equatable, Sendable {
     target: Int,
     unit: String = "times",
     baseline: Int? = nil,
-    deadline: GoalDate? = nil
+    deadline: LocalDate? = nil
   ) {
     self.name = name
     self.kind = kind
@@ -33,8 +33,8 @@ public enum GoalCreationOperationError: Error, Equatable, Sendable {
   case accumulateBaseline(Int)
   case missingMeasureBaseline
   case measureBaselineEqualsTarget(Int)
-  case invalidDeadlineBoundary(GoalDateError)
-  case deadlineExpired(GoalDate)
+  case invalidDeadlineBoundary(LocalDateError)
+  case deadlineExpired(LocalDate)
 }
 
 @MainActor
@@ -116,7 +116,7 @@ public final class GoalCreationOperations {
       let boundary: Date
       do {
         boundary = try deadline.next().start(in: timeZone)
-      } catch let error as GoalDateError {
+      } catch let error as LocalDateError {
         throw GoalCreationOperationError.invalidDeadlineBoundary(error)
       }
       guard boundary > instant else {

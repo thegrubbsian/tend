@@ -237,7 +237,7 @@ struct GoalProgressComputationTests {
     }
   }
 
-  @Test("latest GoalDate then highest sequence selects the effective reading")
+  @Test("latest LocalDate then highest sequence selects the effective reading")
   func measureEffectivenessIgnoresAppendTimeAndArrayOrder() throws {
     let context = try makeContext()
     let effectiveID = UUID()
@@ -632,7 +632,7 @@ struct GoalProgressComputationTests {
     kind: GoalKind,
     target: Int = 10,
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     entries: [GoalEntry] = [],
     readings: [GoalReading] = []
   ) throws -> Goal {
@@ -702,8 +702,8 @@ struct GoalProgressComputationTests {
     try #require(ISO8601DateFormatter().date(from: value))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 }
 

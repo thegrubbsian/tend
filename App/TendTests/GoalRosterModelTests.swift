@@ -415,7 +415,7 @@ struct GoalRosterModelTests {
     let goal = try fixture.insertGoal(
       name: "Finish",
       target: 10,
-      deadline: GoalDate(year: 2026, month: 1, day: 15),
+      deadline: LocalDate(year: 2026, month: 1, day: 15),
       entryAmounts: [2]
     )
     let model = GoalRosterModel(context: fixture.context)
@@ -558,11 +558,11 @@ private final class GoalRosterFixture {
   let timeZone: TimeZone
   let calendar: Calendar
   let locale: Locale
-  let earlierFutureDeadline: GoalDate
-  let futureDeadline: GoalDate
-  let laterFutureDeadline: GoalDate
-  let earlierPastDeadline: GoalDate
-  let pastDeadline: GoalDate
+  let earlierFutureDeadline: LocalDate
+  let futureDeadline: LocalDate
+  let laterFutureDeadline: LocalDate
+  let earlierPastDeadline: LocalDate
+  let pastDeadline: LocalDate
 
   init() throws {
     let container = try TendModelContainer.inMemory()
@@ -574,11 +574,11 @@ private final class GoalRosterFixture {
     calendar.locale = locale
     self.calendar = calendar
     instant = try Self.parseDate("2026-01-15T12:00:00Z")
-    earlierFutureDeadline = try #require(GoalDate(year: 2026, month: 1, day: 18))
-    futureDeadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
-    laterFutureDeadline = try #require(GoalDate(year: 2026, month: 1, day: 21))
-    earlierPastDeadline = try #require(GoalDate(year: 2026, month: 1, day: 10))
-    pastDeadline = try #require(GoalDate(year: 2026, month: 1, day: 14))
+    earlierFutureDeadline = try #require(LocalDate(year: 2026, month: 1, day: 18))
+    futureDeadline = try #require(LocalDate(year: 2026, month: 1, day: 20))
+    laterFutureDeadline = try #require(LocalDate(year: 2026, month: 1, day: 21))
+    earlierPastDeadline = try #require(LocalDate(year: 2026, month: 1, day: 10))
+    pastDeadline = try #require(LocalDate(year: 2026, month: 1, day: 14))
   }
 
   func insertGoal(
@@ -588,7 +588,7 @@ private final class GoalRosterFixture {
     target: Int = 10,
     unit: String = "times",
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     closure: GoalClosure? = nil,
     createdAt: Date? = nil,
     entryAmounts: [Int] = [],
@@ -605,7 +605,7 @@ private final class GoalRosterFixture {
       createdAt: createdAt ?? date("2026-01-01T00:00:00Z")
     )
     goal.closureRawValue = closure?.rawValue
-    let assignedDate = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let assignedDate = try #require(LocalDate(year: 2026, month: 1, day: 15))
     goal.entries = entryAmounts.enumerated().map { index, amount in
       GoalEntry(
         amount: amount,

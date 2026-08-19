@@ -37,7 +37,7 @@ public final class Goal {
     target: Int,
     unit: String = "times",
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     createdAt: Date = Date()
   ) {
     self.id = id

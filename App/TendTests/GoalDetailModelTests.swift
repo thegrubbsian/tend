@@ -118,8 +118,8 @@ struct GoalDetailModelTests {
   @Test("deadline, standing, and closure wording map only query facts to valid actions")
   func presentsStandingAndClosureStates() throws {
     let fixture = try GoalDetailFixture()
-    let futureDeadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
-    let pastDeadline = try #require(GoalDate(year: 2026, month: 1, day: 14))
+    let futureDeadline = try #require(LocalDate(year: 2026, month: 1, day: 20))
+    let pastDeadline = try #require(LocalDate(year: 2026, month: 1, day: 14))
     let futureBoundary = try futureDeadline.next().start(in: fixture.timeZone)
     let elapsedBoundary = try pastDeadline.next().start(in: fixture.timeZone)
     let cases:
@@ -127,7 +127,7 @@ struct GoalDetailModelTests {
         standing: GoalStanding,
         total: Int,
         expected: Double,
-        deadline: GoalDate,
+        deadline: LocalDate,
         boundary: Date,
         deadlineText: String,
         standingText: String
@@ -187,14 +187,19 @@ struct GoalDetailModelTests {
   @Test("deadline wording includes localized civil-day distance and formatted due date")
   func presentsDeadlineCivilDayContext() throws {
     let fixture = try GoalDetailFixture()
-    let cases: [(GoalDate, String)] = [
-      (try #require(GoalDate(year: 2026, month: 1, day: 15)), "Due today · Jan 15, 2026"),
-      (try #require(GoalDate(year: 2026, month: 1, day: 16)), "1 day remaining · Due Jan 16, 2026"),
+    let cases: [(LocalDate, String)] = [
+      (try #require(LocalDate(year: 2026, month: 1, day: 15)), "Due today · Jan 15, 2026"),
       (
-        try #require(GoalDate(year: 2026, month: 1, day: 17)), "2 days remaining · Due Jan 17, 2026"
+        try #require(LocalDate(year: 2026, month: 1, day: 16)), "1 day remaining · Due Jan 16, 2026"
       ),
-      (try #require(GoalDate(year: 2026, month: 1, day: 14)), "1 day past due · Due Jan 14, 2026"),
-      (try #require(GoalDate(year: 2026, month: 1, day: 13)), "2 days past due · Due Jan 13, 2026"),
+      (
+        try #require(LocalDate(year: 2026, month: 1, day: 17)),
+        "2 days remaining · Due Jan 17, 2026"
+      ),
+      (try #require(LocalDate(year: 2026, month: 1, day: 14)), "1 day past due · Due Jan 14, 2026"),
+      (
+        try #require(LocalDate(year: 2026, month: 1, day: 13)), "2 days past due · Due Jan 13, 2026"
+      ),
     ]
 
     let today = cases[0].0
@@ -220,8 +225,8 @@ struct GoalDetailModelTests {
   @Test("history preserves query order, local day wording, and same-day effective reading")
   func presentsHistoryInAuthoritativeOrder() throws {
     let fixture = try GoalDetailFixture()
-    let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
-    let yesterday = try #require(GoalDate(year: 2026, month: 1, day: 14))
+    let today = try #require(LocalDate(year: 2026, month: 1, day: 15))
+    let yesterday = try #require(LocalDate(year: 2026, month: 1, day: 14))
     let effectiveID = GoalReadingIdentity(rawValue: UUID())
     let supersededID = GoalReadingIdentity(rawValue: UUID())
     let oldID = GoalReadingIdentity(rawValue: UUID())
@@ -518,7 +523,7 @@ struct GoalDetailModelTests {
     let fixture = try GoalDetailFixture()
     let eligibleID = GoalEntryIdentity(rawValue: UUID())
     let ineligibleID = GoalEntryIdentity(rawValue: UUID())
-    let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let today = try #require(LocalDate(year: 2026, month: 1, day: 15))
     let history: [GoalDetailHistoryItem] = [
       .entry(
         .init(
@@ -552,7 +557,7 @@ struct GoalDetailModelTests {
   func rejectsUnresolvedHistoryDeletion() throws {
     let fixture = try GoalDetailFixture()
     let entryID = GoalEntryIdentity(rawValue: UUID())
-    let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let today = try #require(LocalDate(year: 2026, month: 1, day: 15))
     let history: [GoalDetailHistoryItem] = [
       .entry(
         .init(
@@ -859,7 +864,7 @@ struct GoalDetailModelTests {
   func preservesDeletionFailureContexts() throws {
     let fixture = try GoalDetailFixture()
     let entryID = GoalEntryIdentity(rawValue: UUID())
-    let today = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let today = try #require(LocalDate(year: 2026, month: 1, day: 15))
     let history: [GoalDetailHistoryItem] = [
       .entry(
         .init(
@@ -993,7 +998,7 @@ struct GoalDetailModelTests {
   @Test("projection rejects contradictory standing payloads")
   func rejectsMalformedStandingContracts() throws {
     let fixture = try GoalDetailFixture()
-    let deadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
+    let deadline = try #require(LocalDate(year: 2026, month: 1, day: 20))
     let futureBoundary = fixture.instant.addingTimeInterval(1)
     let elapsedBoundary = fixture.instant
 
@@ -1159,7 +1164,7 @@ struct GoalDetailModelTests {
   func rejectsFutureDeadlineWithElapsedPastDueBoundary() throws {
     let fixture = try GoalDetailFixture()
     let good = fixture.accumulateSnapshot(name: "Last good")
-    let deadline = try #require(GoalDate(year: 2026, month: 1, day: 20))
+    let deadline = try #require(LocalDate(year: 2026, month: 1, day: 20))
     let contradictory = fixture.accumulateSnapshot(
       name: "Contradictory",
       deadline: deadline,
@@ -1216,7 +1221,7 @@ struct GoalDetailModelTests {
     let foreignGoal = Goal(name: "Read", kind: .accumulate, target: 10)
     context.insert(goal)
     context.insert(foreignGoal)
-    let date = try #require(GoalDate(year: 2026, month: 1, day: 15))
+    let date = try #require(LocalDate(year: 2026, month: 1, day: 15))
     let sharedID = UUID()
     let foreign = GoalEntry(
       id: sharedID,
@@ -1492,7 +1497,7 @@ private final class GoalDetailFixture {
     total: Int = 0,
     target: Int = 10,
     unit: String = "times",
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     closure: GoalClosure? = nil,
     standing: GoalStandingSnapshot? = nil,
     omitsStanding: Bool = false,

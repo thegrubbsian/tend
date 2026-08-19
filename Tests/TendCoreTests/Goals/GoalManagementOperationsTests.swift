@@ -856,7 +856,7 @@ struct GoalManagementOperationsTests {
     kind: GoalKind,
     target: Int = 10,
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     createdAt: Date = Date(timeIntervalSince1970: 1_719_792_000),
     closure: GoalClosure? = nil,
     childCount: Int = 0
@@ -876,7 +876,7 @@ struct GoalManagementOperationsTests {
       goal.entries = (0..<childCount).map { index in
         GoalEntry(
           amount: index + 1,
-          assignedDate: GoalDate(rawValue: "2024-07-01")!,
+          assignedDate: LocalDate(rawValue: "2024-07-01")!,
           appendedAt: createdAt.addingTimeInterval(TimeInterval(index)),
           appendSequence: index * 3
         )
@@ -885,7 +885,7 @@ struct GoalManagementOperationsTests {
       goal.readings = (0..<childCount).map { index in
         GoalReading(
           value: 100 - (index * 10),
-          assignedDate: GoalDate(rawValue: "2024-07-01")!,
+          assignedDate: LocalDate(rawValue: "2024-07-01")!,
           appendedAt: createdAt.addingTimeInterval(TimeInterval(index)),
           appendSequence: index * 3
         )
@@ -1044,8 +1044,8 @@ struct GoalManagementOperationsTests {
     return calendar
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 
   private func makeTemporaryStoreLocation() throws -> (directory: URL, store: URL) {
@@ -1065,7 +1065,7 @@ private struct UpdateCase {
   let closure: GoalClosure?
   let originalTarget: Int
   let originalBaseline: Int?
-  var originalDeadline: GoalDate? = nil
+  var originalDeadline: LocalDate? = nil
   let fields: GoalEditableFields
 }
 

@@ -71,7 +71,7 @@ struct GoalFormModelTests {
   func measureSaveSendsExactPayload() throws {
     let instant = Date(timeIntervalSince1970: 1_725_214_400)
     let timeZone = try #require(TimeZone(identifier: "UTC"))
-    let deadline = try #require(GoalDate(year: 2026, month: 11, day: 1))
+    let deadline = try #require(LocalDate(year: 2026, month: 11, day: 1))
     let expectedGoal = Goal(
       name: "Fund",
       kind: .measure,
@@ -271,7 +271,7 @@ struct GoalFormModelTests {
 
   @Test("A deadline can be added to New and removed from Edit")
   func deadlineCanBeAddedAndRemoved() throws {
-    let deadline = try #require(GoalDate(year: 2027, month: 3, day: 14))
+    let deadline = try #require(LocalDate(year: 2027, month: 3, day: 14))
     let newRecorder = GoalFormPersistenceRecorder()
     let newModel = validAccumulateModel()
     newModel.deadline = deadline
@@ -299,22 +299,22 @@ struct GoalFormModelTests {
   func deadlineAdapterPreservesCivilDateNearMidnightAndDST() throws {
     let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
     let calendar = Calendar(identifier: .gregorian)
-    let examples: [(date: Date, expected: GoalDate)] = [
+    let examples: [(date: Date, expected: LocalDate)] = [
       (
         try utcDate(year: 2024, month: 3, day: 10, hour: 7, minute: 59),
-        try #require(GoalDate(year: 2024, month: 3, day: 9))
+        try #require(LocalDate(year: 2024, month: 3, day: 9))
       ),
       (
         try utcDate(year: 2024, month: 3, day: 10, hour: 10, minute: 1),
-        try #require(GoalDate(year: 2024, month: 3, day: 10))
+        try #require(LocalDate(year: 2024, month: 3, day: 10))
       ),
       (
         try utcDate(year: 2024, month: 11, day: 3, hour: 8, minute: 30),
-        try #require(GoalDate(year: 2024, month: 11, day: 3))
+        try #require(LocalDate(year: 2024, month: 11, day: 3))
       ),
       (
         try utcDate(year: 2024, month: 11, day: 3, hour: 9, minute: 30),
-        try #require(GoalDate(year: 2024, month: 11, day: 3))
+        try #require(LocalDate(year: 2024, month: 11, day: 3))
       ),
     ]
 
@@ -345,7 +345,7 @@ struct GoalFormModelTests {
     let timeZone = try #require(TimeZone(identifier: "Asia/Riyadh"))
     let callerCalendar = Calendar(identifier: .islamicUmmAlQura)
     let instant = try utcDate(year: 2024, month: 3, day: 10, hour: 21, minute: 30)
-    let expected = try #require(GoalDate(year: 2024, month: 3, day: 11))
+    let expected = try #require(LocalDate(year: 2024, month: 3, day: 11))
 
     #expect(
       GoalFormDeadlineAdapter.goalDate(
@@ -359,7 +359,7 @@ struct GoalFormModelTests {
   func deadlineAdapterWritesGregorianDateWithNonGregorianCalendar() throws {
     let timeZone = try #require(TimeZone(identifier: "Asia/Riyadh"))
     let callerCalendar = Calendar(identifier: .islamicUmmAlQura)
-    let expected = try #require(GoalDate(year: 2024, month: 3, day: 11))
+    let expected = try #require(LocalDate(year: 2024, month: 3, day: 11))
 
     let pickerDate = GoalFormDeadlineAdapter.date(
       for: expected,
@@ -380,7 +380,7 @@ struct GoalFormModelTests {
 
   @Test("Edit snapshots persisted values once and never permits a kind change")
   func editSnapshotsValuesAndLocksKind() throws {
-    let deadline = try #require(GoalDate(year: 2026, month: 8, day: 31))
+    let deadline = try #require(LocalDate(year: 2026, month: 8, day: 31))
     let goal = Goal(
       name: "Run",
       kind: .measure,
@@ -476,8 +476,8 @@ struct GoalFormModelTests {
 
   @Test("Edit Save updates the original closed goal exactly once without changing kind")
   func editSaveUpdatesOriginalClosedGoalExactlyOnce() throws {
-    let originalDeadline = try #require(GoalDate(year: 2026, month: 8, day: 31))
-    let replacementDeadline = try #require(GoalDate(year: 2027, month: 1, day: 2))
+    let originalDeadline = try #require(LocalDate(year: 2026, month: 8, day: 31))
+    let replacementDeadline = try #require(LocalDate(year: 2027, month: 1, day: 2))
     let timeZone = try #require(TimeZone(identifier: "Pacific/Auckland"))
     var calendar = Calendar(identifier: .gregorian)
     calendar.firstWeekday = 2
@@ -537,7 +537,7 @@ struct GoalFormModelTests {
 
   @Test("Editing or discarding a draft performs no persistence or optimistic mutation")
   func unsavedAndCancelledDraftsPerformNoWrites() throws {
-    let deadline = try #require(GoalDate(year: 2026, month: 12, day: 20))
+    let deadline = try #require(LocalDate(year: 2026, month: 12, day: 20))
     let goal = Goal(
       name: "Read",
       kind: .accumulate,
@@ -565,7 +565,7 @@ struct GoalFormModelTests {
 
   @Test("A localized save failure retains every draft and exposes its diagnostic")
   func localizedSaveFailureRetainsDraftAndDiagnostic() throws {
-    let deadline = try #require(GoalDate(year: 2026, month: 10, day: 15))
+    let deadline = try #require(LocalDate(year: 2026, month: 10, day: 15))
     let recorder = GoalFormPersistenceRecorder()
     recorder.createError = TestGoalSaveFailure.expected
     let model = validMeasureModel()
@@ -611,8 +611,8 @@ struct GoalFormModelTests {
 
   @Test("Edit failure leaves the persisted goal untouched and retains the full draft")
   func editFailureLeavesGoalUntouchedAndRetainsDraft() throws {
-    let oldDeadline = try #require(GoalDate(year: 2026, month: 9, day: 1))
-    let newDeadline = try #require(GoalDate(year: 2026, month: 10, day: 1))
+    let oldDeadline = try #require(LocalDate(year: 2026, month: 9, day: 1))
+    let newDeadline = try #require(LocalDate(year: 2026, month: 10, day: 1))
     let goal = Goal(
       name: "Weight",
       kind: .measure,
@@ -812,8 +812,8 @@ private enum TestGoalSaveFailure: LocalizedError {
   }
 }
 
-private extension Collection {
-  var only: Element? {
+extension Collection {
+  fileprivate var only: Element? {
     count == 1 ? first : nil
   }
 }

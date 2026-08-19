@@ -51,7 +51,7 @@ struct GoalLifecyclePersistenceTests {
         kind: .accumulate,
         target: 20,
         unit: "pages",
-        deadline: GoalDate(rawValue: "2026-03-01"),
+        deadline: LocalDate(rawValue: "2026-03-01"),
         createdAt: Date(timeIntervalSince1970: 1_760_000_002)
       )
       harvestedGoal.closureRawValue = GoalClosure.harvested.rawValue
@@ -59,7 +59,7 @@ struct GoalLifecyclePersistenceTests {
         GoalEntry(
           id: uuid("92000000-0000-0000-0000-000000000001"),
           amount: 7,
-          assignedDate: try #require(GoalDate(rawValue: "2026-02-01")),
+          assignedDate: try #require(LocalDate(rawValue: "2026-02-01")),
           appendedAt: Date(timeIntervalSince1970: 1_760_000_101),
           appendSequence: 4
         )
@@ -72,7 +72,7 @@ struct GoalLifecyclePersistenceTests {
         target: 165,
         unit: "lb",
         baseline: 195,
-        deadline: GoalDate(rawValue: "2026-04-01"),
+        deadline: LocalDate(rawValue: "2026-04-01"),
         createdAt: Date(timeIntervalSince1970: 1_760_000_003)
       )
       letGoGoal.closureRawValue = GoalClosure.letGo.rawValue
@@ -80,7 +80,7 @@ struct GoalLifecyclePersistenceTests {
         GoalReading(
           id: uuid("93000000-0000-0000-0000-000000000001"),
           value: 183,
-          assignedDate: try #require(GoalDate(rawValue: "2026-02-02")),
+          assignedDate: try #require(LocalDate(rawValue: "2026-02-02")),
           appendedAt: Date(timeIntervalSince1970: 1_760_000_102),
           appendSequence: 5
         )
@@ -280,21 +280,21 @@ struct GoalLifecyclePersistenceTests {
       kind: .accumulate,
       target: 40,
       unit: "chapters read",
-      deadline: GoalDate(rawValue: "2026-06-30"),
+      deadline: LocalDate(rawValue: "2026-06-30"),
       createdAt: Date(timeIntervalSince1970: 1_750_000_001)
     )
     let accumulateEntries = [
       TendSchemaV2.GoalEntry(
         id: uuid("a2000000-0000-0000-0000-000000000001"),
         amount: 3,
-        assignedDate: try #require(GoalDate(rawValue: "2026-01-03")),
+        assignedDate: try #require(LocalDate(rawValue: "2026-01-03")),
         appendedAt: Date(timeIntervalSince1970: 1_750_000_101),
         appendSequence: 8
       ),
       TendSchemaV2.GoalEntry(
         id: uuid("a2000000-0000-0000-0000-000000000002"),
         amount: 5,
-        assignedDate: try #require(GoalDate(rawValue: "2026-01-04")),
+        assignedDate: try #require(LocalDate(rawValue: "2026-01-04")),
         appendedAt: Date(timeIntervalSince1970: 1_750_000_102),
         appendSequence: 13
       ),
@@ -317,21 +317,21 @@ struct GoalLifecyclePersistenceTests {
       target: 165,
       unit: "lb",
       baseline: 195,
-      deadline: GoalDate(rawValue: "2027-01-01"),
+      deadline: LocalDate(rawValue: "2027-01-01"),
       createdAt: Date(timeIntervalSince1970: 1_750_000_003)
     )
     let measureReadings = [
       TendSchemaV2.GoalReading(
         id: uuid("b3000000-0000-0000-0000-000000000001"),
         value: 190,
-        assignedDate: try #require(GoalDate(rawValue: "2026-01-05")),
+        assignedDate: try #require(LocalDate(rawValue: "2026-01-05")),
         appendedAt: Date(timeIntervalSince1970: 1_750_000_103),
         appendSequence: 21
       ),
       TendSchemaV2.GoalReading(
         id: uuid("b3000000-0000-0000-0000-000000000002"),
         value: 183,
-        assignedDate: try #require(GoalDate(rawValue: "2026-01-06")),
+        assignedDate: try #require(LocalDate(rawValue: "2026-01-06")),
         appendedAt: Date(timeIntervalSince1970: 1_750_000_104),
         appendSequence: 34
       ),

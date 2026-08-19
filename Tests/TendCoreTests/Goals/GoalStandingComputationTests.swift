@@ -152,7 +152,7 @@ struct GoalStandingComputationTests {
   }
 
   @Test("deadline resolution stays proleptic Gregorian across the 1582 civil cutover")
-  func deadlineResolutionUsesGoalDateCalendarSemantics() throws {
+  func deadlineResolutionUsesLocalDateCalendarSemantics() throws {
     let deadline = try goalDate("1582-10-04")
     let expectedBoundary = Date(timeIntervalSince1970: -12_220_156_800)
     let goal = Goal(
@@ -677,8 +677,8 @@ struct GoalStandingComputationTests {
     try #require(ISO8601DateFormatter().date(from: value))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 }
 

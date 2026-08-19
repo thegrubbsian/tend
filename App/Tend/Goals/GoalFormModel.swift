@@ -95,7 +95,7 @@ enum GoalFormDeadlineAdapter {
     from date: Date,
     calendar _: Calendar,
     timeZone: TimeZone
-  ) -> GoalDate? {
+  ) -> LocalDate? {
     var gregorianCalendar = Calendar(identifier: .gregorian)
     gregorianCalendar.timeZone = timeZone
     let components = gregorianCalendar.dateComponents([.year, .month, .day], from: date)
@@ -106,11 +106,11 @@ enum GoalFormDeadlineAdapter {
     else {
       return nil
     }
-    return GoalDate(year: year, month: month, day: day)
+    return LocalDate(year: year, month: month, day: day)
   }
 
   static func date(
-    for goalDate: GoalDate,
+    for goalDate: LocalDate,
     calendar _: Calendar,
     timeZone: TimeZone
   ) -> Date {
@@ -139,7 +139,7 @@ final class GoalFormModel {
   var targetText = "1"
   var unit = "times"
   var baselineText = ""
-  var deadline: GoalDate?
+  var deadline: LocalDate?
   private(set) var isSaving = false
   private(set) var focusedField: GoalFormField?
   private(set) var persistenceError: String?
@@ -164,7 +164,7 @@ final class GoalFormModel {
     unit = goal.unit
     baselineText = goal.baseline.map(String.init) ?? ""
     if let deadlineKey = goal.deadlineKey {
-      if let storedDeadline = GoalDate(rawValue: deadlineKey) {
+      if let storedDeadline = LocalDate(rawValue: deadlineKey) {
         deadline = storedDeadline
       } else {
         configurationErrors.insert(.invalidDeadline)

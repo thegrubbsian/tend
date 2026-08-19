@@ -148,7 +148,7 @@ struct TodayPresentationFormatter {
       goal: goal,
       name: goal.name,
       createdAt: goal.createdAt,
-      deadline: goal.deadlineKey.flatMap(GoalDate.init(rawValue:)),
+      deadline: goal.deadlineKey.flatMap(LocalDate.init(rawValue:)),
       facts: nil,
       failure: failure,
       progress: nil,
@@ -255,7 +255,7 @@ struct TodayPresentationFormatter {
   private func validateStanding(
     _ standing: GoalStandingSnapshot,
     normalizedProgress: Double,
-    deadline: GoalDate?
+    deadline: LocalDate?
   ) throws {
     guard standing.actualNormalizedProgress.isFinite,
       standing.actualNormalizedProgress == normalizedProgress
@@ -281,10 +281,10 @@ struct TodayPresentationFormatter {
     }
   }
 
-  private func validateDeadline(_ deadline: GoalDate?, goal: Goal) throws {
-    let persisted: GoalDate?
+  private func validateDeadline(_ deadline: LocalDate?, goal: Goal) throws {
+    let persisted: LocalDate?
     if let key = goal.deadlineKey {
-      guard let parsed = GoalDate(rawValue: key) else {
+      guard let parsed = LocalDate(rawValue: key) else {
         throw TodayPresentationFormatterError.invalidGoalDeadline
       }
       persisted = parsed
@@ -311,7 +311,7 @@ struct TodayPresentationFormatter {
     }
   }
 
-  private func goalDeadlineText(_ deadline: GoalDate?) throws -> String {
+  private func goalDeadlineText(_ deadline: LocalDate?) throws -> String {
     guard let deadline else { return String(localized: "No deadline", locale: locale) }
     return String(
       format: String(localized: "Due %@", locale: locale),

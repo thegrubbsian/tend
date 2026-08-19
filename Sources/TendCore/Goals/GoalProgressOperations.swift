@@ -27,9 +27,9 @@ public enum GoalProgressOperationError: Error, Equatable, Sendable {
   case invalidSequence(Int)
   case duplicateSequence(Int)
   case sequenceOverflow
-  case destinationBeforeCreation(GoalDate)
+  case destinationBeforeCreation(LocalDate)
   case childNotFound
-  case destinationNotEditable(GoalDate)
+  case destinationNotEditable(LocalDate)
 }
 
 @MainActor
@@ -318,7 +318,7 @@ public final class GoalProgressOperations {
         throw GoalProgressOperationError.invalidGoalConfiguration
       }
     }
-    if let deadlineKey = goal.deadlineKey, GoalDate(rawValue: deadlineKey) == nil {
+    if let deadlineKey = goal.deadlineKey, LocalDate(rawValue: deadlineKey) == nil {
       throw GoalProgressOperationError.invalidDeadline(deadlineKey)
     }
     return kind
@@ -329,7 +329,7 @@ public final class GoalProgressOperations {
     for goal: Goal,
     at instant: Date,
     timeZone: TimeZone
-  ) throws -> GoalDate {
+  ) throws -> LocalDate {
     let window: GoalProgressLocalDayWindow
     do {
       window = try GoalProgressLocalDayEligibility.window(
@@ -348,7 +348,7 @@ public final class GoalProgressOperations {
   }
 
   private func authorizeDeletion(
-    of assignedDate: GoalDate,
+    of assignedDate: LocalDate,
     at instant: Date,
     timeZone: TimeZone
   ) throws {
@@ -366,8 +366,8 @@ public final class GoalProgressOperations {
     }
   }
 
-  private func parsedDate(_ key: String) throws -> GoalDate {
-    guard let date = GoalDate(rawValue: key) else {
+  private func parsedDate(_ key: String) throws -> LocalDate {
+    guard let date = LocalDate(rawValue: key) else {
       throw GoalProgressOperationError.invalidAssignedDate(key)
     }
     return date
@@ -526,7 +526,7 @@ enum GoalProgressLocalDayEligibility {
   private static func localDate(
     containing instant: Date,
     in timeZone: TimeZone
-  ) throws -> GoalDate {
+  ) throws -> LocalDate {
     var calendar = Calendar(identifier: .gregorian)
     calendar.locale = Locale(identifier: "en_US_POSIX")
     calendar.timeZone = timeZone
@@ -536,7 +536,7 @@ enum GoalProgressLocalDayEligibility {
       let year = components.year,
       let month = components.month,
       let day = components.day,
-      let date = GoalDate(year: year, month: month, day: day)
+      let date = LocalDate(year: year, month: month, day: day)
     else {
       throw GoalProgressLocalDayEligibilityError.invalidDate
     }
@@ -545,19 +545,19 @@ enum GoalProgressLocalDayEligibility {
 }
 
 struct GoalProgressEditableDays {
-  let today: GoalDate
+  let today: LocalDate
 
-  func contains(_ date: GoalDate) throws -> Bool {
+  func contains(_ date: LocalDate) throws -> Bool {
     let yesterday = try today.previous()
     return date == today || date == yesterday
   }
 }
 
 struct GoalProgressLocalDayWindow {
-  let creationDate: GoalDate
+  let creationDate: LocalDate
   let editableDays: GoalProgressEditableDays
 
-  var today: GoalDate {
+  var today: LocalDate {
     editableDays.today
   }
 
@@ -568,7 +568,7 @@ struct GoalProgressLocalDayWindow {
     return [.today, .yesterday]
   }
 
-  func assignedDate(for destination: GoalProgressDestination) throws -> GoalDate {
+  func assignedDate(for destination: GoalProgressDestination) throws -> LocalDate {
     switch destination {
     case .today:
       return today
@@ -577,7 +577,7 @@ struct GoalProgressLocalDayWindow {
     }
   }
 
-  func isDeleteEligible(_ date: GoalDate) -> Bool {
+  func isDeleteEligible(_ date: LocalDate) -> Bool {
     (try? editableDays.contains(date)) ?? false
   }
 }

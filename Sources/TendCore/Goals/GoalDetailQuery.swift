@@ -24,7 +24,7 @@ public struct GoalDetailMetadata: Equatable, Sendable {
   public let target: Int
   public let unit: String
   public let baseline: Int?
-  public let deadline: GoalDate?
+  public let deadline: LocalDate?
   public let createdAt: Date
   public let closure: GoalClosure?
 
@@ -35,7 +35,7 @@ public struct GoalDetailMetadata: Equatable, Sendable {
     target: Int,
     unit: String,
     baseline: Int?,
-    deadline: GoalDate?,
+    deadline: LocalDate?,
     createdAt: Date,
     closure: GoalClosure?
   ) {
@@ -53,7 +53,7 @@ public struct GoalDetailMetadata: Equatable, Sendable {
 
 public struct GoalDetailEntry: Equatable, Sendable {
   public let id: GoalEntryIdentity
-  public let assignedDate: GoalDate
+  public let assignedDate: LocalDate
   public let amount: Int
   public let appendedAt: Date
   public let appendSequence: Int
@@ -61,7 +61,7 @@ public struct GoalDetailEntry: Equatable, Sendable {
 
   public init(
     id: GoalEntryIdentity,
-    assignedDate: GoalDate,
+    assignedDate: LocalDate,
     amount: Int,
     appendedAt: Date,
     appendSequence: Int,
@@ -78,7 +78,7 @@ public struct GoalDetailEntry: Equatable, Sendable {
 
 public struct GoalDetailReading: Equatable, Sendable {
   public let id: GoalReadingIdentity
-  public let assignedDate: GoalDate
+  public let assignedDate: LocalDate
   public let value: Int
   public let appendedAt: Date
   public let appendSequence: Int
@@ -87,7 +87,7 @@ public struct GoalDetailReading: Equatable, Sendable {
 
   public init(
     id: GoalReadingIdentity,
-    assignedDate: GoalDate,
+    assignedDate: LocalDate,
     value: Int,
     appendedAt: Date,
     appendSequence: Int,
@@ -139,8 +139,8 @@ public enum GoalDetailQueryError: Error, Equatable, Sendable {
   case duplicateReadingIdentity(GoalReadingIdentity)
   case invalidEntryAppendInstant(GoalEntryIdentity)
   case invalidReadingAppendInstant(GoalReadingIdentity)
-  case historyBeforeCreation(GoalDate)
-  case historyAfterEvaluation(GoalDate)
+  case historyBeforeCreation(LocalDate)
+  case historyAfterEvaluation(LocalDate)
 }
 
 @MainActor
@@ -179,7 +179,7 @@ public final class GoalDetailQuery {
 
     let kind = try validatedKind(of: goal)
     let closure = try validatedClosure(of: goal)
-    let deadline = goal.deadlineKey.flatMap(GoalDate.init(rawValue:))
+    let deadline = goal.deadlineKey.flatMap(LocalDate.init(rawValue:))
     let localDays: GoalProgressLocalDayWindow
     do {
       localDays = try GoalProgressLocalDayEligibility.window(
@@ -282,7 +282,7 @@ public final class GoalDetailQuery {
       guard entry.appendedAt.timeIntervalSinceReferenceDate.isFinite else {
         throw GoalDetailQueryError.invalidEntryAppendInstant(id)
       }
-      guard let assignedDate = GoalDate(rawValue: entry.assignedDateKey) else {
+      guard let assignedDate = LocalDate(rawValue: entry.assignedDateKey) else {
         throw GoalDetailQueryError.progress(.invalidAssignedDate(entry.assignedDateKey))
       }
       try validateChronology(assignedDate, localDays: localDays)
@@ -321,7 +321,7 @@ public final class GoalDetailQuery {
       guard reading.appendedAt.timeIntervalSinceReferenceDate.isFinite else {
         throw GoalDetailQueryError.invalidReadingAppendInstant(id)
       }
-      guard let assignedDate = GoalDate(rawValue: reading.assignedDateKey) else {
+      guard let assignedDate = LocalDate(rawValue: reading.assignedDateKey) else {
         throw GoalDetailQueryError.progress(.invalidAssignedDate(reading.assignedDateKey))
       }
       try validateChronology(assignedDate, localDays: localDays)
@@ -343,7 +343,7 @@ public final class GoalDetailQuery {
   }
 
   private func validateChronology(
-    _ assignedDate: GoalDate,
+    _ assignedDate: LocalDate,
     localDays: GoalProgressLocalDayWindow
   ) throws {
     guard assignedDate >= localDays.creationDate else {
@@ -381,9 +381,9 @@ public final class GoalDetailQuery {
   }
 
   private func historyPrecedes(
-    lhsDate: GoalDate,
+    lhsDate: LocalDate,
     lhsSequence: Int,
-    rhsDate: GoalDate,
+    rhsDate: LocalDate,
     rhsSequence: Int
   ) -> Bool {
     if lhsDate != rhsDate {

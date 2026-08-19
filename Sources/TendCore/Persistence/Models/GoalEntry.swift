@@ -13,7 +13,7 @@ public final class GoalEntry {
   public init(
     id: UUID = UUID(),
     amount: Int,
-    assignedDate: GoalDate,
+    assignedDate: LocalDate,
     appendedAt: Date,
     appendSequence: Int,
     goal: Goal? = nil
