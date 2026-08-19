@@ -1,9 +1,19 @@
 id: T-4i270c
 key: journal/journal-entry-records/journal-entry-query
 title: Provide deterministic Journal entry queries
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-vo9ia2
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:25d66f5118e79a4102fdb04f9b0d342ca0a5876a
+        path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.md
+        observed_at: 2026-08-19T22:51:20.828928Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:20.851884Z

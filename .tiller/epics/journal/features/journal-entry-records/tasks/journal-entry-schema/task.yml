@@ -1,9 +1,19 @@
 id: T-6we44f
 key: journal/journal-entry-records/journal-entry-schema
 title: Add the durable Journal entry schema
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-1a7ycj
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:25954da91de95e25a4ad6d697310e09d9d165001
+        path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-schema/task.md
+        observed_at: 2026-08-19T22:51:20.778127Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:20.804246Z

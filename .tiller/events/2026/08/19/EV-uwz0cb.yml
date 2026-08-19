@@ -1,0 +1,13 @@
+id: EV-uwz0cb
+type: approve.task
+at: 2026-08-19T22:51:20.778006Z
+owner: jc
+command: approve task T-1a7ycj
+targets:
+    - T-1a7ycj
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml

@@ -12,9 +12,20 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic journal (E-l8goi4): ready
-- feature journal/journal-entry-records (F-rsayqb): specced
-- feature journal/journal-experience (F-wf19av): specced
-- feature journal/today-journal-invitation (F-0rn0hs): specced
+- feature journal/journal-entry-records (F-rsayqb): ready
+- feature journal/journal-experience (F-wf19av): ready
+- feature journal/today-journal-invitation (F-0rn0hs): ready
+- task journal/journal-entry-records/local-date-generalization (T-1a7ycj): ready
+- task journal/journal-entry-records/journal-entry-schema (T-6we44f): ready
+- task journal/journal-entry-records/journal-entry-operations (T-vo9ia2): ready
+- task journal/journal-entry-records/journal-entry-query (T-4i270c): ready
+- task journal/journal-experience/journal-routing (T-3t6eal): ready
+- task journal/journal-experience/journal-overview-projection (T-a5ad8n): ready
+- task journal/journal-experience/journal-automatic-editor (T-hb747f): ready
+- task journal/journal-experience/journal-day-garden (T-62rnjr): ready
+- task journal/journal-experience/journal-destination (T-3hwtmu): ready
+- task journal/today-journal-invitation/today-journal-projection (T-19qcbl): ready
+- task journal/today-journal-invitation/today-journal-surface (T-6wblsz): ready
 
 ### Blocked
 

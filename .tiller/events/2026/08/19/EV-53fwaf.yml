@@ -1,0 +1,13 @@
+id: EV-53fwaf
+type: approve.task
+at: 2026-08-19T22:51:21.126343Z
+owner: jc
+command: approve task T-62rnjr
+targets:
+    - T-62rnjr
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml

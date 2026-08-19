@@ -1,0 +1,13 @@
+id: EV-istn3t
+type: approve.task
+at: 2026-08-19T22:51:21.059972Z
+owner: jc
+command: approve task T-3t6eal
+targets:
+    - T-3t6eal
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml

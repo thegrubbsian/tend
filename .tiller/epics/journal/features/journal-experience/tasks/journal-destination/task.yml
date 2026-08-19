@@ -1,9 +1,19 @@
 id: T-3hwtmu
 key: journal/journal-experience/journal-destination
 title: Assemble the complete Journal destination
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-62rnjr
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:1aa7819a022f9aa0cda242606bc8ab5cd0774861
+        path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.md
+        observed_at: 2026-08-19T22:51:21.126414Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:21.14814Z

@@ -1,9 +1,19 @@
 id: T-vo9ia2
 key: journal/journal-entry-records/journal-entry-operations
 title: Enforce Journal entry lifecycle rules
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-6we44f
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:1bf69debbeecfb5259a2a1fae4c443b3e5cb7d95
+        path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.md
+        observed_at: 2026-08-19T22:51:20.804465Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:20.828794Z

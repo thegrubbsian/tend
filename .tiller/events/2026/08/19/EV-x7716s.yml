@@ -1,0 +1,13 @@
+id: EV-x7716s
+type: approve.feature
+at: 2026-08-19T22:51:20.75116Z
+owner: jc
+command: approve feature F-rsayqb
+targets:
+    - F-rsayqb
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/feature.yml

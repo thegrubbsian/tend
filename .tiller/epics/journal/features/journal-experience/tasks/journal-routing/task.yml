@@ -1,7 +1,17 @@
 id: T-3t6eal
 key: journal/journal-experience/journal-routing
 title: Build identity-safe Journal routing
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:86b287ad65764326b1037f275cf6116d4199d631
+        path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.md
+        observed_at: 2026-08-19T22:51:21.037597Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:21.059908Z

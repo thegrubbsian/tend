@@ -1,9 +1,19 @@
 id: T-6wblsz
 key: journal/today-journal-invitation/today-journal-surface
 title: Render and route the Today Journal invitation
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-19qcbl
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:d9db264608d07620a4f3c82884d3955f39e94b86
+        path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.md
+        observed_at: 2026-08-19T22:51:21.364427Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:21.387266Z

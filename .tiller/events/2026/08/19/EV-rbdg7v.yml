@@ -1,0 +1,13 @@
+id: EV-rbdg7v
+type: approve.feature
+at: 2026-08-19T22:51:21.037516Z
+owner: jc
+command: approve feature F-wf19av
+targets:
+    - F-wf19av
+before:
+    status: specced
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/features/journal-experience/feature.yml

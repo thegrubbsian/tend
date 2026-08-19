@@ -1,9 +1,19 @@
 id: T-hb747f
 key: journal/journal-experience/journal-automatic-editor
 title: Build the automatic Journal editor
-status: proposed
+status: ready
 blocked: false
 owner: jc
 proposed_by: jc
 depends_on:
     - T-a5ad8n
+accepted_against:
+    spec:
+        kind: git_blob
+        value: git:26eb9e82726433a8baceab16874d0ad791bc731a
+        path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.md
+        observed_at: 2026-08-19T22:51:21.082243Z
+    commit:
+        kind: git_commit
+        value: git:e514010
+        observed_at: 2026-08-19T22:51:21.103779Z
