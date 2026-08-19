@@ -445,7 +445,7 @@ struct GoalLifecycleOperationsTests {
       goal.entries = testCase.progressValues.enumerated().map { index, amount in
         GoalEntry(
           amount: amount,
-          assignedDate: GoalDate(rawValue: "2024-07-01")!,
+          assignedDate: LocalDate(rawValue: "2024-07-01")!,
           appendedAt: createdAt.addingTimeInterval(TimeInterval(index)),
           appendSequence: index * 3
         )
@@ -454,7 +454,7 @@ struct GoalLifecycleOperationsTests {
       goal.readings = testCase.progressValues.enumerated().map { index, value in
         GoalReading(
           value: value,
-          assignedDate: GoalDate(rawValue: "2024-07-01")!,
+          assignedDate: LocalDate(rawValue: "2024-07-01")!,
           appendedAt: createdAt.addingTimeInterval(TimeInterval(index)),
           appendSequence: index * 3
         )
@@ -619,8 +619,8 @@ struct GoalLifecycleOperationsTests {
     try #require(ISO8601DateFormatter().date(from: value))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 
   private func timeZone(_ identifier: String) throws -> TimeZone {

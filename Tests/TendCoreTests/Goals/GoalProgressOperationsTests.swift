@@ -109,7 +109,7 @@ struct GoalProgressOperationsTests {
   }
 
   @Test("destination dates follow the explicit zone across DST, midnight, and zone changes")
-  func destinationsUseExplicitLocalGoalDates() throws {
+  func destinationsUseExplicitLocalLocalDates() throws {
     let cases = [
       (
         instant: "2024-03-10T10:30:00Z", zone: "America/Los_Angeles", today: "2024-03-10",
@@ -602,7 +602,7 @@ struct GoalProgressOperationsTests {
     #expect(maximumGoal.entries?.isEmpty == true)
   }
 
-  @Test("delete eligibility uses assigned GoalDate at exact local day boundaries")
+  @Test("delete eligibility uses assigned LocalDate at exact local day boundaries")
   func deleteEligibilityUsesAssignedDateNotAppendTimestamp() throws {
     let cases = [
       (
@@ -1138,7 +1138,7 @@ struct GoalProgressOperationsTests {
     kind: GoalKind,
     target: Int = 10,
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     createdAt: Date = Date(timeIntervalSince1970: 1_704_067_200)
   ) throws -> Goal {
     let goal = Goal(
@@ -1158,7 +1158,7 @@ struct GoalProgressOperationsTests {
   private func persistedGoalWithEntries(
     in context: ModelContext,
     sequences: [Int],
-    assignedDate: GoalDate = GoalDate(rawValue: "2024-01-01")!,
+    assignedDate: LocalDate = LocalDate(rawValue: "2024-01-01")!,
     appendedAt: Date = Date(timeIntervalSince1970: 1_704_067_200)
   ) throws -> Goal {
     let goal = Goal(
@@ -1184,7 +1184,7 @@ struct GoalProgressOperationsTests {
   private func persistedGoalWithReadings(
     in context: ModelContext,
     sequences: [Int],
-    assignedDate: GoalDate = GoalDate(rawValue: "2024-01-01")!,
+    assignedDate: LocalDate = LocalDate(rawValue: "2024-01-01")!,
     appendedAt: Date = Date(timeIntervalSince1970: 1_704_067_200)
   ) throws -> Goal {
     let goal = Goal(
@@ -1232,8 +1232,8 @@ struct GoalProgressOperationsTests {
     try #require(TimeZone(identifier: identifier))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 }
 

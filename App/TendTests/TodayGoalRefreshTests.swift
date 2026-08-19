@@ -11,14 +11,14 @@ struct TodayGoalRefreshTests {
   @Test("query mutation closure reopening and deletion replace one complete generation")
   func queryAndLifecycleMutationsReplaceGeneration() throws {
     let store = try makeStore()
-    let due = try #require(GoalDate(rawValue: "2026-08-20"))
+    let due = try #require(LocalDate(rawValue: "2026-08-20"))
     let first = try insertGoal(in: store, name: "First", deadline: due)
     let second = try insertGoal(in: store, name: "Second", deadline: due)
     let model = makeModel { goal, _ in
       if let closure = try goal.checkedClosure { return .closed(closure) }
       return .open(self.facts(standing: .behind, deadline: goalDate(goal)))
     }
-    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
 
     model.refresh(habits: [], goals: [first], context: context)
     #expect(model.goalRows.map(\.name) == ["First"])
@@ -46,7 +46,7 @@ struct TodayGoalRefreshTests {
     let habit = try insertHabit(in: store, name: "Habit")
     let goal = try insertGoal(in: store, name: "Goal")
     let firstContext = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18"))
+      on: try #require(LocalDate(rawValue: "2026-08-18"))
     )
     let secondContext = refreshContext(
       instant: firstContext.instant.addingTimeInterval(60),
@@ -94,7 +94,7 @@ struct TodayGoalRefreshTests {
     let habit = try insertHabit(in: store, name: "Habit")
     let goal = try insertGoal(in: store, name: "Goal")
     let context = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18"))
+      on: try #require(LocalDate(rawValue: "2026-08-18"))
     )
     var shouldFail = true
     var goalCalls = 0
@@ -138,7 +138,7 @@ struct TodayGoalRefreshTests {
       try insertGoal(in: store, name: $0)
     }
     let initial = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18"))
+      on: try #require(LocalDate(rawValue: "2026-08-18"))
     )
     let changed = refreshContext(
       instant: initial.instant.addingTimeInterval(60),
@@ -192,17 +192,17 @@ struct TodayGoalRefreshTests {
   @Test("scene environment day and transition refreshes use fresh contexts")
   func refreshTriggersUseFreshContextsAndEligibility() throws {
     let store = try makeStore()
-    let distantDue = try #require(GoalDate(rawValue: "2026-09-01"))
-    let nearDue = try #require(GoalDate(rawValue: "2026-08-20"))
+    let distantDue = try #require(LocalDate(rawValue: "2026-09-01"))
+    let nearDue = try #require(LocalDate(rawValue: "2026-08-20"))
     let changing = try insertGoal(in: store, name: "Changing", deadline: distantDue)
     let near = try insertGoal(in: store, name: "Near", deadline: nearDue)
-    let scene = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let scene = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     let environment = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18")),
+      on: try #require(LocalDate(rawValue: "2026-08-18")),
       timeZone: "America/Los_Angeles", locale: "sv_SE"
     )
     let nextDay = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-19")),
+      on: try #require(LocalDate(rawValue: "2026-08-19")),
       timeZone: "America/Los_Angeles", locale: "sv_SE"
     )
     var actual = 0.75
@@ -286,7 +286,7 @@ struct TodayGoalRefreshTests {
       }
     )
     model = TodayModel(operations: operations)
-    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     model.refresh(habits: [habit], goals: goals, context: context)
 
     generation = 2
@@ -318,7 +318,7 @@ struct TodayGoalRefreshTests {
       return .open(self.facts(standing: .behind, deadline: nil))
     }
     let goals = [failed, sibling]
-    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     model.refresh(habits: [], goals: goals, context: context)
     let retainedFailure = try #require(
       model.goalRows.first { $0.id == failed.persistentModelID }?.failure)
@@ -375,12 +375,12 @@ struct TodayGoalRefreshTests {
       if goal === failed, shouldFail { throw FixtureError.unavailable }
       return .open(self.facts(standing: goal === failed ? .onPace : .behind, deadline: nil))
     }
-    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     model.refresh(habits: [], goals: [failed, sibling], context: context)
 
     let graphEntry = GoalEntry(
       amount: 1,
-      assignedDate: try #require(GoalDate(rawValue: "2026-08-18")),
+      assignedDate: try #require(LocalDate(rawValue: "2026-08-18")),
       appendedAt: context.instant,
       appendSequence: 0,
       goal: failed
@@ -400,11 +400,11 @@ struct TodayGoalRefreshTests {
   @Test("Goal retry with a changed context replaces the complete generation")
   func goalRetryContextChangeRefreshesAllSiblingsAtomically() throws {
     let store = try makeStore()
-    let deadline = try #require(GoalDate(rawValue: "2026-08-20"))
+    let deadline = try #require(LocalDate(rawValue: "2026-08-20"))
     let failed = try insertGoal(in: store, name: "Failed", deadline: deadline)
     let sibling = try insertGoal(in: store, name: "Sibling", deadline: deadline)
     let initial = refreshContext(
-      on: try #require(GoalDate(rawValue: "2026-08-18"))
+      on: try #require(LocalDate(rawValue: "2026-08-18"))
     )
     let changed = refreshContext(
       instant: initial.instant.addingTimeInterval(10),
@@ -467,7 +467,7 @@ struct TodayGoalRefreshTests {
   @Test("all open goals contribute only valid future earliest transitions")
   func earliestTransitionIncludesCurrentlyIneligibleGoals() throws {
     let store = try makeStore()
-    let today = try #require(GoalDate(rawValue: "2026-08-18"))
+    let today = try #require(LocalDate(rawValue: "2026-08-18"))
     let distant = try insertGoal(
       in: store, name: "Distant", deadline: try addingDays(8, to: today)
     )
@@ -495,7 +495,7 @@ struct TodayGoalRefreshTests {
   @Test("projection performs no persistence write reminder or notification work")
   func projectionHasNoSideEffects() throws {
     let store = try makeStore()
-    let due = try #require(GoalDate(rawValue: "2026-08-20"))
+    let due = try #require(LocalDate(rawValue: "2026-08-20"))
     let goal = try insertGoal(in: store, name: "Unchanged", deadline: due)
     let original = (
       goal.name, goal.target, goal.deadlineKey, goal.closureRawValue,
@@ -505,7 +505,7 @@ struct TodayGoalRefreshTests {
 
     model.refresh(
       habits: [], goals: [goal],
-      context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+      context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 
     #expect(model.goalRows.map(\.name) == ["Unchanged"])
@@ -592,7 +592,7 @@ struct TodayGoalRefreshTests {
 
   private func facts(
     standing: GoalStanding,
-    deadline: GoalDate?,
+    deadline: LocalDate?,
     normalizedProgress: Double = 0.25,
     next: Date? = nil
   ) -> TodayGoalFacts {
@@ -634,7 +634,7 @@ struct TodayGoalRefreshTests {
     in context: ModelContext,
     id: UUID = UUID(),
     name: String,
-    deadline: GoalDate? = nil
+    deadline: LocalDate? = nil
   ) throws -> Goal {
     let goal = Goal(
       id: id, name: name, kind: .accumulate, target: 4,
@@ -656,7 +656,7 @@ struct TodayGoalRefreshTests {
       if shouldFail { throw FixtureError.unavailable }
       return .open(self.facts(standing: .behind, deadline: nil))
     }
-    let context = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     let initialHabits = initiallyIncludesInactiveHabit ? [inactive] : []
     let retryHabits = initiallyIncludesInactiveHabit ? [] : [inactive]
     model.refresh(habits: initialHabits, goals: [failed], context: context)
@@ -699,18 +699,18 @@ struct TodayGoalRefreshTests {
     return habit
   }
 
-  private func goalDate(_ goal: Goal) -> GoalDate? {
-    goal.deadlineKey.flatMap(GoalDate.init(rawValue:))
+  private func goalDate(_ goal: Goal) -> LocalDate? {
+    goal.deadlineKey.flatMap(LocalDate.init(rawValue:))
   }
 
-  private func addingDays(_ count: Int, to date: GoalDate) throws -> GoalDate {
+  private func addingDays(_ count: Int, to date: LocalDate) throws -> LocalDate {
     var result = date
     for _ in 0..<count { result = try result.next() }
     return result
   }
 
   private func refreshContext(
-    on day: GoalDate,
+    on day: LocalDate,
     timeZone identifier: String = "UTC",
     locale localeIdentifier: String = "en_US"
   ) -> TodayRefreshContext {

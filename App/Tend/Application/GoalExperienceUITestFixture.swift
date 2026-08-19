@@ -372,8 +372,8 @@
       return date
     }
 
-    private static func goalDate(_ value: String) throws -> GoalDate {
-      guard let date = GoalDate(rawValue: value) else {
+    private static func goalDate(_ value: String) throws -> LocalDate {
+      guard let date = LocalDate(rawValue: value) else {
         throw GoalExperienceUITestFixtureError.unexpectedState(value)
       }
       return date

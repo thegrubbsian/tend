@@ -39,7 +39,7 @@ enum GoalDetailHistoryID: Equatable, Hashable, Sendable {
 
 struct GoalDetailHistoryFact: Equatable, Identifiable, Sendable {
   let id: GoalDetailHistoryID
-  let assignedDate: GoalDate
+  let assignedDate: LocalDate
   let value: Int
   let dateText: String
   let valueText: String
@@ -1099,10 +1099,10 @@ private struct GoalDetailPresentationBuilder {
     }
   }
 
-  private func civilDayDistance(to deadline: GoalDate?) -> Int? {
+  private func civilDayDistance(to deadline: LocalDate?) -> Int? {
     guard
       let deadline,
-      let today = localGoalDate(instant),
+      let today = localLocalDate(instant),
       let todayStart = try? today.start(in: timeZone),
       let deadlineStart = try? deadline.start(in: timeZone)
     else { return nil }
@@ -1113,7 +1113,7 @@ private struct GoalDetailPresentationBuilder {
     ).day
   }
 
-  private func deadlineText(_ deadline: GoalDate?, dayDistance: Int?) -> String {
+  private func deadlineText(_ deadline: LocalDate?, dayDistance: Int?) -> String {
     guard let deadline else {
       return String(localized: "No deadline", locale: locale)
     }
@@ -1184,8 +1184,8 @@ private struct GoalDetailPresentationBuilder {
     }
   }
 
-  private func dayText(_ assignedDate: GoalDate) -> String {
-    guard let today = localGoalDate(instant) else { return formatted(assignedDate) }
+  private func dayText(_ assignedDate: LocalDate) -> String {
+    guard let today = localLocalDate(instant) else { return formatted(assignedDate) }
     if assignedDate == today {
       return String(localized: "Today", locale: locale)
     }
@@ -1195,17 +1195,17 @@ private struct GoalDetailPresentationBuilder {
     return formatted(assignedDate)
   }
 
-  private func localGoalDate(_ date: Date) -> GoalDate? {
+  private func localLocalDate(_ date: Date) -> LocalDate? {
     let components = calendar.dateComponents([.year, .month, .day], from: date)
     guard
       let year = components.year,
       let month = components.month,
       let day = components.day
     else { return nil }
-    return GoalDate(year: year, month: month, day: day)
+    return LocalDate(year: year, month: month, day: day)
   }
 
-  private func formatted(_ goalDate: GoalDate) -> String {
+  private func formatted(_ goalDate: LocalDate) -> String {
     guard let date = try? goalDate.start(in: timeZone) else { return goalDate.rawValue }
     return dateFormatter.string(from: date)
   }

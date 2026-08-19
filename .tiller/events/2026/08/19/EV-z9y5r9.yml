@@ -1,0 +1,14 @@
+id: EV-z9y5r9
+type: submit.task
+at: 2026-08-19T23:12:45.791658Z
+owner: jc
+command: submit task T-1a7ycj
+targets:
+    - T-1a7ycj
+before:
+    status: check
+after:
+    pr: 55
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml

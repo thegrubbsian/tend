@@ -6,14 +6,14 @@ public struct GoalEditableFields: Equatable, Sendable {
   public let target: Int
   public let unit: String
   public let baseline: Int?
-  public let deadline: GoalDate?
+  public let deadline: LocalDate?
 
   public init(
     name: String,
     target: Int,
     unit: String = "times",
     baseline: Int? = nil,
-    deadline: GoalDate? = nil
+    deadline: LocalDate? = nil
   ) {
     self.name = name
     self.target = target
@@ -32,8 +32,8 @@ public enum GoalManagementOperationError: Error, Equatable, Sendable {
   case measureBaselineEqualsTarget(Int)
   case invalidGoalKind(String)
   case invalidClosure(String)
-  case invalidDeadlineBoundary(GoalDateError)
-  case deadlineNotAfterCreation(GoalDate)
+  case invalidDeadlineBoundary(LocalDateError)
+  case deadlineNotAfterCreation(LocalDate)
   case detachedGoal
   case deletedGoal
   case foreignGoal
@@ -139,7 +139,7 @@ public final class GoalManagementOperations {
       let followingDayStart: Date
       do {
         followingDayStart = try deadline.next().start(in: timeZone)
-      } catch let error as GoalDateError {
+      } catch let error as LocalDateError {
         throw GoalManagementOperationError.invalidDeadlineBoundary(error)
       }
       var localCalendar = calendar

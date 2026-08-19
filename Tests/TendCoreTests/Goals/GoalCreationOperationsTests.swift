@@ -376,11 +376,11 @@ struct GoalCreationOperationsTests {
     try #require(TimeZone(identifier: identifier))
   }
 
-  private func goalDate(_ value: String) throws -> GoalDate {
-    try #require(GoalDate(rawValue: value))
+  private func goalDate(_ value: String) throws -> LocalDate {
+    try #require(LocalDate(rawValue: value))
   }
 
-  private func followingDayBoundary(after date: GoalDate, in timeZone: TimeZone) throws -> Date {
+  private func followingDayBoundary(after date: LocalDate, in timeZone: TimeZone) throws -> Date {
     var calendar = Calendar(identifier: .gregorian)
     calendar.locale = Locale(identifier: "en_US_POSIX")
     calendar.timeZone = timeZone

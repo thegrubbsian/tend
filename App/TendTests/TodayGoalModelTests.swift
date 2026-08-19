@@ -11,7 +11,7 @@ struct TodayGoalModelTests {
   @Test("standing and owner-calendar deadline window determine eligibility")
   func standingAndDeadlineWindowDetermineEligibility() throws {
     let store = try makeStore()
-    let today = try #require(GoalDate(rawValue: "2026-03-07"))
+    let today = try #require(LocalDate(rawValue: "2026-03-07"))
     let dates = try (0...8).map { try addingDays($0, to: today) }
     let behindBefore = try insertGoal(in: store, name: "Behind before", deadline: nil)
     let behindInside = try insertGoal(in: store, name: "Behind inside", deadline: dates[3])
@@ -48,7 +48,7 @@ struct TodayGoalModelTests {
   @Test("past due remains eligible at the exclusive boundary and long afterward")
   func pastDueRemainsEligible() throws {
     let store = try makeStore()
-    let deadline = try #require(GoalDate(rawValue: "2026-03-07"))
+    let deadline = try #require(LocalDate(rawValue: "2026-03-07"))
     let atBoundary = try insertGoal(in: store, name: "At boundary", deadline: deadline)
     let longAfter = try insertGoal(in: store, name: "Long after", deadline: deadline)
     let model = makeModel { goal, _ in
@@ -64,7 +64,7 @@ struct TodayGoalModelTests {
     )
     #expect(model.goalRows.map(\.name) == ["At boundary"])
 
-    let later = try #require(GoalDate(rawValue: "2027-12-31"))
+    let later = try #require(LocalDate(rawValue: "2027-12-31"))
     model.refresh(
       habits: [],
       goals: [longAfter],
@@ -78,7 +78,7 @@ struct TodayGoalModelTests {
   @Test("closed goals are excluded and reopening reevaluates over-target goals")
   func lifecycleAndOverTargetEligibility() throws {
     let store = try makeStore()
-    let deadline = try #require(GoalDate(rawValue: "2026-08-18"))
+    let deadline = try #require(LocalDate(rawValue: "2026-08-18"))
     let harvested = try insertGoal(in: store, name: "Harvested", deadline: deadline)
     harvested.closureRawValue = GoalClosure.harvested.rawValue
     let letGo = try insertGoal(in: store, name: "Let go", deadline: deadline)
@@ -120,8 +120,8 @@ struct TodayGoalModelTests {
     ]
 
     for (todayKey, deadlineKey, zone, expected) in cases {
-      let today = try #require(GoalDate(rawValue: todayKey))
-      let deadline = try #require(GoalDate(rawValue: deadlineKey))
+      let today = try #require(LocalDate(rawValue: todayKey))
+      let deadline = try #require(LocalDate(rawValue: deadlineKey))
       let goal = try insertGoal(in: store, name: "\(todayKey)-\(zone)", deadline: deadline)
       let model = makeModel { goal, _ in
         .open(facts(standing: .onPace, deadline: goalDate(goal)))
@@ -133,7 +133,7 @@ struct TodayGoalModelTests {
     let instant = try #require(
       ISO8601DateFormatter().date(from: "2026-08-17T12:30:00Z")
     )
-    let deadline = try #require(GoalDate(rawValue: "2026-08-25"))
+    let deadline = try #require(LocalDate(rawValue: "2026-08-25"))
     let shifted = try insertGoal(in: store, name: "Shifted", deadline: deadline)
     let model = makeModel { goal, _ in
       .open(facts(standing: .onPace, deadline: goalDate(goal)))
@@ -188,7 +188,7 @@ struct TodayGoalModelTests {
     let sharedUUID = UUID()
     let first = try insertGoal(in: store, id: sharedUUID, name: "First")
     let second = try insertGoal(in: store, id: sharedUUID, name: "Second")
-    let expectedContext = refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+    let expectedContext = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     var calls: [PersistentIdentifier: Int] = [:]
     var contexts: [TodayRefreshContext] = []
     let model = makeModel { goal, context in
@@ -214,8 +214,8 @@ struct TodayGoalModelTests {
   @Test("urgency deadline localized name creation and persistent identity order rows")
   func deterministicOrdering() throws {
     let store = try makeStore()
-    let earlierDate = try #require(GoalDate(rawValue: "2026-08-19"))
-    let laterDate = try #require(GoalDate(rawValue: "2026-08-20"))
+    let earlierDate = try #require(LocalDate(rawValue: "2026-08-19"))
+    let laterDate = try #require(LocalDate(rawValue: "2026-08-20"))
     let sameCreation = Date(timeIntervalSince1970: 100)
     let unavailable = try insertGoal(in: store, name: "Unavailable", deadline: laterDate)
     let pastDue = try insertGoal(in: store, name: "Past", deadline: earlierDate)
@@ -250,7 +250,7 @@ struct TodayGoalModelTests {
         onPace, betaLater, alphaSecond, behindLater, unavailable, pastDue, alphaFirst,
         behindEarlier, betaEarlier,
       ],
-      context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")), locale: "en_US")
+      context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")), locale: "en_US")
     )
 
     #expect(
@@ -271,7 +271,7 @@ struct TodayGoalModelTests {
       habits: [],
       goals: [umlaut, zed],
       context: refreshContext(
-        on: try #require(GoalDate(rawValue: "2026-08-18")),
+        on: try #require(LocalDate(rawValue: "2026-08-18")),
         locale: "sv_SE"
       )
     )
@@ -281,7 +281,7 @@ struct TodayGoalModelTests {
   @Test("Accumulate and both Measure directions retain truthful formatted facts")
   func truthfulProgressFormatting() throws {
     let store = try makeStore()
-    let due = try #require(GoalDate(rawValue: "2026-08-20"))
+    let due = try #require(LocalDate(rawValue: "2026-08-20"))
     let accumulateGoal = try insertGoal(
       in: store, name: "Read", target: 6, unit: "books", deadline: due)
     let increasing = try insertGoal(
@@ -312,7 +312,7 @@ struct TodayGoalModelTests {
 
     model.refresh(
       habits: [], goals: [accumulateGoal, increasing, decreasing],
-      context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")), locale: "en_US")
+      context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")), locale: "en_US")
     )
 
     let rows = Dictionary(uniqueKeysWithValues: model.goalRows.map { ($0.name, $0) })
@@ -353,7 +353,7 @@ struct TodayGoalModelTests {
   @Test("malformed facts and relationship failures are isolated as unavailable rows")
   func failuresAreIsolatedAndTruthful() throws {
     let store = try makeStore()
-    let due = try #require(GoalDate(rawValue: "2026-08-20"))
+    let due = try #require(LocalDate(rawValue: "2026-08-20"))
     let good = try insertGoal(in: store, name: "Good", deadline: due)
     let malformedClosure = try insertGoal(in: store, name: "Closure", deadline: due)
     malformedClosure.closureRawValue = "unknown"
@@ -362,7 +362,7 @@ struct TodayGoalModelTests {
     let malformedProgress = try insertGoal(in: store, name: "Progress", deadline: due)
     let malformedStanding = try insertGoal(in: store, name: "Standing", deadline: due)
     let relationship = try insertGoal(in: store, name: "Relationship", deadline: due)
-    let distant = try #require(GoalDate(rawValue: "2026-09-01"))
+    let distant = try #require(LocalDate(rawValue: "2026-09-01"))
     let malformedOutsideWindow = try insertGoal(
       in: store,
       name: "Outside-window standing",
@@ -432,7 +432,7 @@ struct TodayGoalModelTests {
         relationship,
         malformedOutsideWindow,
       ],
-      context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+      context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 
     #expect(model.goalRows.count == 7)
@@ -471,7 +471,7 @@ struct TodayGoalModelTests {
 
     model.refresh(
       habits: [habit], goals: [goal],
-      context: refreshContext(on: try #require(GoalDate(rawValue: "2026-08-18")))
+      context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 
     guard case .dashboard(let dashboard)? = model.presentation else {
@@ -505,7 +505,7 @@ struct TodayGoalModelTests {
 
   private func facts(
     standing: GoalStanding,
-    deadline: GoalDate?,
+    deadline: LocalDate?,
     normalizedProgress: Double = 0.25,
     progress: GoalProgressSnapshot? = nil,
     nextTransition: Date? = nil
@@ -576,7 +576,7 @@ struct TodayGoalModelTests {
     target: Int = 4,
     unit: String = "times",
     baseline: Int? = nil,
-    deadline: GoalDate? = nil,
+    deadline: LocalDate? = nil,
     createdAt: Date = Date(timeIntervalSince1970: 1_700_000_000)
   ) throws -> Goal {
     let goal = Goal(
@@ -595,18 +595,18 @@ struct TodayGoalModelTests {
     return habit
   }
 
-  private func goalDate(_ goal: Goal) -> GoalDate? {
-    goal.deadlineKey.flatMap(GoalDate.init(rawValue:))
+  private func goalDate(_ goal: Goal) -> LocalDate? {
+    goal.deadlineKey.flatMap(LocalDate.init(rawValue:))
   }
 
-  private func addingDays(_ count: Int, to date: GoalDate) throws -> GoalDate {
+  private func addingDays(_ count: Int, to date: LocalDate) throws -> LocalDate {
     var result = date
     for _ in 0..<count { result = try result.next() }
     return result
   }
 
   private func refreshContext(
-    on day: GoalDate,
+    on day: LocalDate,
     timeZone identifier: String = "UTC",
     locale identifierLocale: String = "en_US"
   ) -> TodayRefreshContext {

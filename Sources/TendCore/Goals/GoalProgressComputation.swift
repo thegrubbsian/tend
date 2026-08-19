@@ -221,7 +221,7 @@ public final class GoalProgressComputation {
       _ = try parsedDate(entry.assignedDateKey)
     }
 
-    var effective: (reading: GoalReading, date: GoalDate)?
+    var effective: (reading: GoalReading, date: LocalDate)?
     for reading in readings {
       guard isPersisted(reading), reading.goal === goal else {
         throw GoalProgressComputationError.invalidGoalGraph
@@ -291,14 +291,14 @@ public final class GoalProgressComputation {
       }
     }
 
-    if let deadlineKey = goal.deadlineKey, GoalDate(rawValue: deadlineKey) == nil {
+    if let deadlineKey = goal.deadlineKey, LocalDate(rawValue: deadlineKey) == nil {
       throw GoalProgressComputationError.invalidDeadline(deadlineKey)
     }
     return kind
   }
 
-  private func parsedDate(_ key: String) throws -> GoalDate {
-    guard let date = GoalDate(rawValue: key) else {
+  private func parsedDate(_ key: String) throws -> LocalDate {
+    guard let date = LocalDate(rawValue: key) else {
       throw GoalProgressComputationError.invalidAssignedDate(key)
     }
     return date

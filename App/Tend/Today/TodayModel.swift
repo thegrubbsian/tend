@@ -41,7 +41,7 @@ struct TodayHabitRow: Identifiable {
 struct TodayGoalFacts: Equatable, Sendable {
   let progress: GoalProgressSnapshot
   let standing: GoalStandingSnapshot
-  let deadline: GoalDate?
+  let deadline: LocalDate?
 }
 
 enum TodayGoalProjection: Equatable, Sendable {
@@ -59,7 +59,7 @@ struct TodayGoalRow: Identifiable {
   let goal: Goal
   let name: String
   let createdAt: Date
-  let deadline: GoalDate?
+  let deadline: LocalDate?
   let facts: TodayGoalFacts?
   let failure: TodayGoalFailure?
   let progress: GoalDetailProgressFact?
@@ -132,9 +132,9 @@ struct TodayOperations {
         if let closure = try goal.checkedClosure {
           return .closed(closure)
         }
-        let deadline: GoalDate?
+        let deadline: LocalDate?
         if let key = goal.deadlineKey {
-          guard let parsed = GoalDate(rawValue: key) else {
+          guard let parsed = LocalDate(rawValue: key) else {
             throw TodayOperationsError.invalidGoalDeadline(key)
           }
           deadline = parsed
@@ -455,7 +455,7 @@ final class TodayModel {
       return true
     case .onPace:
       guard let deadline = facts.deadline,
-        var candidate = localGoalDate(
+        var candidate = localLocalDate(
           at: context.instant,
           timeZone: context.timeZone
         )
@@ -469,10 +469,10 @@ final class TodayModel {
     }
   }
 
-  private func localGoalDate(
+  private func localLocalDate(
     at instant: Date,
     timeZone: TimeZone
-  ) -> GoalDate? {
+  ) -> LocalDate? {
     var ownerCalendar = Calendar(identifier: .gregorian)
     ownerCalendar.timeZone = timeZone
     let components = ownerCalendar.dateComponents([.year, .month, .day], from: instant)
@@ -481,7 +481,7 @@ final class TodayModel {
       let month = components.month,
       let day = components.day
     else { return nil }
-    return GoalDate(year: year, month: month, day: day)
+    return LocalDate(year: year, month: month, day: day)
   }
 
   private func dashboard(

@@ -1,0 +1,13 @@
+id: EV-d4qklk
+type: check.task
+at: 2026-08-19T23:11:46.640531Z
+owner: jc
+command: check task T-1a7ycj
+targets:
+    - T-1a7ycj
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml

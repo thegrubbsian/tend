@@ -7,159 +7,6 @@ import Testing
 @MainActor
 @Suite("Goal persistence")
 struct GoalPersistenceTests {
-  @Test("goal dates validate and round-trip one chronological key")
-  func goalDatesValidateAndRoundTrip() throws {
-    let leapDay = try #require(GoalDate(year: 2024, month: 2, day: 29))
-
-    #expect(leapDay.year == 2024)
-    #expect(leapDay.month == 2)
-    #expect(leapDay.day == 29)
-    #expect(leapDay.rawValue == "2024-02-29")
-    #expect(GoalDate(rawValue: leapDay.rawValue) == leapDay)
-    #expect(GoalDate(year: 1, month: 1, day: 1)?.rawValue == "0001-01-01")
-    #expect(GoalDate(year: 9_999, month: 12, day: 31)?.rawValue == "9999-12-31")
-
-    let encoded = try JSONEncoder().encode(leapDay)
-    #expect(String(decoding: encoded, as: UTF8.self) == "\"2024-02-29\"")
-    #expect(try JSONDecoder().decode(GoalDate.self, from: encoded) == leapDay)
-  }
-
-  @Test("goal dates reject malformed, impossible, and unsupported keys")
-  func goalDatesRejectInvalidKeys() {
-    let malformed = [
-      "2024-2-29", "2024-02-9", "24-02-29", "2024/02/29", "2024-02-29Z",
-      "abcd-ef-gh", "", " 2024-02-29",
-    ]
-    for key in malformed {
-      #expect(GoalDate(rawValue: key) == nil)
-    }
-
-    let impossible = [
-      "0000-01-01", "10000-01-01", "2023-02-29", "2024-02-30", "2024-04-31",
-      "2024-00-01", "2024-13-01", "2024-01-00", "2024-01-32",
-    ]
-    for key in impossible {
-      #expect(GoalDate(rawValue: key) == nil)
-    }
-
-    #expect(GoalDate(year: 0, month: 1, day: 1) == nil)
-    #expect(GoalDate(year: 10_000, month: 1, day: 1) == nil)
-    #expect(GoalDate(year: 2023, month: 2, day: 29) == nil)
-    #expect(throws: GoalDateError.malformedKey("2024-2-29")) {
-      try GoalDate(validating: "2024-2-29")
-    }
-    #expect(throws: GoalDateError.invalidDate("2023-02-29")) {
-      try GoalDate(validating: "2023-02-29")
-    }
-  }
-
-  @Test("goal date comparison is chronological across the supported range")
-  func goalDateComparisonIsChronological() throws {
-    let dates = try [
-      #require(GoalDate(rawValue: "9999-12-31")),
-      #require(GoalDate(rawValue: "2024-02-29")),
-      #require(GoalDate(rawValue: "2024-02-28")),
-      #require(GoalDate(rawValue: "0001-01-01")),
-      #require(GoalDate(rawValue: "2025-01-01")),
-    ]
-    let sorted = dates.sorted()
-
-    #expect(sorted.map(\.rawValue) == [
-      "0001-01-01", "2024-02-28", "2024-02-29", "2025-01-01", "9999-12-31",
-    ])
-    #expect(sorted.map(\.rawValue) == dates.map(\.rawValue).sorted())
-  }
-
-  @Test("adjacent goal dates cross month, year, and leap boundaries")
-  func adjacentGoalDatesCrossCalendarBoundaries() throws {
-    let marchFirst = try #require(GoalDate(rawValue: "2024-03-01"))
-    #expect(try marchFirst.previous().rawValue == "2024-02-29")
-    #expect(try marchFirst.next().rawValue == "2024-03-02")
-
-    let newYearsEve = try #require(GoalDate(rawValue: "2024-12-31"))
-    #expect(try newYearsEve.next().rawValue == "2025-01-01")
-    #expect(try newYearsEve.next().previous() == newYearsEve)
-
-    let nonLeapFebruary = try #require(GoalDate(rawValue: "2023-02-28"))
-    #expect(try nonLeapFebruary.next().rawValue == "2023-03-01")
-  }
-
-  @Test("goal dates use proleptic Gregorian leap-year rules")
-  func goalDatesUseProlepticGregorianLeapYearRules() throws {
-    #expect(GoalDate(rawValue: "1500-02-29") == nil)
-    #expect(GoalDate(rawValue: "1600-02-29") != nil)
-
-    let march1500 = try #require(GoalDate(rawValue: "1500-03-01"))
-    let march1600 = try #require(GoalDate(rawValue: "1600-03-01"))
-    #expect(try march1500.previous().rawValue == "1500-02-28")
-    #expect(try march1600.previous().rawValue == "1600-02-29")
-  }
-
-  @Test("goal dates remain continuous across the historical Gregorian cutover")
-  func goalDatesRemainContinuousAcrossHistoricalCutover() throws {
-    let utc = try #require(TimeZone(identifier: "UTC"))
-    let dates = try (4...15).map { day in
-      try #require(GoalDate(rawValue: String(format: "1582-10-%02d", day)))
-    }
-
-    for index in dates.indices.dropLast() {
-      #expect(try dates[index].next() == dates[index + 1])
-      #expect(try dates[index + 1].previous() == dates[index])
-      let start = try dates[index].start(in: utc)
-      let nextStart = try dates[index + 1].start(in: utc)
-      #expect(nextStart.timeIntervalSince(start) == 24 * 60 * 60)
-    }
-    #expect(
-      try dates[0].start(in: utc)
-        == Date(timeIntervalSince1970: -12_220_243_200)
-    )
-    #expect(
-      try dates[dates.count - 1].start(in: utc)
-        == Date(timeIntervalSince1970: -12_219_292_800)
-    )
-  }
-
-  @Test("goal date resolution uses an explicit time zone without changing its key")
-  func goalDateResolutionUsesExplicitTimeZone() throws {
-    let goalDate = try #require(GoalDate(rawValue: "2024-07-04"))
-    let utc = try #require(TimeZone(identifier: "UTC"))
-    let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
-    let tokyo = try #require(TimeZone(identifier: "Asia/Tokyo"))
-
-    let utcStart = try goalDate.start(in: utc)
-    let losAngelesStart = try goalDate.start(in: losAngeles)
-    let tokyoStart = try goalDate.start(in: tokyo)
-
-    #expect(utcStart != losAngelesStart)
-    #expect(utcStart != tokyoStart)
-    #expect(dateComponents(of: utcStart, in: utc) == DateComponents(year: 2024, month: 7, day: 4))
-    #expect(
-      dateComponents(of: losAngelesStart, in: losAngeles)
-        == DateComponents(year: 2024, month: 7, day: 4)
-    )
-    #expect(dateComponents(of: tokyoStart, in: tokyo) == DateComponents(year: 2024, month: 7, day: 4))
-    #expect(goalDate.rawValue == "2024-07-04")
-  }
-
-  @Test("adjacent goal dates resolve across daylight-saving boundaries")
-  func adjacentGoalDatesResolveAcrossDaylightSavingBoundaries() throws {
-    let losAngeles = try #require(TimeZone(identifier: "America/Los_Angeles"))
-    let springForward = try #require(GoalDate(rawValue: "2024-03-10"))
-    let springNext = try springForward.next()
-    let fallBack = try #require(GoalDate(rawValue: "2024-11-03"))
-    let fallNext = try fallBack.next()
-
-    #expect(springNext.rawValue == "2024-03-11")
-    #expect(
-      try springNext.start(in: losAngeles).timeIntervalSince(springForward.start(in: losAngeles))
-        == 23 * 60 * 60
-    )
-    #expect(fallNext.rawValue == "2024-11-04")
-    #expect(
-      try fallNext.start(in: losAngeles).timeIntervalSince(fallBack.start(in: losAngeles))
-        == 25 * 60 * 60
-    )
-  }
 
   @Test("goal kind raw values are stable and unknown values fail checked decoding")
   func goalKindRawValuesAreStable() throws {
@@ -204,7 +51,7 @@ struct GoalPersistenceTests {
     goal.deadlineKey = "today"
     let entry = GoalEntry(
       amount: 1,
-      assignedDate: try #require(GoalDate(rawValue: "2024-01-01")),
+      assignedDate: try #require(LocalDate(rawValue: "2024-01-01")),
       appendedAt: Date(timeIntervalSince1970: 1),
       appendSequence: 0
     )
@@ -219,9 +66,9 @@ struct GoalPersistenceTests {
     #expect(fetched.kindRawValue == "count")
     #expect(GoalKind(rawValue: fetched.kindRawValue) == nil)
     #expect(fetched.deadlineKey == "today")
-    #expect(GoalDate(rawValue: try #require(fetched.deadlineKey)) == nil)
+    #expect(LocalDate(rawValue: try #require(fetched.deadlineKey)) == nil)
     #expect(fetchedEntry.assignedDateKey == "yesterday")
-    #expect(GoalDate(rawValue: fetchedEntry.assignedDateKey) == nil)
+    #expect(LocalDate(rawValue: fetchedEntry.assignedDateKey) == nil)
   }
 
   @Test("optional collections and inverses remain legal storage states")
@@ -232,7 +79,7 @@ struct GoalPersistenceTests {
     goal.readings = nil
     let entry = GoalEntry(
       amount: 1,
-      assignedDate: try #require(GoalDate(rawValue: "2024-01-01")),
+      assignedDate: try #require(LocalDate(rawValue: "2024-01-01")),
       appendedAt: Date(timeIntervalSince1970: 1),
       appendSequence: 0,
       goal: nil
@@ -335,10 +182,11 @@ struct GoalPersistenceTests {
     #expect(habit.bestStreak == 11)
 
     let sortedPeriods = periods.sorted { $0.startedAt < $1.startedAt }
-    #expect(sortedPeriods.map(\.id) == [
-      UUID(uuidString: "20000000-0000-0000-0000-000000000001"),
-      UUID(uuidString: "20000000-0000-0000-0000-000000000002"),
-    ])
+    #expect(
+      sortedPeriods.map(\.id) == [
+        UUID(uuidString: "20000000-0000-0000-0000-000000000001"),
+        UUID(uuidString: "20000000-0000-0000-0000-000000000002"),
+      ])
     #expect(sortedPeriods[0].startedAt == Date(timeIntervalSince1970: 1_700_000_100))
     #expect(sortedPeriods[0].endedAt == Date(timeIntervalSince1970: 1_700_086_400))
     #expect(sortedPeriods[1].endedAt == nil)
@@ -346,10 +194,11 @@ struct GoalPersistenceTests {
     #expect(sortedPeriods.allSatisfy { $0.habit?.id == habit.id })
 
     let sortedBuckets = buckets.sorted { $0.periodKey < $1.periodKey }
-    #expect(sortedBuckets.map(\.id) == [
-      UUID(uuidString: "30000000-0000-0000-0000-000000000001"),
-      UUID(uuidString: "30000000-0000-0000-0000-000000000002"),
-    ])
+    #expect(
+      sortedBuckets.map(\.id) == [
+        UUID(uuidString: "30000000-0000-0000-0000-000000000001"),
+        UUID(uuidString: "30000000-0000-0000-0000-000000000002"),
+      ])
     #expect(sortedBuckets[0].periodKey == "week:2023-11-13")
     #expect(sortedBuckets[0].startAt == Date(timeIntervalSince1970: 1_699_833_600))
     #expect(sortedBuckets[0].endAt == Date(timeIntervalSince1970: 1_700_438_400))
@@ -371,14 +220,16 @@ struct GoalPersistenceTests {
     #expect(sortedBuckets.allSatisfy { $0.habit?.id == habit.id })
 
     let sortedEntries = entries.sorted { $0.timestamp < $1.timestamp }
-    #expect(sortedEntries.map(\.id) == [
-      UUID(uuidString: "40000000-0000-0000-0000-000000000001"),
-      UUID(uuidString: "40000000-0000-0000-0000-000000000002"),
-    ])
-    #expect(sortedEntries.map(\.timestamp) == [
-      Date(timeIntervalSince1970: 1_700_000_200),
-      Date(timeIntervalSince1970: 1_700_500_000),
-    ])
+    #expect(
+      sortedEntries.map(\.id) == [
+        UUID(uuidString: "40000000-0000-0000-0000-000000000001"),
+        UUID(uuidString: "40000000-0000-0000-0000-000000000002"),
+      ])
+    #expect(
+      sortedEntries.map(\.timestamp) == [
+        Date(timeIntervalSince1970: 1_700_000_200),
+        Date(timeIntervalSince1970: 1_700_500_000),
+      ])
     #expect(sortedEntries.map(\.amount) == [1, 2])
     #expect(sortedEntries.allSatisfy { $0.habit?.id == habit.id })
     #expect(sortedEntries[0].bucket?.id == sortedBuckets[0].id)
@@ -401,7 +252,7 @@ struct GoalPersistenceTests {
           target: kind == .accumulate ? 100 : -25,
           unit: kind == .accumulate ? "pages" : "kg",
           baseline: kind == .measure ? 75 : nil,
-          deadline: GoalDate(rawValue: "2025-12-31")!,
+          deadline: LocalDate(rawValue: "2025-12-31")!,
           createdAt: createdAt.addingTimeInterval(TimeInterval(childCount))
         )
         if kind == .accumulate {
@@ -460,7 +311,7 @@ struct GoalPersistenceTests {
     GoalEntry(
       id: progressID(prefix: 5, index: index),
       amount: index + 1,
-      assignedDate: GoalDate(rawValue: "2024-01-0\(index + 1)")!,
+      assignedDate: LocalDate(rawValue: "2024-01-0\(index + 1)")!,
       appendedAt: Date(timeIntervalSince1970: 1_730_000_000 + Double(index)),
       appendSequence: index
     )
@@ -470,7 +321,7 @@ struct GoalPersistenceTests {
     GoalReading(
       id: progressID(prefix: 6, index: index),
       value: 70 - index,
-      assignedDate: GoalDate(rawValue: "2024-02-0\(index + 1)")!,
+      assignedDate: LocalDate(rawValue: "2024-02-0\(index + 1)")!,
       appendedAt: Date(timeIntervalSince1970: 1_740_000_000 + Double(index)),
       appendSequence: index
     )
@@ -483,13 +334,6 @@ struct GoalPersistenceTests {
 
   private func progressID(prefix: Int, index: Int) -> UUID {
     UUID(uuidString: "\(prefix)0000000-0000-0000-0000-00000000000\(index)")!
-  }
-
-  private func dateComponents(of date: Date, in timeZone: TimeZone) -> DateComponents {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.locale = Locale(identifier: "en_US_POSIX")
-    calendar.timeZone = timeZone
-    return calendar.dateComponents([.year, .month, .day], from: date)
   }
 
   private func makeTemporaryStoreLocation() throws -> (directory: URL, store: URL) {
