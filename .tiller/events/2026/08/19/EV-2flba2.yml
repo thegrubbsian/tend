@@ -1,0 +1,12 @@
+id: EV-2flba2
+type: link.feature
+at: 2026-08-19T22:22:51.23872Z
+owner: jc
+command: link feature F-0rn0hs
+targets:
+    - F-0rn0hs
+after:
+    depends_on:
+        - F-wf19av
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.yml

@@ -1,0 +1,9 @@
+id: T-6we44f
+key: journal/journal-entry-records/journal-entry-schema
+title: Add the durable Journal entry schema
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-1a7ycj

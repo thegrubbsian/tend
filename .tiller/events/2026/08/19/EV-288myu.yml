@@ -1,0 +1,14 @@
+id: EV-288myu
+type: add.task
+at: 2026-08-19T22:24:21.222005Z
+owner: jc
+command: add task journal/journal-entry-records/journal-entry-operations
+targets:
+    - T-vo9ia2
+after:
+    feature: F-rsayqb
+    key: journal/journal-entry-records/journal-entry-operations
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.md
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.yml

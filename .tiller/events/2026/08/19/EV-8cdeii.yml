@@ -1,0 +1,14 @@
+id: EV-8cdeii
+type: add.task
+at: 2026-08-19T22:26:41.714228Z
+owner: jc
+command: add task journal/today-journal-invitation/today-journal-projection
+targets:
+    - T-19qcbl
+after:
+    feature: F-0rn0hs
+    key: journal/today-journal-invitation/today-journal-projection
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-projection/task.md
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-projection/task.yml

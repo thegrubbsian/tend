@@ -1,0 +1,14 @@
+id: EV-oklv6s
+type: add.task
+at: 2026-08-19T22:24:21.049636Z
+owner: jc
+command: add task journal/journal-entry-records/local-date-generalization
+targets:
+    - T-1a7ycj
+after:
+    feature: F-rsayqb
+    key: journal/journal-entry-records/local-date-generalization
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.md
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml

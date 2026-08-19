@@ -1,0 +1,13 @@
+id: EV-q4zccb
+type: spec.feature
+at: 2026-08-19T22:27:25.398496Z
+owner: jc
+command: spec feature F-0rn0hs
+targets:
+    - F-0rn0hs
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.yml

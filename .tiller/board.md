@@ -12,6 +12,8 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic journal (E-l8goi4): ready
+- feature journal/journal-entry-records (F-rsayqb): specced
+- feature journal/today-journal-invitation (F-0rn0hs): specced
 
 ### Blocked
 

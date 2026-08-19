@@ -1,0 +1,13 @@
+id: EV-im1xpd
+type: spec.feature
+at: 2026-08-19T22:25:13.698302Z
+owner: jc
+command: spec feature F-rsayqb
+targets:
+    - F-rsayqb
+before:
+    status: draft
+after:
+    status: specced
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/feature.yml

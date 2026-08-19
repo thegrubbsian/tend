@@ -1,0 +1,14 @@
+id: EV-5a0i9a
+type: add.task
+at: 2026-08-19T22:24:21.303423Z
+owner: jc
+command: add task journal/journal-entry-records/journal-entry-query
+targets:
+    - T-4i270c
+after:
+    feature: F-rsayqb
+    key: journal/journal-entry-records/journal-entry-query
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.md
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.yml

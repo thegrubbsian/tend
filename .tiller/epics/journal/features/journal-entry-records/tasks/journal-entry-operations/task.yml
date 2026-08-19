@@ -1,0 +1,9 @@
+id: T-vo9ia2
+key: journal/journal-entry-records/journal-entry-operations
+title: Enforce Journal entry lifecycle rules
+status: proposed
+blocked: false
+owner: jc
+proposed_by: jc
+depends_on:
+    - T-6we44f

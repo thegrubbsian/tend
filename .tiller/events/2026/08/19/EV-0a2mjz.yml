@@ -1,0 +1,14 @@
+id: EV-0a2mjz
+type: add.task
+at: 2026-08-19T22:26:41.828377Z
+owner: jc
+command: add task journal/today-journal-invitation/today-journal-surface
+targets:
+    - T-6wblsz
+after:
+    feature: F-0rn0hs
+    key: journal/today-journal-invitation/today-journal-surface
+    status: proposed
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.md
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.yml
