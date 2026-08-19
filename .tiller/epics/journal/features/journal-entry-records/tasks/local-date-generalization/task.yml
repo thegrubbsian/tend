@@ -1,7 +1,7 @@
 id: T-1a7ycj
 key: journal/journal-entry-records/local-date-generalization
 title: Generalize the shared civil-date value type
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc

@@ -1,0 +1,13 @@
+id: EV-q31yvc
+type: start.task
+at: 2026-08-19T22:53:41.947188Z
+owner: jc
+command: start task T-1a7ycj
+targets:
+    - T-1a7ycj
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml
