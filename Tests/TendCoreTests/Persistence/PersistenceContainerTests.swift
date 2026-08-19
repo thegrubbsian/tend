@@ -7,14 +7,14 @@ import Testing
 @MainActor
 @Suite("Persistence container")
 struct PersistenceContainerTests {
-  @Test("production configuration is local and version three")
-  func productionConfigurationIsLocalAndVersionThree() {
+  @Test("production configuration is local and version four")
+  func productionConfigurationIsLocalAndVersionFour() {
     let configuration = TendModelContainer.productionConfiguration
 
     #expect(configuration.name == "Tend")
     #expect(cloudKitIsDisabled(configuration.cloudKitDatabase))
     #expect(!configuration.isStoredInMemoryOnly)
-    #expect(configuration.schema?.version == Schema.Version(3, 0, 0))
+    #expect(configuration.schema?.version == Schema.Version(4, 0, 0))
   }
 
   @Test("in-memory containers do not share state")
