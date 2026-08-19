@@ -11,7 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- (none)
+- epic journal (E-l8goi4): ready
 
 ### Blocked
 

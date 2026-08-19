@@ -1,0 +1,13 @@
+id: EV-4uu0cr
+type: approve.epic
+at: 2026-08-19T22:20:01.309665Z
+owner: jc
+command: approve epic E-l8goi4
+targets:
+    - E-l8goi4
+before:
+    status: draft
+after:
+    status: ready
+files:
+    - path: .tiller/epics/journal/epic.yml
