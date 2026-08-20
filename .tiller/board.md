@@ -30,7 +30,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task journal/journal-entry-records/journal-entry-operations (T-vo9ia2): build pass, tests pass
+- (none)
 
 ### Open questions
 

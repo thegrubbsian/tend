@@ -1,0 +1,14 @@
+id: EV-hdt0lf
+type: sync.task
+at: 2026-08-20T18:31:04.856219Z
+owner: jc
+command: sync task T-vo9ia2
+targets:
+    - T-vo9ia2
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.yml
