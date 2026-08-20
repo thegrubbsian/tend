@@ -1,7 +1,7 @@
 id: T-vo9ia2
 key: journal/journal-entry-records/journal-entry-operations
 title: Enforce Journal entry lifecycle rules
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
