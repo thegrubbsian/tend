@@ -1,0 +1,14 @@
+id: EV-0sjce8
+type: submit.task
+at: 2026-08-20T21:44:04.947375Z
+owner: jc
+command: submit task T-3t6eal
+targets:
+    - T-3t6eal
+before:
+    status: check
+after:
+    pr: 59
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
