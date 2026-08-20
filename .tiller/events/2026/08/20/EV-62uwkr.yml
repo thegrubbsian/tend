@@ -1,0 +1,14 @@
+id: EV-62uwkr
+type: sync.task
+at: 2026-08-20T17:48:33.302541Z
+owner: jc
+command: sync task T-6we44f
+targets:
+    - T-6we44f
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-schema/task.yml
