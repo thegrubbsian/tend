@@ -1,13 +1,14 @@
 id: F-wf19av
 key: journal/journal-experience
 title: Journal Experience
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L25-31
 change_type: create
 depends_on:
     - F-rsayqb
+branch: tiller/journal/journal-experience
 accepted_against:
     spec:
         kind: git_blob

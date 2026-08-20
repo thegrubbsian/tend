@@ -10,18 +10,17 @@ committing a root change. The Journal editor registers that guard only while it
 has unsaved or pending text; failed flushes cancel the requested route.
 
 Add an ephemeral Journal route with overview, compose(`LocalDate`), and
-entry(UUID) states. A route request selects Journal and records stable scalar
-identity; it never retains a SwiftData model object or persists across process
-launch.
+entry(UUID) states. Journal route preparation records stable scalar identity;
+it never retains a SwiftData model object or persists across process launch.
+Resolve entry identity through `JournalEntryQuery`; missing identities collapse
+to overview while query corruption remains a truthful failure. Repeated
+identical route preparation is inert, and current root-destination changes
+preserve the in-process Journal route.
 
-Resolve entry identity through `JournalEntryQuery` when the Journal destination
-renders. Missing or deleted identities collapse to overview with a truthful
-load result. Repeated identical requests are inert. Changing to another root
-destination preserves the in-process Journal route, while cold launch starts
-with Today and Journal overview.
-
-Do not add the visible fourth tab in this task; establish the tested routing
-contract consumed by the final destination task.
+Do not add `.journal`, a visible fourth tab, a placeholder screen, or actual
+Journal selection in this task. The final destination task adds the real root
+case and view, then combines root selection with the prepared Journal route.
+Until then, cold launch remains Today with Journal overview prepared.
 
 ## Surfaces
 
@@ -44,7 +43,7 @@ vocabulary without changing its contracts.
 ## Edge cases
 
 Never retain a deleted or foreign `JournalEntry` instance in routing state.
-Two entries cannot share a day, but route resolution must report that persisted
-invariant failure rather than choose one. A reminder notification arriving
-while Journal is selected must still route to the requested Habit without
-leaving stale Journal focus behind.
+Duplicate or malformed persisted entries remain truthful query failures rather
+than choosing a route target. Reminder navigation through the guarded request
+API must retain its strict ownership checks, and changing among the current
+Today, Goals, and Habits roots must not clear a prepared Journal route.

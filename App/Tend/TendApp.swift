@@ -18,7 +18,7 @@ struct TendApp: App {
     #else
       let makeContainer: ModelContainerFactory = TendModelContainer.production
     #endif
-    let routing = ReminderRoutingModel()
+    let routing = ShellRoutingModel()
     let notificationCenter = LiveReminderNotificationCenter()
     let notificationDelegate = ReminderNotificationDelegate(routing: routing)
     UNUserNotificationCenter.current().delegate = notificationDelegate

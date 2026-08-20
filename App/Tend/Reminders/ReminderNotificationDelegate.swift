@@ -4,9 +4,9 @@ import UserNotifications
 final class ReminderNotificationDelegate: NSObject, UNUserNotificationCenterDelegate,
   @unchecked Sendable
 {
-  private let routing: ReminderRoutingModel
+  private let routing: ShellRoutingModel
 
-  init(routing: ReminderRoutingModel) {
+  init(routing: ShellRoutingModel) {
     self.routing = routing
   }
 
@@ -15,12 +15,12 @@ final class ReminderNotificationDelegate: NSObject, UNUserNotificationCenterDele
     didReceive response: UNNotificationResponse
   ) async {
     guard Self.isTendOwned(response.notification.request) else { return }
-    await showToday()
+    _ = await showToday()
   }
 
-  func route(_ request: UNNotificationRequest) {
+  func route(_ request: UNNotificationRequest) async {
     guard Self.isTendOwned(request) else { return }
-    showToday()
+    _ = await showToday()
   }
 
   nonisolated private static func isTendOwned(
@@ -32,7 +32,7 @@ final class ReminderNotificationDelegate: NSObject, UNUserNotificationCenterDele
       && request.content.userInfo[ReminderPendingRequest.ownershipKey] as? Bool == true
   }
 
-  private func showToday() {
-    routing.showToday()
+  private func showToday() async -> Bool {
+    await routing.showToday()
   }
 }

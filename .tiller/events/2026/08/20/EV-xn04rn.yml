@@ -1,0 +1,13 @@
+id: EV-xn04rn
+type: check.task
+at: 2026-08-20T21:43:08.798546Z
+owner: jc
+command: check task T-3t6eal
+targets:
+    - T-3t6eal
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
