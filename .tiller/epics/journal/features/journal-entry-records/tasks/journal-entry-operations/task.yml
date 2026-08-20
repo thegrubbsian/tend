@@ -1,7 +1,7 @@
 id: T-vo9ia2
 key: journal/journal-entry-records/journal-entry-operations
 title: Enforce Journal entry lifecycle rules
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:20.828794Z
+pr: 57
 gates:
     build:
         required: true
