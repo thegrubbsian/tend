@@ -1,7 +1,7 @@
 id: T-4i270c
 key: journal/journal-entry-records/journal-entry-query
 title: Provide deterministic Journal entry queries
-status: ready
+status: in_progress
 blocked: false
 owner: jc
 proposed_by: jc
