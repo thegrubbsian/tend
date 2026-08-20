@@ -1,0 +1,13 @@
+id: EV-z9vx43
+type: start.task
+at: 2026-08-20T21:08:58.559917Z
+owner: jc
+command: start task T-3t6eal
+targets:
+    - T-3t6eal
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
