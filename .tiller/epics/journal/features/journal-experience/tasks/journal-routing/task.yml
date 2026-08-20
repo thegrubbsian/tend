@@ -8,10 +8,10 @@ proposed_by: jc
 accepted_against:
     spec:
         kind: git_blob
-        value: git:86b287ad65764326b1037f275cf6116d4199d631
+        value: git:614e330e3376f5eac79cd2f55fcd94b3f15d1e23
         path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.md
-        observed_at: 2026-08-19T22:51:21.037597Z
+        observed_at: 2026-08-20T21:15:15.713084Z
     commit:
         kind: git_commit
-        value: git:e514010
-        observed_at: 2026-08-19T22:51:21.059908Z
+        value: git:2c3c948
+        observed_at: 2026-08-20T21:15:15.741665Z
