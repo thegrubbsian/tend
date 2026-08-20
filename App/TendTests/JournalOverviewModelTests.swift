@@ -39,6 +39,25 @@ struct JournalOverviewModelTests {
     #expect(model.loadFailure == nil)
   }
 
+  @Test("maximum LocalDate month stops without advancing into year 10000")
+  func maximumSupportedMonthProjects() throws {
+    let fixture = try JournalOverviewFixture()
+    let model = JournalOverviewModel(context: fixture.context)
+
+    model.refresh(
+      at: try fixture.day("9999-12-31").start(in: fixture.timeZone),
+      calendar: fixture.calendar,
+      timeZone: fixture.timeZone,
+      locale: fixture.locale
+    )
+
+    let month = try #require(model.presentation?.month)
+    #expect(month.selectedMonth == fixture.day("9999-12-01"))
+    #expect(month.cells.count == 31)
+    #expect(month.cells.last?.day == fixture.day("9999-12-31"))
+    #expect(model.loadFailure == nil)
+  }
+
   @Test("today and past rows derive current first lines in reverse local-day order")
   func projectsTodayAndPastEntries() throws {
     let fixture = try JournalOverviewFixture()
@@ -81,6 +100,28 @@ struct JournalOverviewModelTests {
       })?.state
         == .written(entryID: empty.id)
     )
+  }
+
+  @Test(
+    "first-line titles recognize every newline form",
+    arguments: [
+      "Heading\r\nDetails",
+      "Heading\rDetails",
+      "Heading\u{2028}Details",
+    ]
+  )
+  func derivesTitleAcrossNewlineForms(body: String) throws {
+    let fixture = try JournalOverviewFixture()
+    _ = try fixture.insert(
+      id: "a1000000-0000-0000-0000-000000000004",
+      day: "2026-03-07",
+      body: body
+    )
+    let model = JournalOverviewModel(context: fixture.context)
+
+    try fixture.refresh(model, at: "2026-03-08T12:00:00Z")
+
+    #expect(model.presentation?.pastEntries.first?.title == "Heading")
   }
 
   @Test("entry graph fingerprints refresh changed first lines without duplicate queries")

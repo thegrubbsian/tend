@@ -335,7 +335,11 @@ private struct JournalOverviewProjector {
     while day.year == selectedMonth.year && day.month == selectedMonth.month {
       let state = entriesByDay[day].map(JournalMonthCellState.written(entryID:)) ?? .absent
       cells.append(JournalMonthCell(day: day, state: state, isToday: day == today))
-      day = try day.next()
+      do {
+        day = try day.next()
+      } catch LocalDateError.unrepresentableDate {
+        break
+      }
     }
 
     let geometry = AlmanacMonthGridGeometry(
@@ -430,7 +434,7 @@ private struct JournalOverviewFormatter {
   func title(body: String) -> String {
     let firstLine =
       body
-      .split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
+      .split(maxSplits: 1, omittingEmptySubsequences: false) { $0.isNewline }
       .first
       .map(String.init)?
       .trimmingCharacters(in: .whitespacesAndNewlines)
