@@ -6,7 +6,7 @@ public enum JournalEntryQueryError: Error, Equatable, Sendable {
   case malformedDay(entryID: UUID, key: String)
   case duplicateDay(LocalDate, entryIDs: [UUID])
   case detachedEntry(UUID)
-  case deletedEntry(UUID)
+  case deletedEntry
   case foreignContext(UUID)
   case persistenceFailure
 }
@@ -61,14 +61,20 @@ public final class JournalEntryQuery {
       throw JournalEntryQueryError.persistenceFailure
     }
 
+    let ownedEntries = try ownedEntries(from: entries)
     var validated: [ValidatedJournalEntry] = []
-    validated.reserveCapacity(entries.count)
-    for entry in entries.sorted(by: identityPrecedes) {
-      try validateOwnership(of: entry)
-      guard let day = LocalDate(rawValue: entry.dayKey) else {
-        throw JournalEntryQueryError.malformedDay(entryID: entry.id, key: entry.dayKey)
+    var malformed: [MalformedJournalDay] = []
+    validated.reserveCapacity(ownedEntries.count)
+    malformed.reserveCapacity(ownedEntries.count)
+    for entry in ownedEntries {
+      if let day = LocalDate(rawValue: entry.dayKey) {
+        validated.append(ValidatedJournalEntry(entry: entry, day: day))
+      } else {
+        malformed.append(MalformedJournalDay(entryID: entry.id, key: entry.dayKey))
       }
-      validated.append(ValidatedJournalEntry(entry: entry, day: day))
+    }
+    if let failure = malformed.sorted(by: malformedPrecedes).first {
+      throw JournalEntryQueryError.malformedDay(entryID: failure.entryID, key: failure.key)
     }
 
     let grouped = Dictionary(grouping: validated, by: { $0.day.rawValue })
@@ -85,27 +91,51 @@ public final class JournalEntryQuery {
     return validated
   }
 
-  private func validateOwnership(of entry: JournalEntry) throws {
-    if entry.modelContext === context {
-      guard !entry.isDeleted else {
-        throw JournalEntryQueryError.deletedEntry(entry.id)
+  private func ownedEntries(from entries: [JournalEntry]) throws -> [JournalEntry] {
+    var owned: [JournalEntry] = []
+    var detachedIDs: [UUID] = []
+    var foreignIDs: [UUID] = []
+    var containsDeleted = false
+    owned.reserveCapacity(entries.count)
+
+    for entry in entries {
+      if entry.modelContext === context {
+        if entry.isDeleted {
+          containsDeleted = true
+        } else if entry.persistentModelID.storeIdentifier == nil {
+          detachedIDs.append(entry.id)
+        } else {
+          owned.append(entry)
+        }
+      } else if entry.modelContext != nil {
+        foreignIDs.append(entry.id)
+      } else if entry.persistentModelID.storeIdentifier != nil {
+        containsDeleted = true
+      } else {
+        detachedIDs.append(entry.id)
       }
-      guard entry.persistentModelID.storeIdentifier != nil else {
-        throw JournalEntryQueryError.detachedEntry(entry.id)
-      }
-      return
     }
-    if entry.modelContext != nil {
-      throw JournalEntryQueryError.foreignContext(entry.id)
+
+    if containsDeleted {
+      throw JournalEntryQueryError.deletedEntry
     }
-    if entry.persistentModelID.storeIdentifier != nil {
-      throw JournalEntryQueryError.deletedEntry(entry.id)
+    if let id = detachedIDs.sorted(by: uuidPrecedes).first {
+      throw JournalEntryQueryError.detachedEntry(id)
     }
-    throw JournalEntryQueryError.detachedEntry(entry.id)
+    if let id = foreignIDs.sorted(by: uuidPrecedes).first {
+      throw JournalEntryQueryError.foreignContext(id)
+    }
+    return owned
   }
 
-  private func identityPrecedes(_ lhs: JournalEntry, _ rhs: JournalEntry) -> Bool {
-    uuidPrecedes(lhs.id, rhs.id)
+  private func malformedPrecedes(
+    _ lhs: MalformedJournalDay,
+    _ rhs: MalformedJournalDay
+  ) -> Bool {
+    if lhs.entryID != rhs.entryID {
+      return uuidPrecedes(lhs.entryID, rhs.entryID)
+    }
+    return lhs.key < rhs.key
   }
 
   private func historyPrecedes(
@@ -119,6 +149,11 @@ public final class JournalEntryQuery {
   private func uuidPrecedes(_ lhs: UUID, _ rhs: UUID) -> Bool {
     lhs.uuidString < rhs.uuidString
   }
+}
+
+private struct MalformedJournalDay {
+  let entryID: UUID
+  let key: String
 }
 
 private struct ValidatedJournalEntry {

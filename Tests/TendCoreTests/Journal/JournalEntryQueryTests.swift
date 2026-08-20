@@ -146,6 +146,39 @@ struct JournalEntryQueryTests {
     }
   }
 
+  @Test("duplicate UUID malformed errors ignore fetch order")
+  func malformedErrorOrderingUsesUUIDThenKey() throws {
+    let context = try makeContext()
+    let sharedID = uuid("b2000000-0000-0000-0000-000000000002")
+    let first = JournalEntry(
+      id: sharedID,
+      day: try localDate("2026-03-08"),
+      body: "First",
+      createdAt: Date(timeIntervalSince1970: 1),
+      editedAt: Date(timeIntervalSince1970: 1)
+    )
+    first.dayKey = "z-day"
+    let second = JournalEntry(
+      id: sharedID,
+      day: try localDate("2026-03-09"),
+      body: "Second",
+      createdAt: Date(timeIntervalSince1970: 2),
+      editedAt: Date(timeIntervalSince1970: 2)
+    )
+    second.dayKey = "a-day"
+    context.insert(first)
+    context.insert(second)
+    try context.save()
+    let expected = JournalEntryQueryError.malformedDay(entryID: sharedID, key: "a-day")
+
+    try expectError(expected) {
+      _ = try JournalEntryQuery(context: context) { [first, second] }.entries()
+    }
+    try expectError(expected) {
+      _ = try JournalEntryQuery(context: context) { [second, first] }.entries()
+    }
+  }
+
   @Test("inverted windows fail while the full supported range does not overflow")
   func windowsValidateOrderWithoutIterationOverflow() throws {
     let context = try makeContext()
@@ -195,10 +228,9 @@ struct JournalEntryQueryTests {
     let deleted = try persistedEntry(
       id: "b4000000-0000-0000-0000-000000000002", day: day, in: context)
     context.delete(deleted)
-    context.processPendingChanges()
+    try context.save()
     let deletedQuery = JournalEntryQuery(context: context) { [deleted] }
-    try expectError(.deletedEntry(deleted.id)) { _ = try deletedQuery.entries() }
-    context.rollback()
+    try expectError(.deletedEntry) { _ = try deletedQuery.entries() }
 
     let foreignContext = try makeContext()
     let foreign = try persistedEntry(
