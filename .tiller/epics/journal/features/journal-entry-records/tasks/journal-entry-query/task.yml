@@ -1,7 +1,7 @@
 id: T-4i270c
 key: journal/journal-entry-records/journal-entry-query
 title: Provide deterministic Journal entry queries
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:20.851884Z
+pr: 58
 gates:
     build:
         required: true
