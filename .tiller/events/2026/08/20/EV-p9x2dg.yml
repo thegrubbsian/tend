@@ -1,0 +1,14 @@
+id: EV-p9x2dg
+type: sync.feature
+at: 2026-08-20T21:08:27.413157Z
+owner: jc
+command: sync feature F-rsayqb
+targets:
+    - F-rsayqb
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/feature.yml
