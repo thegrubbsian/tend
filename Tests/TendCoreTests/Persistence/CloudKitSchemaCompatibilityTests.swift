@@ -7,7 +7,7 @@ import Testing
 struct CloudKitSchemaCompatibilityTests {
   @Test("latest schema has no CloudKit-incompatible metadata")
   func latestSchemaHasNoCloudKitIncompatibleMetadata() {
-    let schema = Schema(versionedSchema: TendSchemaV3.self)
+    let schema = Schema(versionedSchema: TendSchemaV4.self)
     var violations: [String] = []
 
     for entity in schema.entities {

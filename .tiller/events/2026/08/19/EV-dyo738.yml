@@ -1,0 +1,14 @@
+id: EV-dyo738
+type: submit.task
+at: 2026-08-19T23:52:23.287323Z
+owner: jc
+command: submit task T-6we44f
+targets:
+    - T-6we44f
+before:
+    status: check
+after:
+    pr: 56
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-schema/task.yml
