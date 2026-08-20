@@ -2,17 +2,18 @@ import SwiftUI
 
 struct AlmanacShellView: View {
   let reminders: any ReminderRuntimeClient
-  let routing: ReminderRoutingModel
+  let routing: ShellRoutingModel
   @AccessibilityFocusState private var accessibilityFocus: ShellDestination?
 
   var body: some View {
-    @Bindable var routing = routing
     destination
       .safeAreaInset(edge: .bottom, spacing: 0) {
-        FloatingTabPill(selection: $routing.selection)
-          .frame(maxWidth: AlmanacMetrics.tabPillMaximumWidth)
-          .padding(.horizontal, AlmanacMetrics.tabPillEdgeInset)
-          .padding(.bottom, AlmanacMetrics.tabPillEdgeInset)
+        FloatingTabPill(selection: routing.selection) { destination in
+          Task { _ = await routing.requestSelection(destination) }
+        }
+        .frame(maxWidth: AlmanacMetrics.tabPillMaximumWidth)
+        .padding(.horizontal, AlmanacMetrics.tabPillEdgeInset)
+        .padding(.bottom, AlmanacMetrics.tabPillEdgeInset)
       }
       .onChange(of: routing.selection) { _, newSelection in
         accessibilityFocus = newSelection

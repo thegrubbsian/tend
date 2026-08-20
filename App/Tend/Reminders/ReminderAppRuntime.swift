@@ -6,7 +6,7 @@ typealias ReminderAuthorizationRequest = @MainActor () async -> Void
 
 @MainActor
 protocol ReminderRuntimeClient: AnyObject {
-  var routing: ReminderRoutingModel { get }
+  var routing: ShellRoutingModel { get }
 
   func refresh()
   func requestAuthorizationIfNeeded() async
@@ -45,7 +45,7 @@ final class ReminderAuthorizationController {
 
 @MainActor
 final class ReminderAppRuntime: ReminderRuntimeClient {
-  let routing: ReminderRoutingModel
+  let routing: ShellRoutingModel
 
   private let coordinator: ReminderCoordinator
   private let notificationCenter: any ReminderNotificationCenterClient
@@ -57,7 +57,7 @@ final class ReminderAppRuntime: ReminderRuntimeClient {
   init(
     container: ModelContainer,
     notificationCenter: any ReminderNotificationCenterClient,
-    routing: ReminderRoutingModel
+    routing: ShellRoutingModel
   ) {
     coordinator = ReminderCoordinator(
       context: container.mainContext,
@@ -78,7 +78,7 @@ final class ReminderAppRuntime: ReminderRuntimeClient {
 
 @MainActor
 final class DisabledReminderRuntime: ReminderRuntimeClient {
-  let routing = ReminderRoutingModel()
+  let routing = ShellRoutingModel()
 
   func refresh() {}
 

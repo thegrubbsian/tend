@@ -182,8 +182,8 @@ struct ReminderAppIntegrationTests {
     #expect(replacementRuntime.refreshCount == 3)
   }
   @Test("notification delegate routes only strict Tend ownership to Today")
-  func notificationDelegateRoutesOnlyStrictTendOwnershipToToday() {
-    let routing = ReminderRoutingModel(selection: .habits)
+  func notificationDelegateRoutesOnlyStrictTendOwnershipToToday() async {
+    let routing = ShellRoutingModel(selection: .habits)
     let delegate = ReminderNotificationDelegate(routing: routing)
     let ownedContent = UNMutableNotificationContent()
     ownedContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
@@ -194,15 +194,15 @@ struct ReminderAppIntegrationTests {
       trigger: nil
     )
 
-    delegate.route(ownedRequest)
+    await delegate.route(ownedRequest)
 
     #expect(routing.selection == .today)
 
     let foreignContent = UNMutableNotificationContent()
     foreignContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
     foreignContent.userInfo = [ReminderPendingRequest.ownershipKey: true]
-    routing.selection = .habits
-    delegate.route(
+    _ = await routing.requestSelection(.habits)
+    await delegate.route(
       UNNotificationRequest(
         identifier: "another.app.reminder",
         content: foreignContent,
@@ -213,8 +213,8 @@ struct ReminderAppIntegrationTests {
 
     let malformedContent = UNMutableNotificationContent()
     malformedContent.categoryIdentifier = ReminderPendingRequest.requiredCategoryIdentifier
-    routing.selection = .habits
-    delegate.route(
+    _ = await routing.requestSelection(.habits)
+    await delegate.route(
       UNNotificationRequest(
         identifier: "\(ReminderPlanner.identifierPrefix)malformed",
         content: malformedContent,
@@ -228,7 +228,7 @@ struct ReminderAppIntegrationTests {
 
 @MainActor
 private final class IntegrationReminderRuntime: ReminderRuntimeClient {
-  let routing = ReminderRoutingModel()
+  let routing = ShellRoutingModel()
   private(set) var refreshCount = 0
   private(set) var authorizationRequestCount = 0
 

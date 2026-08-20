@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct FloatingTabPill: View {
-  @Binding var selection: ShellDestination
+  let selection: ShellDestination
+  let onSelect: (ShellDestination) -> Void
 
   var body: some View {
     HStack(spacing: AlmanacMetrics.tabPillInset) {
@@ -19,7 +20,7 @@ struct FloatingTabPill: View {
     let isSelected = selection == destination
 
     return Button {
-      selection = destination
+      onSelect(destination)
     } label: {
       VStack(spacing: AlmanacMetrics.tabPillInset) {
         icon(for: destination, isSelected: isSelected)
