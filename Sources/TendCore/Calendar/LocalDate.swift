@@ -7,7 +7,7 @@ public enum LocalDateError: Error, Equatable, Sendable {
   case calendarCalculationFailed
 }
 
-public struct LocalDate: RawRepresentable, Equatable, Comparable, Codable, Sendable {
+public struct LocalDate: RawRepresentable, Equatable, Hashable, Comparable, Codable, Sendable {
   public let year: Int
   public let month: Int
   public let day: Int

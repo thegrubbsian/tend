@@ -1,0 +1,13 @@
+id: EV-5gs1do
+type: start.task
+at: 2026-08-20T18:31:33.21195Z
+owner: jc
+command: start task T-4i270c
+targets:
+    - T-4i270c
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.yml
