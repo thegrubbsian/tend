@@ -1,0 +1,13 @@
+id: EV-6uj76h
+type: check.task
+at: 2026-08-20T18:48:24.083325Z
+owner: jc
+command: check task T-4i270c
+targets:
+    - T-4i270c
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.yml
