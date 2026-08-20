@@ -1,0 +1,13 @@
+id: EV-9x98ft
+type: check.feature
+at: 2026-08-20T21:08:13.816447Z
+owner: jc
+command: check feature F-rsayqb
+targets:
+    - F-rsayqb
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/feature.yml
