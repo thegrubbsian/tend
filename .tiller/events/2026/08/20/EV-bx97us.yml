@@ -1,0 +1,14 @@
+id: EV-bx97us
+type: sync.task
+at: 2026-08-20T21:05:17.576057Z
+owner: jc
+command: sync task T-4i270c
+targets:
+    - T-4i270c
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.yml
