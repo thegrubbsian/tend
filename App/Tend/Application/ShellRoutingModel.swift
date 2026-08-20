@@ -5,6 +5,11 @@ struct ShellNavigationGuardToken: Equatable, Sendable {
   fileprivate let rawValue: UInt64
 }
 
+struct ShellSelectionRequest {
+  fileprivate let destination: ShellDestination
+  fileprivate let generation: UInt64
+}
+
 @MainActor
 @Observable
 final class ShellRoutingModel {
@@ -23,19 +28,34 @@ final class ShellRoutingModel {
     self.journalRoute = journalRoute
   }
 
-  @discardableResult
-  func requestSelection(_ destination: ShellDestination) async -> Bool {
+  func beginSelectionRequest(_ destination: ShellDestination) -> ShellSelectionRequest {
     requestGeneration &+= 1
-    let generation = requestGeneration
-    guard destination != selection else { return true }
+    return ShellSelectionRequest(destination: destination, generation: requestGeneration)
+  }
+
+  @discardableResult
+  func completeSelectionRequest(_ request: ShellSelectionRequest) async -> Bool {
+    guard request.generation == requestGeneration else { return false }
+    guard request.destination != selection else { return true }
 
     if let navigationGuard {
       guard await navigationGuard.operation() else { return false }
-      guard generation == requestGeneration else { return false }
+      guard request.generation == requestGeneration else { return false }
+      if let currentGuard = self.navigationGuard,
+        currentGuard.token != navigationGuard.token
+      {
+        return false
+      }
     }
-    guard generation == requestGeneration else { return false }
-    selection = destination
+    guard request.generation == requestGeneration else { return false }
+    selection = request.destination
     return true
+  }
+
+  @discardableResult
+  func requestSelection(_ destination: ShellDestination) async -> Bool {
+    let request = beginSelectionRequest(destination)
+    return await completeSelectionRequest(request)
   }
 
   func prepareJournalRoute(_ route: JournalRoute) {

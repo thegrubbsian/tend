@@ -129,6 +129,23 @@ struct JournalRoutingModelTests {
     #expect(routing.journalRoute == .compose(day))
   }
 
+  @Test("a successful navigation guard commits once and preserves Journal route")
+  func successfulGuardCommitsNavigation() async throws {
+    let day = try localDate("2026-03-08")
+    let routing = ShellRoutingModel(selection: .today)
+    routing.prepareJournalRoute(.compose(day))
+    var callCount = 0
+    _ = routing.installNavigationGuard {
+      callCount += 1
+      return true
+    }
+
+    #expect(await routing.requestSelection(.goals))
+    #expect(routing.selection == .goals)
+    #expect(routing.journalRoute == .compose(day))
+    #expect(callCount == 1)
+  }
+
   @Test("stale guard tokens cannot remove a replacement guard")
   func staleGuardRemovalIsIdentitySafe() async {
     let routing = ShellRoutingModel()
@@ -146,6 +163,27 @@ struct JournalRoutingModelTests {
     #expect(replacementCalls == 1)
   }
 
+  @Test("a replacement guard cancels a suspended request")
+  func replacementGuardCannotBeBypassed() async {
+    let routing = ShellRoutingModel()
+    let probe = NavigationGuardProbe()
+    _ = routing.installNavigationGuard { await probe.wait() }
+    let request = Task { await routing.requestSelection(.goals) }
+    await probe.waitUntilPending()
+    var replacementCalls = 0
+    _ = routing.installNavigationGuard {
+      replacementCalls += 1
+      return false
+    }
+
+    probe.resume(with: true)
+
+    #expect(!(await request.value))
+    #expect(routing.selection == .today)
+    #expect(!(await routing.requestSelection(.goals)))
+    #expect(replacementCalls == 1)
+  }
+
   @Test("the latest concurrent destination request wins")
   func latestDestinationRequestWins() async {
     let routing = ShellRoutingModel()
@@ -159,6 +197,17 @@ struct JournalRoutingModelTests {
 
     #expect(!(await first.value))
     #expect(routing.selection == .today)
+  }
+
+  @Test("synchronously registered requests preserve tap order")
+  func selectionRequestRegistrationMakesLatestTapWin() async {
+    let routing = ShellRoutingModel()
+    let first = routing.beginSelectionRequest(.goals)
+    let second = routing.beginSelectionRequest(.habits)
+
+    #expect(!(await routing.completeSelectionRequest(first)))
+    #expect(await routing.completeSelectionRequest(second))
+    #expect(routing.selection == .habits)
   }
 
   @Test("strict Tend notifications use guarded Today routing")

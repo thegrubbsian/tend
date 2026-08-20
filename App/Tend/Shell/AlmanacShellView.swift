@@ -9,7 +9,8 @@ struct AlmanacShellView: View {
     destination
       .safeAreaInset(edge: .bottom, spacing: 0) {
         FloatingTabPill(selection: routing.selection) { destination in
-          Task { _ = await routing.requestSelection(destination) }
+          let request = routing.beginSelectionRequest(destination)
+          Task { _ = await routing.completeSelectionRequest(request) }
         }
         .frame(maxWidth: AlmanacMetrics.tabPillMaximumWidth)
         .padding(.horizontal, AlmanacMetrics.tabPillEdgeInset)
