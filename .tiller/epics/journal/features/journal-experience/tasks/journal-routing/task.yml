@@ -1,7 +1,7 @@
 id: T-3t6eal
 key: journal/journal-experience/journal-routing
 title: Build identity-safe Journal routing
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -15,3 +15,30 @@ accepted_against:
         kind: git_commit
         value: git:2c3c948
         observed_at: 2026-08-20T21:15:15.741665Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-20T21:43:05.981661Z
+        against:
+            kind: git_commit
+            value: git:3477656
+            observed_at: 2026-08-20T21:43:05.981653Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-3477656-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-20T21:43:05.981661Z
+        against:
+            kind: git_commit
+            value: git:3477656
+            observed_at: 2026-08-20T21:43:05.981653Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-3477656-out-a73a96b6b7cd05a5494b61429ee17f284c246740f165113042032986d1bea2b3.txt
