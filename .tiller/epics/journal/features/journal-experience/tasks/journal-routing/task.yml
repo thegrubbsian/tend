@@ -1,7 +1,7 @@
 id: T-3t6eal
 key: journal/journal-experience/journal-routing
 title: Build identity-safe Journal routing
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:2c3c948
         observed_at: 2026-08-20T21:15:15.741665Z
 pr: 59
+done_basis: ancestry
 gates:
     build:
         required: true

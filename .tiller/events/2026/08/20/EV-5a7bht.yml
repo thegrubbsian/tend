@@ -1,0 +1,14 @@
+id: EV-5a7bht
+type: sync.task
+at: 2026-08-20T21:53:32.057177Z
+owner: jc
+command: sync task T-3t6eal
+targets:
+    - T-3t6eal
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
