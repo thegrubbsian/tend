@@ -1,0 +1,13 @@
+id: EV-sq1666
+type: check.task
+at: 2026-08-20T18:09:39.857659Z
+owner: jc
+command: check task T-vo9ia2
+targets:
+    - T-vo9ia2
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.yml

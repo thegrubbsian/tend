@@ -15,7 +15,6 @@ this file is regenerated from the working tree on every sync. -->
 - feature journal/journal-entry-records (F-rsayqb): active
 - feature journal/journal-experience (F-wf19av): ready
 - feature journal/today-journal-invitation (F-0rn0hs): ready
-- task journal/journal-entry-records/journal-entry-operations (T-vo9ia2): ready
 - task journal/journal-entry-records/journal-entry-query (T-4i270c): ready
 - task journal/journal-experience/journal-routing (T-3t6eal): ready
 - task journal/journal-experience/journal-overview-projection (T-a5ad8n): ready
@@ -31,7 +30,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task journal/journal-entry-records/journal-entry-operations (T-vo9ia2): build pass, tests pass
 
 ### Open questions
 
