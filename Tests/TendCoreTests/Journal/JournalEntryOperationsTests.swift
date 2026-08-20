@@ -272,13 +272,27 @@ struct JournalEntryOperationsTests {
 
     #expect(facts(entry) == original)
     #expect(goal.name == "Pending goal edit")
+    #expect(
+      context.changedModelsArray.map(\.persistentModelID).contains(goal.persistentModelID)
+    )
     #expect(context.hasChanges)
   }
 
-  @Test("delete save failure restores the same Journal model and exact facts")
-  func deleteSaveFailureRestoresSameModel() throws {
+  @Test("delete save failure restores Journal and unrelated pending change sets")
+  func deleteSaveFailureRestoresSameModelAndCallerWork() throws {
     let context = try makeContext()
     let entry = try persistedEntry(day: localDate("2026-03-08"), in: context)
+    let changedHabit = Habit(name: "Original", cadence: .daily, target: 1)
+    let deletedGoal = Goal(name: "Delete pending", kind: .accumulate, target: 1)
+    context.insert(changedHabit)
+    context.insert(deletedGoal)
+    try context.save()
+    changedHabit.name = "Pending habit edit"
+    let deletedGoalID = deletedGoal.persistentModelID
+    context.delete(deletedGoal)
+    let insertedHabit = Habit(name: "Pending insert", cadence: .weekly, target: 2)
+    context.insert(insertedHabit)
+    context.processPendingChanges()
     let original = facts(entry)
     let operations = JournalEntryOperations(context: context) { throw TestSaveFailure.expected }
 
@@ -295,15 +309,28 @@ struct JournalEntryOperationsTests {
     #expect(fetched.first === entry)
     #expect(facts(entry) == original)
     #expect(!entry.isDeleted)
-    #expect(context.insertedModelsArray.isEmpty)
-    #expect(context.changedModelsArray.isEmpty)
-    #expect(context.deletedModelsArray.isEmpty)
+    #expect(
+      Set(context.insertedModelsArray.map(\.persistentModelID))
+        == Set([insertedHabit.persistentModelID])
+    )
+    #expect(
+      Set(context.changedModelsArray.map(\.persistentModelID))
+        == Set([changedHabit.persistentModelID])
+    )
+    #expect(
+      Set(context.deletedModelsArray.map(\.persistentModelID))
+        == Set([deletedGoalID])
+    )
+    #expect(changedHabit.name == "Pending habit edit")
+    #expect(context.hasChanges)
   }
 
   @Test("DST extreme zones and zone changes use the explicit operation context")
   func eligibilityUsesExplicitTimeZone() throws {
     let cases = [
+      ("2024-03-10T07:30:00Z", "America/Los_Angeles", "2024-03-09", "2024-03-08"),
       ("2024-03-10T10:30:00Z", "America/Los_Angeles", "2024-03-10", "2024-03-09"),
+      ("2024-11-03T07:30:00Z", "America/Los_Angeles", "2024-11-03", "2024-11-02"),
       ("2024-11-03T09:30:00Z", "America/Los_Angeles", "2024-11-03", "2024-11-02"),
       ("2024-07-04T10:30:00Z", "Pacific/Kiritimati", "2024-07-05", "2024-07-04"),
       ("2024-07-04T10:30:00Z", "America/Adak", "2024-07-04", "2024-07-03"),
@@ -344,7 +371,7 @@ struct JournalEntryOperationsTests {
     #expect(kiritimatiEntry.dayKey == "2024-07-05")
   }
 
-  @Test("invalid instants fail before insert edit or delete")
+  @Test("invalid and non-Common-Era instants fail before insert edit or delete")
   func invalidInstantsFailBeforeMutation() throws {
     let context = try makeContext()
     let day = try localDate("2026-03-08")
@@ -361,54 +388,124 @@ struct JournalEntryOperationsTests {
       try operations.edit(entry, body: "Bad", at: invalid)
     }
     try expectError(.invalidInstant) {
+      try operations.edit(entry, body: entry.body, at: invalid)
+    }
+    try expectError(.invalidInstant) {
       try operations.delete(entry, at: invalid, timeZone: timeZone("UTC"))
+    }
+    try expectError(.invalidInstant) {
+      _ = try operations.create(
+        day: localDate("0001-03-08"),
+        body: "BCE",
+        at: bceInstant(),
+        timeZone: timeZone("UTC")
+      )
     }
 
     #expect(facts(entry) == original)
     #expect(saveCount == 0)
   }
 
-  @Test("Journal mutations leave Habit LogEntry and Goal facts unchanged")
+  @Test("Journal mutations preserve every Habit LogEntry and Goal fact")
   func mutationsDoNotTouchOtherDomains() throws {
     let context = try makeContext()
     let instant = try instant("2026-03-08T12:00:00Z")
+    let periodEnd = instant.addingTimeInterval(7 * 86_400)
     let habit = Habit(
       id: uuid("d1000000-0000-0000-0000-000000000001"),
       name: "Read",
-      cadence: .daily,
-      target: 2,
+      cadence: .weekly,
+      target: 5,
+      unit: "chapters",
+      pinnedWeekdays: .monday,
+      reminderTime: try reminderTime(hour: 7, minute: 30),
+      isActive: true,
       createdAt: instant,
       bestStreak: 3
     )
-    let log = LogEntry(
-      id: uuid("d2000000-0000-0000-0000-000000000001"),
-      timestamp: instant,
-      amount: 1,
+    let activity = HabitActivityPeriod(
+      id: uuid("d1100000-0000-0000-0000-000000000001"),
+      startedAt: instant,
+      endedAt: periodEnd,
       habit: habit
     )
+    let bucket = HabitBucket(
+      id: uuid("d1200000-0000-0000-0000-000000000001"),
+      periodKey: "weekly:2026-03-02",
+      startAt: instant,
+      endAt: periodEnd,
+      cadence: .weekly,
+      isExempt: true,
+      finalizedAt: periodEnd,
+      verdict: .met,
+      targetSnapshot: 5,
+      unitSnapshot: "chapters",
+      habit: habit
+    )
+    let log = LogEntry(
+      id: uuid("d2000000-0000-0000-0000-000000000001"),
+      timestamp: instant.addingTimeInterval(60),
+      amount: 4,
+      habit: habit,
+      bucket: bucket
+    )
+    habit.activityPeriods = [activity]
+    habit.buckets = [bucket]
     habit.entries = [log]
+    bucket.entries = [log]
+
     let goal = Goal(
       id: uuid("d3000000-0000-0000-0000-000000000001"),
-      name: "Finish",
-      kind: .accumulate,
-      target: 10,
+      name: "Weight",
+      kind: .measure,
+      target: 165,
+      unit: "lb",
+      baseline: 195,
+      deadline: try localDate("2026-12-31"),
       createdAt: instant
     )
+    goal.closureRawValue = GoalClosure.letGo.rawValue
+    let reading = GoalReading(
+      id: uuid("d3100000-0000-0000-0000-000000000001"),
+      value: 183,
+      assignedDate: try localDate("2026-03-08"),
+      appendedAt: instant.addingTimeInterval(120),
+      appendSequence: 7,
+      goal: goal
+    )
+    goal.readings = [reading]
     context.insert(habit)
     context.insert(goal)
     try context.save()
-    let expected = OtherDomainFacts(habit: habit, log: log, goal: goal)
+    let expected = OtherDomainFacts(
+      habit: habit,
+      activity: activity,
+      bucket: bucket,
+      log: log,
+      goal: goal,
+      reading: reading
+    )
     let operations = JournalEntryOperations(context: context)
 
     let journal = try operations.create(
       day: localDate("2026-03-08"), body: "Created", at: instant, timeZone: timeZone("UTC"))
+    #expect(
+      OtherDomainFacts(
+        habit: habit, activity: activity, bucket: bucket, log: log, goal: goal, reading: reading)
+        == expected
+    )
     try operations.edit(journal, body: "Edited", at: instant.addingTimeInterval(1))
+    #expect(
+      OtherDomainFacts(
+        habit: habit, activity: activity, bucket: bucket, log: log, goal: goal, reading: reading)
+        == expected
+    )
     try operations.delete(journal, at: instant.addingTimeInterval(2), timeZone: timeZone("UTC"))
-
-    #expect(OtherDomainFacts(habit: habit, log: log, goal: goal) == expected)
-    #expect(try context.fetch(FetchDescriptor<Habit>()).count == 1)
-    #expect(try context.fetch(FetchDescriptor<LogEntry>()).count == 1)
-    #expect(try context.fetch(FetchDescriptor<Goal>()).count == 1)
+    #expect(
+      OtherDomainFacts(
+        habit: habit, activity: activity, bucket: bucket, log: log, goal: goal, reading: reading)
+        == expected
+    )
   }
 
   private struct EntryFacts: Equatable {
@@ -422,24 +519,115 @@ struct JournalEntryOperationsTests {
   private struct OtherDomainFacts: Equatable {
     let habitID: UUID
     let habitName: String
+    let habitCadence: String
+    let habitTarget: Int
+    let habitUnit: String
+    let pinnedWeekdays: Int
+    let reminderMinute: Int?
+    let habitIsActive: Bool
+    let habitCreatedAt: Date
     let habitBestStreak: Int
+    let habitActivityIDs: [UUID]
+    let habitBucketIDs: [UUID]
+    let habitEntryIDs: [UUID]
+    let activityID: UUID
+    let activityStartedAt: Date
+    let activityEndedAt: Date?
+    let activityHabitID: UUID?
+    let bucketID: UUID
+    let bucketKey: String
+    let bucketStartAt: Date
+    let bucketEndAt: Date
+    let bucketCadence: String
+    let bucketIsExempt: Bool
+    let bucketFinalizedAt: Date?
+    let bucketVerdict: String?
+    let bucketTarget: Int?
+    let bucketUnit: String?
+    let bucketHabitID: UUID?
+    let bucketEntryIDs: [UUID]
     let logID: UUID
     let logTimestamp: Date
     let logAmount: Int
+    let logHabitID: UUID?
+    let logBucketID: UUID?
     let goalID: UUID
     let goalName: String
+    let goalKind: String
     let goalTarget: Int
+    let goalUnit: String
+    let goalBaseline: Int?
+    let goalDeadline: String?
+    let goalCreatedAt: Date
+    let goalClosure: String?
+    let goalEntryIDs: [UUID]
+    let goalReadingIDs: [UUID]
+    let readingID: UUID
+    let readingValue: Int
+    let readingDate: String
+    let readingAppendedAt: Date
+    let readingSequence: Int
+    let readingGoalID: UUID?
 
-    init(habit: Habit, log: LogEntry, goal: Goal) {
+    init(
+      habit: Habit,
+      activity: HabitActivityPeriod,
+      bucket: HabitBucket,
+      log: LogEntry,
+      goal: Goal,
+      reading: GoalReading
+    ) {
       habitID = habit.id
       habitName = habit.name
+      habitCadence = habit.cadenceRawValue
+      habitTarget = habit.target
+      habitUnit = habit.unit
+      pinnedWeekdays = habit.pinnedWeekdaysRawValue
+      reminderMinute = habit.reminderMinuteOfDay
+      habitIsActive = habit.isActive
+      habitCreatedAt = habit.createdAt
       habitBestStreak = habit.bestStreak
+      habitActivityIDs = (habit.activityPeriods ?? []).map(\.id)
+      habitBucketIDs = (habit.buckets ?? []).map(\.id)
+      habitEntryIDs = (habit.entries ?? []).map(\.id)
+      activityID = activity.id
+      activityStartedAt = activity.startedAt
+      activityEndedAt = activity.endedAt
+      activityHabitID = activity.habit?.id
+      bucketID = bucket.id
+      bucketKey = bucket.periodKey
+      bucketStartAt = bucket.startAt
+      bucketEndAt = bucket.endAt
+      bucketCadence = bucket.cadenceRawValue
+      bucketIsExempt = bucket.isExempt
+      bucketFinalizedAt = bucket.finalizedAt
+      bucketVerdict = bucket.verdictRawValue
+      bucketTarget = bucket.targetSnapshot
+      bucketUnit = bucket.unitSnapshot
+      bucketHabitID = bucket.habit?.id
+      bucketEntryIDs = (bucket.entries ?? []).map(\.id)
       logID = log.id
       logTimestamp = log.timestamp
       logAmount = log.amount
+      logHabitID = log.habit?.id
+      logBucketID = log.bucket?.id
       goalID = goal.id
       goalName = goal.name
+      goalKind = goal.kindRawValue
       goalTarget = goal.target
+      goalUnit = goal.unit
+      goalBaseline = goal.baseline
+      goalDeadline = goal.deadlineKey
+      goalCreatedAt = goal.createdAt
+      goalClosure = goal.closureRawValue
+      goalEntryIDs = (goal.entries ?? []).map(\.id)
+      goalReadingIDs = (goal.readings ?? []).map(\.id)
+      readingID = reading.id
+      readingValue = reading.value
+      readingDate = reading.assignedDateKey
+      readingAppendedAt = reading.appendedAt
+      readingSequence = reading.appendSequence
+      readingGoalID = reading.goal?.id
     }
   }
 
@@ -499,6 +687,29 @@ struct JournalEntryOperationsTests {
 
   private func instant(_ value: String) throws -> Date {
     try #require(ISO8601DateFormatter().date(from: value))
+  }
+
+  private func bceInstant() throws -> Date {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = try timeZone("UTC")
+    return try #require(
+      calendar.date(
+        from: DateComponents(
+          calendar: calendar,
+          timeZone: calendar.timeZone,
+          era: 0,
+          year: 1,
+          month: 3,
+          day: 8,
+          hour: 12
+        )
+      )
+    )
+  }
+
+  private func reminderTime(hour: Int, minute: Int) throws -> ReminderTime {
+    try #require(ReminderTime(hour: hour, minute: minute))
   }
 
   private func timeZone(_ identifier: String) throws -> TimeZone {

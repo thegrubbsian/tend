@@ -66,8 +66,8 @@ public final class JournalEntryOperations {
   ) throws {
     try validateOwnership(of: entry)
     _ = try parsedDay(entry.dayKey)
-    guard body != entry.body else { return }
     try validate(instant)
+    guard body != entry.body else { return }
 
     let priorBody = entry.body
     let priorEditedAt = entry.editedAt
@@ -79,6 +79,7 @@ public final class JournalEntryOperations {
     } catch {
       entry.body = priorBody
       entry.editedAt = priorEditedAt
+      context.processPendingChanges()
       throw JournalEntryOperationError.persistenceFailure
     }
   }
@@ -155,8 +156,9 @@ public final class JournalEntryOperations {
     var calendar = Calendar(identifier: .gregorian)
     calendar.locale = Locale(identifier: "en_US_POSIX")
     calendar.timeZone = timeZone
-    let components = calendar.dateComponents([.year, .month, .day], from: instant)
+    let components = calendar.dateComponents([.era, .year, .month, .day], from: instant)
     guard
+      components.era == 1,
       let year = components.year,
       let month = components.month,
       let day = components.day,
