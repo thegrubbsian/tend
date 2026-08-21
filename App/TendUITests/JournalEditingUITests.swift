@@ -99,6 +99,7 @@ final class JournalEditingUITests: XCTestCase {
   @MainActor
   func testLargeTextLandscapeAndKeyboardClearance() throws {
     XCUIDevice.shared.orientation = .portrait
+    defer { XCUIDevice.shared.orientation = .portrait }
     let app = launch(
       storeName: "JournalEditingAdaptiveUITests-\(UUID().uuidString)",
       reset: true,
