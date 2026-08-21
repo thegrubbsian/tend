@@ -1,0 +1,13 @@
+id: EV-p8sxw3
+type: check.task
+at: 2026-08-20T22:25:48.765161Z
+owner: jc
+command: check task T-a5ad8n
+targets:
+    - T-a5ad8n
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-overview-projection/task.yml

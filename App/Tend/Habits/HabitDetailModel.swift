@@ -969,10 +969,12 @@ extension HabitDetailModel {
     calendar: Calendar
   ) -> (leading: Int, trailing: Int) {
     guard cadence == .daily else { return (0, 0) }
-    let weekday = calendar.component(.weekday, from: selectedMonth)
-    let leading = (weekday + 5) % 7
-    let trailing = (7 - ((leading + historyCount) % 7)) % 7
-    return (leading, trailing)
+    let geometry = AlmanacMonthGridGeometry(
+      monthStart: selectedMonth,
+      dayCount: historyCount,
+      calendar: calendar
+    )
+    return (geometry.leadingFillerCount, geometry.trailingFillerCount)
   }
 
   fileprivate static func historyStateText(

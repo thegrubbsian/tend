@@ -1,7 +1,7 @@
 id: T-a5ad8n
 key: journal/journal-experience/journal-overview-projection
 title: Project the Journal overview
-status: ready
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,31 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.08211Z
+pr: 60
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-20T22:25:45.995535Z
+        against:
+            kind: git_commit
+            value: git:8a831d2
+            observed_at: 2026-08-20T22:25:45.995524Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-8a831d2-out-a86b9ee5bee5236d1f12be1da389b1056c40a05b5b1b4af119af9dc2008dcc6d.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-20T22:25:45.995535Z
+        against:
+            kind: git_commit
+            value: git:8a831d2
+            observed_at: 2026-08-20T22:25:45.995524Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-8a831d2-out-dc915cc3829ded63ca038d602358ccc3e041cb594c5f95abdb8d7d57e139e3dc.txt
