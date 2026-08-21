@@ -13,7 +13,8 @@ struct TendRootView: View {
         JournalEditorUITestHarness(
           routing: routing,
           instant: TendUITestStore.fixedInstant(arguments: arguments) ?? .now,
-          failsSaves: arguments.contains(JournalEditorUITestHarnessArguments.failSave)
+          failsSaves: arguments.contains(JournalEditorUITestHarnessArguments.failSave),
+          failsFirstSave: arguments.contains(JournalEditorUITestHarnessArguments.failFirstSave)
         )
       } else {
         AlmanacShellView(reminders: reminders, routing: routing)

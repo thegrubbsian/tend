@@ -129,6 +129,7 @@ final class JournalEditorModel {
   @ObservationIgnored private let onDeleted: @MainActor () -> Void
   @ObservationIgnored private var debounceTask: Task<Void, Never>?
   @ObservationIgnored private var retryAction: RetryAction?
+  @ObservationIgnored private var deletionFailure: JournalEditorFailure?
   @ObservationIgnored private var isDeleted = false
 
   convenience init(
@@ -231,14 +232,20 @@ final class JournalEditorModel {
   }
 
   func retry() {
-    guard let retryAction else { return }
-    switch retryAction {
-    case .save(let revision):
-      guard !isComposing else { return }
-      persist(revision: revision)
-    case .delete:
-      performDeletion()
+    if let retryAction {
+      switch retryAction {
+      case .save(let revision):
+        guard !isComposing else { return }
+        persist(revision: revision)
+      }
+      return
     }
+    guard deletionFailure != nil else { return }
+    guard canDelete else {
+      retireExpiredDeletionRetry()
+      return
+    }
+    performDeletion()
   }
 
   func requestDeletion() {
@@ -320,7 +327,7 @@ final class JournalEditorModel {
 
       persistedBody = body
       retryAction = nil
-      status = .saved
+      status = deletionFailure.map(JournalEditorStatus.failed) ?? .saved
       onSaved(savedEntry)
     } catch {
       retryAction = .save(requestedRevision)
@@ -337,11 +344,28 @@ final class JournalEditorModel {
       persistedBody = body
       isDeleted = true
       retryAction = nil
+      deletionFailure = nil
       status = .idle
       onDeleted()
     } catch {
-      retryAction = .delete
-      status = .failed(failure(for: .delete))
+      let failure = failure(for: .delete)
+      deletionFailure = failure
+      status = .failed(failure)
+      if hasUnsavedChanges, !isComposing {
+        scheduleDebounce(for: revision)
+      }
+    }
+  }
+
+  private func retireExpiredDeletionRetry() {
+    deletionFailure = nil
+    if hasUnsavedChanges {
+      status = .pending
+      if !isComposing {
+        scheduleDebounce(for: revision)
+      }
+    } else {
+      status = entry == nil ? .idle : .saved
     }
   }
 
@@ -382,7 +406,6 @@ final class JournalEditorModel {
 extension JournalEditorModel {
   fileprivate enum RetryAction {
     case save(UInt64)
-    case delete
   }
 
   fileprivate enum EditorConfigurationError: Error {

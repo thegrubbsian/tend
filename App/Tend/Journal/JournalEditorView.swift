@@ -79,12 +79,12 @@ struct JournalEditorView: View {
       guard status.failure != nil, scenePhase == .active else { return }
       editorIsFocused = true
     }
-    .onChange(of: scenePhase) { _, phase in
+    .onChange(of: scenePhase) { previousPhase, phase in
       if phase == .active {
         if model.status.failure != nil {
           editorIsFocused = true
         }
-      } else {
+      } else if previousPhase == .active {
         model.flushForLifecycle()
       }
     }

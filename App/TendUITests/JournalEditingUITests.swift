@@ -97,6 +97,32 @@ final class JournalEditingUITests: XCTestCase {
   }
 
   @MainActor
+  func testBackgroundFlushFailureWaitsForActiveRetry() {
+    XCUIDevice.shared.orientation = .portrait
+    let app = launch(
+      storeName: "JournalEditingBackgroundUITests-\(UUID().uuidString)",
+      reset: true,
+      failsFirstSave: true
+    )
+    let prose = app.textViews["journalEditor.prose"]
+    XCTAssertTrue(prose.waitForExistence(timeout: 5))
+    prose.typeText("Background field note")
+
+    XCUIDevice.shared.press(.home)
+    XCTAssertTrue(app.wait(for: .runningBackground, timeout: 5))
+    app.activate()
+
+    let failure = element("journalEditor.failure", in: app)
+    XCTAssertTrue(failure.waitForExistence(timeout: 5))
+    XCTAssertEqual(prose.value as? String, "Background field note")
+    XCTAssertFalse(element("journalEditor.status", in: app).exists)
+
+    app.buttons["journalEditor.failure.retry"].tap()
+    XCTAssertTrue(waitForLabel("Saved", on: element("journalEditor.status", in: app)))
+    XCTAssertFalse(failure.exists)
+  }
+
+  @MainActor
   func testLargeTextLandscapeAndKeyboardClearance() throws {
     XCUIDevice.shared.orientation = .portrait
     defer { XCUIDevice.shared.orientation = .portrait }
@@ -152,6 +178,7 @@ final class JournalEditingUITests: XCTestCase {
     storeName: String,
     reset: Bool,
     failsSaves: Bool = false,
+    failsFirstSave: Bool = false,
     additionalArguments: [String] = []
   ) -> XCUIApplication {
     let app = XCUIApplication()
@@ -159,6 +186,7 @@ final class JournalEditingUITests: XCTestCase {
       storeName: storeName,
       reset: reset,
       failsSaves: failsSaves,
+      failsFirstSave: failsFirstSave,
       additionalArguments: additionalArguments
     )
     app.launch()
@@ -171,6 +199,7 @@ final class JournalEditingUITests: XCTestCase {
       storeName: storeName,
       reset: false,
       failsSaves: false,
+      failsFirstSave: false,
       additionalArguments: []
     )
     app.launch()
@@ -180,6 +209,7 @@ final class JournalEditingUITests: XCTestCase {
     storeName: String,
     reset: Bool,
     failsSaves: Bool,
+    failsFirstSave: Bool,
     additionalArguments: [String]
   ) -> [String] {
     var arguments = [
@@ -198,6 +228,7 @@ final class JournalEditingUITests: XCTestCase {
     ]
     if reset { arguments.append("-tend-ui-test-reset") }
     if failsSaves { arguments.append("-tend-journal-editor-fail-save") }
+    if failsFirstSave { arguments.append("-tend-journal-editor-fail-first-save") }
     arguments.append(contentsOf: additionalArguments)
     return arguments
   }

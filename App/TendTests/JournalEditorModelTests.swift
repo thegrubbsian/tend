@@ -255,6 +255,58 @@ struct JournalEditorModelTests {
     #expect(deletedIDs == [entry.id])
   }
 
+  @Test("a failed delete resumes autosave without hiding its retry")
+  func failedDeleteKeepsPendingRevisionAlive() async throws {
+    let fixture = try JournalEditorFixture()
+    let entry = fixture.entry(day: fixture.today, body: "Saved body")
+    let probe = EditorOperationProbe(storedEntry: entry)
+    probe.deleteFailuresRemaining = 1
+    let model = fixture.model(entry: entry, operations: probe.operations)
+
+    model.updateBody("Unsaved body", isComposing: false)
+    await fixture.clock.waitForPendingCount(1)
+    model.requestDeletion()
+    model.confirmDeletion()
+    for _ in 0..<10 { await Task.yield() }
+
+    #expect(model.status.failure?.operation == .delete)
+    #expect(await fixture.clock.pendingCount == 2)
+
+    await fixture.clock.resumeNext()
+    await fixture.clock.resumeNext()
+    await yieldUntil { probe.editCalls.count == 1 }
+
+    #expect(entry.body == "Unsaved body")
+    #expect(model.status.failure?.operation == .delete)
+    #expect(probe.deleteCalls.count == 1)
+    await fixture.clock.resumeAll()
+  }
+
+  @Test("a delete retry retires when Yesterday becomes too old")
+  func deleteRetryExpiresAtLocalMidnight() throws {
+    let fixture = try JournalEditorFixture()
+    let entry = fixture.entry(day: fixture.yesterday, body: "Yesterday")
+    let probe = EditorOperationProbe(storedEntry: entry)
+    probe.deleteFailuresRemaining = 1
+    let model = fixture.model(
+      day: fixture.yesterday,
+      entry: entry,
+      operations: probe.operations
+    )
+
+    model.requestDeletion()
+    model.confirmDeletion()
+    #expect(model.status.failure?.operation == .delete)
+
+    fixture.now = fixture.now.addingTimeInterval(24 * 60 * 60)
+    model.retry()
+
+    #expect(probe.deleteCalls.count == 1)
+    #expect(model.status.failure == nil)
+    #expect(model.status == .saved)
+    #expect(model.entryID == entry.id)
+  }
+
   @Test("background flush failure preserves unsaved prose for the next active scene")
   func backgroundFailureKeepsUnsavedBody() async throws {
     let fixture = try JournalEditorFixture()
@@ -436,7 +488,7 @@ private final class JournalEditorFixture {
   let clock = ManualJournalEditorClock()
   let timeZone: TimeZone
   let locale = Locale(identifier: "en_US")
-  let now: Date
+  var now: Date
   let today: LocalDate
   let yesterday: LocalDate
   var calendar: Calendar
