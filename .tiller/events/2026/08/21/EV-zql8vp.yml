@@ -1,0 +1,13 @@
+id: EV-zql8vp
+type: start.task
+at: 2026-08-21T00:37:59.243197Z
+owner: jc
+command: start task T-hb747f
+targets:
+    - T-hb747f
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml
