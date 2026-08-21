@@ -1,0 +1,14 @@
+id: EV-iuc2ir
+type: sync.task
+at: 2026-08-21T00:37:08.923405Z
+owner: jc
+command: sync task T-a5ad8n
+targets:
+    - T-a5ad8n
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-overview-projection/task.yml
