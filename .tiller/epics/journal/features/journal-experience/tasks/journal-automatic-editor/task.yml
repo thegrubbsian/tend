@@ -1,7 +1,7 @@
 id: T-hb747f
 key: journal/journal-experience/journal-automatic-editor
 title: Build the automatic Journal editor
-status: in_progress
+status: check
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,3 +17,30 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.103779Z
+gates:
+    build:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-21T02:21:34.799965Z
+        against:
+            kind: git_commit
+            value: git:e250415
+            observed_at: 2026-08-21T02:21:34.799962Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/build-e250415-out-2e71531854e1df73110494349178e520b66586e3ebfb04643218f01259b5662b.txt
+    tests:
+        required: true
+        kind: command
+        status: pass
+        run_by: jc
+        run_at: 2026-08-21T02:21:34.799965Z
+        against:
+            kind: git_commit
+            value: git:e250415
+            observed_at: 2026-08-21T02:21:34.799962Z
+        evidence:
+            - kind: command_output
+              ref: artifacts/tiller/gates/tests-e250415-out-135771fd2ca74feaf2b2846c4923e50adb183d5910ec2426babeab9fbdadf1e9.txt
