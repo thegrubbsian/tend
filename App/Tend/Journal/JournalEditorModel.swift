@@ -202,7 +202,9 @@ final class JournalEditorModel {
     cancelDebounce()
 
     guard hasUnsavedChanges else {
-      status = entry == nil ? .idle : .saved
+      status =
+        deletionFailure.map(JournalEditorStatus.failed)
+        ?? (entry == nil ? .idle : .saved)
       return
     }
     status = .pending

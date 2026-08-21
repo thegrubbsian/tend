@@ -267,7 +267,7 @@ struct JournalEditorModelTests {
     await fixture.clock.waitForPendingCount(1)
     model.requestDeletion()
     model.confirmDeletion()
-    for _ in 0..<10 { await Task.yield() }
+    await fixture.clock.waitForPendingCount(2)
 
     #expect(model.status.failure?.operation == .delete)
     #expect(await fixture.clock.pendingCount == 2)
@@ -279,6 +279,27 @@ struct JournalEditorModelTests {
     #expect(entry.body == "Unsaved body")
     #expect(model.status.failure?.operation == .delete)
     #expect(probe.deleteCalls.count == 1)
+    await fixture.clock.resumeAll()
+  }
+
+  @Test("reverting an edit does not hide a retained delete failure")
+  func revertedEditKeepsDeleteRetryVisible() async throws {
+    let fixture = try JournalEditorFixture()
+    let entry = fixture.entry(day: fixture.today, body: "Saved body")
+    let probe = EditorOperationProbe(storedEntry: entry)
+    probe.deleteFailuresRemaining = 1
+    let model = fixture.model(entry: entry, operations: probe.operations)
+
+    model.requestDeletion()
+    model.confirmDeletion()
+    #expect(model.status.failure?.operation == .delete)
+
+    model.updateBody("Changed", isComposing: false)
+    await fixture.clock.waitForPendingCount(1)
+    model.updateBody("Saved body", isComposing: false)
+
+    #expect(model.status.failure?.operation == .delete)
+    #expect(probe.editCalls.isEmpty)
     await fixture.clock.resumeAll()
   }
 
