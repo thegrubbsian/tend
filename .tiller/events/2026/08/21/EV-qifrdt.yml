@@ -1,0 +1,14 @@
+id: EV-qifrdt
+type: submit.task
+at: 2026-08-21T02:23:11.051475Z
+owner: jc
+command: submit task T-hb747f
+targets:
+    - T-hb747f
+before:
+    status: check
+after:
+    pr: 61
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml
