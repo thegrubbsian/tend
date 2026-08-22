@@ -1,0 +1,14 @@
+id: EV-kxjw95
+type: sync.task
+at: 2026-08-22T04:06:40.676222Z
+owner: jc
+command: sync task T-62rnjr
+targets:
+    - T-62rnjr
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml
