@@ -1,0 +1,13 @@
+id: EV-ydge1f
+type: start.task
+at: 2026-08-22T01:07:24.535231Z
+owner: jc
+command: start task T-62rnjr
+targets:
+    - T-62rnjr
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml
