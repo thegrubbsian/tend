@@ -14,7 +14,6 @@ this file is regenerated from the working tree on every sync. -->
 - epic journal (E-l8goi4): ready, active
 - feature journal/journal-experience (F-wf19av): active, awaiting check
 - feature journal/today-journal-invitation (F-0rn0hs): active
-- task journal/today-journal-invitation/today-journal-projection (T-19qcbl): check
 - task journal/today-journal-invitation/today-journal-surface (T-6wblsz): ready
 
 ### Blocked
@@ -23,7 +22,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- (none)
+- task journal/today-journal-invitation/today-journal-projection (T-19qcbl): build pass, tests pass
 
 ### Open questions
 
