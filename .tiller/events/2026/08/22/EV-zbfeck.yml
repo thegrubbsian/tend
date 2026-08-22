@@ -1,0 +1,14 @@
+id: EV-zbfeck
+type: submit.task
+at: 2026-08-22T02:20:33.722889Z
+owner: jc
+command: submit task T-62rnjr
+targets:
+    - T-62rnjr
+before:
+    status: check
+after:
+    pr: 62
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml

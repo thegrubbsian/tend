@@ -1,7 +1,7 @@
 id: T-62rnjr
 key: journal/journal-experience/journal-day-garden
 title: Render each entry's live Habit garden
-status: check
+status: in_review
 blocked: false
 owner: jc
 proposed_by: jc
@@ -17,6 +17,7 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.126276Z
+pr: 62
 gates:
     build:
         required: true
