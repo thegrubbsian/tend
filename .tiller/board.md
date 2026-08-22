@@ -14,7 +14,7 @@ this file is regenerated from the working tree on every sync. -->
 - epic journal (E-l8goi4): ready, active
 - feature journal/journal-experience (F-wf19av): active
 - feature journal/today-journal-invitation (F-0rn0hs): ready
-- task journal/journal-experience/journal-destination (T-3hwtmu): in_progress
+- task journal/journal-experience/journal-destination (T-3hwtmu): check
 - task journal/today-journal-invitation/today-journal-projection (T-19qcbl): ready
 - task journal/today-journal-invitation/today-journal-surface (T-6wblsz): ready
 

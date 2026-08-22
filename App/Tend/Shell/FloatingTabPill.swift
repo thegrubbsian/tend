@@ -58,6 +58,8 @@ struct FloatingTabPill: View {
       Image(systemName: isSelected ? "flag.fill" : "flag")
     case .habits:
       Image(systemName: "list.bullet")
+    case .journal:
+      Image(systemName: isSelected ? "book.closed.fill" : "book.closed")
     }
   }
 }

@@ -11,7 +11,6 @@ struct JournalEditorView: View {
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.timeZone) private var timeZone
   @Environment(\.verticalSizeClass) private var verticalSizeClass
-  @Query private var habits: [Habit]
 
   @State private var model: JournalEditorModel
   @State private var gardenModel: JournalDayGardenModel?
@@ -19,20 +18,29 @@ struct JournalEditorView: View {
   @State private var navigationGuardToken: ShellNavigationGuardToken?
 
   private let routing: ShellRoutingModel?
+  private let habits: [Habit]
   private let onClose: @MainActor () -> Void
   private let onSelectDate: @MainActor (LocalDate) -> Void
   private let gardenNow: @MainActor () -> Date
+  private let gardenRefreshSignal: Date?
+  private let managesLifecycle: Bool
 
   init(
     model: JournalEditorModel,
+    habits: [Habit],
     routing: ShellRoutingModel? = nil,
     gardenNow: @escaping @MainActor () -> Date = Date.init,
+    gardenRefreshSignal: Date?,
+    managesLifecycle: Bool = true,
     onClose: @escaping @MainActor () -> Void = {},
     onSelectDate: @escaping @MainActor (LocalDate) -> Void = { _ in }
   ) {
     _model = State(initialValue: model)
+    self.habits = habits
     self.routing = routing
     self.gardenNow = gardenNow
+    self.gardenRefreshSignal = gardenRefreshSignal
+    self.managesLifecycle = managesLifecycle
     self.onClose = onClose
     self.onSelectDate = onSelectDate
   }
@@ -49,7 +57,8 @@ struct JournalEditorView: View {
       if !model.scopeOptions.isEmpty {
         scopePicker
           .padding(
-            .top, isCompactHeight ? AlmanacMetrics.spacingSmall : AlmanacMetrics.spacingMedium)
+            .top, isCompactHeight ? AlmanacMetrics.spacingSmall : AlmanacMetrics.spacingMedium
+          )
       }
 
       persistenceStatus
@@ -72,13 +81,16 @@ struct JournalEditorView: View {
       }
     )
     .task(id: gardenRefreshStamp) {
-      refreshGarden()
+      refreshGarden(force: true)
     }
     .onAppear {
       editorIsFocused = true
-      installNavigationGuard()
+      if managesLifecycle {
+        installNavigationGuard()
+      }
     }
     .onDisappear {
+      guard managesLifecycle else { return }
       removeNavigationGuard()
       model.stop()
     }
@@ -364,12 +376,16 @@ struct JournalEditorView: View {
     .accessibilityLabel("Journal entry for \(formattedDay)")
     .accessibilityIdentifier("journalEditor.prose")
   }
-  private var gardenRefreshStamp: JournalDayGardenModel.InputFingerprint? {
+  private var gardenRefreshStamp: JournalEditorGardenRefreshStamp? {
     guard model.entryID != nil else { return nil }
-    return JournalDayGardenModel.InputFingerprint(
+    let input = JournalDayGardenModel.InputFingerprint(
       day: model.day,
       habits: habits,
       context: gardenRefreshContext
+    )
+    return JournalEditorGardenRefreshStamp(
+      input: input,
+      refreshSignal: gardenRefreshSignal
     )
   }
 
@@ -481,6 +497,11 @@ struct JournalEditorView: View {
     routing.removeNavigationGuard(navigationGuardToken)
     self.navigationGuardToken = nil
   }
+}
+
+struct JournalEditorGardenRefreshStamp: Equatable {
+  let input: JournalDayGardenModel.InputFingerprint
+  let refreshSignal: Date?
 }
 
 private struct JournalProseTextView: UIViewRepresentable {

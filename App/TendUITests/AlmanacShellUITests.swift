@@ -14,20 +14,21 @@ final class AlmanacShellUITests: XCTestCase {
     let todayTab = app.buttons["shell.tab.today"]
     let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
+    let journalTab = app.buttons["shell.tab.journal"]
 
     XCTAssertTrue(
       app.descendants(matching: .any)["shell.destination.today"].waitForExistence(timeout: 5))
-    XCTAssertTrue(goalsTab.waitForExistence(timeout: 5))
-    XCTAssertEqual(shellTabs.count, 3)
+    XCTAssertTrue(journalTab.waitForExistence(timeout: 5))
+    XCTAssertEqual(shellTabs.count, 4)
     XCTAssertEqual(
       shellTabs.allElementsBoundByIndex.map { $0.label },
-      ["Today", "Goals", "Habits"]
+      ["Today", "Goals", "Habits", "Journal"]
     )
     XCTAssertTrue(todayTab.isSelected)
     XCTAssertFalse(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
+    XCTAssertFalse(journalTab.isSelected)
     XCTAssertEqual(app.tabBars.count, 0)
-    XCTAssertFalse(app.buttons["Journal"].exists)
   }
 
   @MainActor
@@ -36,6 +37,7 @@ final class AlmanacShellUITests: XCTestCase {
     let todayTab = app.buttons["shell.tab.today"]
     let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
+    let journalTab = app.buttons["shell.tab.journal"]
     let destinations = app.descendants(matching: .any).matching(
       NSPredicate(format: "identifier BEGINSWITH %@", "shell.destination.")
     )
@@ -50,9 +52,35 @@ final class AlmanacShellUITests: XCTestCase {
     XCTAssertEqual(destinations.count, 1)
     XCTAssertFalse(app.descendants(matching: .any)["shell.destination.today"].exists)
     XCTAssertFalse(app.descendants(matching: .any)["shell.destination.habits"].exists)
+    XCTAssertFalse(app.descendants(matching: .any)["shell.destination.journal"].exists)
     XCTAssertFalse(todayTab.isSelected)
     XCTAssertTrue(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
+    XCTAssertFalse(journalTab.isSelected)
+  }
+  @MainActor
+  func testTappingJournalSwitchesDestinationAndSelectedState() {
+    let app = launchFreshApp()
+    let todayTab = app.buttons["shell.tab.today"]
+    let goalsTab = app.buttons["shell.tab.goals"]
+    let habitsTab = app.buttons["shell.tab.habits"]
+    let journalTab = app.buttons["shell.tab.journal"]
+    let destinations = app.descendants(matching: .any).matching(
+      NSPredicate(format: "identifier BEGINSWITH %@", "shell.destination.")
+    )
+
+    XCTAssertTrue(journalTab.waitForExistence(timeout: 5))
+    journalTab.tap()
+
+    XCTAssertTrue(
+      app.descendants(matching: .any)[
+        "shell.destination.journal"
+      ].waitForExistence(timeout: 5))
+    XCTAssertEqual(destinations.count, 1)
+    XCTAssertFalse(todayTab.isSelected)
+    XCTAssertFalse(goalsTab.isSelected)
+    XCTAssertFalse(habitsTab.isSelected)
+    XCTAssertTrue(journalTab.isSelected)
   }
 
   @MainActor
@@ -61,6 +89,7 @@ final class AlmanacShellUITests: XCTestCase {
     let todayTab = app.buttons["shell.tab.today"]
     let goalsTab = app.buttons["shell.tab.goals"]
     let habitsTab = app.buttons["shell.tab.habits"]
+    let journalTab = app.buttons["shell.tab.journal"]
 
     XCTAssertTrue(goalsTab.waitForExistence(timeout: 5))
     goalsTab.tap()
@@ -79,6 +108,7 @@ final class AlmanacShellUITests: XCTestCase {
     XCTAssertFalse(todayTab.isSelected)
     XCTAssertTrue(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
+    XCTAssertFalse(journalTab.isSelected)
 
     app.terminate()
     app.launch()
@@ -89,6 +119,7 @@ final class AlmanacShellUITests: XCTestCase {
     XCTAssertTrue(todayTab.isSelected)
     XCTAssertFalse(goalsTab.isSelected)
     XCTAssertFalse(habitsTab.isSelected)
+    XCTAssertFalse(journalTab.isSelected)
   }
 
   @MainActor
