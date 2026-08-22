@@ -1,0 +1,13 @@
+id: EV-yfsrws
+type: check.task
+at: 2026-08-21T02:21:38.132388Z
+owner: jc
+command: check task T-hb747f
+targets:
+    - T-hb747f
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml
