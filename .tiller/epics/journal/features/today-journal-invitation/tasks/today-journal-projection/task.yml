@@ -1,7 +1,7 @@
 id: T-19qcbl
 key: journal/today-journal-invitation/today-journal-projection
 title: Project today's Journal invitation state
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -16,6 +16,7 @@ accepted_against:
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.36398Z
 pr: 64
+done_basis: ancestry
 gates:
     build:
         required: true

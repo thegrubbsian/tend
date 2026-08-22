@@ -22,7 +22,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task journal/today-journal-invitation/today-journal-projection (T-19qcbl): build pass, tests pass
+- (none)
 
 ### Open questions
 

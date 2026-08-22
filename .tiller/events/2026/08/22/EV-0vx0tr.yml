@@ -1,0 +1,14 @@
+id: EV-0vx0tr
+type: sync.task
+at: 2026-08-22T18:05:27.544762Z
+owner: jc
+command: sync task T-19qcbl
+targets:
+    - T-19qcbl
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-projection/task.yml
