@@ -75,6 +75,13 @@
       case goalExperience = "goal-experience"
       case journalExperience = "journal-experience"
       case journalLoadFailure = "journal-load-failure"
+      case todayJournalEligible = "today-journal-eligible"
+      case todayJournalComplete = "today-journal-complete"
+      case todayJournalUnavailable = "today-journal-unavailable"
+      case todayJournalFirstLaunch = "today-journal-first-launch"
+      case todayJournalInactive = "today-journal-inactive"
+      case todayJournalAllTended = "today-journal-all-tended"
+      case todayJournalJourney = "today-journal-journey"
     }
 
     static func containerFactory(
@@ -215,6 +222,55 @@
         case .todayGoalsEmpty:
           try TodayGoalUITestFixture.seed(
             .empty,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalEligible:
+          try TodayJournalInvitationUITestFixture.seed(
+            .eligible,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalComplete:
+          try TodayJournalInvitationUITestFixture.seed(
+            .complete,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalUnavailable:
+          try TodayJournalInvitationUITestFixture.seed(
+            .unavailable,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalFirstLaunch:
+          try TodayJournalInvitationUITestFixture.seed(
+            .firstLaunch,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalInactive:
+          try TodayJournalInvitationUITestFixture.seed(
+            .inactive,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalAllTended:
+          try TodayJournalInvitationUITestFixture.seed(
+            .allTended,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .todayJournalJourney:
+          try TodayJournalInvitationUITestFixture.seed(
+            .journey,
             context: container.mainContext,
             at: launchInstant,
             timeZone: fixtureTimeZone
@@ -384,6 +440,13 @@
         .todayGoalsEmpty,
         .journalExperience,
         .journalLoadFailure,
+        .todayJournalEligible,
+        .todayJournalComplete,
+        .todayJournalUnavailable,
+        .todayJournalFirstLaunch,
+        .todayJournalInactive,
+        .todayJournalAllTended,
+        .todayJournalJourney,
       ]
 
       private static func isValid(name: String) -> Bool {

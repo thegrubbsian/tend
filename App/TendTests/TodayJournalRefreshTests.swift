@@ -166,6 +166,52 @@ struct TodayJournalRefreshTests {
     #expect(journalCalls == 4)
   }
 
+  @Test("same-local-day Journal retry does not reproject Habit siblings")
+  func retryUsesJournalRelevantContext() throws {
+    let store = try makeStore()
+    let habit = try insertHabit(in: store)
+    let today = try #require(LocalDate(rawValue: "2026-08-18"))
+    let initial = refreshContext(on: today)
+    let retryContext = refreshContext(
+      instant: initial.instant.addingTimeInterval(60),
+      timeZone: initial.timeZone.identifier
+    )
+    var journalFails = true
+    var habitCalls = 0
+    var journalContexts: [TodayRefreshContext] = []
+    let model = TodayModel(
+      operations: TodayOperations(
+        snapshot: { _, _ in
+          habitCalls += 1
+          return self.habitSnapshot()
+        },
+        journalEntryExists: { _, context in
+          journalContexts.append(context)
+          if journalFails { throw FixtureError.unavailable }
+          return false
+        }
+      )
+    )
+    model.refresh(
+      habits: [habit],
+      goals: [],
+      journalEntries: [],
+      context: initial
+    )
+
+    journalFails = false
+    model.retryJournal(
+      habits: [habit],
+      goals: [],
+      journalEntries: [],
+      context: retryContext
+    )
+
+    #expect(model.journalInvitation == .invitation(day: today))
+    #expect(habitCalls == 1)
+    #expect(journalContexts == [initial, retryContext])
+  }
+
   @Test("Habit retry refreshes after a live Journal graph mutation")
   func habitRetryUsesLiveJournalGraph() throws {
     let store = try makeStore()

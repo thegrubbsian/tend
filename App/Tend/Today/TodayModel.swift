@@ -486,7 +486,8 @@ final class TodayModel {
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
       journalFingerprints(for: journalInputs) == lastJournalInputs,
-      generationContext == context
+      let generationContext,
+      matchesJournalRetryContext(generationContext, context)
     else {
       refresh(
         habits: habits,
@@ -620,6 +621,17 @@ final class TodayModel {
       let day = components.day
     else { return nil }
     return LocalDate(year: year, month: month, day: day)
+  }
+
+  private func matchesJournalRetryContext(
+    _ previous: TodayRefreshContext,
+    _ current: TodayRefreshContext
+  ) -> Bool {
+    previous.timeZone == current.timeZone
+      && previous.calendar == current.calendar
+      && previous.locale == current.locale
+      && localLocalDate(at: previous.instant, timeZone: previous.timeZone)
+        == localLocalDate(at: current.instant, timeZone: current.timeZone)
   }
 
   private func dashboard(

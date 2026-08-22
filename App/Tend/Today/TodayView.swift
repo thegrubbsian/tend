@@ -17,6 +17,7 @@ struct TodayView: View {
   let instant: Date
   let fixedOperationInstant: Date?
   let onPlantHabit: () -> Void
+  let onOpenJournal: (LocalDate) -> Void
   let onGoalTransitionChange: (Date?) -> Void
   let reminderRefresh: ReminderRefreshSignal
 
@@ -27,6 +28,7 @@ struct TodayView: View {
     instant: Date,
     fixedOperationInstant: Date?,
     onPlantHabit: @escaping () -> Void,
+    onOpenJournal: @escaping (LocalDate) -> Void,
     onGoalTransitionChange: @escaping (Date?) -> Void,
     reminderRefresh: @escaping ReminderRefreshSignal = {}
   ) {
@@ -36,6 +38,7 @@ struct TodayView: View {
     self.instant = instant
     self.fixedOperationInstant = fixedOperationInstant
     self.onPlantHabit = onPlantHabit
+    self.onOpenJournal = onOpenJournal
     self.onGoalTransitionChange = onGoalTransitionChange
     self.reminderRefresh = reminderRefresh
   }
@@ -133,7 +136,10 @@ struct TodayView: View {
         instant: instant,
         onPlantHabit: onPlantHabit,
         goalRows: model?.goalRows ?? [],
-        retryGoal: retry
+        retryGoal: retry,
+        journalInvitation: model?.journalInvitation,
+        openJournal: onOpenJournal,
+        retryJournal: retryJournal
       )
     case .inactiveOnly:
       scrollSurface(identifier: "today.inactive") {
@@ -147,6 +153,8 @@ struct TodayView: View {
         if let goalRows = model?.goalRows, !goalRows.isEmpty {
           TodayGoalsSection(rows: goalRows, retry: retry)
         }
+
+        journalSection
       }
     case .dashboard(let dashboard):
       scrollSurface(identifier: "today.dashboard") {
@@ -194,7 +202,20 @@ struct TodayView: View {
         if !dashboard.goalRows.isEmpty {
           TodayGoalsSection(rows: dashboard.goalRows, retry: retry)
         }
+
+        journalSection
       }
+    }
+  }
+
+  @ViewBuilder
+  private var journalSection: some View {
+    if let invitation = model?.journalInvitation, invitation != .complete {
+      TodayJournalSection(
+        invitation: invitation,
+        openJournal: onOpenJournal,
+        retry: retryJournal
+      )
     }
   }
 
@@ -322,6 +343,15 @@ struct TodayView: View {
       context: operationContext()
     )
   }
+  private func retryJournal() {
+    model?.retryJournal(
+      habits: habits,
+      goals: goals,
+      journalEntries: journalEntries,
+      context: operationContext()
+    )
+  }
+
 }
 
 struct TodayFirstLaunchView: View {
@@ -333,17 +363,26 @@ struct TodayFirstLaunchView: View {
   let onPlantHabit: () -> Void
   let goalRows: [TodayGoalRow]
   let retryGoal: (TodayGoalRow) -> Void
+  let journalInvitation: TodayJournalInvitation?
+  let openJournal: (LocalDate) -> Void
+  let retryJournal: () -> Void
 
   init(
     instant: Date,
     onPlantHabit: @escaping () -> Void,
     goalRows: [TodayGoalRow] = [],
-    retryGoal: @escaping (TodayGoalRow) -> Void = { _ in }
+    retryGoal: @escaping (TodayGoalRow) -> Void = { _ in },
+    journalInvitation: TodayJournalInvitation? = nil,
+    openJournal: @escaping (LocalDate) -> Void = { _ in },
+    retryJournal: @escaping () -> Void = {},
   ) {
     self.instant = instant
     self.onPlantHabit = onPlantHabit
     self.goalRows = goalRows
     self.retryGoal = retryGoal
+    self.journalInvitation = journalInvitation
+    self.openJournal = openJournal
+    self.retryJournal = retryJournal
   }
 
   var body: some View {
@@ -363,6 +402,14 @@ struct TodayFirstLaunchView: View {
 
           if !goalRows.isEmpty {
             TodayGoalsSection(rows: goalRows, retry: retryGoal)
+          }
+
+          if let journalInvitation, journalInvitation != .complete {
+            TodayJournalSection(
+              invitation: journalInvitation,
+              openJournal: openJournal,
+              retry: retryJournal
+            )
           }
         }
         .padding(.top, AlmanacMetrics.spacingExtraLarge)
