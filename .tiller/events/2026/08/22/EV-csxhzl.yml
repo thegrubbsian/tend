@@ -1,0 +1,13 @@
+id: EV-csxhzl
+type: check.feature
+at: 2026-08-22T21:20:49.330789Z
+owner: jc
+command: check feature F-0rn0hs
+targets:
+    - F-0rn0hs
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.yml

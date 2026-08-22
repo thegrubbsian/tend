@@ -1,0 +1,13 @@
+id: EV-vc7bcw
+type: check.feature
+at: 2026-08-22T20:44:26.961311Z
+owner: jc
+command: check feature F-wf19av
+targets:
+    - F-wf19av
+before:
+    status: active
+after:
+    status: active
+files:
+    - path: .tiller/epics/journal/features/journal-experience/feature.yml
