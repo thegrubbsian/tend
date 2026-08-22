@@ -63,6 +63,11 @@ final class ShellRoutingModel {
     journalRoute = route
   }
 
+  func beginJournalRequest(on day: LocalDate) -> ShellSelectionRequest {
+    prepareJournalRoute(.compose(day))
+    return beginSelectionRequest(.journal)
+  }
+
   func resolveJournalEntry(using query: JournalEntryQuery) throws -> JournalEntry? {
     guard case .entry(let id) = journalRoute else { return nil }
     let entry = try query.entries().first { $0.id == id }

@@ -25,7 +25,7 @@ struct AlmanacShellView: View {
   private var destination: some View {
     switch routing.selection {
     case .today:
-      TodayDestinationChrome(reminders: reminders)
+      TodayDestinationChrome(reminders: reminders, routing: routing)
         .accessibilityFocused($accessibilityFocus, equals: .today)
     case .goals:
       GoalsDestinationChrome()

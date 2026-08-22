@@ -35,6 +35,37 @@ struct JournalRoutingModelTests {
     #expect(routing.journalRoute == .overview)
   }
 
+  @Test("Today Journal invitation prepares one idempotent compose destination")
+  func todayJournalInvitationRoutesOnce() async throws {
+    let routing = ShellRoutingModel(selection: .today)
+    let day = try localDate("2026-03-08")
+
+    let first = routing.beginJournalRequest(on: day)
+    #expect(routing.selection == .today)
+    #expect(routing.journalRoute == .compose(day))
+    #expect(await routing.completeSelectionRequest(first))
+    #expect(routing.selection == .journal)
+
+    let repeated = routing.beginJournalRequest(on: day)
+    #expect(await routing.completeSelectionRequest(repeated))
+    #expect(routing.selection == .journal)
+    #expect(routing.journalRoute == .compose(day))
+  }
+
+  @Test("a later tab request supersedes a registered Journal invitation")
+  func laterTabRequestWinsOverJournalInvitation() async throws {
+    let routing = ShellRoutingModel(selection: .today)
+    let day = try localDate("2026-03-08")
+
+    let journal = routing.beginJournalRequest(on: day)
+    let goals = routing.beginSelectionRequest(.goals)
+
+    #expect(!(await routing.completeSelectionRequest(journal)))
+    #expect(await routing.completeSelectionRequest(goals))
+    #expect(routing.selection == .goals)
+    #expect(routing.journalRoute == .compose(day))
+  }
+
   @Test("entry routes resolve exact identity and missing identity returns to overview")
   func entryRoutesResolveOrReturnToOverview() throws {
     let context = ModelContext(try TendModelContainer.inMemory())

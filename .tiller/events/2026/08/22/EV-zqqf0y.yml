@@ -1,0 +1,13 @@
+id: EV-zqqf0y
+type: start.task
+at: 2026-08-22T18:06:25.356027Z
+owner: jc
+command: start task T-6wblsz
+targets:
+    - T-6wblsz
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.yml

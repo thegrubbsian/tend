@@ -13,13 +13,16 @@ struct TodayDestinationChrome: View {
   @State private var nextGoalTransition: Date?
   @State private var timelineDate: Date?
   private let reminders: any ReminderRuntimeClient
+  private let routing: ShellRoutingModel
   private let fixedDate: Date?
 
   init(
     reminders: any ReminderRuntimeClient,
+    routing: ShellRoutingModel,
     date: Date? = nil
   ) {
     self.reminders = reminders
+    self.routing = routing
     #if DEBUG
       fixedDate =
         date
@@ -77,6 +80,10 @@ struct TodayDestinationChrome: View {
       fixedOperationInstant: fixedDate,
       onPlantHabit: {
         isPresentingNewHabit = true
+      },
+      onOpenJournal: { day in
+        let request = routing.beginJournalRequest(on: day)
+        Task { _ = await routing.completeSelectionRequest(request) }
       },
       onGoalTransitionChange: updateGoalTransition,
       reminderRefresh: {
