@@ -7,6 +7,7 @@
     static let enabled = "-tend-journal-editor"
     static let failSave = "-tend-journal-editor-fail-save"
     static let failFirstSave = "-tend-journal-editor-fail-first-save"
+    static let garden = "-tend-journal-garden"
 
     static func isEnabled(_ arguments: [String]) -> Bool {
       arguments.contains(enabled)
@@ -70,6 +71,7 @@
         JournalEditorView(
           model: model,
           routing: routing,
+          gardenNow: { instant },
           onClose: onClose
         )
       } else {
@@ -103,7 +105,12 @@
       } else {
         operations = liveOperations
       }
-      let entry = entries.first { $0.dayKey == day.rawValue }
+      let entry =
+        if ProcessInfo.processInfo.arguments.contains(JournalEditorUITestHarnessArguments.garden) {
+          try? seedGarden(on: day)
+        } else {
+          entries.first { $0.dayKey == day.rawValue }
+        }
       let sleep: JournalEditorModel.Sleep
       if failsFirstSave {
         sleep = { _ in try await Task.sleep(for: .seconds(60)) }
@@ -120,6 +127,73 @@
         sleep: sleep,
         onDeleted: onDeleted
       )
+    }
+
+    private func seedGarden(on day: LocalDate) throws -> JournalEntry {
+      if let entry = entries.first(where: { $0.dayKey == day.rawValue }) {
+        return entry
+      }
+      let management = HabitManagementOperations(context: context)
+      let logging = LogEntryOperations(context: context)
+
+      let read = try management.create(
+        fields: HabitEditableFields(name: "Read", target: 2, unit: "pages"),
+        cadence: .daily,
+        at: instant,
+        timeZone: timeZone
+      )
+      read.id = fixtureID(1)
+      _ = try logging.append(
+        amount: 2,
+        to: read,
+        at: instant,
+        timeZone: timeZone
+      )
+
+      let walk = try management.create(
+        fields: HabitEditableFields(name: "Walk", target: 2, unit: "miles"),
+        cadence: .daily,
+        at: instant,
+        timeZone: timeZone
+      )
+      walk.id = fixtureID(2)
+      _ = try logging.append(
+        amount: 1,
+        to: walk,
+        at: instant,
+        timeZone: timeZone
+      )
+
+      let broken = Habit(
+        id: fixtureID(3),
+        name: "Broken",
+        cadence: .daily,
+        target: 1,
+        isActive: true,
+        createdAt: instant
+      )
+      let brokenActivity = HabitActivityPeriod(startedAt: instant, habit: broken)
+      context.insert(broken)
+      context.insert(brokenActivity)
+      broken.activityPeriods = [brokenActivity]
+      try context.save()
+
+      return try JournalEntryOperations(context: context).create(
+        day: day,
+        body: "Field notes from the garden.",
+        at: instant,
+        timeZone: timeZone
+      )
+    }
+
+    private func fixtureID(_ value: Int) -> UUID {
+      UUID(
+        uuidString: String(
+          format: "00000000-0000-0000-0000-%012d",
+          locale: Locale(identifier: "en_US_POSIX"),
+          value
+        )
+      )!
     }
 
     private var localDay: LocalDate? {
