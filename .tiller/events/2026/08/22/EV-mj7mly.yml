@@ -1,0 +1,14 @@
+id: EV-mj7mly
+type: sync.feature
+at: 2026-08-22T21:21:57.742795Z
+owner: jc
+command: sync feature F-wf19av
+targets:
+    - F-wf19av
+before:
+    status: active
+after:
+    basis: rollup
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/feature.yml

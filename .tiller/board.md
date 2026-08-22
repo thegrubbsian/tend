@@ -11,9 +11,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Active work
 
-- epic journal (E-l8goi4): ready, active
-- feature journal/journal-experience (F-wf19av): active, awaiting sync
-- feature journal/today-journal-invitation (F-0rn0hs): active, awaiting sync
+- (none)
 
 ### Blocked
 

@@ -1,7 +1,19 @@
 id: E-l8goi4
 key: journal
 title: Journal
-status: ready
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L1-3
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:e00fe47d638649a23782d6edcba745a4b528e1ba
+        path: .tiller/epics/journal/epic.md
+        observed_at: 2026-08-22T21:21:57.891212Z
+    commit:
+        kind: git_commit
+        value: git:b2dffda
+        observed_at: 2026-08-22T21:21:57.164643Z
+    surfaces: []
+done_basis: rollup

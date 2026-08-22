@@ -1,7 +1,7 @@
 id: F-wf19av
 key: journal/journal-experience
 title: Journal Experience
-status: active
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L25-31
@@ -24,6 +24,23 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.037424Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:7987ec6e873dfe1f74dd66c1d23e59b5ae86253c
+        path: .tiller/epics/journal/features/journal-experience/feature.md
+        observed_at: 2026-08-22T21:21:57.724037Z
+    eval:
+        kind: git_blob
+        value: git:0479b7e54acd1853380898aa289f6479f41cd266
+        path: .tiller/epics/journal/features/journal-experience/feature.eval.md
+        observed_at: 2026-08-22T21:21:57.724037Z
+    commit:
+        kind: git_commit
+        value: git:b2dffda
+        observed_at: 2026-08-22T21:21:57.164643Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true
@@ -94,3 +111,11 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-92920d2-out-20bf81a98d6ff5667a1cdeda5f1971fd05ff01caa8e3e9cef7d23d5f40296449.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:b2dffda
+        observed_at: 2026-08-22T21:21:57.164643Z
+      status: pending
+      evidence_ref: artifacts/tiller/gates/eval-C1-92920d2-out-995f3846e2f6f4a6d8f65c30397203dcb746c112a0cc8ccc9f7bce905d1db210.txt

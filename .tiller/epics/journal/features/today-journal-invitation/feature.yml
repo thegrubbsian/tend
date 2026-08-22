@@ -1,7 +1,7 @@
 id: F-0rn0hs
 key: journal/today-journal-invitation
 title: Today Journal Invitation
-status: active
+status: done
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L33-35
@@ -24,6 +24,23 @@ accepted_against:
         kind: git_commit
         value: git:e514010
         observed_at: 2026-08-19T22:51:21.341024Z
+verified_against:
+    spec:
+        kind: git_blob
+        value: git:a15c45d4fb89980887b865bed40896f6880ef401
+        path: .tiller/epics/journal/features/today-journal-invitation/feature.md
+        observed_at: 2026-08-22T21:21:57.164873Z
+    eval:
+        kind: git_blob
+        value: git:fff5365458c7af3b35194ef64c4db8002160cc67
+        path: .tiller/epics/journal/features/today-journal-invitation/feature.eval.md
+        observed_at: 2026-08-22T21:21:57.164873Z
+    commit:
+        kind: git_commit
+        value: git:b2dffda
+        observed_at: 2026-08-22T21:21:57.164643Z
+    surfaces: []
+done_basis: rollup
 gates:
     build:
         required: true
@@ -84,3 +101,11 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-sha256-471ec3be6f22-out-3d4d641a39106a6c4d7e348b524e75567cf366559fdac4c0e0a6824d939fa32a.txt
+policy_violations:
+    - gate: evals
+      observed:
+        kind: git_commit
+        value: git:b2dffda
+        observed_at: 2026-08-22T21:21:57.164643Z
+      status: fail
+      evidence_ref: artifacts/tiller/gates/eval-C1-sha256-471ec3be6f22-out-151b641ae7b38c49c132258ae94872af7fb61b310c56c9dff540609017005d9e.txt
