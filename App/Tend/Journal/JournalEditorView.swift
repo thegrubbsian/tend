@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 import TendCore
 import UIKit
@@ -6,26 +7,32 @@ struct JournalEditorView: View {
   @Environment(\.calendar) private var calendar
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @Environment(\.locale) private var locale
+  @Environment(\.modelContext) private var modelContext
   @Environment(\.scenePhase) private var scenePhase
   @Environment(\.timeZone) private var timeZone
   @Environment(\.verticalSizeClass) private var verticalSizeClass
+  @Query private var habits: [Habit]
 
   @State private var model: JournalEditorModel
+  @State private var gardenModel: JournalDayGardenModel?
   @State private var editorIsFocused = false
   @State private var navigationGuardToken: ShellNavigationGuardToken?
 
   private let routing: ShellRoutingModel?
   private let onClose: @MainActor () -> Void
   private let onSelectDate: @MainActor (LocalDate) -> Void
+  private let gardenNow: @MainActor () -> Date
 
   init(
     model: JournalEditorModel,
     routing: ShellRoutingModel? = nil,
+    gardenNow: @escaping @MainActor () -> Date = Date.init,
     onClose: @escaping @MainActor () -> Void = {},
     onSelectDate: @escaping @MainActor (LocalDate) -> Void = { _ in }
   ) {
     _model = State(initialValue: model)
     self.routing = routing
+    self.gardenNow = gardenNow
     self.onClose = onClose
     self.onSelectDate = onSelectDate
   }
@@ -48,10 +55,7 @@ struct JournalEditorView: View {
       persistenceStatus
         .padding(.top, isCompactHeight ? AlmanacMetrics.spacingSmall : AlmanacMetrics.spacingMedium)
 
-      prosePage
-        .padding(.top, AlmanacMetrics.spacingSmall)
-        .padding(
-          .bottom, isCompactHeight ? AlmanacMetrics.spacingSmall : AlmanacMetrics.spacingMedium)
+      editorPage
     }
     .almanacScreen(readableContentWidth: AlmanacMetrics.readableContentWidth)
     .accessibilityElement(children: .contain)
@@ -67,6 +71,9 @@ struct JournalEditorView: View {
         Text("This removes the prose for this day.")
       }
     )
+    .task(id: gardenRefreshStamp) {
+      refreshGarden()
+    }
     .onAppear {
       editorIsFocused = true
       installNavigationGuard()
@@ -81,6 +88,7 @@ struct JournalEditorView: View {
     }
     .onChange(of: scenePhase) { previousPhase, phase in
       if phase == .active {
+        refreshGarden(force: true)
         if model.status.failure != nil {
           editorIsFocused = true
         }
@@ -93,9 +101,8 @@ struct JournalEditorView: View {
   @ViewBuilder
   private var navigationHeader: some View {
     if isCompactHeight {
-      ZStack {
+      inlineNavigationHeader {
         compactDateTitle
-        navigationActions
       }
     } else if dynamicTypeSize.isAccessibilitySize {
       VStack(spacing: AlmanacMetrics.spacingSmall) {
@@ -103,9 +110,8 @@ struct JournalEditorView: View {
         navigationActions
       }
     } else {
-      ZStack {
+      inlineNavigationHeader {
         dateTitle
-        navigationActions
       }
     }
   }
@@ -125,44 +131,109 @@ struct JournalEditorView: View {
       .font(.headline)
       .lineLimit(1)
       .minimumScaleFactor(0.75)
+      .multilineTextAlignment(.center)
       .accessibilityAddTraits(.isHeader)
       .accessibilityIdentifier("journalEditor.date")
   }
 
+  private func inlineNavigationHeader<Title: View>(
+    @ViewBuilder title: () -> Title
+  ) -> some View {
+    HStack(spacing: AlmanacMetrics.spacingSmall) {
+      Group {
+        if isCompactHeight {
+          compactBackButton
+        } else {
+          backButton
+        }
+      }
+      .frame(
+        width: isCompactHeight ? AlmanacMetrics.minimumTarget : 80,
+        alignment: .leading
+      )
+
+      title()
+        .frame(maxWidth: .infinity)
+
+      deletionSlot
+        .frame(
+          width: isCompactHeight ? AlmanacMetrics.minimumTarget : 80,
+          alignment: .trailing
+        )
+    }
+    .frame(maxWidth: .infinity)
+  }
+
   private var navigationActions: some View {
     HStack(spacing: AlmanacMetrics.spacingMedium) {
-      Button(action: requestClose) {
-        Label("Back", systemImage: "chevron.left")
-          .frame(
-            minWidth: AlmanacMetrics.minimumTarget,
-            minHeight: AlmanacMetrics.minimumTarget
-          )
-          .contentShape(Rectangle())
-      }
-      .buttonStyle(.plain)
-      .foregroundStyle(AlmanacPalette.mossDeep)
-      .accessibilityHint("Saves pending prose before returning")
-      .accessibilityIdentifier("journalEditor.back")
-
+      backButton
       Spacer(minLength: AlmanacMetrics.spacingMedium)
-
       if model.canDelete {
-        Button(action: model.requestDeletion) {
-          Image(systemName: "trash")
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(AlmanacPalette.clayDeep)
+        deleteButton
+      }
+    }
+    .frame(maxWidth: .infinity)
+  }
+
+  private var backButton: some View {
+    Button(action: requestClose) {
+      Label("Back", systemImage: "chevron.left")
         .frame(
           minWidth: AlmanacMetrics.minimumTarget,
           minHeight: AlmanacMetrics.minimumTarget
         )
         .contentShape(Rectangle())
-        .accessibilityLabel("Delete entry")
-        .accessibilityHint("Requires confirmation")
-        .accessibilityIdentifier("journalEditor.delete")
-      }
     }
-    .frame(maxWidth: .infinity)
+    .buttonStyle(.plain)
+    .foregroundStyle(AlmanacPalette.mossDeep)
+    .accessibilityHint("Saves pending prose before returning")
+    .accessibilityIdentifier("journalEditor.back")
+  }
+
+  private var compactBackButton: some View {
+    Button(action: requestClose) {
+      Image(systemName: "chevron.left")
+        .frame(
+          minWidth: AlmanacMetrics.minimumTarget,
+          minHeight: AlmanacMetrics.minimumTarget
+        )
+        .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .foregroundStyle(AlmanacPalette.mossDeep)
+    .accessibilityLabel("Back")
+    .accessibilityHint("Saves pending prose before returning")
+    .accessibilityIdentifier("journalEditor.back")
+  }
+
+  @ViewBuilder
+  private var deletionSlot: some View {
+    if model.canDelete {
+      deleteButton
+    } else {
+      Color.clear
+        .frame(
+          width: AlmanacMetrics.minimumTarget,
+          height: AlmanacMetrics.minimumTarget
+        )
+        .accessibilityHidden(true)
+    }
+  }
+
+  private var deleteButton: some View {
+    Button(action: model.requestDeletion) {
+      Image(systemName: "trash")
+    }
+    .buttonStyle(.plain)
+    .foregroundStyle(AlmanacPalette.clayDeep)
+    .frame(
+      minWidth: AlmanacMetrics.minimumTarget,
+      minHeight: AlmanacMetrics.minimumTarget
+    )
+    .contentShape(Rectangle())
+    .accessibilityLabel("Delete entry")
+    .accessibilityHint("Requires confirmation")
+    .accessibilityIdentifier("journalEditor.delete")
   }
 
   private var scopePicker: some View {
@@ -256,17 +327,87 @@ struct JournalEditorView: View {
     }
   }
 
+  private var editorPage: some View {
+    GeometryReader { geometry in
+      ScrollView {
+        VStack(spacing: AlmanacMetrics.spacingLarge) {
+          prosePage
+            .frame(minHeight: proseMinimumHeight(in: geometry.size.height))
+
+          if model.entryID != nil, let gardenModel, !gardenModel.rows.isEmpty {
+            JournalDayGardenView(
+              rows: gardenModel.rows,
+              onRetry: { refreshGarden(force: true) }
+            )
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, AlmanacMetrics.spacingSmall)
+        .padding(
+          .bottom,
+          isCompactHeight ? AlmanacMetrics.spacingSmall : AlmanacMetrics.spacingMedium
+        )
+      }
+      .scrollDismissesKeyboard(.immediately)
+      .accessibilityIdentifier("journalEditor.scroll")
+    }
+  }
+
   private var prosePage: some View {
     JournalProseTextView(
       text: model.body,
       isFocused: $editorIsFocused,
       onChange: model.updateBody
     )
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .frame(minHeight: isCompactHeight ? AlmanacMetrics.minimumTarget : 180)
+    .frame(maxWidth: .infinity)
     .almanacRaisedSurface(radius: AlmanacMetrics.cardRadius)
     .accessibilityLabel("Journal entry for \(formattedDay)")
     .accessibilityIdentifier("journalEditor.prose")
+  }
+  private var gardenRefreshStamp: JournalDayGardenModel.InputFingerprint? {
+    guard model.entryID != nil else { return nil }
+    return JournalDayGardenModel.InputFingerprint(
+      day: model.day,
+      habits: habits,
+      context: gardenRefreshContext
+    )
+  }
+
+  private var gardenRefreshContext: JournalDayGardenRefreshContext {
+    JournalDayGardenRefreshContext(
+      instant: gardenNow(),
+      timeZone: timeZone,
+      locale: locale
+    )
+  }
+
+  private func proseMinimumHeight(in availableHeight: CGFloat) -> CGFloat {
+    if model.entryID != nil {
+      return isCompactHeight ? 100 : 180
+    }
+    let minimum = isCompactHeight ? AlmanacMetrics.minimumTarget : 180
+    return max(minimum, availableHeight - AlmanacMetrics.spacingMedium)
+  }
+
+  private func refreshGarden(force: Bool = false) {
+    guard model.entryID != nil else {
+      gardenModel?.clear()
+      return
+    }
+    let gardenModel = resolvedGardenModel()
+    _ = gardenModel.refresh(
+      day: model.day,
+      habits: habits,
+      context: gardenRefreshContext,
+      force: force
+    )
+  }
+
+  private func resolvedGardenModel() -> JournalDayGardenModel {
+    if let gardenModel { return gardenModel }
+    let gardenModel = JournalDayGardenModel(context: modelContext)
+    self.gardenModel = gardenModel
+    return gardenModel
   }
 
   private var deletionConfirmation: Binding<Bool> {

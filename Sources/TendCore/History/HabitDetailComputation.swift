@@ -14,6 +14,7 @@ public final class HabitDetailComputation {
   private let context: ModelContext
   private let reconciler: BucketReconciler
   private let streakComputation: HabitStreakComputation
+  private let dayProjector = HabitDayProjector()
   private let evaluator = BucketEvaluator()
 
   public init(context: ModelContext) {
@@ -140,85 +141,73 @@ public final class HabitDetailComputation {
     instant: Date,
     timeZone: TimeZone
   ) throws -> HabitHistoryPeriod {
-    if let bucket {
-      let evaluation = try evaluator.evaluate(
-        habit: habit,
-        bucket: bucket,
-        at: instant,
-        timeZone: timeZone
-      )
-      let state: HabitHistoryState
-      let progress: Int?
-      let isRequirementMet: Bool?
-      let target: Int?
-      let unit: String?
-      switch (evaluation.phase, evaluation.standing) {
-      case (.final, .met):
-        state = .met
-        progress = nil
-        isRequirementMet = nil
-        target = evaluation.target
-        unit = evaluation.unit
-      case (.final, .missed):
-        state = .missed
-        progress = nil
-        isRequirementMet = nil
-        target = evaluation.target
-        unit = evaluation.unit
-      case (.open, .pendingMet), (.open, .pendingUnmet),
-        (.grace, .pendingMet), (.grace, .pendingUnmet):
-        guard let provisionalProgress = evaluation.progress else {
-          throw HabitStreakComputationError.unexpectedBucketState(
-            key: bucket.periodKey,
-            phase: evaluation.phase,
-            standing: evaluation.standing
-          )
-        }
-        state = evaluation.phase == .open ? .open : .grace
-        progress = provisionalProgress
-        isRequirementMet = evaluation.standing == .pendingMet
-        target = evaluation.target
-        unit = evaluation.unit
-      case (.exempt, .exempt):
-        state = .inactive
-        progress = nil
-        target = nil
-        unit = nil
-        isRequirementMet = nil
-      default:
-        throw HabitStreakComputationError.unexpectedBucketState(
-          key: bucket.periodKey,
-          phase: evaluation.phase,
-          standing: evaluation.standing
-        )
-      }
-      return HabitHistoryPeriod(
-        key: period.key,
-        start: period.start,
-        end: period.end,
-        state: state,
-        progress: progress,
-        target: target,
-        unit: unit,
-        isRequirementMet: isRequirementMet
-      )
-    }
-
+    let projection = try dayProjector.project(
+      period,
+      habit: habit,
+      bucket: bucket,
+      activityPeriods: activityPeriods,
+      creationPeriod: creationPeriod,
+      instant: instant,
+      timeZone: timeZone
+    )
     let state: HabitHistoryState
-    if instant < period.start {
-      state = .future
-    } else if period.end <= creationPeriod.start {
-      state = .beforeCreation
-    } else if activityPeriods.contains(where: { overlaps($0, period: period) }) {
-      throw HabitDetailComputationError.missingActiveBucket(period.key)
-    } else {
+    let progress: Int?
+    let target: Int?
+    let unit: String?
+    let isRequirementMet: Bool?
+    switch projection.state {
+    case .met:
+      state = .met
+      progress = nil
+      target = projection.target
+      unit = projection.unit
+      isRequirementMet = nil
+    case .missed:
+      state = .missed
+      progress = nil
+      target = projection.target
+      unit = projection.unit
+      isRequirementMet = nil
+    case .open:
+      state = .open
+      progress = projection.progress
+      target = projection.target
+      unit = projection.unit
+      isRequirementMet = projection.isRequirementMet
+    case .grace:
+      state = .grace
+      progress = projection.progress
+      target = projection.target
+      unit = projection.unit
+      isRequirementMet = projection.isRequirementMet
+    case .exempt, .inactive:
       state = .inactive
+      progress = nil
+      target = nil
+      unit = nil
+      isRequirementMet = nil
+    case .beforeCreation:
+      state = .beforeCreation
+      progress = nil
+      target = nil
+      unit = nil
+      isRequirementMet = nil
+    case .future:
+      state = .future
+      progress = nil
+      target = nil
+      unit = nil
+      isRequirementMet = nil
     }
     return HabitHistoryPeriod(
-      key: period.key,
-      start: period.start,
-      end: period.end,
-      state: state
+      key: projection.periodKey,
+      start: projection.periodStart,
+      end: projection.periodEnd,
+      state: state,
+      progress: progress,
+      target: target,
+      unit: unit,
+      isRequirementMet: isRequirementMet
     )
   }
 
@@ -533,17 +522,6 @@ public final class HabitDetailComputation {
       throw HabitActivityOperationError.unexpectedOpenActivityPeriod
     }
     return periods
-  }
-
-  private func overlaps(
-    _ activityPeriod: HabitActivityPeriod,
-    period: CalendarBucketPeriod
-  ) -> Bool {
-    let activityEnd = activityPeriod.endedAt ?? .distantFuture
-    guard activityEnd > activityPeriod.startedAt else {
-      return false
-    }
-    return activityPeriod.startedAt < period.end && activityEnd > period.start
   }
 
   private func month(
