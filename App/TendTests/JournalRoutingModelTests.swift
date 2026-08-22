@@ -228,9 +228,9 @@ struct JournalRoutingModelTests {
     #expect(routing.selection == .habits)
   }
 
-  @Test("the current shell keeps exactly three visible destinations")
-  func routingDoesNotAddJournalDestinationEarly() {
-    #expect(ShellDestination.allCases == [.today, .goals, .habits])
+  @Test("the shell exposes Journal after Habits")
+  func shellDestinationOrderIncludesJournal() {
+    #expect(ShellDestination.allCases == [.today, .goals, .habits, .journal])
   }
 
   private func ownedReminderRequest() -> UNNotificationRequest {

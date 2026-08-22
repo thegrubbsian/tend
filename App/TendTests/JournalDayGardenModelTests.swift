@@ -115,6 +115,27 @@ struct JournalDayGardenModelTests {
     #expect(probe.calls.count == 7)
   }
 
+  @Test("a local-day tick changes the editor garden refresh task identity")
+  func localDayTickChangesEditorGardenRefreshIdentity() throws {
+    let day = try localDate("2026-08-05")
+    let context = refreshContext(try instant("2026-08-05T12:00:00Z"))
+    let input = JournalDayGardenModel.InputFingerprint(
+      day: day,
+      habits: [],
+      context: context
+    )
+    let before = JournalEditorGardenRefreshStamp(
+      input: input,
+      refreshSignal: try instant("2026-08-05T12:00:00Z")
+    )
+    let after = JournalEditorGardenRefreshStamp(
+      input: input,
+      refreshSignal: try instant("2026-08-06T00:00:00Z")
+    )
+
+    #expect(before != after)
+  }
+
   @Test("retry replaces one unavailable row without disturbing valid siblings")
   func retryReprojectsUnavailableSibling() throws {
     let day = try localDate("2026-08-05")

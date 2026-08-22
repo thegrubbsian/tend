@@ -33,6 +33,9 @@ struct AlmanacShellView: View {
     case .habits:
       HabitsDestinationChrome(reminders: reminders)
         .accessibilityFocused($accessibilityFocus, equals: .habits)
+    case .journal:
+      JournalDestinationChrome(routing: routing)
+        .accessibilityFocused($accessibilityFocus, equals: .journal)
     }
   }
 }

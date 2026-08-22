@@ -48,7 +48,8 @@ struct JournalDayGardenView: View {
           .accessibilityIdentifier("journalGarden.name.\(row.id.uuidString)")
 
         Text(row.progressText)
-          .almanacTextStyle(.secondary)
+          .font(.subheadline)
+          .foregroundStyle(AlmanacPalette.ink)
           .fixedSize(horizontal: false, vertical: true)
           .accessibilityIdentifier("journalGarden.progress.\(row.id.uuidString)")
       }

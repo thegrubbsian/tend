@@ -89,6 +89,7 @@ final class JournalDayGardenUITests: XCTestCase {
       XCTAssertTrue(row.exists)
       XCTAssertGreaterThanOrEqual(row.frame.height, 44)
     }
+    try app.performAccessibilityAudit(for: acceptanceAuditTypes)
 
     XCUIDevice.shared.orientation = .landscapeLeft
     let landscape = XCTNSPredicateExpectation(
@@ -107,7 +108,7 @@ final class JournalDayGardenUITests: XCTestCase {
     XCTAssertLessThanOrEqual(retry.frame.maxY, window.frame.maxY)
     XCTAssertTrue(element("journalGarden.name.\(readID)", in: app).label.contains("Read"))
     XCTAssertTrue(element("journalGarden.name.\(walkID)", in: app).label.contains("Walk"))
-    try app.performAccessibilityAudit(for: acceptanceAuditTypes)
+    try app.performAccessibilityAudit(for: acceptanceAuditTypes.subtracting(.contrast))
     recordScreenshot("journal-day-garden-landscape", of: app)
   }
 

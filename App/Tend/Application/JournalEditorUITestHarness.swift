@@ -56,6 +56,7 @@
     @Environment(\.modelContext) private var context
     @Environment(\.timeZone) private var timeZone
     @Query private var entries: [JournalEntry]
+    @Query private var habits: [Habit]
     @State private var model: JournalEditorModel?
 
     let routing: ShellRoutingModel
@@ -70,8 +71,10 @@
       if let model {
         JournalEditorView(
           model: model,
+          habits: habits,
           routing: routing,
           gardenNow: { instant },
+          gardenRefreshSignal: instant,
           onClose: onClose
         )
       } else {

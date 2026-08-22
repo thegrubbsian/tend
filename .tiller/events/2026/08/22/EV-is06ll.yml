@@ -1,0 +1,13 @@
+id: EV-is06ll
+type: check.task
+at: 2026-08-22T06:16:41.554043Z
+owner: jc
+command: check task T-3hwtmu
+targets:
+    - T-3hwtmu
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.yml

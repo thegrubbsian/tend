@@ -1,0 +1,14 @@
+id: EV-2jcw2s
+type: submit.task
+at: 2026-08-22T06:17:32.375106Z
+owner: jc
+command: submit task T-3hwtmu
+targets:
+    - T-3hwtmu
+before:
+    status: check
+after:
+    pr: 63
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.yml

@@ -73,6 +73,8 @@
       case fastLoggingWeekly = "fast-logging-weekly"
       case goalRoster = "goal-roster"
       case goalExperience = "goal-experience"
+      case journalExperience = "journal-experience"
+      case journalLoadFailure = "journal-load-failure"
     }
 
     static func containerFactory(
@@ -243,6 +245,20 @@
             at: launchInstant,
             timeZone: fixtureTimeZone
           )
+        case .journalExperience:
+          try JournalExperienceUITestFixture.seed(
+            .experience,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
+        case .journalLoadFailure:
+          try JournalExperienceUITestFixture.seed(
+            .loadFailure,
+            context: container.mainContext,
+            at: launchInstant,
+            timeZone: fixtureTimeZone
+          )
         case nil:
           break
         }
@@ -366,6 +382,8 @@
         .todayGoalsFailure,
         .todayGoalsJourney,
         .todayGoalsEmpty,
+        .journalExperience,
+        .journalLoadFailure,
       ]
 
       private static func isValid(name: String) -> Bool {
