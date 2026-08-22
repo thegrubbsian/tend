@@ -391,6 +391,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
+      journalEntries: [],
       context: refreshContext
     )
     let repeated = try requireDashboard(model)
@@ -403,6 +404,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
+      journalEntries: [],
       context: refreshContext
     )
     let recovered = try requireDashboard(model)
@@ -474,6 +476,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: habits,
+      journalEntries: [],
       context: refreshContext
     )
 
@@ -556,6 +559,7 @@ struct TodayModelTests {
     model.retry(
       habitID: failed.persistentModelID,
       habits: updatedHabits,
+      journalEntries: [],
       context: refreshContext
     )
 

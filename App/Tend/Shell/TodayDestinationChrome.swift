@@ -8,6 +8,7 @@ struct TodayDestinationChrome: View {
   @Environment(\.timeZone) private var timeZone
   @Query private var habits: [Habit]
   @Query private var goals: [Goal]
+  @Query private var journalEntries: [JournalEntry]
   @State private var isPresentingNewHabit = false
   @State private var nextGoalTransition: Date?
   @State private var timelineDate: Date?
@@ -68,33 +69,20 @@ struct TodayDestinationChrome: View {
   }
 
   private func content(for date: Date) -> some View {
-    Group {
-      if habits.isEmpty && goals.isEmpty {
-        TodayFirstLaunchView(
-          instant: date,
-          onPlantHabit: {
-            isPresentingNewHabit = true
-          }
-        )
-        .onAppear {
-          updateGoalTransition(nil)
-        }
-      } else {
-        TodayView(
-          habits: habits,
-          goals: goals,
-          instant: date,
-          fixedOperationInstant: fixedDate,
-          onPlantHabit: {
-            isPresentingNewHabit = true
-          },
-          onGoalTransitionChange: updateGoalTransition,
-          reminderRefresh: {
-            reminders.refresh()
-          }
-        )
+    TodayView(
+      habits: habits,
+      goals: goals,
+      journalEntries: journalEntries,
+      instant: date,
+      fixedOperationInstant: fixedDate,
+      onPlantHabit: {
+        isPresentingNewHabit = true
+      },
+      onGoalTransitionChange: updateGoalTransition,
+      reminderRefresh: {
+        reminders.refresh()
       }
-    }
+    )
     .accessibilityElement(children: .contain)
     .accessibilityLabel("Today")
     .accessibilityIdentifier("shell.destination.today")

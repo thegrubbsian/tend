@@ -20,23 +20,23 @@ struct TodayGoalRefreshTests {
     }
     let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
 
-    model.refresh(habits: [], goals: [first], context: context)
+    model.refresh(habits: [], goals: [first], journalEntries: [], context: context)
     #expect(model.goalRows.map(\.name) == ["First"])
 
-    model.refresh(habits: [], goals: [first, second], context: context)
+    model.refresh(habits: [], goals: [first, second], journalEntries: [], context: context)
     #expect(Set(model.goalRows.map(\.name)) == Set(["First", "Second"]))
 
     first.closureRawValue = GoalClosure.harvested.rawValue
     try store.save()
-    model.refresh(habits: [], goals: [first, second], context: context)
+    model.refresh(habits: [], goals: [first, second], journalEntries: [], context: context)
     #expect(model.goalRows.map(\.name) == ["Second"])
 
     first.closureRawValue = nil
     try store.save()
-    model.refresh(habits: [], goals: [first, second], context: context)
+    model.refresh(habits: [], goals: [first, second], journalEntries: [], context: context)
     #expect(Set(model.goalRows.map(\.name)) == Set(["First", "Second"]))
 
-    model.refresh(habits: [], goals: [first], context: context)
+    model.refresh(habits: [], goals: [first], journalEntries: [], context: context)
     #expect(model.goalRows.map(\.name) == ["First"])
   }
 
@@ -68,6 +68,7 @@ struct TodayGoalRefreshTests {
     model.refresh(
       habits: [habit],
       goals: [goal],
+      journalEntries: [],
       context: firstContext
     )
 
@@ -110,12 +111,13 @@ struct TodayGoalRefreshTests {
         }
       )
     )
-    model.refresh(habits: [habit], goals: [goal], context: context)
+    model.refresh(habits: [habit], goals: [goal], journalEntries: [], context: context)
 
     shouldFail = false
     model.retry(
       habitID: habit.persistentModelID,
       habits: [habit],
+      journalEntries: [],
       context: context
     )
 
@@ -164,12 +166,13 @@ struct TodayGoalRefreshTests {
         }
       )
     )
-    model.refresh(habits: [habit], goals: goals, context: initial)
+    model.refresh(habits: [habit], goals: goals, journalEntries: [], context: initial)
 
     shouldFail = false
     model.retry(
       habitID: habit.persistentModelID,
       habits: [habit],
+      journalEntries: [],
       context: changed
     )
 
@@ -224,7 +227,7 @@ struct TodayGoalRefreshTests {
         ))
     }
 
-    model.refresh(habits: [], goals: [changing, near], context: scene)
+    model.refresh(habits: [], goals: [changing, near], journalEntries: [], context: scene)
     #expect(model.goalRows.map(\.name) == ["Near"])
     let standingTransition = try #require(model.nextGoalTransition)
     actual = 0.25
@@ -232,11 +235,12 @@ struct TodayGoalRefreshTests {
       instant: standingTransition,
       timeZone: scene.timeZone.identifier
     )
-    model.refresh(habits: [], goals: [changing, near], context: transitionEntry)
+    model.refresh(
+      habits: [], goals: [changing, near], journalEntries: [], context: transitionEntry)
     #expect(Set(model.goalRows.map(\.name)) == Set(["Changing", "Near"]))
 
-    model.refresh(habits: [], goals: [changing, near], context: environment)
-    model.refresh(habits: [], goals: [changing, near], context: nextDay)
+    model.refresh(habits: [], goals: [changing, near], journalEntries: [], context: environment)
+    model.refresh(habits: [], goals: [changing, near], journalEntries: [], context: nextDay)
     #expect(Set(model.goalRows.map(\.name)) == Set(["Changing", "Near"]))
 
     actual = 0.75
@@ -245,7 +249,7 @@ struct TodayGoalRefreshTests {
       timeZone: nextDay.timeZone.identifier,
       locale: "sv_SE"
     )
-    model.refresh(habits: [], goals: [changing, near], context: transitionExit)
+    model.refresh(habits: [], goals: [changing, near], journalEntries: [], context: transitionExit)
     #expect(model.goalRows.map(\.name) == ["Near"])
     #expect(contexts.suffix(2) == [transitionExit, transitionExit])
   }
@@ -287,10 +291,10 @@ struct TodayGoalRefreshTests {
     )
     model = TodayModel(operations: operations)
     let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
-    model.refresh(habits: [habit], goals: goals, context: context)
+    model.refresh(habits: [habit], goals: goals, journalEntries: [], context: context)
 
     generation = 2
-    model.refresh(habits: [habit], goals: goals, context: context)
+    model.refresh(habits: [habit], goals: goals, journalEntries: [], context: context)
 
     #expect(model.goalRows.compactMap { $0.normalizedProgress } == [0.5, 0.5, 0.5])
     guard case .dashboard(let dashboard)? = model.presentation else {
@@ -319,34 +323,41 @@ struct TodayGoalRefreshTests {
     }
     let goals = [failed, sibling]
     let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
-    model.refresh(habits: [], goals: goals, context: context)
+    model.refresh(habits: [], goals: goals, journalEntries: [], context: context)
     let retainedFailure = try #require(
       model.goalRows.first { $0.id == failed.persistentModelID }?.failure)
 
     mode = 1
-    model.retry(goalID: failed.persistentModelID, habits: [], goals: goals, context: context)
+    model.retry(
+      goalID: failed.persistentModelID, habits: [], goals: goals, journalEntries: [],
+      context: context)
     #expect(model.goalRows.first { $0.id == failed.persistentModelID }?.failure == retainedFailure)
     #expect(calls[sibling.persistentModelID] == 1)
 
     mode = 2
-    model.retry(goalID: failed.persistentModelID, habits: [], goals: goals, context: context)
+    model.retry(
+      goalID: failed.persistentModelID, habits: [], goals: goals, journalEntries: [],
+      context: context)
     #expect(model.goalRows.first { $0.id == failed.persistentModelID }?.facts != nil)
     #expect(model.goalRows.count == 2)
     #expect(calls[sibling.persistentModelID] == 1)
 
     mode = 0
-    model.refresh(habits: [], goals: goals, context: context)
+    model.refresh(habits: [], goals: goals, journalEntries: [], context: context)
     mode = 3
-    model.retry(goalID: failed.persistentModelID, habits: [], goals: goals, context: context)
+    model.retry(
+      goalID: failed.persistentModelID, habits: [], goals: goals, journalEntries: [],
+      context: context)
     #expect(model.goalRows.map(\.id) == [sibling.persistentModelID])
     #expect(calls[sibling.persistentModelID] == 3)
 
     mode = 0
-    model.refresh(habits: [], goals: goals, context: context)
+    model.refresh(habits: [], goals: goals, journalEntries: [], context: context)
     model.retry(
       goalID: failed.persistentModelID,
       habits: [],
       goals: [sibling],
+      journalEntries: [],
       context: context
     )
     #expect(model.goalRows.map(\.id) == [sibling.persistentModelID])
@@ -376,7 +387,7 @@ struct TodayGoalRefreshTests {
       return .open(self.facts(standing: goal === failed ? .onPace : .behind, deadline: nil))
     }
     let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
-    model.refresh(habits: [], goals: [failed, sibling], context: context)
+    model.refresh(habits: [], goals: [failed, sibling], journalEntries: [], context: context)
 
     let graphEntry = GoalEntry(
       amount: 1,
@@ -390,7 +401,7 @@ struct TodayGoalRefreshTests {
     shouldFail = false
     model.retry(
       goalID: failed.persistentModelID,
-      habits: [], goals: [failed, sibling], context: context
+      habits: [], goals: [failed, sibling], journalEntries: [], context: context
     )
 
     #expect(model.goalRows.map(\.name) == ["Sibling"])
@@ -436,6 +447,7 @@ struct TodayGoalRefreshTests {
     model.refresh(
       habits: [],
       goals: [failed, sibling],
+      journalEntries: [],
       context: initial
     )
     let initialDeadlineText = try #require(
@@ -447,6 +459,7 @@ struct TodayGoalRefreshTests {
       goalID: failed.persistentModelID,
       habits: [],
       goals: [failed, sibling],
+      journalEntries: [],
       context: changed
     )
 
@@ -486,7 +499,8 @@ struct TodayGoalRefreshTests {
       return .open(self.facts(standing: .behind, deadline: nil, next: late))
     }
 
-    model.refresh(habits: [], goals: [visible, distant, stale], context: context)
+    model.refresh(
+      habits: [], goals: [visible, distant, stale], journalEntries: [], context: context)
 
     #expect(Set(model.goalRows.map(\.name)) == Set(["Visible", "Stale"]))
     #expect(model.nextGoalTransition == early)
@@ -505,6 +519,7 @@ struct TodayGoalRefreshTests {
 
     model.refresh(
       habits: [], goals: [goal],
+      journalEntries: [],
       context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 
@@ -659,13 +674,14 @@ struct TodayGoalRefreshTests {
     let context = refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     let initialHabits = initiallyIncludesInactiveHabit ? [inactive] : []
     let retryHabits = initiallyIncludesInactiveHabit ? [] : [inactive]
-    model.refresh(habits: initialHabits, goals: [failed], context: context)
+    model.refresh(habits: initialHabits, goals: [failed], journalEntries: [], context: context)
 
     shouldFail = false
     model.retry(
       goalID: failed.persistentModelID,
       habits: retryHabits,
       goals: [failed],
+      journalEntries: [],
       context: context
     )
 

@@ -423,7 +423,8 @@ struct TodayLoggingModelTests {
     #expect(model.state.undo?.generation == acceptedUndo)
     #expect(model.state.feedback?.id == acceptedFeedback)
     #expect(reminderRefreshCount == 2)
-    model.refresh(habits: fixture.habits, goals: [], context: fixture.refreshContext)
+    model.refresh(
+      habits: fixture.habits, goals: [], journalEntries: [], context: fixture.refreshContext)
     #expect(model.state.sheet?.progress == 4)
     #expect(model.state.sheet?.sheetError == nil)
   }
@@ -437,26 +438,29 @@ struct TodayLoggingModelTests {
 
     fixture.progress = 7
     fixture.graceProgress = 6
-    model.refresh(habits: fixture.habits, goals: [], context: fixture.refreshContext)
+    model.refresh(
+      habits: fixture.habits, goals: [], journalEntries: [], context: fixture.refreshContext)
     #expect(model.state.sheet?.selectedPeriodKey == graceKey)
     #expect(model.state.sheet?.progress == 6)
     #expect(model.state.sheet?.sheetError == nil)
 
     let announcementBeforeFallback = model.state.announcementToken
     fixture.graceProgress = nil
-    model.refresh(habits: fixture.habits, goals: [], context: fixture.refreshContext)
+    model.refresh(
+      habits: fixture.habits, goals: [], journalEntries: [], context: fixture.refreshContext)
     #expect(model.state.sheet?.selectedPeriodKey == fixture.currentKey)
     #expect(model.state.sheet?.progress == 7)
     #expect(model.state.announcementToken != announcementBeforeFallback)
 
     fixture.habit.isActive = false
-    model.refresh(habits: fixture.habits, goals: [], context: fixture.refreshContext)
+    model.refresh(
+      habits: fixture.habits, goals: [], journalEntries: [], context: fixture.refreshContext)
     #expect(model.state.sheet == nil)
 
     fixture.habit.isActive = true
     fixture.presentSheet(model)
     #expect(model.state.sheet != nil)
-    model.refresh(habits: [], goals: [], context: fixture.refreshContext)
+    model.refresh(habits: [], goals: [], journalEntries: [], context: fixture.refreshContext)
     #expect(model.state.sheet == nil)
   }
 
@@ -653,6 +657,7 @@ struct TodayLoggingModelTests {
     externalModel.refresh(
       habits: externalFixture.habits,
       goals: [],
+      journalEntries: [],
       context: externalFixture.refreshContext
     )
     #expect(externalModel.state.undo == nil)
@@ -838,6 +843,7 @@ struct TodayLoggingModelTests {
     alreadyMetModel.refresh(
       habits: alreadyMetFixture.habits,
       goals: [],
+      journalEntries: [],
       context: alreadyMetFixture.refreshContext
     )
     #expect(alreadyMetModel.state.feedback?.id == eventID)
@@ -937,14 +943,14 @@ struct TodayLoggingModelTests {
     model.activateCurrent(habit: second, habits: habits, context: refreshContext)
     secondProgress = 7
     firstProjectionError = HabitLoggingComputationError.detachedHabit
-    model.refresh(habits: habits, goals: [], context: refreshContext)
+    model.refresh(habits: habits, goals: [], journalEntries: [], context: refreshContext)
     #expect(model.state.undo == nil)
     #expect(model.state.feedback == nil)
     #expect(model.state.sheet?.habitID == second.persistentModelID)
     #expect(model.state.sheet?.progress == 7)
 
     secondProjectionError = BucketEvaluationError.invalidRequirement(0)
-    model.refresh(habits: habits, goals: [], context: refreshContext)
+    model.refresh(habits: habits, goals: [], journalEntries: [], context: refreshContext)
     #expect(model.state.sheet == nil)
   }
 
