@@ -1,0 +1,14 @@
+id: EV-hmnqon
+type: sync.task
+at: 2026-08-22T19:52:30.247752Z
+owner: jc
+command: sync task T-6wblsz
+targets:
+    - T-6wblsz
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.yml
