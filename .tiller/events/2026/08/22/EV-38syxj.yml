@@ -1,0 +1,14 @@
+id: EV-38syxj
+type: submit.task
+at: 2026-08-22T18:57:20.207363Z
+owner: jc
+command: submit task T-6wblsz
+targets:
+    - T-6wblsz
+before:
+    status: check
+after:
+    pr: 65
+    status: in_review
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.yml
