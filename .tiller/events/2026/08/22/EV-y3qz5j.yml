@@ -1,0 +1,14 @@
+id: EV-y3qz5j
+type: sync.task
+at: 2026-08-22T17:11:17.850209Z
+owner: jc
+command: sync task T-3hwtmu
+targets:
+    - T-3hwtmu
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.yml

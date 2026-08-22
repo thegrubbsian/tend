@@ -12,7 +12,7 @@ this file is regenerated from the working tree on every sync. -->
 ### Active work
 
 - epic journal (E-l8goi4): ready, active
-- feature journal/journal-experience (F-wf19av): active
+- feature journal/journal-experience (F-wf19av): active, awaiting check
 - feature journal/today-journal-invitation (F-0rn0hs): ready
 - task journal/today-journal-invitation/today-journal-projection (T-19qcbl): ready
 - task journal/today-journal-invitation/today-journal-surface (T-6wblsz): ready
@@ -23,7 +23,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task journal/journal-experience/journal-destination (T-3hwtmu): build pass, tests pass
+- (none)
 
 ### Open questions
 
