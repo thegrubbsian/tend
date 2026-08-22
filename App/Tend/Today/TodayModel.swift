@@ -53,6 +53,16 @@ struct TodayGoalFailure: Equatable, Sendable {
   let message: String
   let retryTitle: String
 }
+struct TodayJournalFailure: Equatable, Sendable {
+  let message: String
+  let retryTitle: String
+}
+
+enum TodayJournalInvitation: Equatable, Sendable {
+  case invitation(day: LocalDate)
+  case complete
+  case unavailable(TodayJournalFailure)
+}
 
 struct TodayGoalRow: Identifiable {
   let id: PersistentIdentifier
@@ -102,24 +112,32 @@ struct TodayOperations {
     _ goal: Goal,
     _ context: TodayRefreshContext
   ) throws -> TodayGoalProjection
+  typealias JournalEntryExists = (
+    _ day: LocalDate,
+    _ context: TodayRefreshContext
+  ) throws -> Bool
 
   let snapshot: Snapshot
   let goalFacts: GoalFacts
+  let journalEntryExists: JournalEntryExists
 
   init(
     snapshot: @escaping Snapshot,
     goalFacts: @escaping GoalFacts = { _, _ in
       throw TodayOperationsError.goalProjectionUnavailable
-    }
+    },
+    journalEntryExists: @escaping JournalEntryExists = { _, _ in false }
   ) {
     self.snapshot = snapshot
     self.goalFacts = goalFacts
+    self.journalEntryExists = journalEntryExists
   }
 
   static func live(context: ModelContext) -> Self {
     let habitComputation = HabitTodayComputation(context: context)
     let progressComputation = GoalProgressComputation(context: context)
     let standingComputation = GoalStandingComputation()
+    let journalQuery = JournalEntryQuery(context: context)
     return Self(
       snapshot: { habit, refreshContext in
         try habitComputation.snapshot(
@@ -159,6 +177,9 @@ struct TodayOperations {
             standing: standing,
             deadline: deadline
           ))
+      },
+      journalEntryExists: { day, _ in
+        try journalQuery.entry(on: day) != nil
       }
     )
   }
@@ -178,12 +199,16 @@ final class TodayModel {
   @ObservationIgnored private var lastHabitInputs: [PersistentIdentifier: HabitInputFingerprint] =
     [:]
   @ObservationIgnored private var lastGoalInputs: [PersistentIdentifier: GoalInputFingerprint] = [:]
+  @ObservationIgnored private var lastJournalInputs:
+    [PersistentIdentifier: JournalInputFingerprint] = [:]
   @ObservationIgnored private var retainedGoals: [Goal] = []
+  @ObservationIgnored private var retainedJournalEntries: [JournalEntry] = []
   @ObservationIgnored private var generationContext: TodayRefreshContext?
 
   var presentation: TodayPresentation? { generation?.presentation }
   var goalRows: [TodayGoalRow] { generation?.goalRows ?? [] }
   var nextGoalTransition: Date? { generation?.nextGoalTransition }
+  var journalInvitation: TodayJournalInvitation? { generation?.journalInvitation }
 
   init(context: ModelContext) {
     operations = .live(context: context)
@@ -196,11 +221,19 @@ final class TodayModel {
   func refresh(
     habits: [Habit],
     goals: [Goal],
+    journalEntries: [JournalEntry],
     context: TodayRefreshContext
   ) {
     let goalInputs = uniqueGoalInputs(from: goals)
+    let journalInputs = uniqueJournalInputs(from: journalEntries)
     retainedGoals = goalInputs.map(\.goal)
-    refresh(habits: habits, goalInputs: goalInputs, context: context)
+    retainedJournalEntries = journalInputs.map(\.entry)
+    refresh(
+      habits: habits,
+      goalInputs: goalInputs,
+      journalInputs: journalInputs,
+      context: context
+    )
   }
 
   func refresh(
@@ -210,6 +243,7 @@ final class TodayModel {
     refresh(
       habits: habits,
       goalInputs: uniqueGoalInputs(from: retainedGoals),
+      journalInputs: uniqueJournalInputs(from: retainedJournalEntries),
       context: context
     )
   }
@@ -217,12 +251,14 @@ final class TodayModel {
   private func refresh(
     habits: [Habit],
     goalInputs: [GoalInput],
+    journalInputs: [JournalInput],
     context: TodayRefreshContext
   ) {
     let habitInputs = uniqueHabitInputs(from: habits)
     let activeHabitInputs = habitInputs.filter { $0.habit.isActive }
     let formatter = TodayPresentationFormatter(context: context)
     let goalProjection = projectGoals(goalInputs, formatter: formatter, context: context)
+    let journalInvitation = projectJournal(context: context)
 
     let replacementPresentation: TodayPresentation
     if habitInputs.isEmpty {
@@ -247,10 +283,12 @@ final class TodayModel {
     let replacement = Generation(
       presentation: replacementPresentation,
       goalRows: goalProjection.rows,
-      nextGoalTransition: goalProjection.nextTransition
+      nextGoalTransition: goalProjection.nextTransition,
+      journalInvitation: journalInvitation
     )
     lastHabitInputs = habitFingerprints(for: habitInputs)
     lastGoalInputs = goalFingerprints(for: goalInputs)
+    lastJournalInputs = journalFingerprints(for: journalInputs)
     generationContext = context
     generation = replacement
   }
@@ -258,6 +296,7 @@ final class TodayModel {
   func retry(
     habitID: PersistentIdentifier,
     habits: [Habit],
+    journalEntries: [JournalEntry],
     context: TodayRefreshContext
   ) {
     guard case .dashboard(let current)? = presentation,
@@ -269,12 +308,20 @@ final class TodayModel {
     let habitInputs = uniqueHabitInputs(from: habits)
     let activeHabitInputs = habitInputs.filter { $0.habit.isActive }
     let goalInputs = uniqueGoalInputs(from: retainedGoals)
+    let journalInputs = uniqueJournalInputs(from: journalEntries)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
       generationContext == context,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
+      journalFingerprints(for: journalInputs) == lastJournalInputs,
+      let journalInvitation = generation?.journalInvitation,
       let retryInput = activeHabitInputs.first(where: { $0.id == habitID })
     else {
-      refresh(habits: habits, context: context)
+      refresh(
+        habits: habits,
+        goals: retainedGoals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
 
@@ -292,7 +339,12 @@ final class TodayModel {
 
     var rows = current.toTendRows + current.tendedRows
     guard let index = rows.firstIndex(where: { $0.id == habitID }) else {
-      refresh(habits: habits, context: context)
+      refresh(
+        habits: habits,
+        goals: retainedGoals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
     rows[index] = replacement
@@ -305,7 +357,8 @@ final class TodayModel {
     generation = Generation(
       presentation: .dashboard(dashboard),
       goalRows: current.goalRows,
-      nextGoalTransition: current.nextGoalTransition
+      nextGoalTransition: current.nextGoalTransition,
+      journalInvitation: journalInvitation
     )
   }
 
@@ -313,6 +366,7 @@ final class TodayModel {
     goalID: PersistentIdentifier,
     habits: [Habit],
     goals: [Goal],
+    journalEntries: [JournalEntry],
     context: TodayRefreshContext
   ) {
     guard goalRows.contains(where: { $0.id == goalID && $0.failure != nil }) else {
@@ -320,12 +374,20 @@ final class TodayModel {
     }
     let habitInputs = uniqueHabitInputs(from: habits)
     let goalInputs = uniqueGoalInputs(from: goals)
+    let journalInputs = uniqueJournalInputs(from: journalEntries)
     guard habitFingerprints(for: habitInputs) == lastHabitInputs,
       generationContext == context,
       goalFingerprints(for: goalInputs) == lastGoalInputs,
+      journalFingerprints(for: journalInputs) == lastJournalInputs,
+      let journalInvitation = generation?.journalInvitation,
       let retryInput = goalInputs.first(where: { $0.id == goalID })
     else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(
+        habits: habits,
+        goals: goals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
 
@@ -337,7 +399,12 @@ final class TodayModel {
       return
     }
     guard case .open(let facts) = projection else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(
+        habits: habits,
+        goals: goals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
     let replacement: TodayGoalRow
@@ -351,13 +418,23 @@ final class TodayModel {
       return
     }
     guard isEligible(facts, context: context) else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(
+        habits: habits,
+        goals: goals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
 
     var rows = goalRows
     guard let index = rows.firstIndex(where: { $0.id == goalID }) else {
-      refresh(habits: habits, goals: goals, context: context)
+      refresh(
+        habits: habits,
+        goals: goals,
+        journalEntries: journalEntries,
+        context: context
+      )
       return
     }
     rows[index] = replacement
@@ -389,8 +466,47 @@ final class TodayModel {
     generation = Generation(
       presentation: replacementPresentation,
       goalRows: rows,
-      nextGoalTransition: transition
+      nextGoalTransition: transition,
+      journalInvitation: journalInvitation
     )
+  }
+
+  func retryJournal(
+    habits: [Habit],
+    goals: [Goal],
+    journalEntries: [JournalEntry],
+    context: TodayRefreshContext
+  ) {
+    guard case .unavailable? = journalInvitation, let current = generation else {
+      return
+    }
+    let habitInputs = uniqueHabitInputs(from: habits)
+    let goalInputs = uniqueGoalInputs(from: goals)
+    let journalInputs = uniqueJournalInputs(from: journalEntries)
+    guard habitFingerprints(for: habitInputs) == lastHabitInputs,
+      goalFingerprints(for: goalInputs) == lastGoalInputs,
+      journalFingerprints(for: journalInputs) == lastJournalInputs,
+      generationContext == context
+    else {
+      refresh(
+        habits: habits,
+        goals: goals,
+        journalEntries: journalEntries,
+        context: context
+      )
+      return
+    }
+
+    let replacement = projectJournal(context: context)
+    guard case .unavailable = replacement else {
+      generation = Generation(
+        presentation: current.presentation,
+        goalRows: current.goalRows,
+        nextGoalTransition: current.nextGoalTransition,
+        journalInvitation: replacement
+      )
+      return
+    }
   }
 
   private func projectHabit(
@@ -407,6 +523,28 @@ final class TodayModel {
     } catch {
       return formatter.unavailableRow(for: input.habit, id: input.id, error: error)
     }
+  }
+
+  private func projectJournal(context: TodayRefreshContext) -> TodayJournalInvitation {
+    guard let day = localLocalDate(at: context.instant, timeZone: context.timeZone) else {
+      return unavailableJournal()
+    }
+    do {
+      return try operations.journalEntryExists(day, context)
+        ? .complete
+        : .invitation(day: day)
+    } catch {
+      return unavailableJournal()
+    }
+  }
+
+  private func unavailableJournal() -> TodayJournalInvitation {
+    .unavailable(
+      TodayJournalFailure(
+        message: "Journal is unavailable right now.",
+        retryTitle: "Try again"
+      )
+    )
   }
 
   private func projectGoals(
@@ -544,6 +682,18 @@ final class TodayModel {
     return inputs
   }
 
+  private func uniqueJournalInputs(from entries: [JournalEntry]) -> [JournalInput] {
+    var seen: Set<PersistentIdentifier> = []
+    var inputs: [JournalInput] = []
+    inputs.reserveCapacity(entries.count)
+    for entry in entries {
+      let id = entry.persistentModelID
+      guard seen.insert(id).inserted else { continue }
+      inputs.append(JournalInput(id: id, entry: entry))
+    }
+    return inputs
+  }
+
   private func habitFingerprints(
     for inputs: [HabitInput]
   ) -> [PersistentIdentifier: HabitInputFingerprint] {
@@ -555,6 +705,16 @@ final class TodayModel {
   ) -> [PersistentIdentifier: GoalInputFingerprint] {
     Dictionary(uniqueKeysWithValues: inputs.map { ($0.id, GoalInputFingerprint(goal: $0.goal)) })
   }
+
+  private func journalFingerprints(
+    for inputs: [JournalInput]
+  ) -> [PersistentIdentifier: JournalInputFingerprint] {
+    Dictionary(
+      uniqueKeysWithValues: inputs.map {
+        ($0.id, JournalInputFingerprint(entry: $0.entry))
+      }
+    )
+  }
 }
 
 extension TodayModel {
@@ -562,6 +722,7 @@ extension TodayModel {
     let presentation: TodayPresentation
     let goalRows: [TodayGoalRow]
     let nextGoalTransition: Date?
+    let journalInvitation: TodayJournalInvitation
   }
 
   private struct GoalProjectionResult {
@@ -577,6 +738,23 @@ extension TodayModel {
   private struct GoalInput {
     let id: PersistentIdentifier
     let goal: Goal
+  }
+
+  private struct JournalInput {
+    let id: PersistentIdentifier
+    let entry: JournalEntry
+  }
+
+  private struct JournalInputFingerprint: Equatable {
+    let objectIdentifier: ObjectIdentifier
+    let publicID: UUID
+    let dayKey: String
+
+    init(entry: JournalEntry) {
+      objectIdentifier = ObjectIdentifier(entry)
+      publicID = entry.id
+      dayKey = entry.dayKey
+    }
   }
 
   private struct HabitInputFingerprint: Equatable {

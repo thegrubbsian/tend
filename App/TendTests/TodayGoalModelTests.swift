@@ -36,6 +36,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: goals,
+      journalEntries: [],
       context: refreshContext(on: today, timeZone: "America/New_York")
     )
 
@@ -60,6 +61,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: [atBoundary],
+      journalEntries: [],
       context: refreshContext(instant: boundary, timeZone: timeZone.identifier)
     )
     #expect(model.goalRows.map(\.name) == ["At boundary"])
@@ -68,6 +70,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: [longAfter],
+      journalEntries: [],
       context: refreshContext(on: later, timeZone: "Pacific/Auckland")
     )
     #expect(model.goalRows.map(\.name) == ["Long after"])
@@ -97,12 +100,12 @@ struct TodayGoalModelTests {
     }
     let context = refreshContext(on: deadline)
 
-    model.refresh(habits: [], goals: [harvested, letGo], context: context)
+    model.refresh(habits: [], goals: [harvested, letGo], journalEntries: [], context: context)
     #expect(model.goalRows.isEmpty)
 
     harvested.closureRawValue = nil
     try store.save()
-    model.refresh(habits: [], goals: [harvested, letGo], context: context)
+    model.refresh(habits: [], goals: [harvested, letGo], journalEntries: [], context: context)
     #expect(model.goalRows.map(\.name) == ["Harvested"])
     #expect(model.goalRows.first?.facts?.progress == accumulate(total: 7, target: 4))
   }
@@ -126,7 +129,9 @@ struct TodayGoalModelTests {
       let model = makeModel { goal, _ in
         .open(facts(standing: .onPace, deadline: goalDate(goal)))
       }
-      model.refresh(habits: [], goals: [goal], context: refreshContext(on: today, timeZone: zone))
+      model.refresh(
+        habits: [], goals: [goal], journalEntries: [],
+        context: refreshContext(on: today, timeZone: zone))
       #expect(!model.goalRows.isEmpty == expected)
     }
 
@@ -140,6 +145,7 @@ struct TodayGoalModelTests {
     }
     model.refresh(
       habits: [], goals: [shifted],
+      journalEntries: [],
       context: refreshContext(instant: instant, timeZone: "Pacific/Kiritimati")
     )
     #expect(model.goalRows.map(\.name) == ["Shifted"])
@@ -149,6 +155,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: [shifted],
+      journalEntries: [],
       context: TodayRefreshContext(
         instant: instant,
         timeZone: ownerTimeZone,
@@ -166,6 +173,7 @@ struct TodayGoalModelTests {
       model.refresh(
         habits: [],
         goals: [shifted],
+        journalEntries: [],
         context: TodayRefreshContext(
           instant: gregorianInstant,
           timeZone: TimeZone(secondsFromGMT: 0)!,
@@ -177,6 +185,7 @@ struct TodayGoalModelTests {
     }
     model.refresh(
       habits: [], goals: [shifted],
+      journalEntries: [],
       context: refreshContext(instant: instant, timeZone: "America/Los_Angeles")
     )
     #expect(model.goalRows.isEmpty)
@@ -200,6 +209,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: [first, first, second, second],
+      journalEntries: [],
       context: expectedContext
     )
 
@@ -250,6 +260,7 @@ struct TodayGoalModelTests {
         onPace, betaLater, alphaSecond, behindLater, unavailable, pastDue, alphaFirst,
         behindEarlier, betaEarlier,
       ],
+      journalEntries: [],
       context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")), locale: "en_US")
     )
 
@@ -270,6 +281,7 @@ struct TodayGoalModelTests {
     model.refresh(
       habits: [],
       goals: [umlaut, zed],
+      journalEntries: [],
       context: refreshContext(
         on: try #require(LocalDate(rawValue: "2026-08-18")),
         locale: "sv_SE"
@@ -312,6 +324,7 @@ struct TodayGoalModelTests {
 
     model.refresh(
       habits: [], goals: [accumulateGoal, increasing, decreasing],
+      journalEntries: [],
       context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")), locale: "en_US")
     )
 
@@ -432,6 +445,7 @@ struct TodayGoalModelTests {
         relationship,
         malformedOutsideWindow,
       ],
+      journalEntries: [],
       context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 
@@ -471,6 +485,7 @@ struct TodayGoalModelTests {
 
     model.refresh(
       habits: [habit], goals: [goal],
+      journalEntries: [],
       context: refreshContext(on: try #require(LocalDate(rawValue: "2026-08-18")))
     )
 

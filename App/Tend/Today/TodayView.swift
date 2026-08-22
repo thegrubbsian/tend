@@ -13,6 +13,7 @@ struct TodayView: View {
 
   let habits: [Habit]
   let goals: [Goal]
+  let journalEntries: [JournalEntry]
   let instant: Date
   let fixedOperationInstant: Date?
   let onPlantHabit: () -> Void
@@ -22,6 +23,7 @@ struct TodayView: View {
   init(
     habits: [Habit],
     goals: [Goal],
+    journalEntries: [JournalEntry],
     instant: Date,
     fixedOperationInstant: Date?,
     onPlantHabit: @escaping () -> Void,
@@ -30,6 +32,7 @@ struct TodayView: View {
   ) {
     self.habits = habits
     self.goals = goals
+    self.journalEntries = journalEntries
     self.instant = instant
     self.fixedOperationInstant = fixedOperationInstant
     self.onPlantHabit = onPlantHabit
@@ -117,6 +120,7 @@ struct TodayView: View {
     TodayViewRefreshStamp(
       habits: habits,
       goals: goals,
+      journalEntries: journalEntries,
       context: refreshContext
     )
   }
@@ -231,6 +235,7 @@ struct TodayView: View {
     resolvedLoggingModel().refresh(
       habits: habits,
       goals: goals,
+      journalEntries: journalEntries,
       context: operationContext()
     )
   }
@@ -303,6 +308,7 @@ struct TodayView: View {
     model?.retry(
       habitID: row.id,
       habits: habits,
+      journalEntries: journalEntries,
       context: operationContext()
     )
   }
@@ -312,6 +318,7 @@ struct TodayView: View {
       goalID: row.id,
       habits: habits,
       goals: goals,
+      journalEntries: journalEntries,
       context: operationContext()
     )
   }
@@ -1024,8 +1031,14 @@ private struct TodayViewRefreshStamp: Equatable {
   let localeIdentifier: String
   let habits: [HabitStamp]
   let goals: [GoalStamp]
+  let journalEntries: [JournalStamp]
 
-  init(habits: [Habit], goals: [Goal], context: TodayRefreshContext) {
+  init(
+    habits: [Habit],
+    goals: [Goal],
+    journalEntries: [JournalEntry],
+    context: TodayRefreshContext
+  ) {
     instant = context.instant
     timeZoneIdentifier = context.timeZone.identifier
     calendarIdentifier = String(describing: context.calendar.identifier)
@@ -1038,6 +1051,27 @@ private struct TodayViewRefreshStamp: Equatable {
       goals
       .map(GoalStamp.init)
       .sorted { $0.persistentID < $1.persistentID }
+    var seenJournalIDs: Set<PersistentIdentifier> = []
+    self.journalEntries =
+      journalEntries
+      .compactMap { entry in
+        let persistentID = entry.persistentModelID
+        guard seenJournalIDs.insert(persistentID).inserted else { return nil }
+        return JournalStamp(entry)
+      }
+      .sorted { $0.persistentID < $1.persistentID }
+  }
+
+  struct JournalStamp: Equatable {
+    let persistentID: PersistentIdentifier
+    let publicID: UUID
+    let dayKey: String
+
+    init(_ entry: JournalEntry) {
+      persistentID = entry.persistentModelID
+      publicID = entry.id
+      dayKey = entry.dayKey
+    }
   }
 
   struct HabitStamp: Equatable {
