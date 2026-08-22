@@ -1,0 +1,13 @@
+id: EV-5497am
+type: check.task
+at: 2026-08-22T17:50:59.631841Z
+owner: jc
+command: check task T-19qcbl
+targets:
+    - T-19qcbl
+before:
+    status: in_progress
+after:
+    status: check
+files:
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-projection/task.yml
