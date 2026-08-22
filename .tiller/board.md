@@ -25,7 +25,7 @@ this file is regenerated from the working tree on every sync. -->
 
 ### Gates in review
 
-- task journal/journal-experience/journal-automatic-editor (T-hb747f): build pass, tests pass
+- (none)
 
 ### Open questions
 

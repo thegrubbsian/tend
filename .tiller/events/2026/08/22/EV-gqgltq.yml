@@ -1,0 +1,14 @@
+id: EV-gqgltq
+type: sync.task
+at: 2026-08-22T01:06:05.255121Z
+owner: jc
+command: sync task T-hb747f
+targets:
+    - T-hb747f
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml
