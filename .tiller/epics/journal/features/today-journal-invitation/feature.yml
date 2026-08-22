@@ -1,13 +1,14 @@
 id: F-0rn0hs
 key: journal/today-journal-invitation
 title: Today Journal Invitation
-status: ready
+status: active
 blocked: false
 owner: jc
 source: .tiller/feedback/07-journal.md#L33-35
 change_type: create
 depends_on:
     - F-wf19av
+branch: tiller/journal/today-journal-invitation
 accepted_against:
     spec:
         kind: git_blob
