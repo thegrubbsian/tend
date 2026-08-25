@@ -24,7 +24,7 @@ struct FloatingTabPill: View {
     } label: {
       VStack(spacing: AlmanacMetrics.tabPillInset) {
         icon(for: destination, isSelected: isSelected)
-          .font(.system(size: AlmanacMetrics.tabIconSize, weight: .black))
+          .font(.system(size: AlmanacMetrics.tabIconSize, weight: .semibold))
           .frame(
             width: AlmanacMetrics.tabIconSize,
             height: AlmanacMetrics.tabIconSize
@@ -32,7 +32,7 @@ struct FloatingTabPill: View {
           .accessibilityHidden(true)
 
         Text(destination.rawValue.uppercased())
-          .font(.caption.weight(.black))
+          .font(.caption.weight(.semibold))
           .tracking(0.25)
           .lineLimit(1)
           .minimumScaleFactor(0.8)
