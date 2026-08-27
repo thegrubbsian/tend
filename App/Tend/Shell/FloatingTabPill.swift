@@ -14,6 +14,12 @@ struct FloatingTabPill: View {
     .frame(maxWidth: .infinity)
     .frame(height: AlmanacMetrics.tabPillHeight)
     .almanacRaisedSurface(radius: AlmanacMetrics.tabPillRadius)
+    .shadow(
+      color: AlmanacPalette.ink.opacity(0.08),
+      radius: 8,
+      x: 0,
+      y: 0
+    )
   }
 
   private func tabButton(for destination: ShellDestination) -> some View {

@@ -1,6 +1,6 @@
 # 05. Visual Design
 
-This document specifies Tend's visual language, called **Almanac**, and anchors it to the comp file that renders it. Where prose and comps disagree, the comps win for look and the domain model wins for behavior.
+This document specifies Tend's visual language, called **Almanac**, and anchors it to the comp file that renders it. Where prose and comps disagree, the comps win for look unless the prose names a later implementation refinement; the domain model wins for behavior.
 
 ## Design language
 
@@ -79,7 +79,7 @@ Dynamic Type is supported: map these styles to the platform's text styles so use
 
 ## Surfaces, spacing, radius
 
-- Cards and the tab pill sit on `paper-raised` with a 1 pt `hairline` stroke. No drop shadows anywhere.
+- Cards and the tab pill sit on `paper-raised` with a 1 pt `hairline` stroke. Cards remain shadowless. As a post-comp refinement, only the floating tab pill has a centered ink shadow at 8% opacity with an 8 pt blur and no directional offset.
 - Inputs, progress tracks, and dormant rows sink into `paper-sunken`.
 - Radius tokens: 14 for cards and sheets' corners, 7 for garden bed cells, full-round for the ring, chips, day circles, and the tab pill (36).
 - Spacing tokens: 8 / 16 / 24 / 40, with 20 pt horizontal screen padding and 16 pt between stacked sections on dense screens.
@@ -113,7 +113,7 @@ The sprout is the one glyph SF Symbols lacks. Author it once as a custom symbol 
 
 **Garden bed grid.** Cells 44 pt, radius 7, distributed edge to edge across content width; weekday letters above; month row with tracked month name and faint chevrons; legend below (Met, Missed, Open). Cell states: met (moss), missed (withered), open/grace (raised with 1.5 pt ochre stroke), today (raised with 1.5 pt clay stroke), out of month or pre-creation (sunken at 45% opacity), dormant span (sunken at 45%, same as ghost; the inactive gap reads as absence). Cells are deliberately unnumbered; a tap on any cell reveals its date and state in a lightweight popover.
 
-**Tab bar.** Floating pill, 62 pt, radius 36, raised with hairline stroke, 21 pt side and bottom insets. Active tab is a solid moss capsule with paper icon and label; inactive tabs are transparent with faint ink. Two destinations: TODAY (sprout), HABITS (list).
+**Tab bar.** Floating pill, 62 pt, radius 36, raised with hairline stroke, a subtle even shadow, and 21 pt side and bottom insets. Active tab is a solid moss capsule with paper icon and label; inactive tabs are transparent with faint ink. Two destinations: TODAY (sprout), HABITS (list).
 
 **Day chips.** 40 pt circles: sunken with muted text unselected, clay with paper text selected.
 
