@@ -1,0 +1,14 @@
+id: EV-ulooni
+type: add.bug
+at: 2026-08-30T17:29:57.970158Z
+owner: jc
+command: add bug journal-today-yesterday-navigation
+targets:
+    - B-8lpm8p
+after:
+    attached_to: F-wf19av
+    key: bugs/journal-today-yesterday-navigation
+    status: proposed
+files:
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.md
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml
