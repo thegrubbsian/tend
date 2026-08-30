@@ -1,0 +1,13 @@
+id: EV-vqhkao
+type: start.bug
+at: 2026-08-30T17:50:57.851417Z
+owner: jc
+command: start bug B-8lpm8p
+targets:
+    - B-8lpm8p
+before:
+    status: ready
+after:
+    status: in_progress
+files:
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml
