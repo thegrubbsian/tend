@@ -1,0 +1,13 @@
+id: EV-klk6e0
+type: approve.bug
+at: 2026-08-30T17:50:35.769324Z
+owner: jc
+command: approve bug B-8lpm8p
+targets:
+    - B-8lpm8p
+before:
+    status: proposed
+after:
+    status: ready
+files:
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml

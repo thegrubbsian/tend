@@ -67,6 +67,67 @@ final class JournalExperienceUITests: XCTestCase {
   }
 
   @MainActor
+  func testFreshTodayEditorSwitchesToYesterdayAndRepeatedRouteKeepsEditor() throws {
+    XCUIDevice.shared.orientation = .portrait
+    let app = launch(
+      storeName: "JournalExperienceDateSwitch-\(UUID().uuidString)",
+      reset: true,
+      additionalArguments: ["-tend-journal-repeat-date-control"]
+    )
+    openJournal(in: app)
+
+    XCTAssertTrue(element("journal.overview", in: app).waitForExistence(timeout: 5))
+    app.buttons["journal.today"].tap()
+
+    let prose = app.textViews["journalEditor.prose"]
+    let date = element("journalEditor.date", in: app)
+    let todayScope = app.buttons["journalEditor.scope.Today"]
+    let yesterdayScope = app.buttons["journalEditor.scope.Yesterday"]
+    XCTAssertTrue(prose.waitForExistence(timeout: 5))
+    XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2))
+    XCTAssertTrue(todayScope.isSelected)
+    XCTAssertTrue(date.label.contains("August 5, 2026"))
+
+    let repeatDateRoute = app.buttons["journal.fixture.repeat-date"]
+    XCTAssertTrue(repeatDateRoute.waitForExistence(timeout: 5))
+    repeatDateRoute.tap()
+
+    XCTAssertTrue(prose.waitForExistence(timeout: 2))
+    XCTAssertTrue(todayScope.isSelected)
+    XCTAssertTrue(date.label.contains("August 5, 2026"))
+
+    yesterdayScope.tap()
+
+    XCTAssertTrue(waitForSelection(yesterdayScope))
+    XCTAssertFalse(todayScope.isSelected)
+    XCTAssertTrue(waitForLabelContaining("August 4, 2026", on: date))
+    XCTAssertTrue(prose.exists)
+    XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2))
+
+    repeatDateRoute.tap()
+
+    XCTAssertTrue(prose.waitForExistence(timeout: 2))
+    XCTAssertTrue(yesterdayScope.isSelected)
+    XCTAssertTrue(date.label.contains("August 4, 2026"))
+
+    prose.typeText("Yesterday from a fresh page")
+    XCTAssertTrue(waitForLabel("Saved", on: element("journalEditor.status", in: app)))
+    app.buttons["journalEditor.back"].tap()
+
+    XCTAssertTrue(element("journal.overview", in: app).waitForExistence(timeout: 5))
+    XCTAssertEqual(app.buttons["journal.today"].label, "Write today's page")
+    let yesterdayRow = app.buttons.matching(
+      NSPredicate(
+        format: "identifier BEGINSWITH %@ AND label CONTAINS %@",
+        "journal.entry.",
+        "Yesterday from a fresh page"
+      )
+    ).firstMatch
+    XCTAssertTrue(yesterdayRow.waitForExistence(timeout: 5))
+    XCTAssertTrue((yesterdayRow.value as? String)?.contains("August 4, 2026") == true)
+  }
+
+  @MainActor
   func testHistoryOldEditDeleteAndLiveHabitMutationStayTruthful() throws {
     XCUIDevice.shared.orientation = .portrait
     let app = launch(
@@ -322,6 +383,35 @@ final class JournalExperienceUITests: XCTestCase {
       for: [
         XCTNSPredicateExpectation(
           predicate: NSPredicate(format: "label == %@", label),
+          object: element
+        )
+      ],
+      timeout: 5
+    ) == .completed
+  }
+
+  @MainActor
+  private func waitForSelection(_ element: XCUIElement) -> Bool {
+    XCTWaiter.wait(
+      for: [
+        XCTNSPredicateExpectation(
+          predicate: NSPredicate(format: "selected == true"),
+          object: element
+        )
+      ],
+      timeout: 5
+    ) == .completed
+  }
+
+  @MainActor
+  private func waitForLabelContaining(
+    _ substring: String,
+    on element: XCUIElement
+  ) -> Bool {
+    XCTWaiter.wait(
+      for: [
+        XCTNSPredicateExpectation(
+          predicate: NSPredicate(format: "label CONTAINS %@", substring),
           object: element
         )
       ],

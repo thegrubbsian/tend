@@ -12,7 +12,7 @@ struct JournalEditorView: View {
   @Environment(\.timeZone) private var timeZone
   @Environment(\.verticalSizeClass) private var verticalSizeClass
 
-  @State private var model: JournalEditorModel
+  private let model: JournalEditorModel
   @State private var gardenModel: JournalDayGardenModel?
   @State private var editorIsFocused = false
   @State private var navigationGuardToken: ShellNavigationGuardToken?
@@ -35,7 +35,7 @@ struct JournalEditorView: View {
     onClose: @escaping @MainActor () -> Void = {},
     onSelectDate: @escaping @MainActor (LocalDate) -> Void = { _ in }
   ) {
-    _model = State(initialValue: model)
+    self.model = model
     self.habits = habits
     self.routing = routing
     self.gardenNow = gardenNow
@@ -477,7 +477,6 @@ struct JournalEditorView: View {
     guard day != model.day else { return }
     Task {
       if await model.flush() {
-        editorIsFocused = false
         onSelectDate(day)
       } else {
         editorIsFocused = true

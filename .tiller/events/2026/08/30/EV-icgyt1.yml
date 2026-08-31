@@ -1,0 +1,14 @@
+id: EV-icgyt1
+type: submit.bug
+at: 2026-08-30T18:15:38.181482Z
+owner: jc
+command: submit bug B-8lpm8p
+targets:
+    - B-8lpm8p
+before:
+    status: check
+after:
+    pr: 66
+    status: in_review
+files:
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml

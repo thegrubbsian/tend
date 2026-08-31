@@ -121,6 +121,7 @@ struct JournalDestinationChrome: View {
         .accessibilityIdentifier("shell.destination.journal")
       #if DEBUG
         routeFailureFixtureControl
+        repeatedDateRouteFixtureControl
       #endif
     }
     .task(id: refreshStamp(at: instant)) {
@@ -229,10 +230,12 @@ struct JournalDestinationChrome: View {
         },
         onDeleted: showOverview
       )
+      let previousModel = editorModel
       editorModel = model
       installEditorNavigationGuard(for: model)
       editorRoute = resolvedRoute
       routeFailureMessage = nil
+      previousModel?.stop()
     } catch {
       routeFailureMessage = "This Journal page could not be loaded."
     }
@@ -271,9 +274,9 @@ struct JournalDestinationChrome: View {
   }
 
   private func showComposer(_ day: LocalDate) {
+    guard editorModel?.day != day else { return }
     routing.prepareJournalRoute(.compose(day))
-    discardEditor()
-    routeFailureMessage = nil
+    resolveEditor(at: operationInstant())
   }
 
   private func showEntry(_ id: UUID) {
@@ -360,6 +363,23 @@ struct JournalDestinationChrome: View {
         }
         .accessibilityLabel("Corrupt Journal route")
         .accessibilityIdentifier("journal.fixture.corrupt-route")
+      }
+    }
+
+    @ViewBuilder
+    private var repeatedDateRouteFixtureControl: some View {
+      if ProcessInfo.processInfo.arguments.contains("-tend-journal-repeat-date-control"),
+        let editorModel
+      {
+        Button {
+          showComposer(editorModel.day)
+        } label: {
+          Color.clear
+            .frame(width: AlmanacMetrics.minimumTarget, height: AlmanacMetrics.minimumTarget)
+            .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Repeat current Journal date route")
+        .accessibilityIdentifier("journal.fixture.repeat-date")
       }
     }
 
