@@ -1,0 +1,14 @@
+id: EV-kowp2x
+type: sync.bug
+at: 2026-08-31T23:06:23.030286Z
+owner: jc
+command: sync bug B-8lpm8p
+targets:
+    - B-8lpm8p
+before:
+    status: in_review
+after:
+    basis: ancestry
+    status: done
+files:
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml

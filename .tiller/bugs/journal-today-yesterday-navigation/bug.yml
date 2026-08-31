@@ -1,7 +1,7 @@
 id: B-8lpm8p
 key: bugs/journal-today-yesterday-navigation
 title: Journal Today/Yesterday navigation ignores taps and can blank the editor
-status: in_review
+status: done
 blocked: false
 owner: jc
 proposed_by: jc
@@ -18,6 +18,7 @@ accepted_against:
         observed_at: 2026-08-30T17:50:35.769213Z
 branch: tiller/bugs/journal-today-yesterday-navigation
 pr: 66
+done_basis: ancestry
 gates:
     build:
         required: true
