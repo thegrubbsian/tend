@@ -1,0 +1,13 @@
+id: EV-2gbu1x
+type: attest.feature
+at: 2026-09-01T02:37:41.143082Z
+owner: jc
+command: attest feature F-zbcv8j
+targets:
+    - F-zbcv8j
+before:
+    status: done
+after:
+    status: done
+files:
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml
