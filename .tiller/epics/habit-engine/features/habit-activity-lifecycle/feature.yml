@@ -3,7 +3,6 @@ key: habit-engine/habit-activity-lifecycle
 title: Habit Activity Lifecycle
 status: done
 blocked: false
-owner: jc
 source: design/02-domain-model.md
 change_type: create
 depends_on:

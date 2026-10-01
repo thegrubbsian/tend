@@ -12,3 +12,6 @@ artifacts/
 # Swift Package Manager build products and per-user Xcode package state.
 .build/
 .swiftpm/
+
+# Per-checkout settings (console preferences and the like), hand-edited; never commit it.
+/.tiller/local.yml

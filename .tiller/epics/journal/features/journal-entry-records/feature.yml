@@ -3,7 +3,6 @@ key: journal/journal-entry-records
 title: Journal Entry Records
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/07-journal.md#L5-20
 change_type: create
 branch: tiller/journal/journal-entry-records

@@ -47,3 +47,4 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-sha256-35f2ca573a10-out-863121ed734431553d3e720cc346da2deae9cabc8337642cd565c97106118642.txt
+started: true

@@ -3,7 +3,6 @@ key: journal
 title: Journal
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/07-journal.md#L1-3
 verified_against:
     spec:

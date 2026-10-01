@@ -3,7 +3,6 @@ key: journal/journal-experience
 title: Journal Experience
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/07-journal.md#L25-31
 change_type: create
 depends_on:

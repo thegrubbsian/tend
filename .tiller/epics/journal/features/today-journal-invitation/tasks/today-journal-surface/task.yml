@@ -46,3 +46,4 @@ gates:
         evidence:
             - kind: command_output
               ref: artifacts/tiller/gates/tests-184f100-out-d36b6a27ff4b09b9b77bce9c3f0ba7f3bc162941d32a476a16f7670292088561.txt
+started: true

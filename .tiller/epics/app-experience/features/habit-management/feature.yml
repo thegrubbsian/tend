@@ -3,7 +3,6 @@ key: app-experience/habit-management
 title: Habit Management
 status: done
 blocked: false
-owner: jc
 source: design/03-user-experience.md
 change_type: create
 depends_on:

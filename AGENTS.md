@@ -3,7 +3,7 @@
 
 This project uses Tiller to run its SDLC workflow. Specs, decomposition, planning, and acceptance gates live in `.tiller/`, under git, beside the code they describe.
 
-One hard rule: drive work to the edge of done and stop. You may propose, build, attach evidence, run gates, and open PRs. A gate is the human's decision, not the human's keyboard: run `approve` only on an explicit human instruction naming the nodes. You never attest a human gate and never cross work to done, even on instruction; the merge is the human's, and Tiller records the crossing from it.
+One hard rule: drive work to the edge of done and stop. You may propose, build, attach evidence, run gates, and open PRs. Authorized execution includes creating task branches and merging them into the recorded feature or epic aggregate, never into the configured integration branch. A gate is the human's decision, not the human's keyboard: run `approve` only on an explicit human instruction naming the nodes. You never attest a human gate and never cross work to done, even on instruction; the final integration merge is the human's, and Tiller records the crossing from it.
 
 PRs are for code: a change that touches only `.tiller/` commits directly, with no pull request.
 

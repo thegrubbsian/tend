@@ -1,0 +1,125 @@
+id: EV-eylgim
+type: migrate.schema
+at: 2026-10-01T20:13:28.022325Z
+owner: jc
+command: upgrade
+before:
+    ancestor_owners:
+        E-h2qea7: jc
+        E-l8goi4: jc
+        E-tslnrm: jc
+        E-ul4fy3: jc
+        E-z3y156: jc
+        F-0rn0hs: jc
+        F-3vz7ho: jc
+        F-5aficd: jc
+        F-6a3jmx: jc
+        F-aotv97: jc
+        F-e8yd2r: jc
+        F-e149jw: jc
+        F-efgzky: jc
+        F-n7oy52: jc
+        F-rsayqb: jc
+        F-skoqxt: jc
+        F-tih743: jc
+        F-tm2imn: jc
+        F-vbsg1a: jc
+        F-vrsbxv: jc
+        F-wf19av: jc
+        F-xowx7x: jc
+        F-z8e13q: jc
+        F-zbcv8j: jc
+    schema_version: 4
+after:
+    schema_version: 7
+files:
+    - path: .tiller/tiller.yml
+    - path: .tiller/epics/app-experience/epic.yml
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/feature.yml
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/almanac-foundations/task.yml
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/ios-application-composition/task.yml
+    - path: .tiller/epics/app-experience/features/almanac-app-shell/tasks/two-destination-shell/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/feature.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/editable-logging-projection/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-acceptance/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-fixtures/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/fast-logging-model/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/iphone-only-acceptance/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/quantity-log-sheet/task.yml
+    - path: .tiller/epics/app-experience/features/fast-logging/tasks/times-logging-surface/task.yml
+    - path: .tiller/epics/app-experience/features/habit-detail-history/feature.yml
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/habit-detail-surface/task.yml
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/history-projection/task.yml
+    - path: .tiller/epics/app-experience/features/habit-detail-history/tasks/roster-detail-integration/task.yml
+    - path: .tiller/epics/app-experience/features/habit-management/feature.yml
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/all-habits-roster/task.yml
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/first-habit-integration/task.yml
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-form/task.yml
+    - path: .tiller/epics/app-experience/features/habit-management/tasks/habit-management-operations/task.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/feature.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/almanac-today-surface/task.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/current-bucket-projection/task.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/deterministic-today-fixtures/task.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-dashboard-acceptance/task.yml
+    - path: .tiller/epics/app-experience/features/today-dashboard/tasks/today-presentation-model/task.yml
+    - path: .tiller/epics/device-readiness/epic.yml
+    - path: .tiller/epics/device-readiness/features/local-reminders/feature.yml
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/notification-reconciliation/task.yml
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-app-integration/task.yml
+    - path: .tiller/epics/device-readiness/features/local-reminders/tasks/reminder-planning/task.yml
+    - path: .tiller/epics/device-readiness/features/owner-device-release/feature.yml
+    - path: .tiller/epics/device-readiness/features/owner-device-release/tasks/iphone-only-cutover/task.yml
+    - path: .tiller/epics/goals/epic.yml
+    - path: .tiller/epics/goals/features/goal-experience/feature.yml
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-detail/task.yml
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-experience-acceptance/task.yml
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goal-form/task.yml
+    - path: .tiller/epics/goals/features/goal-experience/tasks/goals-roster-shell/task.yml
+    - path: .tiller/epics/goals/features/goal-lifecycle/feature.yml
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-closure-operations/task.yml
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-lifecycle-schema/task.yml
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-management-operations/task.yml
+    - path: .tiller/epics/goals/features/goal-lifecycle/tasks/goal-standing-computation/task.yml
+    - path: .tiller/epics/goals/features/goal-records/feature.yml
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-creation/task.yml
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-persistence/task.yml
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-computation/task.yml
+    - path: .tiller/epics/goals/features/goal-records/tasks/goal-progress-operations/task.yml
+    - path: .tiller/epics/goals/features/today-goal-surfacing/feature.yml
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-presentation/task.yml
+    - path: .tiller/epics/goals/features/today-goal-surfacing/tasks/today-goal-surface/task.yml
+    - path: .tiller/epics/habit-engine/epic.yml
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/feature.yml
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-reconciliation/task.yml
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/bucket-state-evaluation/task.yml
+    - path: .tiller/epics/habit-engine/features/bucket-evaluation/tasks/calendar-periods/task.yml
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/feature.yml
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-deactivation/task.yml
+    - path: .tiller/epics/habit-engine/features/habit-activity-lifecycle/tasks/activity-reactivation/task.yml
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/feature.yml
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/bucket-total-adjustment/task.yml
+    - path: .tiller/epics/habit-engine/features/log-entry-operations/tasks/entry-append-delete/task.yml
+    - path: .tiller/epics/habit-engine/features/streak-computation/feature.yml
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-chain-calculation/task.yml
+    - path: .tiller/epics/habit-engine/features/streak-computation/tasks/streak-persistence-integration/task.yml
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/feature.yml
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/bucket-entry-schema/task.yml
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/durable-container/task.yml
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/habit-activity-schema/task.yml
+    - path: .tiller/epics/habit-engine/features/swiftdata-model/tasks/package-foundation/task.yml
+    - path: .tiller/epics/journal/epic.yml
+    - path: .tiller/epics/journal/features/journal-entry-records/feature.yml
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-operations/task.yml
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-query/task.yml
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/journal-entry-schema/task.yml
+    - path: .tiller/epics/journal/features/journal-entry-records/tasks/local-date-generalization/task.yml
+    - path: .tiller/epics/journal/features/journal-experience/feature.yml
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-automatic-editor/task.yml
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-day-garden/task.yml
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-destination/task.yml
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-overview-projection/task.yml
+    - path: .tiller/epics/journal/features/journal-experience/tasks/journal-routing/task.yml
+    - path: .tiller/epics/journal/features/today-journal-invitation/feature.yml
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-projection/task.yml
+    - path: .tiller/epics/journal/features/today-journal-invitation/tasks/today-journal-surface/task.yml
+    - path: .tiller/bugs/journal-today-yesterday-navigation/bug.yml

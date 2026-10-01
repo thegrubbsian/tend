@@ -3,7 +3,6 @@ key: habit-engine
 title: Habit Engine
 status: done
 blocked: false
-owner: jc
 source: design/02-domain-model.md
 verified_against:
     spec:

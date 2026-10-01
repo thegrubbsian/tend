@@ -3,7 +3,6 @@ key: goals/goal-records
 title: Goal Records and Progress
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/06-goals.md#L5-29
 change_type: create
 branch: tiller/goals/goal-records

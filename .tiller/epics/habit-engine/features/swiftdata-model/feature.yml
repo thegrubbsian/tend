@@ -3,7 +3,6 @@ key: habit-engine/swiftdata-model
 title: SwiftData Habit Model
 status: done
 blocked: false
-owner: jc
 source: design/04-platform-and-constraints.md
 change_type: create
 branch: tiller/habit-engine/swiftdata-model

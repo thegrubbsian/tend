@@ -3,7 +3,6 @@ key: app-experience/fast-logging
 title: Fast Logging and Back-fill
 status: done
 blocked: false
-owner: jc
 source: design/03-user-experience.md
 change_type: create
 surface:

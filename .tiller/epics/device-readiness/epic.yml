@@ -3,7 +3,6 @@ key: device-readiness
 title: Device Readiness
 status: done
 blocked: false
-owner: jc
 source: design/01-overview.md
 verified_against:
     spec:

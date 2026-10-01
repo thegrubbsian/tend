@@ -3,7 +3,6 @@ key: journal/today-journal-invitation
 title: Today Journal Invitation
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/07-journal.md#L33-35
 change_type: create
 depends_on:

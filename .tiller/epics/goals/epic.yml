@@ -3,7 +3,6 @@ key: goals
 title: Goals
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/06-goals.md#L1-3
 verified_against:
     spec:

@@ -3,7 +3,6 @@ key: goals/today-goal-surfacing
 title: Today Goal Surfacing
 status: done
 blocked: false
-owner: jc
 source: .tiller/feedback/06-goals.md#L66-68
 change_type: create
 depends_on:
