@@ -13,5 +13,8 @@ artifacts/
 .build/
 .swiftpm/
 
+# xcodebuild output: per-checkout device and simulator build directories.
+build/
+
 # Per-checkout settings (console preferences and the like), hand-edited; never commit it.
 /.tiller/local.yml
